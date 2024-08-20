@@ -1,13 +1,15 @@
 import { Client, ClientOptions, Collection } from "discord.js";
-import { EventRegistry, EventRegistryMethod, SlashCommandRegistry } from "./helpers/registry.js";
+import { Blueprints } from "./helpers/blueprints.js";
 import { FileSystem } from "./helpers/filesystem.js";
 import { pathToFileURL } from "node:url";
 
 export class DClient extends Client {
-  public readonly commands: Collection<string, SlashCommandRegistry> = new Collection();
+  public readonly commands: Collection<string, Blueprints.SlashCommandBlueprint>;
 
   public constructor(options: ClientOptions) {
     super(options);
+
+    this.commands = new Collection();
   }
   
   public async start(options: {
@@ -42,20 +44,20 @@ export class DClient extends Client {
 
   private async loadCommands(options: FileSystem.Options, dirName: string) {
     this.commands.clear();
-    await DClient.load((command: SlashCommandRegistry) => {
+    await DClient.load((command: Blueprints.SlashCommandBlueprint) => {
       this.commands.set(command.data.name, command);
     }, options, dirName);
   }
 
   private async loadEvents(options: FileSystem.Options, dirName: string) {
     const registryMethodMap = {
-      [EventRegistryMethod.off]: this.off,
-      [EventRegistryMethod.on]: this.on,
-      [EventRegistryMethod.once]: this.once,
+      [Blueprints.EventRegistryMethod.off]: this.off,
+      [Blueprints.EventRegistryMethod.on]: this.on,
+      [Blueprints.EventRegistryMethod.once]: this.once,
     };
 
     this.removeAllListeners();
-    await DClient.load((event: EventRegistry) => {
+    await DClient.load((event: Blueprints.EventBlueprint) => {
       registryMethodMap[event.method].call(this, event.event, (...args) => event.listener(...args));
     }, options, dirName);
   }

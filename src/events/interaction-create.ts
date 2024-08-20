@@ -1,8 +1,8 @@
 import { Events, Interaction } from "discord.js";
-import { EventRegistry, EventRegistryMethod } from "../helpers/registry.js";
+import { Blueprints } from "../helpers/blueprints.js";
 import { DClient } from "../client.js";
 
-const registry : EventRegistry = {
+const registry : Blueprints.EventBlueprint = {
   event: Events.InteractionCreate,
   listener: async (interaction: Interaction) => {
     if (!interaction.isChatInputCommand())
@@ -28,7 +28,7 @@ const registry : EventRegistry = {
       // console.log(interaction);
     }
   },
-  method: EventRegistryMethod.on,
+  method: Blueprints.EventRegistryMethod.on,
 };
 
 export default registry;

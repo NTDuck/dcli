@@ -1,11 +1,10 @@
 import { Interaction, SlashCommandBuilder } from "discord.js";
-import { SlashCommandRegistry } from "../../helpers/registry.js";
+import { Blueprints } from "../../helpers/blueprints.js";
 
-const registry: SlashCommandRegistry = {
+const blueprint: Blueprints.SlashCommandBlueprint = {
   data: new SlashCommandBuilder()
     .setName("ping")
     .setDescription("ping => pong"),
-
   callback: async (interaction: Interaction) => {
     if (!interaction.isChatInputCommand())
       return;
@@ -14,4 +13,4 @@ const registry: SlashCommandRegistry = {
   },
 };
 
-export default registry;
+export default blueprint;

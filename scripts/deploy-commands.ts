@@ -11,11 +11,11 @@ if (!CLIENT_ID)
 	throw new Error(`Missing required field "CLIENT_ID" in .env`);
 
 import { DClient } from "../src/client.js";
-import { SlashCommandRegistry } from "../src/helpers/registry.js";
+import { Blueprints } from "../src/helpers/blueprints.js";
 import { REST, Routes } from "discord.js";
 
 let commands = new Array();
-await DClient.load((command: SlashCommandRegistry) => {
+await DClient.load((command: Blueprints.SlashCommandBlueprint) => {
 	commands.push(command.data.toJSON());
 }, { exts: [".js"] }, "commands");
 
