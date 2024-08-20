@@ -8,8 +8,7 @@ const registry : EventRegistry = {
     if (!interaction.isChatInputCommand())
       return;
 
-    const client = interaction.client as DClient;
-    const command = client.commands.get(interaction.commandName);
+    const command = (interaction.client as DClient).commands.get(interaction.commandName);
 
     if (!command) {
       console.error(`No command matching ${interaction.commandName} was found.`);

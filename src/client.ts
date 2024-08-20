@@ -8,32 +8,46 @@ export class DClient extends Client {
 
   public constructor(options: ClientOptions) {
     super(options);
-
-    this.loadCommands({ exts: [".js"] });
-    this.loadEvents({ exts: [".js"] });
+  }
+  
+  public async start(options: {
+    commandsDirName: string;
+    eventsDirName: string;
+    options: FileSystem.Options;
+  }) {
+    await Promise.all([
+      this.loadCommands(options.options, options.commandsDirName),
+      this.loadEvents(options.options, options.eventsDirName),
+    ]);
   }
 
-  public static async load(func: Function, options: FileSystem.Options, dirName: string) {
+  public static async load(func: (module: any) => void, options: FileSystem.Options, dirName: string) {
     const dirPaths = FileSystem.findDir(dirName);
+  
+    await Promise.all(
+      dirPaths.map(async (dirPath) => {
+        const filePaths = FileSystem.findFile(options, dirPath)
+          .map(filePath => pathToFileURL(filePath).href);
+          // Prevent ERR_UNSUPPORTED_ESM_URL_SCHEME on Windows
 
-    for (const dirPath of dirPaths) {
-      const filePaths = FileSystem.findFile(options, dirPath)
-        .map(filePath => pathToFileURL(filePath).href);
-        // Prevent ERR_UNSUPPORTED_ESM_URL_SCHEME on Windows
-    
-      for (const filePath of filePaths)
-        func((await import(filePath)).default);
-    }
+        const modules = await Promise.all(filePaths.map(
+          filePath => import(filePath)
+          .then(module => module.default)
+        ));
+  
+        modules.forEach(module => func(module));
+      })
+    );
   }
 
-  private async loadCommands(options: FileSystem.Options, dirName: string = "commands") {
+  private async loadCommands(options: FileSystem.Options, dirName: string) {
     this.commands.clear();
-    DClient.load((command: SlashCommandRegistry) => {
+    await DClient.load((command: SlashCommandRegistry) => {
       this.commands.set(command.data.name, command);
     }, options, dirName);
   }
 
-  private async loadEvents(options: FileSystem.Options, dirName: string = "events") {
+  private async loadEvents(options: FileSystem.Options, dirName: string) {
     const registryMethodMap = {
       [EventRegistryMethod.off]: this.off,
       [EventRegistryMethod.on]: this.on,
@@ -41,7 +55,7 @@ export class DClient extends Client {
     };
 
     this.removeAllListeners();
-    DClient.load((event: EventRegistry) => {
+    await DClient.load((event: EventRegistry) => {
       registryMethodMap[event.method].call(this, event.event, (...args) => event.listener(...args));
     }, options, dirName);
   }

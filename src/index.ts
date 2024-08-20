@@ -8,5 +8,11 @@ const client = new DClient({
   ],
 });
 
+await client.start({
+  commandsDirName: "commands",
+  eventsDirName: "events",
+  options: { exts: [".js"] },
+});
+
 const TOKEN = process.env.TOKEN;
-client.login(TOKEN);
+await client.login(TOKEN);
