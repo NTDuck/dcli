@@ -1,8 +1,8 @@
 import "dotenv/config";
 
-const TOKEN = process.env.TOKEN;
-const CLIENT_ID = process.env.CLIENT_ID;
-// const GUILD_ID = process.env.GUILD_ID;
+const TOKEN = process.env["TOKEN"];
+const CLIENT_ID = process.env["CLIENT_ID"];
+// const GUILD_ID = process.env["GUILD_ID"];
 
 if (!TOKEN)
 	throw new Error(`Missing required field "TOKEN" in .env`);
@@ -10,12 +10,12 @@ if (!TOKEN)
 if (!CLIENT_ID)
 	throw new Error(`Missing required field "CLIENT_ID" in .env`);
 
-import { DClient } from "../src/client.js";
 import { Blueprints } from "../src/helpers/blueprints.js";
 import { REST, Routes } from "discord.js";
+import { BaseHandler } from "../src/handlers/base.js";
 
 let commands = new Array();
-await DClient.load((command: Blueprints.SlashCommandBlueprint) => {
+await BaseHandler.loadBlueprints((command: Blueprints.SlashCommandBlueprint) => {
 	commands.push(command.data.toJSON());
 }, { exts: [".js"] }, "commands");
 

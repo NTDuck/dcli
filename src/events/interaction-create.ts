@@ -1,14 +1,15 @@
 import { Events, Interaction } from "discord.js";
-import { Blueprints } from "../helpers/blueprints.js";
-import { DClient } from "../client.js";
+import Blueprints from "../helpers/blueprints.js";
 
-const registry : Blueprints.EventBlueprint = {
+const blueprint : Blueprints.EventBlueprint = {
   event: Events.InteractionCreate,
   listener: async (interaction: Interaction) => {
     if (!interaction.isChatInputCommand())
       return;
 
-    const command = (interaction.client as DClient).commands.get(interaction.commandName);
+    // @ts-ignore
+    // "commands" property defined by CommandsHandler
+    const command = interaction.client.commands.get(interaction.commandName);
 
     if (!command) {
       console.error(`No command matching ${interaction.commandName} was found.`);
@@ -28,7 +29,7 @@ const registry : Blueprints.EventBlueprint = {
       // console.log(interaction);
     }
   },
-  method: Blueprints.EventRegistryMethod.on,
+  registryMethod: Blueprints.EventRegistryMethod.on,
 };
 
-export default registry;
+export default blueprint;

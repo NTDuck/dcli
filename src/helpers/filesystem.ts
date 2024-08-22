@@ -53,14 +53,14 @@ export namespace FileSystem {
     return matchingFilePaths;
   };
 
-  export interface Options {
+  export interface FindFileOptions {
     names?: Array<string>;
     exts?: Array<string>;
     basenames?: Array<string>;
     every?: boolean;
-  }
+  };
 
-  export const findFile = (options: Options, srcDirPath: string) => {
+  export const findFile = (options: FindFileOptions, srcDirPath: string) => {
     let predicates: Array<(fileName: string) => boolean> = [];
 
     if (options.names)
@@ -84,3 +84,5 @@ export namespace FileSystem {
     }, srcDirPath);
   };
 }
+
+export default FileSystem;
