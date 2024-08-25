@@ -3,7 +3,7 @@ import path from "node:path";
 
 export namespace FileSystem {
   export const findDir = (dirName: string, srcDirPath: string = process.cwd()) => {
-    let matchingDirPaths: Array<string> = [];
+    const matchingDirPaths: Array<string> = [];
 
     const findDirRecurse = (srcDirPath: string) => {
       const subDirNames = fs.readdirSync(srcDirPath, { withFileTypes: true })
@@ -28,7 +28,7 @@ export namespace FileSystem {
     predicates: Array<(fileName: string) => boolean>;
     every: boolean;
   }, srcDirPath: string) => {
-    let matchingFilePaths: Array<string> = [];
+    const matchingFilePaths: Array<string> = [];
 
     const predicate = (fileName: string) => {
       return options.every
@@ -53,15 +53,15 @@ export namespace FileSystem {
     return matchingFilePaths;
   };
 
-  export interface FindFileOptions {
+  export interface Options {
     names?: Array<string>;
     exts?: Array<string>;
     basenames?: Array<string>;
     every?: boolean;
   };
 
-  export const findFile = (options: FindFileOptions, srcDirPath: string) => {
-    let predicates: Array<(fileName: string) => boolean> = [];
+  export const findFile = (options: Options, srcDirPath: string) => {
+    const predicates: Array<(fileName: string) => boolean> = [];
 
     if (options.names)
       predicates.push(...options.names.map(

@@ -8,11 +8,11 @@ const client = new AppClient({
   ],
 });
 
-await client.loadBlueprints(
+await client.loadModules(
   { exts: [".js"] }, {
-    commandsDirName: "commands",
-    eventsDirName: "events",
-  }
+    commands: "commands",
+    events: "events",
+  },
 );
   
 const TOKEN = process.env["TOKEN"];

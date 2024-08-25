@@ -10,17 +10,17 @@ if (!TOKEN)
 if (!CLIENT_ID)
 	throw new Error(`Missing required field "CLIENT_ID" in .env`);
 
-import { Blueprints } from "../src/helpers/blueprints.js";
 import { REST, Routes } from "discord.js";
-import { BaseHandler } from "../src/handlers/base.js";
+import { AbstractHandler } from "../src/abstracts/handlers.js";
+import { AppSlashCommandBuilder } from "../src/builders/commands.js";
 
 let commands = new Array();
-await BaseHandler.loadBlueprints((command: Blueprints.SlashCommandBlueprint) => {
-	commands.push(command.data.toJSON());
+await AbstractHandler.loadModules((command: AppSlashCommandBuilder) => {
+	commands.push(command.toJSON());
 }, { exts: [".js"] }, "commands");
 
 const rest = new REST().setToken(TOKEN);
-(async () => {
+await (async () => {
 	try {
 		console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
@@ -30,7 +30,7 @@ const rest = new REST().setToken(TOKEN);
 			{ body: commands },
 		);
 
-		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+		console.log(`Successfully reloaded ${data?.length} application (/) commands.`);
 	} catch (error) {
 		console.error(error);
 	}

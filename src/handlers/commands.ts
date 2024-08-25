@@ -1,29 +1,32 @@
 import { Client, Collection } from "discord.js";
-import { BaseHandler } from "./base.js";
-import Blueprints from "../helpers/blueprints.js";
+import { AppSlashCommandBuilder } from "../builders/commands.js";
+import { AbstractHandler } from "../abstracts/handlers.js";
+import { Property } from "../auxiliaries/reflection.js";
 
-export class CommandsHandler<ClientType extends Client> extends BaseHandler<ClientType> {
-  private readonly commands = new Collection<string, Blueprints.SlashCommandBlueprint>();
+export class CommandsHandler<Client_ extends Client> extends AbstractHandler<Client_, AppSlashCommandBuilder> {
+  private readonly commands: Collection<string, AppSlashCommandBuilder>;
 
-  constructor(client: ClientType) {
+  constructor(client: Client_, commandsPropertyKey?: string) {
     super(client);
-    
-    this.defineProperty();
-  }
 
-  protected override loadBlueprint(commandBlueprint: Blueprints.SlashCommandBlueprint) {
-    this.commands.set(commandBlueprint.data.name, commandBlueprint);
-  }
-  
-  protected override preloadBlueprints() {
-    this.commands.clear();
-  }
+    this.commands = new Collection();
 
-  private defineProperty(propertyName: string = "commands") {
-    Object.defineProperty(this.client, propertyName, {
+    commandsPropertyKey = commandsPropertyKey ?? Property.toString(() => this.commands)!;
+
+    // Make `commands` property accessible
+    // via `interaction.client.commands`
+    Reflect.defineProperty(this.client, commandsPropertyKey, {
       get: () => this.commands,
-      configurable: true,
+      configurable: false,
       enumerable: true,
     });
+  }
+
+  protected override loadModule(command: AppSlashCommandBuilder): void | Promise<void> {
+    this.commands.set(command.name, command);
+  }
+
+  protected override preload(): void | Promise<void> {
+    this.commands.clear();
   }
 };
