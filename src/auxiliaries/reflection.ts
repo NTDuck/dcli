@@ -9,6 +9,11 @@ export namespace Property {
    */
   export const toString = (getter: () => any) => {
     const match = getter.toString().match(/[^$\w\u00A0-\uFFFF]+([$\w\u00A0-\uFFFF]+)[^$\w\u00A0-\uFFFF]*$/);
+
+    // Temporary debug, will remove later
+    if (!match)
+      console.error(getter.toString());
+
     return match ? match[1] : null;
   }
 }

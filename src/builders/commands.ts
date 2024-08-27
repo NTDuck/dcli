@@ -1,9 +1,9 @@
-import { Interaction, SlashCommandBuilder } from "discord.js";
+import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import { Property } from "../auxiliaries/reflection.js";
 
 export class AppSlashCommandBuilder extends SlashCommandBuilder {
   public readonly cooldown?: number;
-  public readonly callback!: (interaction: Interaction) => Promise<void>;
+  public readonly callback!: (interaction: CommandInteraction) => Promise<void>;
   
   public setCooldown(cooldown: typeof this.cooldown): typeof this {
     Reflect.set(this, Property.toString(() => this.cooldown)!, cooldown);

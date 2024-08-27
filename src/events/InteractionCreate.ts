@@ -1,10 +1,10 @@
 import { Client, Collection, Events, Interaction, InteractionType } from "discord.js";
 import { AppEventBuilder } from "../builders/events.js";
 import { AppSlashCommandBuilder } from "../builders/commands.js";
-import { CooldownProxy } from "../proxies/cooldown.js";
+import { CommandCooldownProxy } from "../proxies/cooldown.js";
 
 const proxies = {
-  cooldown: new CooldownProxy(),
+  cooldown: new CommandCooldownProxy(),
 };
 
 const event = new AppEventBuilder()

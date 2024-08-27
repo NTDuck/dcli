@@ -1,11 +1,11 @@
-import { Client, Collection, CommandInteraction, Interaction, InteractionType } from "discord.js";
+import { Client, Collection, CommandInteraction, Interaction } from "discord.js";
 import { AbstractProxy } from "../abstracts/proxies.js";
 import { AppSlashCommandBuilder } from "../builders/commands.js";
 
 /**
  * For now, enforce cooldown on slash commands only.
  */
-export class CooldownProxy extends AbstractProxy {
+export class CommandCooldownProxy extends AbstractProxy {
   private readonly cooldowns: Collection<string, Collection<string, number>>;
   private readonly defaultCooldown: number = 0;
 
@@ -15,48 +15,48 @@ export class CooldownProxy extends AbstractProxy {
   }
 
   protected override check(interaction: Interaction, cooldown?: number): boolean | Promise<boolean> {
-    if (interaction.type !== InteractionType.ApplicationCommand)
-      return false;
+    const commandInteraction = interaction as CommandInteraction;
 
     // If the command hasn't been registered,
     // register it
-    if (!this.cooldowns.has(interaction.commandName))
-      this.cooldowns.set(interaction.commandName, new Collection());
+    if (!this.cooldowns.has(commandInteraction.commandName))
+      this.cooldowns.set(commandInteraction.commandName, new Collection());
     
-    const timestamps = this.cooldowns.get(interaction.commandName)!;
-    const interactionTimestamp = interaction.createdTimestamp;
+    const timestamps = this.cooldowns.get(commandInteraction.commandName)!;
+    const interactionTimestamp = commandInteraction.createdTimestamp;
 
     // Set cooldown according to priority:
     // 1. the one provided by parameter
     // 2. the one set by `AppSlashCommandBuilder`
     // 3. the default one
-    cooldown = cooldown ?? (interaction.client as Client & { commands: Collection<string, AppSlashCommandBuilder> }).commands.get(interaction.commandName)?.cooldown ?? this.defaultCooldown;
+    cooldown = cooldown ?? (commandInteraction.client as Client & { commands: Collection<string, AppSlashCommandBuilder> }).commands.get(commandInteraction.commandName)?.cooldown ?? this.defaultCooldown;
 
     // If the user has never used the command
     // (since the app was on)
-    if (!timestamps.has(interaction.user.id)) {
+    if (!timestamps.has(commandInteraction.user.id)) {
       // Add the user
-      timestamps.set(interaction.user.id, interactionTimestamp);
+      timestamps.set(commandInteraction.user.id, interactionTimestamp);
 
       // Remove user after cooldown
-      setTimeout(() => timestamps.delete(interaction.user.id), cooldown);
+      setTimeout(() => timestamps.delete(commandInteraction.user.id), cooldown);
 
       return false;
     }
     
-    const offCooldownTimestamp = timestamps.get(interaction.user.id)! + cooldown;
+    const offCooldownTimestamp = timestamps.get(commandInteraction.user.id)! + cooldown;
 
     if (interactionTimestamp < offCooldownTimestamp)
       return true;
 
     // If off cooldown already,
     // remove user
-    timestamps.delete(interaction.user.id);
+    timestamps.delete(commandInteraction.user.id);
     return false;
   }
 
   protected override onInterceptSuccess(interaction: Interaction): void | Promise<void> {
-    (interaction as CommandInteraction).reply({
+    const commandInteraction = interaction as CommandInteraction;
+    commandInteraction.reply({
       content: "Please wait, you are on cooldown.",
       ephemeral: true,
     });
