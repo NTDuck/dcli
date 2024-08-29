@@ -1,10 +1,13 @@
-import { Client, Collection, Events, Interaction, InteractionType } from "discord.js";
+import { Collection, Events, Interaction, InteractionType } from "discord.js";
 import { AppEventBuilder } from "../builders/events.js";
 import { AppSlashCommandBuilder } from "../builders/commands.js";
 import { CommandCooldownProxy } from "../proxies/cooldown.js";
+import { CommandAppPermissionProxy, CommandMemberPermissionProxy } from "../proxies/permissions.js";
 
 const proxies = {
   cooldown: new CommandCooldownProxy(),
+  appPermissions: new CommandAppPermissionProxy(),
+  memberPermission: new CommandMemberPermissionProxy(),
 };
 
 const event = new AppEventBuilder()
@@ -14,7 +17,7 @@ const event = new AppEventBuilder()
     if (interaction.type !== InteractionType.ApplicationCommand)
       return;
 
-    const command = (interaction.client as Client & { commands: Collection<string, AppSlashCommandBuilder> }).commands.get(interaction.commandName);
+    const command = (interaction.client as typeof interaction.client & { commands: Collection<string, AppSlashCommandBuilder> }).commands.get(interaction.commandName);
 
     if (!command)
       return;
@@ -24,6 +27,11 @@ const event = new AppEventBuilder()
       return;
 
     // Check for permissions also
+    if (await proxies.appPermissions.intercept(interaction, command))
+      return;
+
+    if (await proxies.memberPermission.intercept(interaction, command))
+      return;
 
     // Then handle
     await command.callback(interaction)
