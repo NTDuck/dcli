@@ -1,24 +1,24 @@
 {
   "name": "dcli",
-  "version": "1.0.0",
-  "description": "",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc",
-    "clean": "npx tsc --build --clean",
-    "deploy": "node build/scripts/deploy-commands.js",
-    "start": "node build/src/index.js"
+  "module": "dcli/index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
   },
-  "keywords": [],
-  "author": "",
-  "license": "BSD-3-Clause",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
   "dependencies": {
-    "discord.js": "^14.15.3",
+    "discord.js": "^14.16.2",
     "dotenv": "^16.4.5"
   },
-  "devDependencies": {
-    "eslint": "^9.9.0",
-    "typescript": "^5.5.4"
+  "optionalDependencies": {
+    "@discordjs/voice": "^0.17.0",
+    "bufferutil": "^4.0.8",
+    "utf-8-validate": "^6.0.4",
+    "zlib-sync": "^0.1.9"
   },
-  "type": "module"
+  "scripts": {
+    "start": "bun dcli/index.ts"
+  }
 }
