@@ -1,4 +1,6 @@
 import "dotenv/config";
+import process from "node:process";
+
 const TOKEN = process.env.TOKEN!;
 const CLIENT_ID = process.env.CLIENT_ID!;
 
@@ -30,7 +32,7 @@ client.on("ready", () => {
   console.log(`Logged in as ${client.user?.tag}!`);
 });
 
-client.on("interactionCreate", async interaction => {
+client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   if (interaction.commandName === "ping") {

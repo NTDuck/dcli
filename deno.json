@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "dev": "deno run --watch dcli/index.ts"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1",
+    "discord.js": "npm:discord.js@^14.16.3",
+    "dotenv": "npm:dotenv@^16.4.5"
+  }
+}
