@@ -15,31 +15,31 @@ $ conan install . --output-folder=build --build=missing
 > ### Windows
 ```
 $ conan profile show
-> Host profile:
-> [settings]
-> arch=x86_64
-> build_type=Release
-> compiler=gcc
-> compiler.cppstd=gnu20
-> compiler.libcxx=libstdc++11
-> compiler.version=14
-> os=Windows
-> [conf]
-> tools.cmake.cmaketoolchain:generator=MinGW Makefiles
-> tools.env.virtualenv:powershell=powershell.exe
+Host profile:
+[settings]
+arch=x86_64
+build_type=Release
+compiler=gcc
+compiler.cppstd=gnu20
+compiler.libcxx=libstdc++11
+compiler.version=14
+os=Windows
+[conf]
+tools.cmake.cmaketoolchain:generator=MinGW Makefiles
+tools.env.virtualenv:powershell=powershell.exe
 
-> Build profile:
-> [settings]
-> arch=x86_64
-> build_type=Release
-> compiler=gcc
-> compiler.cppstd=gnu20
-> compiler.libcxx=libstdc++11
-> compiler.version=14
-> os=Windows
-> [conf]
-> tools.cmake.cmaketoolchain:generator=MinGW Makefiles
-> tools.env.virtualenv:powershell=powershell.exe
+Build profile:
+[settings]
+arch=x86_64
+build_type=Release
+compiler=gcc
+compiler.cppstd=gnu20
+compiler.libcxx=libstdc++11
+compiler.version=14
+os=Windows
+[conf]
+tools.cmake.cmaketoolchain:generator=MinGW Makefiles
+tools.env.virtualenv:powershell=powershell.exe
 ```
 
 ```
