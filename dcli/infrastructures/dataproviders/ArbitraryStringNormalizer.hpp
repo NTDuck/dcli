@@ -2,7 +2,7 @@
 #include <string>
 #include <utility>
 
-#include <dcli/core/dataproviders/StringNormalizer.hpp>
+#include <core/dataproviders/StringNormalizer.hpp>
 
 class ArbitraryStringNormalizer : public StringNormalizer<ArbitraryStringNormalizer> {
 public:
