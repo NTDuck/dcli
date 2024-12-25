@@ -1,0 +1,12 @@
+[requires]
+doctest/2.4.11
+
+[tool_requires]
+cmake/3.30.0
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[layout]
+cmake_layout
