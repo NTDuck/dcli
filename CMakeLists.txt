@@ -6,28 +6,99 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
+# Dependendies
 find_package(doctest REQUIRED)
 
-file(GLOB_RECURSE headers "${PROJECT_NAME}/*.hpp")
-file(GLOB_RECURSE sources "${PROJECT_NAME}/*.cpp")
-# file(GLOB_RECURSE modules "${PROJECT_NAME}/*.mpp")
-file(GLOB_RECURSE unit_tests "${PROJECT_NAME}/*.test.cpp")
-file(GLOB_RECURSE integration_tests "${PROJECT_NAME}/*/tests/*.cpp")
+# Output directories
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG
+  ${CMAKE_BINARY_DIR}/build/Debug/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG
+  ${CMAKE_BINARY_DIR}/build/Debug/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG
+  ${CMAKE_BINARY_DIR}/build/Debug/bin)
 
-add_executable(${PROJECT_NAME})
-target_sources(${PROJECT_NAME} PUBLIC ${headers} ${sources})
-# target_sources(${PROJECT_NAME} PUBLIC FILE_SET modules TYPE CXX_MODULES FILES ${modules})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE
+  ${CMAKE_BINARY_DIR}/build/Release/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE
+  ${CMAKE_BINARY_DIR}/build/Release/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE
+  ${CMAKE_BINARY_DIR}/build/Release/bin)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_NAME})
+# Source files
+file(GLOB_RECURSE HEADERS "${PROJECT_NAME}/*.hpp")
+file(GLOB_RECURSE SOURCES "${PROJECT_NAME}/*.cpp")
+# file(GLOB_RECURSE MODULES "${PROJECT_NAME}/*.mpp")
+file(GLOB_RECURSE UNIT_TESTS "${PROJECT_NAME}/*.test.cpp")
+file(GLOB_RECURSE INTEGRATION_TESTS "${PROJECT_NAME}/*/tests/*.cpp")
 
-add_executable(tests)
-target_sources(${PROJECT_NAME} PUBLIC ${headers} ${sources})
-# target_sources(tests PUBLIC FILE_SET modules TYPE CXX_MODULES FILES ${modules})
-target_sources(tests PUBLIC ${unit_tests} ${integration_tests})
+list(REMOVE_ITEM SOURCES ${UNIT_TESTS})
+list(REMOVE_ITEM SOURCES ${INTEGRATION_TESTS})
 
-target_include_directories(tests PRIVATE ${DOCTEST_INCLUDE_DIR})
-target_link_libraries(tests PRIVATE doctest::doctest)
+# Targets
+set(SHARED_LIBRARY_TARGET ${PROJECT_NAME}_lib)
+set(MAIN_EXECUTABLE_TARGET ${PROJECT_NAME})
+set(UNIT_TESTS_TARGET ${PROJECT_NAME}_unit_tests)
+set(INTEGRATION_TESTS_TARGET ${PROJECT_NAME}_integration_tests)
 
-add_test(NAME tests COMMAND tests)
+# Shared library
+if (HEADERS OR SOURCES)
+# if (HEADERS OR SOURCES OR MODULES)
+  add_library(${SHARED_LIBRARY_TARGET} STATIC)
+  target_sources(${SHARED_LIBRARY_TARGET}
+    PRIVATE
+      ${HEADERS} ${SOURCES})
+  # target_sources(${SHARED_LIBRARY_TARGET}
+  #   PRIVATE
+  #     FILE_SET MODULES TYPE CXX_MODULES
+  #       FILES ${MODULES})
+  target_include_directories(${SHARED_LIBRARY_TARGET}
+    PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME})
+endif()
+
+# Main executable
+if (SOURCES)
+  add_executable(${MAIN_EXECUTABLE_TARGET})
+  target_sources(${MAIN_EXECUTABLE_TARGET}
+    PRIVATE
+      ${SOURCES})
+  target_link_libraries(${MAIN_EXECUTABLE_TARGET}
+    PRIVATE
+      ${SHARED_LIBRARY_TARGET})
+endif()
+
+# Unit tests
+if (UNIT_TESTS)
+  add_executable(${UNIT_TESTS_TARGET})
+  target_sources(${UNIT_TESTS_TARGET}
+    PRIVATE
+      ${UNIT_TESTS})
+  target_link_libraries(${UNIT_TESTS_TARGET}
+    PRIVATE
+      ${SHARED_LIBRARY_TARGET}
+      doctest::doctest)
+  target_include_directories(${UNIT_TESTS_TARGET}
+    PRIVATE
+      ${DOCTEST_INCLUDE_DIR})
+
+  add_test(NAME unit_tests
+    COMMAND ${UNIT_TESTS_TARGET})
+endif()
+
+# Integration tests
+if (INTEGRATION_TESTS)
+  add_executable(${INTEGRATION_TESTS_TARGET})
+  target_sources(${INTEGRATION_TESTS_TARGET}
+    PRIVATE
+      ${INTEGRATION_TESTS})
+  target_link_libraries(${INTEGRATION_TESTS_TARGET}
+    PRIVATE
+      ${SHARED_LIBRARY_TARGET}
+      doctest::doctest)
+  target_include_directories(${INTEGRATION_TESTS_TARGET}
+    PRIVATE
+      ${DOCTEST_INCLUDE_DIR})
+
+  add_test(NAME integration_tests
+    COMMAND ${INTEGRATION_TESTS_TARGET})
+endif()
