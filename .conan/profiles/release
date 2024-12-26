@@ -8,7 +8,8 @@ compiler.version=14
 os=Windows
 
 [conf]
-tools.build:cxxflags+=-O3 -Wall -DNDEBUG
+tools.build:cxxflags+=-O3 -Wall
+tools.build:defines+=NDEBUG
 tools.cmake.cmaketoolchain:generator=Ninja
 tools.cmake.cmaketoolchain:toolchain_file="build/Release/generators/conan_toolchain.cmake"
 tools.env.virtualenv:powershell=powershell.exe
