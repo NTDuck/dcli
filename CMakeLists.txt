@@ -6,6 +6,10 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Conan integration
+file(GLOB GENERATOR_DIRS "${CMAKE_BINARY_DIR}/build/*/generators")
+list(APPEND CMAKE_PREFIX_PATH ${GENERATOR_DIRS})
+
 # Dependendies
 find_package(doctest REQUIRED)
 

@@ -3,49 +3,20 @@
 ## Prerequisites
 - Conan 2.11.0
 - GCC 14.2.0
-- [Optional] CMake 3.31.3
-- [Optional] GNU Make 4.4.1 (MinGW)
 
 ## Build from source
-```
+```bash
 $ conan profile detect --force
-$ conan install . --output-folder=build --build=missing
+$ conan install . -pr=".conan/profiles/release" -of=build -b=missing -o *:shared=True
+$ conan install . -pr=".conan/profiles/debug" -of=build -b=missing -o *:shared=True
 ```
 
 > ### Windows
-```
-$ conan profile show
-Host profile:
-[settings]
-arch=x86_64
-build_type=Release
-compiler=gcc
-compiler.cppstd=gnu20
-compiler.libcxx=libstdc++11
-compiler.version=14
-os=Windows
-[conf]
-tools.cmake.cmaketoolchain:generator=Ninja
-tools.env.virtualenv:powershell=powershell.exe
-
-Build profile:
-[settings]
-arch=x86_64
-build_type=Release
-compiler=gcc
-compiler.cppstd=gnu20
-compiler.libcxx=libstdc++11
-compiler.version=14
-os=Windows
-[conf]
-tools.cmake.cmaketoolchain:generator=Ninja
-tools.env.virtualenv:powershell=powershell.exe
-```
-
-```
+> #### Release
+```bash
 $ .\build\build\Release\generators\conanbuild.ps1
 
-$ cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE="build\Release\generators\conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=Release
+$ cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 $ cmake --build build --config Release
 
 $ .\build\build\Release\bin\dcli.exe
@@ -53,4 +24,18 @@ $ .\build\build\Release\bin\dcli_unit_tests.exe
 $ .\build\build\Release\bin\dcli_integration_tests.exe
 
 $ .\build\build\Release\generators\deactivate_conanbuild.ps1
+```
+
+> #### Debug
+```bash
+$ .\build\build\Debug\generators\conanbuild.ps1
+
+$ cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+$ cmake --build build --config Debug
+
+$ .\build\build\Debug\bin\dcli.exe
+$ .\build\build\Debug\bin\dcli_unit_tests.exe
+$ .\build\build\Debug\bin\dcli_integration_tests.exe
+
+$ .\build\build\Debug\generators\deactivate_conanbuild.ps1
 ```
