@@ -25,7 +25,7 @@ compiler.libcxx=libstdc++11
 compiler.version=14
 os=Windows
 [conf]
-tools.cmake.cmaketoolchain:generator=MinGW Makefiles
+tools.cmake.cmaketoolchain:generator=Ninja
 tools.env.virtualenv:powershell=powershell.exe
 
 Build profile:
@@ -38,19 +38,19 @@ compiler.libcxx=libstdc++11
 compiler.version=14
 os=Windows
 [conf]
-tools.cmake.cmaketoolchain:generator=MinGW Makefiles
+tools.cmake.cmaketoolchain:generator=Ninja
 tools.env.virtualenv:powershell=powershell.exe
 ```
 
 ```
 $ .\build\build\Release\generators\conanbuild.ps1
 
-$ cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE="build\Release\generators\conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=Release
+$ cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE="build\Release\generators\conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=Release
 $ cmake --build build --config Release
 
-$ .\build\build\Release\lib\dcli.exe
-$ .\build\build\Release\lib\dcli_unit_tests.exe
-$ .\build\build\Release\lib\dcli_integration_tests.exe
+$ .\build\build\Release\bin\dcli.exe
+$ .\build\build\Release\bin\dcli_unit_tests.exe
+$ .\build\build\Release\bin\dcli_integration_tests.exe
 
 $ .\build\build\Release\generators\deactivate_conanbuild.ps1
 ```
