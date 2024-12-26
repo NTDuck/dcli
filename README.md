@@ -7,8 +7,8 @@
 ## Build from source
 ```bash
 $ conan profile detect --force
-$ conan install . -pr=".conan/profiles/release" -of=build -b=missing -o *:shared=True
-$ conan install . -pr=".conan/profiles/debug" -of=build -b=missing -o *:shared=True
+$ conan install . -pr=".conan/profiles/release" -of=build -b=missing
+$ conan install . -pr=".conan/profiles/debug" -of=build -b=missing
 ```
 
 > ### Windows
