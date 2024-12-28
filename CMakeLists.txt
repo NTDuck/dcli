@@ -11,7 +11,7 @@ file(GLOB GENERATOR_DIRS "${CMAKE_BINARY_DIR}/build/*/generators")
 list(APPEND CMAKE_PREFIX_PATH ${GENERATOR_DIRS})
 
 # Dependendies
-find_package(fmt REQUIRED)
+find_package(Curses REQUIRED)
 find_package(doctest REQUIRED)
 
 # Output directories
@@ -53,7 +53,7 @@ if (HEADERS OR SOURCES OR MODULES)
     target_sources(${SHARED_LIBRARY_TARGET}
       PRIVATE
         ${HEADERS} ${SOURCES}
-        fmt::fmt)
+        Curses::Curses)
   endif()
 
   if (MODULES)

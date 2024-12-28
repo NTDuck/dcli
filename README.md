@@ -7,6 +7,13 @@
 ## Build from source
 ```bash
 $ conan profile detect --force
+$ conan install . --build=missing
+$ conan build .
+$ conan 
+```
+
+```bash
+$ conan profile detect --force
 $ conan install . -pr=".conan/profiles/release" -of=build -b=missing
 $ conan install . -pr=".conan/profiles/debug" -of=build -b=missing
 ```

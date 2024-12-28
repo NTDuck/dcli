@@ -1,10 +1,10 @@
-#include <fmt/core.h>
+#include <iostream>
 
 int main(void) {
     #ifdef NDEBUG
-        fmt::print("Hello from tomfoolery!\n");
+        std::cout << "Hello from tomfoolery!" << std::endl;
     #else
-        fmt::print("Debug from tomfoolery!\n");
+        std::cout << "Debug from tomfoolery!" << std::endl;
     #endif
 
     return EXIT_SUCCESS;
