@@ -13,12 +13,11 @@ class Recipe(ConanFile):
 
     # Requirements
     requires = (
-        # "ncurses/6.5",
+        "ncurses/6.5",
     )
     tool_requires = (
         "cmake/3.30.0",
         "ninja/1.12.0",
-        # "msys2/cci.latest",   # for ncurses
     )
     test_requires = (
         "doctest/2.4.11",
@@ -30,9 +29,16 @@ class Recipe(ConanFile):
     # Binary model
     package_type = "application"
     settings = ( "os", "compiler", "build_type", "arch" )
-    options = { "shared": [ True, False ] }
-    default_options = { "shared": True }
-    languages = "C++"
+    options = {
+        "shared": [ True, False ]
+    }
+    default_options = {
+        "shared": True,
+        "ncurses:shared": True,
+        "ncurses:with_static": False,
+        "ncurses:with_widec": True,
+    }
+    # languages = "C++"
 
     # Build
     generators = ( "CMakeDeps" )   # CMakeToolchain configured independently
@@ -41,11 +47,13 @@ class Recipe(ConanFile):
     # Folders and layout
     # source_folder = 
     build_folder = "build"
-    no_copy_source = True
+    # no_copy_source = True
 
     # Layout
     def layout(self):
         cmake_layout(self)
+
+    implements = [ "auto_shared_fpic" ]
 
     # def configure(self):
     #     pass
@@ -53,8 +61,9 @@ class Recipe(ConanFile):
     def generate(self):
         toolchain = CMakeToolchain(self)
 
-        toolchain.variables.update({
-            "CMAKE_GENERATOR": "Ninja",
+        toolchain.generator = "Ninja"
+
+        toolchain.cache_variables.update({
             "CMAKE_BUILD_TYPE": self.build_type,
             "CMAKE_CXX_STANDARD": 20,
             "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
@@ -62,10 +71,10 @@ class Recipe(ConanFile):
         
         if self.build_type == "Release":
             toolchain.preprocessor_definitions.update(self.release_cmake_preprocessor_definitions)
-            toolchain.extra_cxxflags.append(self.release_cmake_cxx_flags)
+            toolchain.extra_cxxflags = self.release_cmake_cxx_flags
         else:
             toolchain.preprocessor_definitions.update(self.debug_cmake_preprocessor_definitions)
-            toolchain.extra_cxxflags.append(self.debug_cmake_cxx_flags)
+            toolchain.extra_cxxflags = self.debug_cmake_cxx_flags
 
         toolchain.generate()
 
@@ -74,18 +83,17 @@ class Recipe(ConanFile):
 
         cmake.configure(
             cli_args=[
-                f"-DCMAKE_TOOLCHAIN_FILE={self.toolchain_file}"
+                f"-DCMAKE_TOOLCHAIN_FILE={self.toolchain_file}",
             ]
         )
 
         cmake.build()
 
-    def test(self):
-        if not can_run(self):
-            return
-        
-        cmake = CMake(self)
-        cmake.test()
+        if can_run(self):
+            cmake.test()
+
+    # def test(self):
+    #     pass
 
     def package(self):
         cmake = CMake(self)
@@ -93,7 +101,7 @@ class Recipe(ConanFile):
 
     @property
     def release_cmake_cxx_flags(self):
-        return [ "-03", "-Wall" ]
+        return [ "-O3", "-Wall" ]
     
     @property
     def debug_cmake_cxx_flags(self):
