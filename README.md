@@ -9,7 +9,7 @@
 $ conan profile detect --force
 $ conan install . --build=missing
 
-$ conan build .
+$ conan build . 
 
 $ .\build\build\build\Release\bin\dcli.exe
 ```

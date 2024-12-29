@@ -124,7 +124,7 @@ class Recipe(ConanFile, metaclass=NiladicClassMethodsAutoRunner):
 
     # Folders and layout
     # source_folder = 
-    build_folder = "build"
+    # build_folder = "build"
     no_copy_source = True
 
     # Layout
@@ -160,12 +160,7 @@ class Recipe(ConanFile, metaclass=NiladicClassMethodsAutoRunner):
     def build(self):
         cmake = CMake(self)
 
-        cmake.configure(
-            # cli_args=[
-            #     f"-DCMAKE_TOOLCHAIN_FILE={self.toolchain_file}",
-            # ]
-        )
-
+        cmake.configure()
         cmake.build()
 
         if can_run(self):
@@ -215,12 +210,6 @@ class Recipe(ConanFile, metaclass=NiladicClassMethodsAutoRunner):
     @property
     def toolchain_file(self):
         # Assuming CMake layout
-        print(f"Toolchain file is {os.path.join(
-            self.build_folder,
-            self.build_type,
-            "generators",
-            "conan_toolchain.cmake",
-        )}")
         return os.path.join(
             self.build_folder,
             self.build_type,
