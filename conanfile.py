@@ -65,10 +65,29 @@ class ClassAttributeCopier:
         setattr(self.target_cls, attr_name, attr_value)
 
 
+class PackageReference:
+    name: str = "dcli"
+    version: str = "0.0.1-indev"
+    user: str | None = None
+    channel: str | None = None
+
+class Metadata:
+    description: str | None = None
+    license: str | None = "BSD-3-Clause"
+    author: str | None = None
+    topics: tuple[str] | None = None
+    homepage: str | None = None
+    url: str | None = "https://github.com/NTDuck/dcli.git"
+
+
 class Recipe(ConanFile, metaclass=NiladicClassMethodsAutoRunner):
     @classmethod
     def set_package_reference(cls):
-        pass
+        ClassAttributeCopier(cls, PackageReference)
+
+    @classmethod
+    def set_metadata(cls):
+        ClassAttributeCopier(cls, Metadata)
 
     # Requirements
     requires = (
@@ -123,6 +142,7 @@ class Recipe(ConanFile, metaclass=NiladicClassMethodsAutoRunner):
         toolchain.generator = "Ninja"
 
         toolchain.cache_variables.update({
+            "CMAKE_TOOLCHAIN_FILE": self.toolchain_file,
             "CMAKE_BUILD_TYPE": self.build_type,
             "CMAKE_CXX_STANDARD": 20,
             "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
@@ -141,9 +161,9 @@ class Recipe(ConanFile, metaclass=NiladicClassMethodsAutoRunner):
         cmake = CMake(self)
 
         cmake.configure(
-            cli_args=[
-                f"-DCMAKE_TOOLCHAIN_FILE={self.toolchain_file}",
-            ]
+            # cli_args=[
+            #     f"-DCMAKE_TOOLCHAIN_FILE={self.toolchain_file}",
+            # ]
         )
 
         cmake.build()
@@ -195,24 +215,15 @@ class Recipe(ConanFile, metaclass=NiladicClassMethodsAutoRunner):
     @property
     def toolchain_file(self):
         # Assuming CMake layout
+        print(f"Toolchain file is {os.path.join(
+            self.build_folder,
+            self.build_type,
+            "generators",
+            "conan_toolchain.cmake",
+        )}")
         return os.path.join(
             self.build_folder,
             self.build_type,
             "generators",
             "conan_toolchain.cmake",
         )
-
-
-class PackageReference:
-    name: str = "dcli"
-    version: str = "0.0.1-indev"
-    user: str | None = None
-    channel: str | None = None
-
-class Metadata:
-    description: str | None = None
-    license: str | None = "BSD-3-Clause"
-    author: str | None = None
-    topics: tuple[str] | None = None
-    homepage: str | None = None
-    url: str | None = "https://github.com/NTDuck/dcli.git"
