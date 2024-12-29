@@ -11,5 +11,5 @@ $ conan install . --build=missing
 
 $ conan build . 
 
-$ .\build\build\build\Release\bin\dcli.exe
+$ .\build\Release\bin\dcli.exe
 ```

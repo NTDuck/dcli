@@ -151,6 +151,7 @@ class Recipe(ConanFile, metaclass=NiladicClassMethodsAutoRunner):
         if self.build_type == "Release":
             toolchain.preprocessor_definitions.update(self.release_cmake_preprocessor_definitions)
             toolchain.extra_cxxflags = self.release_cmake_cxx_flags
+            # strip ...
         else:
             toolchain.preprocessor_definitions.update(self.debug_cmake_preprocessor_definitions)
             toolchain.extra_cxxflags = self.debug_cmake_cxx_flags
@@ -212,7 +213,7 @@ class Recipe(ConanFile, metaclass=NiladicClassMethodsAutoRunner):
         # Assuming CMake layout
         return os.path.join(
             self.build_folder,
-            self.build_type,
+            # self.build_type,
             "generators",
             "conan_toolchain.cmake",
         )
