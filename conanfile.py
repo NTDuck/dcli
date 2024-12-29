@@ -1,19 +1,78 @@
 import os
+import inspect
+from typing import Any
 
 from conan import ConanFile
 from conan.tools.build import can_run
 from conan.tools.cmake import cmake_layout, CMake, CMakeToolchain
 
-class Recipe(ConanFile):
-    # Metadata
-    name = "dcli"
-    version = "0.1"
-    license = "BSD-3-Clause"
-    url = "https://github.com/NTDuck/dcli.git"
+
+class NiladicClassMethodsAutoRunner(type):
+    def __new__(cls, name: str, bases: tuple[type], cls_dict: dict[str, Any]) -> type:
+        new_cls = super().__new__(cls, name, bases, cls_dict)
+
+        cls.__runNiladicClassMethods(new_cls)
+        return new_cls
+    
+    @classmethod
+    def __runNiladicClassMethods(cls, new_cls: type):
+        for _, attr_value in new_cls.__dict__.items():
+            if cls.__isNiladicClassMethod(attr_value):
+                cls.__runNiladicClassMethod(attr_value)
+    
+    @classmethod
+    def __isNiladicClassMethod(cls, method: Any) -> bool:
+        if not cls.__isClassMethod(method):
+            return False
+
+        signature = inspect.signature(method.__func__)
+        parameters = signature.parameters
+
+        return len(parameters) == 1   # `cls` automatically passed as first argument to any `classmethod`
+    
+    @classmethod
+    def __isClassMethod(cls, method: Any) -> bool:
+        return isinstance(method, classmethod)
+
+    @classmethod
+    def __runNiladicClassMethod(cls, method: classmethod):
+        method.__func__(cls)
+
+class ClassAttributeCopier:
+    def __init__(self, source_cls: type, target_cls: type):
+        self.source_cls = source_cls
+        self.target_cls = target_cls
+
+    def __call__(self):
+        for attr_name in self.source_cls.__dict__:
+            if self.__class__.__isPublicAttribute(attr_name):
+                self.copy_class_attribute(attr_name)
+
+    @classmethod
+    def __isPublicAttribute(cls, attr_name: str) -> bool:
+        return not any([cls.__isProtectedAttribute(attr_name), cls.__isPrivateAttribute(attr_name)])
+    
+    @classmethod
+    def __isProtectedAttribute(cls, attr_name: str) -> bool:
+        return attr_name.startswith("_")
+    
+    @classmethod
+    def __isPrivateAttribute(cls, attr_name: str) -> bool:
+        return attr_name.startswith("__")
+    
+    def copy_class_attribute(self, attr_name: str):
+        attr_value = getattr(self.source_cls, attr_name)
+        setattr(self.target_cls, attr_name, attr_value)
+
+
+class Recipe(ConanFile, metaclass=NiladicClassMethodsAutoRunner):
+    @classmethod
+    def set_package_reference(cls):
+        pass
 
     # Requirements
     requires = (
-        "ncurses/6.5",
+        # "ncurses/6.5",
     )
     tool_requires = (
         "cmake/3.30.0",
@@ -34,20 +93,20 @@ class Recipe(ConanFile):
     }
     default_options = {
         "shared": True,
-        "ncurses:shared": True,
-        "ncurses:with_static": False,
-        "ncurses:with_widec": True,
+        # "ncurses:shared": True,
+        # "ncurses:with_static": False,
+        # "ncurses:with_widec": True,
     }
-    # languages = "C++"
+    languages = "C++"
 
     # Build
     generators = ( "CMakeDeps" )   # CMakeToolchain configured independently
-    # build_policy = "missing"
+    build_policy = "missing"
 
     # Folders and layout
     # source_folder = 
     build_folder = "build"
-    # no_copy_source = True
+    no_copy_source = True
 
     # Layout
     def layout(self):
@@ -101,7 +160,9 @@ class Recipe(ConanFile):
 
     @property
     def release_cmake_cxx_flags(self):
-        return [ "-O3", "-Wall" ]
+        return [
+            "-O3", "-Wall",
+        ]
     
     @property
     def debug_cmake_cxx_flags(self):
@@ -117,11 +178,15 @@ class Recipe(ConanFile):
 
     @property
     def release_cmake_preprocessor_definitions(self):
-        return { "NDEBUG": None }
+        return {
+            "NDEBUG": None,
+        }
     
     @property
     def debug_cmake_preprocessor_definitions(self):
-        return { "DEBUG": None }
+        return {
+            "DEBUG": None,
+        }
     
     @property
     def build_type(self):
@@ -136,3 +201,18 @@ class Recipe(ConanFile):
             "generators",
             "conan_toolchain.cmake",
         )
+
+
+class PackageReference:
+    name: str = "dcli"
+    version: str = "0.0.1-indev"
+    user: str | None = None
+    channel: str | None = None
+
+class Metadata:
+    description: str | None = None
+    license: str | None = "BSD-3-Clause"
+    author: str | None = None
+    topics: tuple[str] | None = None
+    homepage: str | None = None
+    url: str | None = "https://github.com/NTDuck/dcli.git"
