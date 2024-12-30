@@ -44,8 +44,6 @@ class Recipe(ConanFile):
     __cmake_cxx_flags_release = [
         "-O3",
         "-Wall", "-Wextra"
-
-        # "pkgconf -cflags spdlog pkgconf -libs spdlog -lws2_32",
     ]
     __cmake_cxx_flags_debug = [
         "-g", "-Og", "-Ofast", "-march=native", "-mfpmath=sse", "-freorder-blocks", 
