@@ -1,6 +1,10 @@
 #include <iostream>
 
+#include "spdlog/spdlog.h"
+
 int main(void) {
+    spdlog::info("`spdlog` in use");
+
     #ifdef NDEBUG
         std::cout << "Hello from tomfoolery!" << std::endl;
     #else

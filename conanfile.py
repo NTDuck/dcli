@@ -9,6 +9,7 @@ class Recipe(ConanFile):
     # Requirements
     requires = (
         # "ncurses/6.5",
+        "spdlog/1.15.0",
     )
     tool_requires = (
         "cmake/3.30.0",
@@ -29,9 +30,6 @@ class Recipe(ConanFile):
     }
     default_options = {
         "shared": True,
-        # "ncurses:shared": True,
-        # "ncurses:with_static": False,
-        # "ncurses:with_widec": True,
     }
     languages = "C++"
 
@@ -45,7 +43,9 @@ class Recipe(ConanFile):
 
     __cmake_cxx_flags_release = [
         "-O3",
-        "-Wall",
+        "-Wall", "-Wextra"
+
+        # "pkgconf -cflags spdlog pkgconf -libs spdlog -lws2_32",
     ]
     __cmake_cxx_flags_debug = [
         "-g", "-Og", "-Ofast", "-march=native", "-mfpmath=sse", "-freorder-blocks", 

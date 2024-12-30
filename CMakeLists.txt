@@ -7,7 +7,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Dependendies
-# find_package(Curses REQUIRED)
+find_package(fmt REQUIRED)
+find_package(spdlog REQUIRED)
 find_package(doctest REQUIRED)
 
 # Output directories
@@ -41,9 +42,11 @@ if (HEADERS OR SOURCES OR MODULES)
   if (HEADERS OR SOURCES)
     target_sources(${SHARED_LIBRARY_TARGET}
       PRIVATE
-        ${HEADERS} ${SOURCES}
-    )
-        # Curses::Curses)
+        ${HEADERS} ${SOURCES})
+    target_link_libraries(${SHARED_LIBRARY_TARGET}
+      PRIVATE
+        spdlog::spdlog
+        fmt::fmt)
   endif()
 
   if (MODULES)
@@ -53,9 +56,16 @@ if (HEADERS OR SOURCES OR MODULES)
           FILES ${MODULES})
   endif()
 
+  target_compile_definitions(${SHARED_LIBRARY_TARGET}
+    PRIVATE
+      SPDLOG_FMT_EXTERNAL)
   target_include_directories(${SHARED_LIBRARY_TARGET}
     PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME})
+  target_include_directories(${SHARED_LIBRARY_TARGET}
+    PUBLIC
+      ${spdlog_INCLUDE_DIR}
+      ${fmt_INCLUDE_DIR})
 endif()
 
 # Main executable
@@ -67,6 +77,14 @@ if (SOURCES)
   target_link_libraries(${MAIN_EXECUTABLE_TARGET}
     PRIVATE
       ${SHARED_LIBRARY_TARGET})
+
+  target_include_directories(${MAIN_EXECUTABLE_TARGET}
+    PUBLIC
+      ${spdlog_INCLUDE_DIR}
+      ${fmt_INCLUDE_DIR})
+  target_compile_definitions(${MAIN_EXECUTABLE_TARGET}
+    PRIVATE
+      SPDLOG_FMT_EXTERNAL)
 endif()
 
 # Unit tests
