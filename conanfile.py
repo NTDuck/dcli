@@ -2,7 +2,7 @@ import os
 
 from conan import ConanFile
 from conan.tools.build import can_run
-from conan.tools.cmake import cmake_layout, CMake, CMakeToolchain
+from conan.tools.cmake import cmake_layout, CMake, CMakeToolchain, CMakeDeps
 
 
 class Recipe(ConanFile):
@@ -36,9 +36,13 @@ class Recipe(ConanFile):
     languages = "C++"
 
     # Build
-    generators = ("CMakeDeps")   # CMakeToolchain configured independently
-
     __cmake_cxx_standard = 20
+    __cmake_generator = "Ninja"
+
+    __cmake_cache_variables = {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+    }
+
     __cmake_cxx_flags_release = [
         "-O3",
         "-Wall",
@@ -82,42 +86,41 @@ class Recipe(ConanFile):
     }
 
     # Methods
-    # def init(self):
-    #     self.__cmake = CMake(self)
-    #     self.__toolchain = CMakeToolchain(self)
-
-    # def configure(self):
-    #     self.__cmake.configure()
-
     def generate(self):
-        self.__toolchain = CMakeToolchain(self)
-        self.__toolchain.generator = "Ninja"
+        self.__generate_cmake_toolchain()
+        self.__generate_cmake_deps()
 
-        self.__toolchain.cache_variables.update({
+    def __generate_cmake_toolchain(self):
+        toolchain = CMakeToolchain(self)
+        toolchain.generator = self.__cmake_generator
+
+        toolchain.cache_variables.update({
             "CMAKE_TOOLCHAIN_FILE": self.__toolchain_file,
             "CMAKE_BUILD_TYPE": self.__build_type,
             "CMAKE_CXX_STANDARD": self.__cmake_cxx_standard,
-            "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         })
+        toolchain.cache_variables.update(self.__cmake_cache_variables)
         
         if self.__build_type == "Release":
-            self.__toolchain.preprocessor_definitions.update(self.__cmake_preprocessor_definitions_release)
-            self.__toolchain.extra_cxxflags = self.__cmake_cxx_flags_release
+            toolchain.preprocessor_definitions.update(self.__cmake_preprocessor_definitions_release)
+            toolchain.extra_cxxflags = self.__cmake_cxx_flags_release
             # strip ...
         else:
-            self.__toolchain.preprocessor_definitions.update(self.__cmake_preprocessor_definitions_debug)
-            self.__toolchain.extra_cxxflags = self.__cmake_cxx_flags_debug
+            toolchain.preprocessor_definitions.update(self.__cmake_preprocessor_definitions_debug)
+            toolchain.extra_cxxflags = self.__cmake_cxx_flags_debug
 
-        self.__toolchain.generate()
+        toolchain.generate()
 
+    def __generate_cmake_deps(self):
+        deps = CMakeDeps(self)
+        deps.generate()
+
+    # TODO Add "--strip" to "cmake install"
     def build(self):
-        self.__cmake = CMake(self)
-        self.__cmake.configure()
-        self.__cmake.build()
+        cmake = CMake(self)
+
+        cmake.configure()
+        cmake.build()
 
         if can_run(self):
-            self.__cmake.test()
-
-    # def test(self):
-    #     if can_run(self):
-    #         self.__cmake.test()
+            cmake.test()
