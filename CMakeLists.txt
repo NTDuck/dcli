@@ -56,18 +56,12 @@ if (HEADERS OR SOURCES OR MODULES)
     PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME})
 
-  target_compile_definitions(${SHARED_LIBRARY_TARGET}
-    PRIVATE
-      SPDLOG_FMT_EXTERNAL=ON)
-
   target_link_libraries(${SHARED_LIBRARY_TARGET}
     PUBLIC
-      spdlog::spdlog
+      spdlog::spdlog)
+  target_link_libraries(${SHARED_LIBRARY_TARGET}
+    PRIVATE
       fmt::fmt)
-  target_include_directories(${SHARED_LIBRARY_TARGET}
-    PUBLIC
-      ${spdlog_INCLUDE_DIR}
-      ${fmt_INCLUDE_DIR})
 endif()
 
 # Main executable
@@ -92,9 +86,6 @@ if (UNIT_TESTS)
     PRIVATE
       ${SHARED_LIBRARY_TARGET}
       doctest::doctest)
-  target_include_directories(${UNIT_TESTS_TARGET}
-    PRIVATE
-      ${DOCTEST_INCLUDE_DIR})
 
   add_test(NAME unit_tests
     COMMAND ${UNIT_TESTS_TARGET})
@@ -111,9 +102,6 @@ if (INTEGRATION_TESTS)
     PRIVATE
       ${SHARED_LIBRARY_TARGET}
       doctest::doctest)
-  target_include_directories(${INTEGRATION_TESTS_TARGET}
-    PRIVATE
-      ${DOCTEST_INCLUDE_DIR})
 
   add_test(NAME integration_tests
     COMMAND ${INTEGRATION_TESTS_TARGET})
