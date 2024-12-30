@@ -25,12 +25,6 @@ class Recipe(ConanFile):
     # Binary model
     package_type = "application"
     settings = ("os", "compiler", "build_type", "arch")
-    options = {
-        "shared": [True, False],
-    }
-    default_options = {
-        "shared": True,
-    }
     languages = "C++"
 
     # Build
@@ -43,16 +37,27 @@ class Recipe(ConanFile):
 
     __cmake_cxx_flags_release = [
         "-O3",
-        "-Wall", "-Wextra"
+        "-march=native",
+        "-Wall", "-Wextra",
+        "-Wpedantic",
+        "-Wshadow",
+        "-Wnon-virtual-dtor",
+        "-Wformat=2",
+        "-Wfloat-equal",
     ]
     __cmake_cxx_flags_debug = [
-        "-g", "-Og", "-Ofast", "-march=native", "-mfpmath=sse", "-freorder-blocks", 
+        "-g", "-Og",
+        "-Wall", "-Wextra",
+        "-Wpedantic",
+        "-march=native", "-mfpmath=sse", "-freorder-blocks", 
         "-fpredictive-commoning", "-fno-threadsafe-statics", "-ffloat-store", 
         "-ffast-math", "-fno-rounding-math", "-fno-signaling-nans", "-fcx-limited-range", 
         "-fno-math-errno", "-funsafe-math-optimizations", "-fassociative-math", 
         "-freciprocal-math", "-ffinite-math-only", "-fno-signed-zeros", 
         "-fno-trapping-math", "-frounding-math", "-fsingle-precision-constant", 
         "-fcx-fortran-rules",
+        "-fsanitize=address", "-fsanitize=undefined",
+        "-fno-omit-frame-pointer",
     ]
     __cmake_preprocessor_definitions_release = {
         "NDEBUG": None,
