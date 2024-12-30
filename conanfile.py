@@ -1,241 +1,123 @@
 import os
-from typing import Any
 
 from conan import ConanFile
 from conan.tools.build import can_run
 from conan.tools.cmake import cmake_layout, CMake, CMakeToolchain
 
 
-class PackageReference:
-    name: str = "dcli"
-    version: str = "0.0.1-indev"
-    # user: str | None
-    # channel: str | None
-
-class Metadata:
-    # description: str | None
-    license: str | None = "BSD-3-Clause"
-    # author: str | None
-    # topics: tuple[str] | None
-    # homepage: str | None
-    url: str | None = "https://github.com/NTDuck/dcli.git"
-
-class Requirements:
-    requires: tuple[str] = (
+class Recipe(ConanFile):
+    # Requirements
+    requires = (
         # "ncurses/6.5",
     )
-    tool_requires: tuple[str] = (
+    tool_requires = (
         "cmake/3.30.0",
         "ninja/1.12.0",
     )
-    test_requires: tuple[str] = (
+    test_requires = (
         "doctest/2.4.11",
     )
-    # python_requires: tuple[str]
-    # python_requires_extend: tuple[str]
 
-class Sources:
-    # exports: tuple[str]
-    # exports_sources: tuple[str]
+    # Sources
     source_buildenv = True
 
-class BinaryModel:
-    package_type: str | None = "application"
-    settings: tuple[str] = ( "os", "compiler", "build_type", "arch" )
-    options: dict[str, str | Any] = {
-        "shared": [ True, False ],
+    # Binary model
+    package_type = "application"
+    settings = ("os", "compiler", "build_type", "arch")
+    options = {
+        "shared": [True, False],
     }
-    default_options: dict[str, str | Any] = {
+    default_options = {
         "shared": True,
         # "ncurses:shared": True,
         # "ncurses:with_static": False,
         # "ncurses:with_widec": True,
     }
-    # default_build_options: dict[str, str | Any]
-    # options_description: dict[str, str]
     languages = "C++"
-    
-    # package_id_embed_mode: str
-    # package_id_non_embed_mode: str
-    # package_id_python_mode: str
-    # package_id_unknown_mode: str
 
-class Build:
-    generators = ( "CMakeDeps" )   # CMakeToolchain configured independently
-    build_policy = "missing"
+    # Build
+    generators = ("CMakeDeps")   # CMakeToolchain configured independently
 
-    def generate(self):
-        toolchain = CMakeToolchain(self)
-
-        toolchain.generator = "Ninja"
-
-        toolchain.cache_variables.update({
-            "CMAKE_TOOLCHAIN_FILE": self.toolchain_file,
-            "CMAKE_BUILD_TYPE": self.build_type,
-            "CMAKE_CXX_STANDARD": 20,
-            "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        })
-        
-        if self.build_type == "Release":
-            toolchain.preprocessor_definitions.update(self.release_cmake_preprocessor_definitions)
-            toolchain.extra_cxxflags = self.release_cmake_cxx_flags
-            # strip ...
-        else:
-            toolchain.preprocessor_definitions.update(self.debug_cmake_preprocessor_definitions)
-            toolchain.extra_cxxflags = self.debug_cmake_cxx_flags
-
-        toolchain.generate()
-
-    @property
-    def release_cmake_cxx_flags(self):
-        return [
-            "-O3", "-Wall",
-        ]
+    __cmake_cxx_standard = 20
+    __cmake_cxx_flags_release = [
+        "-O3",
+        "-Wall",
+    ]
+    __cmake_cxx_flags_debug = [
+        "-g", "-Og", "-Ofast", "-march=native", "-mfpmath=sse", "-freorder-blocks", 
+        "-fpredictive-commoning", "-fno-threadsafe-statics", "-ffloat-store", 
+        "-ffast-math", "-fno-rounding-math", "-fno-signaling-nans", "-fcx-limited-range", 
+        "-fno-math-errno", "-funsafe-math-optimizations", "-fassociative-math", 
+        "-freciprocal-math", "-ffinite-math-only", "-fno-signed-zeros", 
+        "-fno-trapping-math", "-frounding-math", "-fsingle-precision-constant", 
+        "-fcx-fortran-rules",
+    ]
+    __cmake_preprocessor_definitions_release = {
+        "NDEBUG": None,
+    }
+    __cmake_preprocessor_definitions_debug = {
+        "DEBUG": None,
+    }
     
     @property
-    def debug_cmake_cxx_flags(self):
-        return [
-            "-g", "-Og", "-Ofast", "-march=native", "-mfpmath=sse", "-freorder-blocks", 
-            "-fpredictive-commoning", "-fno-threadsafe-statics", "-ffloat-store", 
-            "-ffast-math", "-fno-rounding-math", "-fno-signaling-nans", "-fcx-limited-range", 
-            "-fno-math-errno", "-funsafe-math-optimizations", "-fassociative-math", 
-            "-freciprocal-math", "-ffinite-math-only", "-fno-signed-zeros", 
-            "-fno-trapping-math", "-frounding-math", "-fsingle-precision-constant", 
-            "-fcx-fortran-rules",
-        ]
-
-    @property
-    def release_cmake_preprocessor_definitions(self):
-        return {
-            "NDEBUG": None,
-        }
-    
-    @property
-    def debug_cmake_preprocessor_definitions(self):
-        return {
-            "DEBUG": None,
-        }
-    
-    @property
-    def build_type(self):
+    def __build_type(self):
         return str(self.settings.build_type)
     
     @property
-    def toolchain_file(self):
+    def __toolchain_file(self):
         # Assuming CMake layout
         return os.path.join(
-            self.build_folder,
-            # self.build_type,
-            "generators",
-            "conan_toolchain.cmake",
+            self.build_folder, # self.build_type,
+            "generators", "conan_toolchain.cmake",
         )
-
-class FoldersAndLayout:
-    pass
-
-class Layout:
-    pass
-
-class Miscellaneous:
-    pass
-
-class Recipe(
-    PackageReference, Metadata, Requirements, Sources, 
-    BinaryModel, Build, FoldersAndLayout, Layout, Miscellaneous,
-    ConanFile   # Placed at the end to avoid inheritence conflict
-):
-    # Folders and layout
-    # source_folder = 
-    # build_folder = "build"
-    no_copy_source = True
 
     # Layout
     def layout(self):
         cmake_layout(self)
 
-    implements = [ "auto_shared_fpic" ]
+    # Miscellaneous
+    implements = ["auto_shared_fpic", "auto_header_only"]
+    extension_properties = {
+        "compatibility_cppstd": False,
+    }
+
+    # Methods
+    # def init(self):
+    #     self.__cmake = CMake(self)
+    #     self.__toolchain = CMakeToolchain(self)
 
     # def configure(self):
-    #     pass
+    #     self.__cmake.configure()
 
-    # def generate(self):
-    #     toolchain = CMakeToolchain(self)
+    def generate(self):
+        self.__toolchain = CMakeToolchain(self)
+        self.__toolchain.generator = "Ninja"
 
-    #     toolchain.generator = "Ninja"
-
-    #     toolchain.cache_variables.update({
-    #         "CMAKE_TOOLCHAIN_FILE": self.toolchain_file,
-    #         "CMAKE_BUILD_TYPE": self.build_type,
-    #         "CMAKE_CXX_STANDARD": 20,
-    #         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-    #     })
+        self.__toolchain.cache_variables.update({
+            "CMAKE_TOOLCHAIN_FILE": self.__toolchain_file,
+            "CMAKE_BUILD_TYPE": self.__build_type,
+            "CMAKE_CXX_STANDARD": self.__cmake_cxx_standard,
+            "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        })
         
-    #     if self.build_type == "Release":
-    #         toolchain.preprocessor_definitions.update(self.release_cmake_preprocessor_definitions)
-    #         toolchain.extra_cxxflags = self.release_cmake_cxx_flags
-    #         # strip ...
-    #     else:
-    #         toolchain.preprocessor_definitions.update(self.debug_cmake_preprocessor_definitions)
-    #         toolchain.extra_cxxflags = self.debug_cmake_cxx_flags
+        if self.__build_type == "Release":
+            self.__toolchain.preprocessor_definitions.update(self.__cmake_preprocessor_definitions_release)
+            self.__toolchain.extra_cxxflags = self.__cmake_cxx_flags_release
+            # strip ...
+        else:
+            self.__toolchain.preprocessor_definitions.update(self.__cmake_preprocessor_definitions_debug)
+            self.__toolchain.extra_cxxflags = self.__cmake_cxx_flags_debug
 
-    #     toolchain.generate()
+        self.__toolchain.generate()
 
     def build(self):
-        cmake = CMake(self)
-
-        cmake.configure()
-        cmake.build()
+        self.__cmake = CMake(self)
+        self.__cmake.configure()
+        self.__cmake.build()
 
         if can_run(self):
-            cmake.test()
+            self.__cmake.test()
 
     # def test(self):
-    #     pass
-
-    def package(self):
-        cmake = CMake(self)
-        cmake.install()
-
-    @property
-    def release_cmake_cxx_flags(self):
-        return [
-            "-O3", "-Wall",
-        ]
-    
-    @property
-    def debug_cmake_cxx_flags(self):
-        return [
-            "-g", "-Og", "-Ofast", "-march=native", "-mfpmath=sse", "-freorder-blocks", 
-            "-fpredictive-commoning", "-fno-threadsafe-statics", "-ffloat-store", 
-            "-ffast-math", "-fno-rounding-math", "-fno-signaling-nans", "-fcx-limited-range", 
-            "-fno-math-errno", "-funsafe-math-optimizations", "-fassociative-math", 
-            "-freciprocal-math", "-ffinite-math-only", "-fno-signed-zeros", 
-            "-fno-trapping-math", "-frounding-math", "-fsingle-precision-constant", 
-            "-fcx-fortran-rules",
-        ]
-
-    @property
-    def release_cmake_preprocessor_definitions(self):
-        return {
-            "NDEBUG": None,
-        }
-    
-    @property
-    def debug_cmake_preprocessor_definitions(self):
-        return {
-            "DEBUG": None,
-        }
-    
-    @property
-    def build_type(self):
-        return str(self.settings.build_type)
-    
-    @property
-    def toolchain_file(self):
-        # Assuming CMake layout
-        return os.path.join(
-            self.build_folder,
-            # self.build_type,
-            "generators",
-            "conan_toolchain.cmake",
-        )
+    #     if can_run(self):
+    #         self.__cmake.test()

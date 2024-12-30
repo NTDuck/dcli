@@ -11,7 +11,7 @@ $ conan profile detect --force
 
 ```bash
 $ conan install . --build=missing
-$ conan build . 
+$ conan build .
 $ .\build\Release\bin\dcli.exe
 ```
 
