@@ -31,6 +31,8 @@ list(REMOVE_ITEM SOURCES ${INTEGRATION_TESTS})
 
 # Targets
 set(SHARED_LIBRARY_TARGET ${PROJECT_NAME}_lib)
+set(SHARED_TEST_LIBRARY_TARGET ${PROJECT_NAME}_test_lib)
+
 set(MAIN_EXECUTABLE_TARGET ${PROJECT_NAME})
 set(UNIT_TESTS_TARGET ${PROJECT_NAME}_unit_tests)
 set(INTEGRATION_TESTS_TARGET ${PROJECT_NAME}_integration_tests)
@@ -58,14 +60,23 @@ if (HEADERS OR SOURCES OR MODULES)
 
   target_link_libraries(${SHARED_LIBRARY_TARGET}
     PUBLIC
-      spdlog::spdlog)
-  target_link_libraries(${SHARED_LIBRARY_TARGET}
+      spdlog::spdlog
     PRIVATE
       fmt::fmt)
 endif()
 
+# Shared test library
+if (TARGET ${SHARED_LIBRARY_TARGET})
+  add_library(${SHARED_TEST_LIBRARY_TARGET} INTERFACE)
+
+  target_link_libraries(${SHARED_TEST_LIBRARY_TARGET}
+    INTERFACE
+      ${SHARED_LIBRARY_TARGET}
+      doctest::doctest)
+endif()
+
 # Main executable
-if (SOURCES)
+if (TARGET ${SHARED_LIBRARY_TARGET} AND SOURCES)
   add_executable(${MAIN_EXECUTABLE_TARGET})
   target_sources(${MAIN_EXECUTABLE_TARGET}
     PRIVATE
@@ -76,32 +87,28 @@ if (SOURCES)
 endif()
 
 # Unit tests
-if (UNIT_TESTS)
+if (TARGET ${SHARED_TEST_LIBRARY_TARGET} AND UNIT_TESTS)
   add_executable(${UNIT_TESTS_TARGET})
   target_sources(${UNIT_TESTS_TARGET}
     PRIVATE
       ${UNIT_TESTS})
-
   target_link_libraries(${UNIT_TESTS_TARGET}
     PRIVATE
-      ${SHARED_LIBRARY_TARGET}
-      doctest::doctest)
+      ${SHARED_TEST_LIBRARY_TARGET})
 
   add_test(NAME unit_tests
     COMMAND ${UNIT_TESTS_TARGET})
 endif()
 
 # Integration tests
-if (INTEGRATION_TESTS)
+if (TARGET ${SHARED_TEST_LIBRARY_TARGET} AND INTEGRATION_TESTS)
   add_executable(${INTEGRATION_TESTS_TARGET})
   target_sources(${INTEGRATION_TESTS_TARGET}
     PRIVATE
       ${INTEGRATION_TESTS})
-
   target_link_libraries(${INTEGRATION_TESTS_TARGET}
     PRIVATE
-      ${SHARED_LIBRARY_TARGET}
-      doctest::doctest)
+      ${SHARED_TEST_LIBRARY_TARGET})
 
   add_test(NAME integration_tests
     COMMAND ${INTEGRATION_TESTS_TARGET})

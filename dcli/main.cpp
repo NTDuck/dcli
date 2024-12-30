@@ -6,9 +6,9 @@ int main(void) {
     spdlog::info("`spdlog` in use");
 
     #ifdef NDEBUG
-        std::cout << "Hello from tomfoolery!" << std::endl;
+        spdlog::info("tomfoolery! Release.");
     #else
-        std::cout << "Debug from tomfoolery!" << std::endl;
+        spdlog::info("tomfoolery! Debug.");
     #endif
 
     return EXIT_SUCCESS;
