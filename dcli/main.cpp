@@ -3,8 +3,6 @@
 #include "spdlog/spdlog.h"
 
 int main(void) {
-    spdlog::info("`spdlog` in use");
-
     #ifdef NDEBUG
         spdlog::info("tomfoolery! Release.");
     #else

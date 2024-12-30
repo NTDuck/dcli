@@ -7,10 +7,9 @@ from conan.tools.cmake import cmake_layout, CMake, CMakeToolchain, CMakeDeps
 
 class Recipe(ConanFile):
     # Requirements
-    requires = (
-        # "ncurses/6.5",
+    requires = [
         "spdlog/1.15.0",
-    )
+    ]
     tool_requires = (
         "cmake/3.30.0",
         "ninja/1.12.0",
@@ -89,6 +88,16 @@ class Recipe(ConanFile):
     }
 
     # Methods
+    def configure(self):
+        __class__.requires.append(self.__curses_library)
+
+    @property
+    def __curses_library(self):
+        if (self.settings.os == "Windows"):
+            return "pdcurses/3.9"
+        else:
+            return "ncurses/6.5"
+
     def generate(self):
         self.__generate_cmake_toolchain()
         self.__generate_cmake_deps()
