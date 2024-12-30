@@ -7,8 +7,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Dependendies
-find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(ftxui REQUIRED)
 find_package(doctest REQUIRED)
 
 # Output directories
@@ -61,6 +61,7 @@ if (HEADERS OR SOURCES OR MODULES)
   target_link_libraries(${SHARED_LIBRARY_TARGET}
     PUBLIC
       spdlog::spdlog
+      ftxui::ftxui
     PRIVATE
       fmt::fmt)
 endif()
