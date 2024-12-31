@@ -5,7 +5,7 @@ from conan.tools.build import can_run
 from conan.tools.cmake import cmake_layout, CMake, CMakeToolchain, CMakeDeps
 
 
-class Recipe(ConanFile):
+class MonolithRecipe(ConanFile):
     # Requirements
     requires = (
         "spdlog/1.15.0",
