@@ -7,7 +7,3 @@ pub mod domain {
         fn get_id(&self) -> &Self::Identifier;
     }
 }
-
-pub fn ping() {
-    println!("Hello from dcli-ddd!");
-}
