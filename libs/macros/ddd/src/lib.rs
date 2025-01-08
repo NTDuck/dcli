@@ -1,28 +1,9 @@
-macro_rules! derive {
-    ($class:ident, $func:ident) => {
-        use proc_macro::TokenStream;
-        
-        #[allow(non_snake_case)]
-        #[proc_macro_derive($class)]
-        pub fn $class(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-            let ast = syn::parse(input).unwrap();
-            return $func(&ast);
-        }
-    };
-}
+#[allow(non_snake_case)]
+mod utils;
 
-derive!(Identifier, impl_identifier);
+#[allow(non_snake_case)]
+mod _Identifier;
 
-use quote::quote;
-use syn::DeriveInput;
+use _Identifier::impl_identifier;
 
-fn impl_identifier(ast: &DeriveInput) -> TokenStream {
-    let struct_name = &ast.ident;
-
-    let result = quote! {
-        impl ddd::Identifier for #struct_name {}
-    };
-
-    return result.into();
-}
-
+utils::derive!(Identifier, impl_identifier);
