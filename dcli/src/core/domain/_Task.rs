@@ -1,9 +1,13 @@
 use ddd::{self, Entity};
+use macros::Identifier;
 
-#[derive(Clone, PartialEq, Eq)]
+// #[derive(ddd::Identifier)]
+// pub struct TaskIdentifier(pub u128);
+
+#[derive(Clone, PartialEq, Eq, Identifier)]
 pub struct TaskIdentifier(pub u128);
 
-impl ddd::Identifier for TaskIdentifier {}
+// impl ddd::Identifier for TaskIdentifier {}
 
 pub struct Task {
     pub identifier: TaskIdentifier,

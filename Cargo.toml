@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "dcli",
+    "libs/macros",
     "libs/ddd",
 ]
 resolver = "2"
