@@ -2,6 +2,7 @@
 members = [
     "dcli",
     "libs/ddd",
+    "libs/macros/common",
     "libs/macros/ddd",
 ]
 resolver = "2"

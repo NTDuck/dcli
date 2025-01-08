@@ -1,7 +1,8 @@
-macro_rules! derive {
+#[macro_export]
+macro_rules! define_procedural_macro {
     ($class:ident, $func:ident) => {
         use proc_macro::TokenStream;
-
+        
         #[allow(non_snake_case)]
         #[proc_macro_derive($class)]
         pub fn $class(input: TokenStream) -> TokenStream {
@@ -10,5 +11,3 @@ macro_rules! derive {
         }
     };
 }
-
-pub(crate) use derive;
