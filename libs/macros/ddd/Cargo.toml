@@ -1,10 +1,10 @@
 [package]
-name = "macros"
+name = "ddd_derive"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-ddd = { path = "../ddd" }
+ddd = { path = "../../ddd" }
 syn = "2.0"
 quote = "1.0"
 
