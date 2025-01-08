@@ -1,9 +1,4 @@
-pub mod domain {
-    pub trait Identifier: Clone + PartialEq + Send + Sync {}
+#[allow(non_snake_case)]
+pub mod domain;
 
-    pub trait Entity : Eq + PartialEq {
-        type Identifier: Identifier;
-
-        fn get_id(&self) -> &Self::Identifier;
-    }
-}
+pub use domain::*;

@@ -1,9 +1,9 @@
-use ddd::{self, domain::Entity};
+use ddd::{self, Entity};
 
 #[derive(Clone, PartialEq, Eq)]
 struct TaskIdentifier(u128);
 
-impl ddd::domain::Identifier for TaskIdentifier {}
+impl ddd::Identifier for TaskIdentifier {}
 
 struct Task {
     identifier: TaskIdentifier,
@@ -11,7 +11,7 @@ struct Task {
     is_active: bool,
 }
 
-impl ddd::domain::Entity for Task {
+impl ddd::Entity for Task {
     type Identifier = TaskIdentifier;
 
     fn get_id(&self) -> &Self::Identifier {
@@ -38,7 +38,7 @@ fn main() {
 
 fn create_task() -> Task {
     let id = TaskIdentifier(4);
-    
+
     return Task {
         identifier: id,
         description: String::from("tomfoolery"),
