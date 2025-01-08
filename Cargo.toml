@@ -1,10 +1,6 @@
-[package]
-name = "dcli"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-
-[[bin]]
-name = "dcli"
-path = "dcli/main.rs"
+[workspace]
+members = [
+    "dcli",
+    "libs/ddd",
+]
+resolver = "2"
