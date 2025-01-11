@@ -1,5 +1,4 @@
-#[allow(non_snake_case)]
-mod core;
+pub mod core;
 
 use core::domain::{Task, TaskIdentifier};
 

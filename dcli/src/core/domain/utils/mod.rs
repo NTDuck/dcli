@@ -1,3 +1,3 @@
-mod _UUID;
+use macros::class_mod;
 
-pub use _UUID::*;
+class_mod!(_UUID);

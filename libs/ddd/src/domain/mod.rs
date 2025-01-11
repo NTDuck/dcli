@@ -1,7 +1,5 @@
-mod _Entity;
-mod _Identifier;
-mod _ValueObject;
+use macros::class_mod;
 
-pub use _Entity::*;
-pub use _Identifier::*;
-pub use _ValueObject::*;
+class_mod!(_Identifier);
+class_mod!(_Entity);
+class_mod!(_ValueObject);

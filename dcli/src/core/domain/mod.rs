@@ -1,3 +1,4 @@
-mod _Task;
+use macros::class_mod;
 
-pub use _Task::*;
+pub mod utils;
+class_mod!(_Task);
