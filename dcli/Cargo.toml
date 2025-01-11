@@ -5,4 +5,4 @@ edition = "2021"
 
 [dependencies]
 ddd = { path = "../libs/ddd" }
-ddd_derive = { path = "../libs/macros/ddd" }
+ddd_derive = { path = "../libs/meow/ddd" }
