@@ -9,6 +9,10 @@
 /// A namespace-like module can contain one or more class-like modules and/or namespace-like modules.
 #[macro_export]
 macro_rules! namespace_mod {
+    (pub $module_name:ident) => {
+        pub mod $module_name;
+    };
+
     ($module_name:ident) => {
         mod $module_name;
     };

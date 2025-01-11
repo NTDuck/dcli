@@ -3,6 +3,7 @@
 /// Class-like modules are file-based,
 /// follow `_` + PascalCase naming conventions,
 /// and may contain one or a few tightly-coupled type declaration(s).
+/// Visibility of declared items is public within the containing namespace (i.e. the parent namespace-like module).
 ///
 /// Example: `_MyClass.rs`
 /// 

@@ -1,4 +1,5 @@
-use macros::class_mod;
+use macros::{class_mod, namespace_mod};
 
-pub mod utils;
+namespace_mod!(utils);
+
 class_mod!(_Task);
