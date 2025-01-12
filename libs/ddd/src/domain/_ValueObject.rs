@@ -1,1 +1,1 @@
-pub trait ValueObject: Clone + PartialEq {}
+pub trait ValueObject: Clone + PartialEq + Eq {}

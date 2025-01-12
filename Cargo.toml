@@ -3,6 +3,6 @@ members = [
     "dcli",
     "libs/layout",
     "libs/ddd",
-    "libs/ddd-macros",
+    "libs/ddd-derive",
 ]
 resolver = "2"
