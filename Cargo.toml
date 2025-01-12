@@ -1,9 +1,8 @@
 [workspace]
 members = [
     "dcli",
+    "libs/layout",
     "libs/ddd",
-    "libs/macros",
-    "libs/meow/common",
-    "libs/meow/ddd",
+    "libs/ddd-macros",
 ]
 resolver = "2"

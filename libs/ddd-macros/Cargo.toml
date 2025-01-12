@@ -1,11 +1,11 @@
 [package]
-name = "ddd_derive"
+name = "ddd-macros"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-common = { path = "../common" }
-ddd = { path = "../../ddd" }
+layout = { path = "../layout" }
+ddd = { path = "../ddd" }
 syn = "2.0"
 quote = "1.0"
 

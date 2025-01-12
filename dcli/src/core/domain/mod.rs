@@ -1,5 +1,5 @@
-use macros::{class_mod, namespace_mod};
+use layout::{class_mod, namespace_mod};
 
-namespace_mod!(utils);
+namespace_mod!(pub utils);
 
 class_mod!(_Task);

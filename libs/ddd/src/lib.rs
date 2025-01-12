@@ -1,4 +1,4 @@
-use macros::namespace_mod;
+use layout::namespace_mod;
 
 namespace_mod!(pub domain);
 

@@ -1,7 +1,7 @@
 /// Defines a class-like module.
 ///
 /// Class-like modules are file-based,
-/// follow `_` + PascalCase naming conventions,
+/// follow underscore-prefixed PascalCase naming conventions,
 /// and may contain one or a few tightly-coupled type declaration(s).
 /// Visibility of declared items is public within the containing namespace (i.e. the parent namespace-like module).
 ///
@@ -12,14 +12,11 @@
 /// A class-like module belongs to a namespace-like module.
 #[macro_export]
 macro_rules! class_mod {
-    ($module_name:ident) => {
+    ($module:ident) => {
         #[allow(non_snake_case)]
-        mod $module_name;
+        mod $module;
         
         #[allow(unused_imports)]
-        pub use $module_name::*;
+        pub use $module::*;
     };
 }
-
-#[allow(unused_imports)]
-pub(crate) use class_mod;

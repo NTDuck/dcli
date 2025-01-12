@@ -1,3 +1,3 @@
-use macros::*;
+use layout::class_mod;
 
 class_mod!(_UUID);

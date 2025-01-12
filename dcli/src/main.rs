@@ -1,6 +1,8 @@
-pub mod core;
+namespace_mod!(core);
 
-use core::domain::{Task, TaskIdentifier};
+use crate::core::domain::{Task, TaskIdentifier};
+
+use layout::namespace_mod;
 
 fn main() {
     let task = create_task();

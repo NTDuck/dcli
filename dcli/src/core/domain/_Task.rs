@@ -1,12 +1,10 @@
-use ddd::{self, Entity};
+use ddd::Entity;
 
 // #[derive(ddd::Identifier)]
 // pub struct TaskIdentifier(pub u128);
 
-#[derive(Clone, PartialEq, Eq, ddd_derive::Identifier)]
+#[derive(Clone, PartialEq, Eq, ddd_macros::Identifier)]
 pub struct TaskIdentifier(pub u128);
-
-// impl ddd::Identifier for TaskIdentifier {}
 
 pub struct Task {
     pub identifier: TaskIdentifier,
@@ -22,7 +20,7 @@ impl ddd::Entity for Task {
     }
 }
 
-impl PartialEq for Task {
+impl PartialEq for Task {   
     fn eq(&self, other: &Self) -> bool {
         let self_id = self.get_id();
         let other_id = other.get_id();
