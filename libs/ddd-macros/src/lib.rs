@@ -1,6 +1,3 @@
-#[allow(unused_imports)]
-use ddd::Identifier;
-
 #[proc_macro_derive(Identifier)]
 pub fn identifier_derive(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast: syn::DeriveInput = syn::parse(tokens).unwrap();
