@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 
 /// # TODO
-/// - Add support for `unsafe` and `unsafe auto` traits
+/// - Add support for `auto` and `unsafe auto` traits
 /// - Add support for generics
 #[macro_export]
 macro_rules! trait_alias {
