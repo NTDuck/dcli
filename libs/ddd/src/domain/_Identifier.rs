@@ -1,1 +1,3 @@
-pub trait Identifier: Clone + PartialEq + Send + Sync {}
+use super::ValueObject;
+
+pub trait Identifier: ValueObject + Send + Sync {}

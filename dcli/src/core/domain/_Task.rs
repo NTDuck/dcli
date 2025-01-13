@@ -1,10 +1,10 @@
 use ddd::Entity;
 
-// #[derive(ddd::Identifier)]
-// pub struct TaskIdentifier(pub u128);
-
-#[derive(Clone, PartialEq, Eq, ddd_derive::Identifier)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct TaskIdentifier(pub u128);
+
+impl ddd::ValueObject for TaskIdentifier {}
+impl ddd::Identifier for TaskIdentifier {}
 
 pub struct Task {
     pub identifier: TaskIdentifier,
