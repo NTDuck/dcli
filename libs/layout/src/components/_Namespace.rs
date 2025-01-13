@@ -15,4 +15,3 @@ macro_rules! namespace_mod {
         $qualifier mod $module;
     };
 }
-

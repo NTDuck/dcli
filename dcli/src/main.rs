@@ -1,6 +1,6 @@
 namespace_mod!(core);
 
-use crate::core::domain::{Task, TaskIdentifier, utils::UUID};
+use crate::core::domain::{utils::UUID, Task, TaskIdentifier};
 
 use layout::namespace_mod;
 
@@ -10,7 +10,7 @@ fn main() {
 
     println!(
         "Description {} of task {}",
-        task.description, task.identifier.0.0
+        task.description, task.identifier.0 .0
     );
 }
 

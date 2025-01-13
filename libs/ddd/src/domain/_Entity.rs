@@ -1,4 +1,4 @@
-use super::_Identifier::Identifier;
+use crate::domain::Identifier;
 
 pub trait Entity: Eq + PartialEq {
     type Identifier: Identifier;

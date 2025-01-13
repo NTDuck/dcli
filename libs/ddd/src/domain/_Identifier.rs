@@ -1,3 +1,4 @@
-use super::ValueObject;
+use crate::utils::Concurrent;
+use crate::domain::ValueObject;
 
-pub trait Identifier: ValueObject + Send + Sync {}
+pub trait Identifier: ValueObject + Concurrent {}
