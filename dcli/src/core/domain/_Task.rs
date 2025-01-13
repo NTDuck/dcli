@@ -1,7 +1,9 @@
 use ddd::Entity;
 
+use super::utils::UUID;
+
 #[derive(Clone, PartialEq, Eq)]
-pub struct TaskIdentifier(pub u128);
+pub struct TaskIdentifier(pub UUID);
 
 impl ddd::ValueObject for TaskIdentifier {}
 impl ddd::Identifier for TaskIdentifier {}

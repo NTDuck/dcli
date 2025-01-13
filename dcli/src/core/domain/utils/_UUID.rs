@@ -1,2 +1,2 @@
-#[derive(PartialEq)]
-pub struct UUID(u128);
+#[derive(Clone, PartialEq, Eq)]
+pub struct UUID(pub u128);
