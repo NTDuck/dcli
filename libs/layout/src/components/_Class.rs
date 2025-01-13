@@ -14,11 +14,11 @@
 /// A class-like module belongs to a namespace-like module.
 #[macro_export]
 macro_rules! class_mod {
-    ($module:ident) => {
+    ($visibility:vis $module:ident) => {
         #[allow(non_snake_case)]
         mod $module;
 
         #[allow(unused_imports)]
-        pub use $module::*;
+        $visibility use $module::*;
     };
 }

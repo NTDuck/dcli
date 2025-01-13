@@ -1,3 +1,3 @@
-use layout::class_mod;
+use layout::namespace_mod;
 
-class_mod!(_Concurrent);
+namespace_mod!(pub types);

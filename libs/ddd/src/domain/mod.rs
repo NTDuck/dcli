@@ -1,5 +1,5 @@
 use layout::class_mod;
 
-class_mod!(_Identifier);
-class_mod!(_Entity);
-class_mod!(_ValueObject);
+class_mod!(pub _Identifier);
+class_mod!(pub _Entity);
+class_mod!(pub _ValueObject);

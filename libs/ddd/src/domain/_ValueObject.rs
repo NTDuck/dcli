@@ -1,1 +1,3 @@
-pub trait ValueObject: Clone + PartialEq + Eq {}
+use crate::utils::types::EqualityComparable;
+
+pub trait ValueObject: Clone + EqualityComparable {}

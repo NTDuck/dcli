@@ -1,4 +1,4 @@
-use crate::utils::Concurrent;
+use crate::utils::types::Concurrent;
 
 pub trait Repository: Concurrent {
 

@@ -1,6 +1,6 @@
-use crate::domain::Identifier;
+use crate::{domain::Identifier, utils::types::EqualityComparable};
 
-pub trait Entity: Eq + PartialEq {
+pub trait Entity: EqualityComparable {
     type Identifier: Identifier;
 
     fn get_id(&self) -> &Self::Identifier;

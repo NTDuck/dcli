@@ -1,3 +1,3 @@
 use layout::class_mod;
 
-class_mod!(_UUID);
+class_mod!(pub _UUID);
