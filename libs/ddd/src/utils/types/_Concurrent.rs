@@ -1,4 +1,3 @@
-pub unsafe trait Concurrent: Send + Sync {}
+use layout::trait_alias;
 
-unsafe impl<T> Concurrent for T
-where T: Send + Sync {}
+trait_alias!(pub unsafe trait Concurrent: Send, Sync);

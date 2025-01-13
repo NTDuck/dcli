@@ -1,4 +1,3 @@
-pub trait EqualityComparable: PartialEq + Eq {}
+use layout::trait_alias;
 
-impl<T> EqualityComparable for T
-where T: PartialEq + Eq {}
+trait_alias!(pub trait EqualityComparable: PartialEq, Eq);
