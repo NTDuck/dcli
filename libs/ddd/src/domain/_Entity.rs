@@ -1,7 +1,8 @@
-use crate::{domain::Identifier, utils::types::EqualityComparable};
+use crate::domain;
+use crate::utils::types::EqualityComparable;
 
 pub trait Entity: EqualityComparable {
-    type Identifier: Identifier;
+    type Identifier: domain::Identifier;
 
     fn get_id(&self) -> &Self::Identifier;
 }

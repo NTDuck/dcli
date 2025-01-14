@@ -1,3 +1,3 @@
-use crate::utils::types::EqualityComparable;
+use crate::utils::types::{Cloneable, EqualityComparable};
 
-pub trait ValueObject: Clone + EqualityComparable {}
+pub trait ValueObject: Cloneable + EqualityComparable {}
