@@ -1,17 +1,28 @@
 namespace_mod!(core);
 
 use crate::core::domain::{utils::UUID, Task, TaskIdentifier};
+use crate::core::dataproviders::InMemoryTaskRepository;
 
+use ddd::{Entity, ReadRepository, Repository};
 use layout::namespace_mod;
 
 fn main() {
+    let task_repository = InMemoryTaskRepository::new();
     let task = create_task();
-    assert!(task.is_active);
+    
+    task_repository.save(task.clone());
+    assert!(task_repository.contains(task.get_id().clone()));
+    assert!(task_repository.get_by_id(task.get_id().clone()).is_some());
+    assert!(task_repository.size() == 1);
+    assert!(task_repository.show(0, 1) == vec![task.clone()]);
+    
+    task_repository.delete(task.get_id().clone());
+    assert!(!task_repository.contains(task.get_id().clone()));
+    assert!(task_repository.get_by_id(task.clone().get_id().clone()).is_none());
+    assert!(task_repository.size() == 0);
+    assert!(task_repository.show(0, 1) == vec![]);
 
-    println!(
-        "Description {} of task {}",
-        task.description, task.identifier.0 .0
-    );
+    println!("Hello from tomfoolery!");
 }
 
 fn create_task() -> core::domain::Task {
