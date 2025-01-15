@@ -2,9 +2,7 @@ use crate::core::domain::{Task, TaskIdentifier};
 
 use super::abc;
 
-pub struct InMemoryTaskRepository {
-    base: abc::InMemoryRepository<Task>,
-}
+pub type InMemoryTaskRepository = abc::InMemoryRepository<Task>;
 
 impl Clone for Task {
     fn clone(&self) -> Self {
@@ -23,37 +21,7 @@ impl std::hash::Hash for TaskIdentifier {
 }
 
 impl InMemoryTaskRepository {
-    pub fn new() -> Self {
-        return Self {
-            base: abc::InMemoryRepository::<Task>::new(),
-        };
-    }
-}
-
-impl ddd::ReadRepository<Task> for InMemoryTaskRepository {
-    fn get_by_id(&self, identifier: TaskIdentifier) -> Option<Task> {
-        return self.base.get_by_id(identifier);
-    }
-
-    fn show(&self, offset: usize, limit: usize) -> Vec<Task> {
-        return self.base.show(offset, limit);
-    }
-
-    fn size(&self) -> usize {
-        return self.base.size();
-    }
-
-    fn contains(&self, identifier: TaskIdentifier) -> bool {
-        return self.base.contains(identifier);
-    }
-}
-
-impl ddd::Repository<Task> for InMemoryTaskRepository {
-    fn save(&self, entity: Task) {
-        return self.base.save(entity);   
-    }
-
-    fn delete(&self, identifier: TaskIdentifier) {
-        return self.base.delete(identifier);
+    pub fn behave_in_a_specialized_way(&self) {
+        println!("Hey, we can also do this? All hail Rust!");
     }
 }

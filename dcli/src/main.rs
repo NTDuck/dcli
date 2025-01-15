@@ -22,7 +22,7 @@ fn main() {
     assert!(task_repository.size() == 0);
     assert!(task_repository.show(0, 1) == vec![]);
 
-    println!("Hello from tomfoolery!");
+    task_repository.behave_in_a_specialized_way();
 }
 
 fn create_task() -> core::domain::Task {
