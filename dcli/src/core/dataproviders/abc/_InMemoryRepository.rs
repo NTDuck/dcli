@@ -1,6 +1,6 @@
 use std::{collections::HashMap, hash::{BuildHasher, RandomState}};
 
-pub struct InMemoryReadRepository<Entity, Hasher = RandomState>
+pub struct InMemoryRepository<Entity, Hasher = RandomState>
 where
     Entity: ddd::Entity,
     Hasher: BuildHasher,
@@ -8,7 +8,7 @@ where
     entities_by_ids: std::sync::RwLock<HashMap<Entity::Identifier, Entity, Hasher>>,
 }
 
-impl<Entity> InMemoryReadRepository<Entity, RandomState>
+impl<Entity> InMemoryRepository<Entity, RandomState>
 where
     Entity: ddd::Entity,
 {
@@ -17,7 +17,7 @@ where
     }
 }
 
-impl<Entity, Hasher> InMemoryReadRepository<Entity, Hasher>
+impl<Entity, Hasher> InMemoryRepository<Entity, Hasher>
 where
     Entity: ddd::Entity,
     Hasher: BuildHasher,
@@ -37,19 +37,19 @@ where
     }
 }
 
-unsafe impl<Entity, Hasher> Sync for InMemoryReadRepository<Entity, Hasher>
+unsafe impl<Entity, Hasher> Sync for InMemoryRepository<Entity, Hasher>
 where
     Entity: ddd::Entity,
     Hasher: BuildHasher,
 {}
 
-unsafe impl<Entity, Hasher> Send for InMemoryReadRepository<Entity, Hasher>
+unsafe impl<Entity, Hasher> Send for InMemoryRepository<Entity, Hasher>
 where
     Entity: ddd::Entity,
     Hasher: BuildHasher,
 {}
 
-impl<Entity, Hasher> ddd::ReadRepository<Entity> for InMemoryReadRepository<Entity, Hasher>
+impl<Entity, Hasher> ddd::ReadRepository<Entity> for InMemoryRepository<Entity, Hasher>
 where
     Entity: ddd::Entity + ddd::types::Cloneable,
     Entity::Identifier: ddd::Identifier + std::hash::Hash,
@@ -81,7 +81,7 @@ where
     }
 }
 
-impl<Entity, Hasher> ddd::Repository<Entity> for InMemoryReadRepository<Entity, Hasher>
+impl<Entity, Hasher> ddd::Repository<Entity> for InMemoryRepository<Entity, Hasher>
 where
     Entity: ddd::Entity + ddd::types::Cloneable,
     Entity::Identifier: ddd::Identifier + std::hash::Hash,
