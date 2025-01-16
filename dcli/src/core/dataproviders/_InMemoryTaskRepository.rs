@@ -1,4 +1,4 @@
-use crate::core::domain::{Task, TaskIdentifier};
+use crate::core::domain::Task;
 
 use super::abc;
 
@@ -14,7 +14,7 @@ impl Clone for Task {
     }
 }
 
-impl std::hash::Hash for TaskIdentifier {
+impl std::hash::Hash for <Task as ddd::Entity>::Identifier {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         return self.0.0.hash(state);
     }

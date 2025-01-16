@@ -1,6 +1,8 @@
 namespace_mod!(core);
 
-use crate::core::domain::{utils::UUID, Task, TaskIdentifier};
+use crate::core::domain::Task;
+use crate::core::domain::TaskIdentifier;
+use crate::core::domain::utils::UUID;
 use crate::core::dataproviders::InMemoryTaskRepository;
 
 use ddd::{Entity, ReadRepository, Repository};

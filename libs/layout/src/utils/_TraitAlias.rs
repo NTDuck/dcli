@@ -5,17 +5,17 @@
 /// - Add support for generics
 #[macro_export]
 macro_rules! trait_alias {
-    ($visibility:vis trait $trait_:ident: $($bound:ident),*) => {
-        $visibility trait $trait_: $( $bound + )* {}
+    ($visibility:vis trait $trait:ident: $($bound:ident),*) => {
+        $visibility trait $trait: $( $bound + )* {}
 
-        impl<T> $trait_ for T
+        impl<T> $trait for T
         where T: $( $bound + )* {}
     };
 
-    ($visibility:vis unsafe trait $trait_:ident: $($bound:ident),*) => {
-        $visibility unsafe trait $trait_: $( $bound + )* {}
+    ($visibility:vis unsafe trait $trait:ident: $($bound:ident),*) => {
+        $visibility unsafe trait $trait: $( $bound + )* {}
 
-        unsafe impl<T> $trait_ for T
+        unsafe impl<T> $trait for T
         where T: $( $bound + )* {}
     };
 }
