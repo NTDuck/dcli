@@ -1,4 +1,5 @@
 pub struct Task {
-    description: String,
-    is_active: bool,
+    pub id: u128,
+    pub description: String,
+    pub is_active: bool,
 }
