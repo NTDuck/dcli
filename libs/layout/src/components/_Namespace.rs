@@ -8,7 +8,8 @@
 ///
 /// Example: `my_namespace/mod.rs`
 ///
-/// A namespace-like module can contain one or more class-like modules and/or namespace-like modules.
+/// A namespace-like module can contain one or more class-like modules and/or
+/// namespace-like modules.
 #[macro_export]
 macro_rules! namespace_mod {
     ($visibility:vis $module:ident) => {
