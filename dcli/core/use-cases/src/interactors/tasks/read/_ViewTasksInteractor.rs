@@ -1,5 +1,3 @@
-use core::task;
-
 use domain::Task;
 
 use crate::interactors::utils;
@@ -32,7 +30,7 @@ impl<'i> utils::contracts::FunctionInteractor for ViewTasksInteractor<'i> {
         }
 
         return Ok(Response {
-            tasks: tasks,
+            tasks,
         });
     }
 
