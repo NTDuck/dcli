@@ -1,2 +1,2 @@
-mod components;
+mod modules;
 mod utils;
