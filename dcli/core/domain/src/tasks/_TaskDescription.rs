@@ -19,7 +19,6 @@ impl TaskDescription {
         return Ok(());
     }
 
-
     fn ensure_max_length(description: &String) -> Result<(), TaskDescriptionError> {
         if description.len() > Self::MAX_LENGTH {
             return Err(TaskDescriptionError::TooLong {

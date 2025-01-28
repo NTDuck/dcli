@@ -3,5 +3,5 @@ use crate::tasks::*;
 pub struct Task {
     pub id: TaskId,
     pub description: TaskDescription,
-    pub state: TaskState,
+    pub status: TaskStatus,
 }

@@ -1,11 +1,16 @@
 use domain::Task;
+use domain::TaskId;
+use domain::TaskStatus;
+
+use crate::dataproviders::gateways::common::PaginationParams;
 
 pub trait TaskGateway {
-    fn save(&self, task: Task);
-    fn deactivate(&self, task_id: u128);
-    fn remove(&self, task_id: u128);
+    fn save(&mut self, task: &Task);
+    fn remove(&mut self, task_id: TaskId);
 
-    fn show(&self, offset: usize, limit: usize) -> Option<Vec<Task>>;
-    fn show_active(&self, offset: usize, limit: usize) -> Option<Vec<Task>>;
-    fn show_inactive(&self, offset: usize, limit: usize) -> Option<Vec<Task>>;
+    fn show(&self, pagination_params: PaginationParams);
+    fn show_by_status(&self, status: TaskStatus, pagination_params: PaginationParams);
+
+    fn clear(&mut self);
+    fn clear_by_status(&mut self, status: TaskStatus);
 }

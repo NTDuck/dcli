@@ -1,4 +1,4 @@
-pub enum TaskState {
+pub enum TaskStatus {
     Pending,
     InProgress,
     Completed,
