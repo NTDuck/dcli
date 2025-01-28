@@ -1,5 +1,7 @@
+use crate::tasks::*;
+
 pub struct Task {
-    pub id: u128,
-    pub description: String,
-    pub is_active: bool,
+    pub id: TaskId,
+    pub description: TaskDescription,
+    pub state: TaskState,
 }
