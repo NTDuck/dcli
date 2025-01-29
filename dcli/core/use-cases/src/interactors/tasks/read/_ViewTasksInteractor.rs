@@ -2,13 +2,13 @@ use domain::Task;
 
 use crate::dataproviders::gateways::common::PaginationParams;
 use crate::dataproviders::gateways::tasks::TaskGateway;
-use crate::interactors::utils::contracts::FunctionInteractor;
+use crate::interactors::utils::contracts::FallibleFunctionInteractor;
 
 pub struct ViewTasksInteractor<'deps> {
     task_gateway: &'deps dyn TaskGateway,
 }
 
-impl<'deps> FunctionInteractor for ViewTasksInteractor<'deps> {
+impl<'deps> FallibleFunctionInteractor for ViewTasksInteractor<'deps> {
     fn apply(&self, request: Self::Request) -> Result<Self::Response, Self::Error> {
         let pagination_params = PaginationParams::new(request.page_number, request.page_size);
         let Some(tasks) = self.task_gateway.show(pagination_params) else {
