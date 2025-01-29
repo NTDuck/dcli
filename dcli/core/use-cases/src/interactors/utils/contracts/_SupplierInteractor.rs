@@ -1,6 +1,6 @@
 pub trait SupplierInteractor {
-    fn supply(&self) -> Result<Self::Response, Self::Exception>;
+    fn supply(&self) -> Result<Self::Response, Self::Error>;
 
     type Response;
-    type Exception;
+    type Error;
 }

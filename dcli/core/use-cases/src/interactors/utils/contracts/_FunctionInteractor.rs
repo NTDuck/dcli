@@ -1,7 +1,7 @@
 pub trait FunctionInteractor {
-    fn apply(&self, request: Self::Request) -> Result<Self::Response, Self::Exception>;
+    fn apply(&self, request: Self::Request) -> Result<Self::Response, Self::Error>;
 
     type Request;
     type Response;
-    type Exception;
+    type Error;
 }

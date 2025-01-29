@@ -1,6 +1,6 @@
 pub trait ConsumerInteractor {
-    fn consume(&self, request: Self::Request) -> Result<(), Self::Exception>;
+    fn consume(&self, request: Self::Request) -> Result<(), Self::Error>;
 
     type Request;
-    type Exception;
+    type Error;
 }
