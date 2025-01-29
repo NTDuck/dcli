@@ -14,16 +14,16 @@ pub struct CreateTaskInteractor<'deps> {
 
 impl<'deps> FallibleMutableConsumerInteractor for CreateTaskInteractor<'deps> {
     fn consume(&mut self, request: Self::Request) -> Result<(), Self::Error> {
-        let description = match TaskDescription::try_from(request.description) {
+        let task_description = match TaskDescription::try_from(request.task_description) {
             Ok(description) => description,
             Err(error) => return Err(CreateTaskError::TaskDescription(error)),
         };
 
-        let uuid = self.uuid_generator.generate();
+        let task_id = self.uuid_generator.generate();
 
         let task = Task {
-            id: uuid,
-            description,
+            id: task_id,
+            description: task_description,
             status: TaskStatus::Pending,
         };
 
@@ -37,7 +37,7 @@ impl<'deps> FallibleMutableConsumerInteractor for CreateTaskInteractor<'deps> {
 }
 
 pub struct CreateTaskRequest {
-    description: String,
+    task_description: String,
 }
 
 pub enum CreateTaskError {
