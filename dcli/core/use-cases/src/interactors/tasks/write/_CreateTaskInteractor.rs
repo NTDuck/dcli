@@ -4,7 +4,7 @@ use domain::TaskDescriptionError;
 use domain::TaskStatus;
 
 use crate::dataproviders::gateways::tasks::TaskGateway;
-use crate::dataproviders::generators::UuidGenerator;
+use crate::dataproviders::generators::ids::UuidGenerator;
 use crate::interactors::utils::contracts::FallibleMutableConsumerInteractor;
 
 pub struct CreateTaskInteractor<'deps> {

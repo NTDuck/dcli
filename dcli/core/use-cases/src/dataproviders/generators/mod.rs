@@ -1,3 +1,3 @@
-use layout::class_mod;
+use layout::namespace_mod;
 
-class_mod!(pub _UuidGenerator);
+namespace_mod!(pub ids);
