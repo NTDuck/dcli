@@ -1,6 +1,6 @@
 pub struct PaginationParams {
-    offset: usize,
-    limit: usize,
+    pub offset: usize,
+    pub limit: usize,
 }
 
 impl PaginationParams {

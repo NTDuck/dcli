@@ -8,6 +8,7 @@ layout = { path = "../../../libs/layout" }
 domain = { path = "../../core/domain" }
 use-cases = { path = "../../core/use-cases" }
 
+rayon = "1.10"
 uuid = { version = "1.12", features = [
     "v4", "fast-rng", "macro-diagnostics",
 ]}

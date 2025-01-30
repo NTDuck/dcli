@@ -10,8 +10,8 @@ pub trait TaskGateway {
 
     fn get(&self, task_id: TaskId) -> Option<Task>;
 
-    fn show(&self, pagination_params: PaginationParams) -> Option<Vec<Task>>;
-    fn show_by_status(&self, status: TaskStatus, pagination_params: PaginationParams) -> Option<Vec<Task>>;
+    fn show(&self, pagination_params: PaginationParams) -> Vec<Task>;
+    fn show_by_status(&self, status: TaskStatus, pagination_params: PaginationParams) -> Vec<Task>;
 
     fn contains(&self, task_id: TaskId) -> bool;
 
