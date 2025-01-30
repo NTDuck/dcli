@@ -7,3 +7,7 @@ edition = "2021"
 layout = { path = "../../../libs/layout" }
 domain = { path = "../../core/domain" }
 use-cases = { path = "../../core/use-cases" }
+
+uuid = { version = "1.12", features = [
+    "v4", "fast-rng", "macro-diagnostics",
+]}
