@@ -12,3 +12,4 @@ rayon = "1.10"
 uuid = { version = "1.12", features = [
     "v4", "fast-rng", "macro-diagnostics",
 ]}
+indexmap = "2.7"
