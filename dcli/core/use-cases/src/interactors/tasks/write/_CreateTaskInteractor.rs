@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use domain::Task;
 use domain::TaskDescription;
 use domain::TaskDescriptionError;
@@ -25,6 +27,7 @@ impl<'deps> FallibleMutableConsumerInteractor for CreateTaskInteractor<'deps> {
             id: task_id,
             description: task_description,
             status: TaskStatus::Pending,
+            created_at: Instant::now(),
         };
 
         self.task_gateway.save(&task);
