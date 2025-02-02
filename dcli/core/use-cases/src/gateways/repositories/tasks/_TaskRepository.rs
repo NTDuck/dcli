@@ -2,7 +2,8 @@ use domain::Task;
 use domain::TaskId;
 use domain::TaskStatus;
 
-use crate::gateways::repositories::common::PaginationParams;
+use crate::dataclasses::pagination::PaginationRequest;
+use crate::dataclasses::pagination::PaginationResult;
 
 pub trait TaskRepository {
     fn save(&mut self, task: &Task);
@@ -10,8 +11,8 @@ pub trait TaskRepository {
 
     fn get(&self, task_id: TaskId) -> Option<Task>;
 
-    fn show(&self, pagination_params: PaginationParams) -> Vec<Task>;
-    fn show_by_status(&self, status: TaskStatus, pagination_params: PaginationParams) -> Vec<Task>;
+    fn show(&self, pagination_request: PaginationRequest) -> PaginationResult<Task>;
+    fn show_by_status(&self, status: TaskStatus, pagination_request: PaginationRequest) -> PaginationResult<Task>;
 
     fn contains(&self, task_id: TaskId) -> bool;
 

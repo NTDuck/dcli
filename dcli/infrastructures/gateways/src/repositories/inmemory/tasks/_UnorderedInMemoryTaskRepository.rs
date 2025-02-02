@@ -3,7 +3,9 @@ use std::collections::HashMap;
 use domain::Task;
 use domain::TaskId;
 use domain::TaskStatus;
-use use_cases::gateways::repositories::common::PaginationParams;
+use use_cases::dataclasses::pagination::PaginationRange;
+use use_cases::dataclasses::pagination::PaginationRequest;
+use use_cases::dataclasses::pagination::PaginationResult;
 use use_cases::gateways::repositories::tasks::TaskRepository;
 
 pub struct UnorderedInMemoryTaskRepository {
@@ -35,23 +37,43 @@ impl TaskRepository for UnorderedInMemoryTaskRepository {
             .cloned();
     }
 
-    fn show(&self, pagination_params: PaginationParams) -> Vec<Task> {
-        return self.tasks_by_ids
+    fn show(&self, pagination_request: PaginationRequest) -> PaginationResult<Task> {
+        let pagination_range = PaginationRange::from(&pagination_request);
+
+        let tasks = self.tasks_by_ids
             .values()
-            .skip(pagination_params.offset)
-            .take(pagination_params.limit)
+            .skip(pagination_range.offset)
+            .take(pagination_range.limit)
             .cloned()
             .collect();
+
+        return PaginationResult {
+            items: tasks,
+            page_size: pagination_range.limit,
+            max_page_size: pagination_request.max_page_size,
+            page_number: pagination_request.page_number,
+            max_page_number: self.calc_max_page_number(pagination_request.max_page_size),
+        };
     }
 
-    fn show_by_status(&self, status: TaskStatus, pagination_params: PaginationParams) -> Vec<Task> {
-        return self.tasks_by_ids
+    fn show_by_status(&self, status: TaskStatus, pagination_request: PaginationRequest) -> PaginationResult<Task> {
+        let pagination_range = PaginationRange::from(&pagination_request);
+
+        let tasks = self.tasks_by_ids
             .values()
             .filter(|task| task.status == status)
-            .skip(pagination_params.offset)
-            .take(pagination_params.limit)
+            .skip(pagination_range.offset)
+            .take(pagination_range.limit)
             .cloned()
             .collect();
+    
+        return PaginationResult {
+            items: tasks,
+            page_size: pagination_range.limit,
+            max_page_size: pagination_request.max_page_size,
+            page_number: pagination_request.page_number,
+            max_page_number: self.calc_max_page_number(pagination_request.max_page_size),
+        };
     }
 
     fn contains(&self, task_id: TaskId) -> bool {
@@ -66,5 +88,12 @@ impl TaskRepository for UnorderedInMemoryTaskRepository {
     fn clear_by_status(&mut self, status: TaskStatus) {
         self.tasks_by_ids
             .retain(|_, task| task.status != status);
+    }
+}
+
+impl UnorderedInMemoryTaskRepository {
+    fn calc_max_page_number(&self, max_page_size: usize) -> usize {
+        let total_items_count = self.tasks_by_ids.len();
+        return total_items_count.div_ceil(max_page_size);
     }
 }

@@ -4,4 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+layout = { path = "../layout" }
 ddd = { path = "../ddd" }
+
+syn = "2"
+quote = "1"

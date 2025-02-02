@@ -39,7 +39,7 @@ pub type ViewableTaskStatus = TaskStatus;
 impl From<ViewTasksResponseModel> for ViewTasksViewModel {
     fn from(response_model: ViewTasksResponseModel) -> Self {
         return Self {
-            tasks: response_model.tasks
+            tasks: response_model.tasks.items
                 .into_iter()
                 .map(|task| ViewableTask::from(task))
                 .collect(),
