@@ -1,8 +1,8 @@
 use std::io::Write;
 
-pub struct ConsoleView;
+pub struct IoProvider;
 
-impl ConsoleView {
+impl IoProvider {
     pub fn read_line(&self) -> String {
         std::io::stdout().flush().unwrap();
 
