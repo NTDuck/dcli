@@ -1,9 +1,9 @@
 use domain::Uuid;
-use use_cases::dataproviders::generators::ids::UuidGenerator;
+use use_cases::dataproviders::factories::ids::UuidFactory;
 
-pub struct UuidV4Generator {}
+pub struct UuidV4Factory {}
 
-impl UuidGenerator for UuidV4Generator {
+impl UuidFactory for UuidV4Factory {
     fn generate(&self) -> Uuid {
         let uuid_v4 = uuid::Uuid::new_v4();
         let uuid_as_u128 = uuid_v4.as_u128();

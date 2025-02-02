@@ -6,12 +6,12 @@ use domain::TaskDescriptionError;
 use domain::TaskStatus;
 
 use crate::dataproviders::gateways::tasks::TaskGateway;
-use crate::dataproviders::generators::ids::UuidGenerator;
+use crate::dataproviders::factories::ids::UuidFactory;
 use crate::utils::contracts::interactors::FallibleMutableConsumerInteractor;
 
 pub struct CreateTaskInteractor<'deps> {
     task_gateway: &'deps mut dyn TaskGateway,
-    uuid_generator: &'deps dyn UuidGenerator,
+    uuid_factory: &'deps dyn UuidFactory,
 }
 
 impl<'deps> FallibleMutableConsumerInteractor for CreateTaskInteractor<'deps> {
@@ -21,7 +21,7 @@ impl<'deps> FallibleMutableConsumerInteractor for CreateTaskInteractor<'deps> {
             Err(error) => return Err(CreateTaskError::TaskDescription(error)),
         };
 
-        let task_id = self.uuid_generator.generate();
+        let task_id = self.uuid_factory.generate();
 
         let task = Task {
             id: task_id,
