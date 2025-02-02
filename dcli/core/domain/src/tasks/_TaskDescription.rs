@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 #[derive(Clone)]
 pub struct TaskDescription(String);
 
@@ -29,6 +31,14 @@ impl TaskDescription {
         }
 
         return Ok(());
+    }
+}
+
+impl Deref for TaskDescription {
+    type Target = String;
+
+    fn deref(&self) -> &Self::Target {
+        return &self.0;
     }
 }
 

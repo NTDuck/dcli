@@ -1,7 +1,7 @@
 use domain::TaskId;
 
 use crate::dataproviders::gateways::tasks::TaskGateway;
-use crate::interactors::utils::contracts::FallibleMutableConsumerInteractor;
+use crate::utils::contracts::interactors::FallibleMutableConsumerInteractor;
 
 pub struct RemoveTaskInteractor<'deps> {
     task_gateway: &'deps mut dyn TaskGateway,

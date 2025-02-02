@@ -3,7 +3,7 @@ use domain::TaskId;
 use domain::TaskStatus;
 
 use crate::dataproviders::gateways::tasks::TaskGateway;
-use crate::interactors::utils::contracts::FallibleMutableConsumerInteractor;
+use crate::utils::contracts::interactors::FallibleMutableConsumerInteractor;
 
 pub struct UpdateTaskStatusInteractor<'deps> {
     task_gateway: &'deps mut dyn TaskGateway,

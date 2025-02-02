@@ -7,7 +7,7 @@ use domain::TaskStatus;
 
 use crate::dataproviders::gateways::tasks::TaskGateway;
 use crate::dataproviders::generators::ids::UuidGenerator;
-use crate::interactors::utils::contracts::FallibleMutableConsumerInteractor;
+use crate::utils::contracts::interactors::FallibleMutableConsumerInteractor;
 
 pub struct CreateTaskInteractor<'deps> {
     task_gateway: &'deps mut dyn TaskGateway,
@@ -35,11 +35,11 @@ impl<'deps> FallibleMutableConsumerInteractor for CreateTaskInteractor<'deps> {
         return Ok(());
     }
 
-    type Request = CreateTaskRequest;
+    type Request = CreateTaskRequestModel;
     type Error = CreateTaskError;
 }
 
-pub struct CreateTaskRequest {
+pub struct CreateTaskRequestModel {
     task_description: String,
 }
 
