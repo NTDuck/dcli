@@ -5,12 +5,12 @@ use domain::TaskDescription;
 use domain::TaskDescriptionError;
 use domain::TaskStatus;
 
-use crate::gateways::gateways::tasks::TaskGateway;
+use crate::gateways::repositories::tasks::TaskRepository;
 use crate::gateways::factories::ids::UuidFactory;
 use crate::utils::contracts::interactors::FallibleMutableConsumerInteractor;
 
 pub struct CreateTaskInteractor<'deps> {
-    task_gateway: &'deps mut dyn TaskGateway,
+    task_repository: &'deps mut dyn TaskRepository,
     uuid_factory: &'deps dyn UuidFactory,
 }
 
@@ -30,7 +30,7 @@ impl<'deps> FallibleMutableConsumerInteractor for CreateTaskInteractor<'deps> {
             created_at: Instant::now(),
         };
 
-        self.task_gateway.save(&task);
+        self.task_repository.save(&task);
 
         return Ok(());
     }

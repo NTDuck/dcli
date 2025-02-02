@@ -2,16 +2,16 @@ use domain::Task;
 use domain::TaskId;
 use domain::TaskStatus;
 
-use crate::gateways::gateways::tasks::TaskGateway;
+use crate::gateways::repositories::tasks::TaskRepository;
 use crate::utils::contracts::interactors::FallibleMutableConsumerInteractor;
 
 pub struct UpdateTaskStatusInteractor<'deps> {
-    task_gateway: &'deps mut dyn TaskGateway,
+    task_repository: &'deps mut dyn TaskRepository,
 }
 
 impl<'deps> FallibleMutableConsumerInteractor for UpdateTaskStatusInteractor<'deps> {
     fn consume(&mut self, request: Self::Request) -> Result<(), Self::Error> {
-        let Some(existing_task) = self.task_gateway.get(request.task_id) else {
+        let Some(existing_task) = self.task_repository.get(request.task_id) else {
             return Err(UpdateTaskStatusError::TaskNotFound);
         };
 
@@ -26,7 +26,7 @@ impl<'deps> FallibleMutableConsumerInteractor for UpdateTaskStatusInteractor<'de
             ..existing_task
         };
 
-        self.task_gateway.save(&new_task);
+        self.task_repository.save(&new_task);
 
         return Ok(());
     }

@@ -1,19 +1,19 @@
 use domain::TaskId;
 
-use crate::gateways::gateways::tasks::TaskGateway;
+use crate::gateways::repositories::tasks::TaskRepository;
 use crate::utils::contracts::interactors::FallibleMutableConsumerInteractor;
 
 pub struct RemoveTaskInteractor<'deps> {
-    task_gateway: &'deps mut dyn TaskGateway,
+    task_repository: &'deps mut dyn TaskRepository,
 }
 
 impl<'deps> FallibleMutableConsumerInteractor for RemoveTaskInteractor<'deps> {
     fn consume(&mut self, request: Self::Request) -> Result<(), Self::Error> {
-        if self.task_gateway.contains(request.task_id) {
+        if self.task_repository.contains(request.task_id) {
             return Err(RemoveTaskError::TaskNotFound);
         }
 
-        self.task_gateway.remove(request.task_id);
+        self.task_repository.remove(request.task_id);
 
         return Ok(());
     }

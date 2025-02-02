@@ -1,17 +1,17 @@
 use domain::Task;
 
-use crate::gateways::gateways::common::PaginationParams;
-use crate::gateways::gateways::tasks::TaskGateway;
+use crate::gateways::repositories::common::PaginationParams;
+use crate::gateways::repositories::tasks::TaskRepository;
 use crate::utils::contracts::interactors::FunctionInteractor;
 
 pub struct ViewTasksInteractor<'deps> {
-    task_gateway: &'deps dyn TaskGateway,
+    task_repository: &'deps dyn TaskRepository,
 }
 
 impl<'deps> FunctionInteractor for ViewTasksInteractor<'deps> {
     fn apply(&self, request: Self::Request) -> Self::Response {
         let pagination_params = PaginationParams::new(request.page_number, request.page_size);
-        let tasks = self.task_gateway.show(pagination_params);
+        let tasks = self.task_repository.show(pagination_params);
         
         return ViewTasksResponseModel { tasks };
     }

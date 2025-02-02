@@ -1,32 +1,30 @@
-use std::collections::HashMap;
-
 use domain::Task;
 use domain::TaskId;
 use domain::TaskStatus;
-use use_cases::gateways::gateways::common::PaginationParams;
-use use_cases::gateways::gateways::tasks::TaskGateway;
+use indexmap::map::MutableKeys;
+use indexmap::IndexMap;
+use use_cases::gateways::repositories::common::PaginationParams;
+use use_cases::gateways::repositories::tasks::TaskRepository;
 
-pub struct UnorderedInMemoryTaskGateway {
-    tasks_by_ids: HashMap<TaskId, Task>,
+pub struct OrderedInMemoryTaskRepository {
+    tasks_by_ids: IndexMap<TaskId, Task>,
 }
 
-impl UnorderedInMemoryTaskGateway {
+impl OrderedInMemoryTaskRepository {
     pub fn new() -> Self {
         return Self {
-            tasks_by_ids: HashMap::new(),
+            tasks_by_ids: IndexMap::new(),
         };
     }
 }
 
-impl TaskGateway for UnorderedInMemoryTaskGateway {
+impl TaskRepository for OrderedInMemoryTaskRepository {
     fn save(&mut self, task: &Task) {
-        self.tasks_by_ids
-            .insert(task.id, task.clone());
+        self.tasks_by_ids.insert(task.id, task.clone());
     }
 
     fn remove(&mut self, task_id: TaskId) {
-        self.tasks_by_ids
-            .remove(&task_id);
+        self.tasks_by_ids.shift_remove(&task_id);
     }
 
     fn get(&self, task_id: TaskId) -> Option<Task> {
@@ -38,6 +36,7 @@ impl TaskGateway for UnorderedInMemoryTaskGateway {
     fn show(&self, pagination_params: PaginationParams) -> Vec<Task> {
         return self.tasks_by_ids
             .values()
+            .rev()   // Sort by insertion order
             .skip(pagination_params.offset)
             .take(pagination_params.limit)
             .cloned()
@@ -48,6 +47,7 @@ impl TaskGateway for UnorderedInMemoryTaskGateway {
         return self.tasks_by_ids
             .values()
             .filter(|task| task.status == status)
+            .rev()   // Sort by insertion order
             .skip(pagination_params.offset)
             .take(pagination_params.limit)
             .cloned()
@@ -65,6 +65,6 @@ impl TaskGateway for UnorderedInMemoryTaskGateway {
 
     fn clear_by_status(&mut self, status: TaskStatus) {
         self.tasks_by_ids
-            .retain(|_, task| task.status != status);
+            .retain2(|_, task| task.status != status);
     }
 }

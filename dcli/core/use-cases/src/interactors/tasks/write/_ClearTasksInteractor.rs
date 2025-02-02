@@ -1,12 +1,12 @@
-use crate::gateways::gateways::tasks::TaskGateway;
+use crate::gateways::repositories::tasks::TaskRepository;
 use crate::utils::contracts::interactors::MutableRunnableInteractor;
 
 pub struct ClearTasksInteractor<'deps> {
-    task_gateway: &'deps mut dyn TaskGateway,
+    task_repository: &'deps mut dyn TaskRepository,
 }
 
 impl<'deps> MutableRunnableInteractor for ClearTasksInteractor<'deps> {
     fn run(&mut self) {
-        self.task_gateway.clear();
+        self.task_repository.clear();
     }
 }

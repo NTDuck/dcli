@@ -3,11 +3,11 @@ use domain::TaskDescription;
 use domain::TaskDescriptionError;
 use domain::TaskId;
 
-use crate::gateways::gateways::tasks::TaskGateway;
+use crate::gateways::repositories::tasks::TaskRepository;
 use crate::utils::contracts::interactors::FallibleMutableConsumerInteractor;
 
 pub struct UpdateTaskDescriptionInteractor<'deps> {
-    task_gateway: &'deps mut dyn TaskGateway,
+    task_repository: &'deps mut dyn TaskRepository,
 }
 
 impl<'deps> FallibleMutableConsumerInteractor for UpdateTaskDescriptionInteractor<'deps> {
@@ -17,7 +17,7 @@ impl<'deps> FallibleMutableConsumerInteractor for UpdateTaskDescriptionInteracto
             Err(error) => return Err(UpdateTaskDescriptionError::TaskDescription(error)),
         };
 
-        let Some(existing_task) = self.task_gateway.get(request.task_id) else {
+        let Some(existing_task) = self.task_repository.get(request.task_id) else {
             return Err(UpdateTaskDescriptionError::TaskNotFound);
         };
         
@@ -26,7 +26,7 @@ impl<'deps> FallibleMutableConsumerInteractor for UpdateTaskDescriptionInteracto
             ..existing_task
         };
 
-        self.task_gateway.save(&new_task);
+        self.task_repository.save(&new_task);
 
         return Ok(());
     }

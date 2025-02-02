@@ -2,9 +2,9 @@ use domain::Task;
 use domain::TaskId;
 use domain::TaskStatus;
 
-use crate::gateways::gateways::common::PaginationParams;
+use crate::gateways::repositories::common::PaginationParams;
 
-pub trait TaskGateway {
+pub trait TaskRepository {
     fn save(&mut self, task: &Task);
     fn remove(&mut self, task_id: TaskId);
 
