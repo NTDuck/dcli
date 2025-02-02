@@ -6,5 +6,6 @@ members = [
     "dcli/infrastructures/dataproviders",
     "dcli/configurations/console",
     "libs/layout",
+    "libs/ddd",
 ]
 resolver = "2"
