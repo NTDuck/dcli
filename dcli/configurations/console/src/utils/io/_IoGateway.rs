@@ -1,8 +1,8 @@
 use std::io::Write;
 
-pub struct IoProvider;
+pub struct IoGateway;
 
-impl IoProvider {
+impl IoGateway {
     pub fn read_line(&self) -> String {
         std::io::stdout().flush().unwrap();
 

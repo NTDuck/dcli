@@ -1,3 +1,3 @@
 use layout::class_mod;
 
-class_mod!(pub _IoProvider);
+class_mod!(pub _IoGateway);
