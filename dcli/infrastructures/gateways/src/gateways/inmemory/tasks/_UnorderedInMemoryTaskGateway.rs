@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use domain::Task;
 use domain::TaskId;
 use domain::TaskStatus;
-use use_cases::dataproviders::gateways::common::PaginationParams;
-use use_cases::dataproviders::gateways::tasks::TaskGateway;
+use use_cases::gateways::gateways::common::PaginationParams;
+use use_cases::gateways::gateways::tasks::TaskGateway;
 
 pub struct UnorderedInMemoryTaskGateway {
     tasks_by_ids: HashMap<TaskId, Task>,

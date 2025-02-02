@@ -1,7 +1,7 @@
 use domain::Task;
 
-use crate::dataproviders::gateways::common::PaginationParams;
-use crate::dataproviders::gateways::tasks::TaskGateway;
+use crate::gateways::gateways::common::PaginationParams;
+use crate::gateways::gateways::tasks::TaskGateway;
 use crate::utils::contracts::interactors::FunctionInteractor;
 
 pub struct ViewTasksInteractor<'deps> {

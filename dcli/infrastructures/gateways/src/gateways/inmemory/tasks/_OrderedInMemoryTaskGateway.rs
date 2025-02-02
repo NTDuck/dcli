@@ -3,8 +3,8 @@ use domain::TaskId;
 use domain::TaskStatus;
 use indexmap::map::MutableKeys;
 use indexmap::IndexMap;
-use use_cases::dataproviders::gateways::common::PaginationParams;
-use use_cases::dataproviders::gateways::tasks::TaskGateway;
+use use_cases::gateways::gateways::common::PaginationParams;
+use use_cases::gateways::gateways::tasks::TaskGateway;
 
 pub struct OrderedInMemoryTaskGateway {
     tasks_by_ids: IndexMap<TaskId, Task>,

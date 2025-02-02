@@ -2,8 +2,8 @@
 members = [
     "dcli/core/domain",
     "dcli/core/use-cases",
+    "dcli/infrastructures/gateways",
     "dcli/infrastructures/interface-adapters",
-    "dcli/infrastructures/dataproviders",
     "dcli/configurations/console",
     "libs/layout",
     "libs/ddd",

@@ -1,5 +1,5 @@
 use domain::Uuid;
-use use_cases::dataproviders::factories::ids::UuidFactory;
+use use_cases::gateways::factories::ids::UuidFactory;
 
 pub struct UuidV4Factory {}
 

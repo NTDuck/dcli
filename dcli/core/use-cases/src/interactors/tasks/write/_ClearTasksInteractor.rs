@@ -1,4 +1,4 @@
-use crate::dataproviders::gateways::tasks::TaskGateway;
+use crate::gateways::gateways::tasks::TaskGateway;
 use crate::utils::contracts::interactors::MutableRunnableInteractor;
 
 pub struct ClearTasksInteractor<'deps> {

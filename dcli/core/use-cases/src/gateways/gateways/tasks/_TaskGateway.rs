@@ -2,7 +2,7 @@ use domain::Task;
 use domain::TaskId;
 use domain::TaskStatus;
 
-use crate::dataproviders::gateways::common::PaginationParams;
+use crate::gateways::gateways::common::PaginationParams;
 
 pub trait TaskGateway {
     fn save(&mut self, task: &Task);
