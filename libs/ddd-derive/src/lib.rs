@@ -1,10 +1,10 @@
 use layout::namespace_mod;
-use proc_macro::TokenStream;
+use utils::TokenStream;
 
 namespace_mod!(domain);
 namespace_mod!(utils);
 
 #[proc_macro_derive(ValueObject)]
-pub fn derive_value_object(input: TokenStream) -> TokenStream {
-    domain::derive_value_object(input)
+pub fn derive_value_object(tokens: TokenStream) -> TokenStream {
+    return domain::derive_value_object(tokens);
 }
