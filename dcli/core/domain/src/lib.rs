@@ -8,6 +8,7 @@ pub use tasks::*;
 
 // Test code, delete later!
 #[derive(ddd::ValueObject)]
+#[allow(dead_code)]
 struct MyObject {
     s: String,
     i: usize,

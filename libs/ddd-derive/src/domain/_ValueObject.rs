@@ -1,25 +1,24 @@
 use darling::FromDeriveInput;
-use proc_macro::TokenStream;
 use quote::quote;
 
-pub fn derive_value_object(input_token_stream: TokenStream) -> TokenStream {
-    let derive_input = syn::parse_macro_input!(input_token_stream as syn::DeriveInput);
+use crate::utils::*;
 
-    let DerivedPayload {
-        ident,
-        generics,
-        data,
-        ..
-    } = match DerivedPayload::from_derive_input(&derive_input) {
+pub fn derive_value_object(tokens: TokenStream) -> TokenStream {
+    let ast = match AbstractSyntaxTree::try_from(tokens) {
+        Ok(ast) => ast,
+        Err(error) => return TokenStream::from(error.into_compile_error()),
+    };
+
+    let payload = match Payload::try_from(ast) {
         Ok(payload) => payload,
         Err(error) => return TokenStream::from(error.write_errors()),
     };
 
-    match data {
+    match payload.data {
         darling::ast::Data::Struct(fields) => {
-            let parsed_payload = ParsedPayload {
-                ident,
-                generics,
+            let parsed_payload = StructPayload {
+                ident: payload.ident,
+                generics: payload.generics,
                 fields,
             };
 
@@ -35,26 +34,28 @@ pub fn derive_value_object(input_token_stream: TokenStream) -> TokenStream {
 
 #[derive(darling::FromDeriveInput)]
 #[darling(supports(struct_any))]
-struct DerivedPayload {
+struct Payload {
     ident: syn::Ident,
     generics: syn::Generics,
     data: darling::ast::Data<(), syn::Field>,
 }
 
-struct ParsedPayload {
+impl TryFrom<AbstractSyntaxTree> for Payload {
+    type Error = darling::Error;
+
+    fn try_from(ast: AbstractSyntaxTree) -> Result<Self, Self::Error> {
+        return Self::from_derive_input(&ast);
+    }
+}
+
+struct StructPayload {
     ident: syn::Ident,
     generics: syn::Generics,
     fields: darling::ast::Fields<syn::Field>,
 }
 
-fn is_named_struct(fields: &darling::ast::Fields<syn::Field>) -> bool {
-    return fields
-        .iter()
-        .all(|field| field.ident.is_some());
-}
-
-fn generate_token_stream_for_named_struct(parsed_payload: ParsedPayload) -> TokenStream {
-    let ParsedPayload {
+fn generate_token_stream_for_named_struct(parsed_payload: StructPayload) -> TokenStream {
+    let StructPayload {
         ident,
         generics,
         fields,
@@ -84,8 +85,8 @@ fn generate_token_stream_for_named_struct(parsed_payload: ParsedPayload) -> Toke
     .into()
 }
 
-fn generate_token_stream_for_unnamed_struct(parsed_payload: ParsedPayload) -> TokenStream {
-    let ParsedPayload {
+fn generate_token_stream_for_unnamed_struct(parsed_payload: StructPayload) -> TokenStream {
+    let StructPayload {
         ident,
         generics,
         fields,
