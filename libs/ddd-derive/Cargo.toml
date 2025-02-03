@@ -9,3 +9,7 @@ ddd = { path = "../ddd" }
 
 syn = "2"
 quote = "1"
+darling = "0.20.10"
+
+[lib]
+proc-macro = true
