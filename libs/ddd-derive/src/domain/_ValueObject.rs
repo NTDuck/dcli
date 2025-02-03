@@ -2,44 +2,64 @@ use darling::FromDeriveInput;
 use proc_macro::TokenStream;
 use quote::quote;
 
-#[derive(darling::FromDeriveInput)]
-#[darling(supports(struct_any))] // Supports both named and unnamed structs
-struct Payload {
-    ident: syn::Ident,
-    generics: syn::Generics,
-    data: darling::ast::Data<(), syn::Field>,
-}
+pub fn derive_value_object(input_token_stream: TokenStream) -> TokenStream {
+    let derive_input = syn::parse_macro_input!(input_token_stream as syn::DeriveInput);
 
-pub fn derive_value_object(input: TokenStream) -> TokenStream {
-    let derive_input = syn::parse_macro_input!(input as syn::DeriveInput);
-
-    let Payload {
+    let DerivedPayload {
         ident,
         generics,
         data,
         ..
-    } = match Payload::from_derive_input(&derive_input) {
-        Ok(receiver) => receiver,
+    } = match DerivedPayload::from_derive_input(&derive_input) {
+        Ok(payload) => payload,
         Err(error) => return TokenStream::from(error.write_errors()),
     };
 
     match data {
         darling::ast::Data::Struct(fields) => {
-            if fields.iter().all(|f| f.ident.is_some()) {
-                generate_named_struct(ident, generics, fields)
+            let parsed_payload = ParsedPayload {
+                ident,
+                generics,
+                fields,
+            };
+
+            if is_named_struct(&parsed_payload.fields) {
+                generate_token_stream_for_named_struct(parsed_payload)
             } else {
-                generate_unnamed_struct(ident, generics, fields)
+                generate_token_stream_for_unnamed_struct(parsed_payload)
             }
         }
-        _ => unreachable!("This derive macro only supports structs"),
+        _ => unreachable!(),
     }
 }
 
-fn generate_named_struct(
+#[derive(darling::FromDeriveInput)]
+#[darling(supports(struct_any))]
+struct DerivedPayload {
+    ident: syn::Ident,
+    generics: syn::Generics,
+    data: darling::ast::Data<(), syn::Field>,
+}
+
+struct ParsedPayload {
     ident: syn::Ident,
     generics: syn::Generics,
     fields: darling::ast::Fields<syn::Field>,
-) -> TokenStream {
+}
+
+fn is_named_struct(fields: &darling::ast::Fields<syn::Field>) -> bool {
+    return fields
+        .iter()
+        .all(|field| field.ident.is_some());
+}
+
+fn generate_token_stream_for_named_struct(parsed_payload: ParsedPayload) -> TokenStream {
+    let ParsedPayload {
+        ident,
+        generics,
+        fields,
+    } = parsed_payload;
+
     let field_names: Vec<_> = fields.iter().filter_map(|f| f.ident.as_ref()).collect();
 
     quote! {
@@ -64,11 +84,13 @@ fn generate_named_struct(
     .into()
 }
 
-fn generate_unnamed_struct(
-    ident: syn::Ident,
-    generics: syn::Generics,
-    fields: darling::ast::Fields<syn::Field>,
-) -> TokenStream {
+fn generate_token_stream_for_unnamed_struct(parsed_payload: ParsedPayload) -> TokenStream {
+    let ParsedPayload {
+        ident,
+        generics,
+        fields,
+    } = parsed_payload;
+
     let field_indices: Vec<_> = (0..fields.len())
         .map(syn::Index::from)
         .collect();
