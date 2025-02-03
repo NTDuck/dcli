@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 layout = { path = "../../../libs/layout" }
+ddd = { path = "../../../libs/ddd" }

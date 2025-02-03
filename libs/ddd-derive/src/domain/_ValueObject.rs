@@ -27,7 +27,7 @@ pub fn derive_value_object(input: TokenStream) -> TokenStream {
     let field_names: Vec<_> = fields.iter().map(|f| &f.ident).collect();
 
     quote! {
-        impl #generics ddd_rs::domain::ValueObject for #ident #generics {}
+        impl #generics ddd::domain::ValueObject for #ident #generics {}
 
         impl #generics Clone for #ident #generics {
             fn clone(&self) -> Self {
@@ -42,5 +42,7 @@ pub fn derive_value_object(input: TokenStream) -> TokenStream {
                 true #( && self.#field_names == other.#field_names)*
             }
         }
+
+        impl #generics Eq for #ident #generics {}
     }.into()
 }
