@@ -1,7 +1,5 @@
 use std::time::Instant;
 
-use ddd::Entity;
-
 use crate::tasks::*;
 
 #[derive(ddd::Entity, Clone)]
