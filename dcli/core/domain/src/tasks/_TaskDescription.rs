@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-#[derive(Clone)]
+#[derive(ddd::ValueObject)]
 pub struct TaskDescription(String);
 
 impl TaskDescription {
