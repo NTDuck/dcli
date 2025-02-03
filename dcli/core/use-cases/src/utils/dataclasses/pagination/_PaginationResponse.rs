@@ -1,5 +1,5 @@
 #[derive(PartialEq, Eq)]
-pub struct PaginationResult<T> {
+pub struct PaginationResponse<T> {
     pub items: Vec<T>,
     pub page_size: usize,
     pub max_page_size: usize,
@@ -7,12 +7,12 @@ pub struct PaginationResult<T> {
     pub max_page_number: usize,
 }
 
-impl<T> ddd::ValueObject for PaginationResult<T>
+impl<T> ddd::ValueObject for PaginationResponse<T>
 where
     T: Clone + Eq,
 {}
 
-impl<T> Clone for PaginationResult<T>
+impl<T> Clone for PaginationResponse<T>
 where
     T: Clone,
 {

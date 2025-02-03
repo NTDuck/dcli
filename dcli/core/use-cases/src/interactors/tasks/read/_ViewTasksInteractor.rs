@@ -15,7 +15,7 @@ impl<'deps> ViewTasksBoundary for ViewTasksInteractor<'deps> {
         } = request;
 
         return Ok(ViewTasksResponseModel {
-            tasks: self.task_repository.show(pagination_request),
+            pagination_response: self.task_repository.show(pagination_request),
         });
     }
 }

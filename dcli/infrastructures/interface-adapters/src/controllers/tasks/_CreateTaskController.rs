@@ -1,16 +1,22 @@
-use use_cases::contracts::interactors::FallibleMutableConsumerInteractor;
-use use_cases::interactors::tasks::CreateTaskInteractor;
-use use_cases::interactors::tasks::CreateTaskRequestModel;
+use use_cases::boundaries::tasks::CreateTaskBoundary;
+use use_cases::boundaries::tasks::CreateTaskErrorModel;
+use use_cases::boundaries::tasks::CreateTaskRequestModel;
+use use_cases::boundaries::tasks::CreateTaskResponseModel;
 
-pub struct CreateTaskController<'int, 'deps> {
-    interactor: &'int mut CreateTaskInteractor<'deps>,
+pub struct CreateTaskController<'bdrs> {
+    interactor: &'bdrs mut dyn CreateTaskBoundary,
 }
 
-impl<'int, 'deps> CreateTaskController<'int, 'deps> {
-    pub fn apply(&mut self, request_object: CreateTaskRequestObject) {
-        let request_model = request_object;
-        self.interactor.consume(request_model);
+impl<'bdr> CreateTaskController<'bdr> {
+    pub fn apply(&mut self, request: CreateTaskRequestObject) -> Result<CreateTaskViewModel, CreateTaskErrorViewModel> {
+        let request = request.into();
+        return match self.interactor.apply(request) {
+            Ok(response) => Ok(CreateTaskViewModel::from(response)),
+            Err(error) => Err(CreateTaskErrorViewModel::from(error)),
+        };
     }
 }
 
 pub type CreateTaskRequestObject = CreateTaskRequestModel;
+pub type CreateTaskViewModel = CreateTaskResponseModel;
+pub type CreateTaskErrorViewModel = CreateTaskErrorModel;

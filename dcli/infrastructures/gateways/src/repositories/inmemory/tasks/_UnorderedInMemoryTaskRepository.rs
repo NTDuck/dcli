@@ -6,7 +6,7 @@ use domain::TaskStatus;
 use use_cases::gateways::repositories::tasks::TaskRepository;
 use use_cases::utils::dataclasses::pagination::PaginationRange;
 use use_cases::utils::dataclasses::pagination::PaginationRequest;
-use use_cases::utils::dataclasses::pagination::PaginationResult;
+use use_cases::utils::dataclasses::pagination::PaginationResponse;
 
 use crate::utils::repositories::tasks::HashableTaskId;
 
@@ -41,7 +41,7 @@ impl TaskRepository for UnorderedInMemoryTaskRepository {
             .cloned();
     }
 
-    fn show(&self, pagination_request: PaginationRequest) -> PaginationResult<Task> {
+    fn show(&self, pagination_request: PaginationRequest) -> PaginationResponse<Task> {
         let pagination_range = PaginationRange::from(&pagination_request);
 
         let tasks = self.tasks_by_ids
@@ -51,7 +51,7 @@ impl TaskRepository for UnorderedInMemoryTaskRepository {
             .cloned()
             .collect();
 
-        return PaginationResult {
+        return PaginationResponse {
             items: tasks,
             page_size: pagination_range.limit,
             max_page_size: pagination_request.max_page_size,
@@ -60,7 +60,7 @@ impl TaskRepository for UnorderedInMemoryTaskRepository {
         };
     }
 
-    fn show_by_status(&self, status: TaskStatus, pagination_request: PaginationRequest) -> PaginationResult<Task> {
+    fn show_by_status(&self, status: TaskStatus, pagination_request: PaginationRequest) -> PaginationResponse<Task> {
         let pagination_range = PaginationRange::from(&pagination_request);
 
         let tasks = self.tasks_by_ids
@@ -71,7 +71,7 @@ impl TaskRepository for UnorderedInMemoryTaskRepository {
             .cloned()
             .collect();
     
-        return PaginationResult {
+        return PaginationResponse {
             items: tasks,
             page_size: pagination_range.limit,
             max_page_size: pagination_request.max_page_size,

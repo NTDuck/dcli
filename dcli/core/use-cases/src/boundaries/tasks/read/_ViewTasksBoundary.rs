@@ -1,7 +1,7 @@
 use domain::Task;
 
 use crate::utils::dataclasses::pagination::PaginationRequest;
-use crate::utils::dataclasses::pagination::PaginationResult;
+use crate::utils::dataclasses::pagination::PaginationResponse;
 
 pub trait ViewTasksBoundary {
     fn apply(&self, request: ViewTasksRequestModel) -> Result<ViewTasksResponseModel, ViewTasksErrorModel>;
@@ -12,7 +12,7 @@ pub struct ViewTasksRequestModel {
 }
 
 pub struct ViewTasksResponseModel {
-    pub tasks: PaginationResult<Task>,
+    pub pagination_response: PaginationResponse<Task>,
 }
 
 pub struct ViewTasksErrorModel;

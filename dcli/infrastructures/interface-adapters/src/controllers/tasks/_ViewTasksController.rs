@@ -1,30 +1,34 @@
 use domain::Task;
 use domain::TaskStatus;
-use use_cases::contracts::interactors::FunctionInteractor;
-use use_cases::interactors::tasks::ViewTasksInteractor;
-use use_cases::interactors::tasks::ViewTasksRequestModel;
-use use_cases::interactors::tasks::ViewTasksResponseModel;
+use use_cases::boundaries::tasks::ViewTasksBoundary;
+use use_cases::boundaries::tasks::ViewTasksErrorModel;
+use use_cases::boundaries::tasks::ViewTasksRequestModel;
+use use_cases::boundaries::tasks::ViewTasksResponseModel;
 
 use crate::utils::adapters::TimestampAdapter;
 
-pub struct ViewTasksController<'int, 'deps> {
-    interactor: &'int ViewTasksInteractor<'deps>,
+pub struct ViewTasksController<'bdrs> {
+    interactor: &'bdrs dyn ViewTasksBoundary,
 }
 
-impl<'int, 'deps> ViewTasksController<'int, 'deps> {
-    pub fn apply(&self, request_object: ViewTasksRequestObject) -> ViewTasksViewModel {
-        let request_model = request_object;
-        let response_model = self.interactor.apply(request_model);
-        let view_model = ViewTasksViewModel::from(response_model);
-
-        return view_model;
+impl<'bdrs> ViewTasksController<'bdrs> {
+    pub fn apply(&self, request: ViewTasksRequestObject) -> Result<ViewTasksViewModel, ViewTasksErrorViewModel> {
+        let request = request.into();
+        return match self.interactor.apply(request) {
+            Ok(response) => Ok(ViewTasksViewModel::from(response)),
+            Err(error) => Err(ViewTasksErrorViewModel::from(error)),
+        };
     }
 }
 
 pub type ViewTasksRequestObject = ViewTasksRequestModel;
 
 pub struct ViewTasksViewModel {
-    tasks: Vec<ViewableTask>,
+    pub tasks: Vec<ViewableTask>,
+    pub page_size: usize,
+    pub max_page_size: usize,
+    pub page_number: usize,
+    pub max_page_number: usize,
 }
 
 pub struct ViewableTask {
@@ -37,12 +41,16 @@ pub struct ViewableTask {
 pub type ViewableTaskStatus = TaskStatus;
 
 impl From<ViewTasksResponseModel> for ViewTasksViewModel {
-    fn from(response_model: ViewTasksResponseModel) -> Self {
+    fn from(response: ViewTasksResponseModel) -> Self {
         return Self {
-            tasks: response_model.tasks.items
+            tasks: response.pagination_response.items
                 .into_iter()
                 .map(|task| ViewableTask::from(task))
                 .collect(),
+            page_size: response.pagination_response.page_size,
+            max_page_size: response.pagination_response.max_page_size,
+            page_number: response.pagination_response.page_number,
+            max_page_number: response.pagination_response.max_page_number,
         };
     }
 }
@@ -52,8 +60,10 @@ impl From<Task> for ViewableTask {
         return ViewableTask {
             id: *task.id,
             description: task.description.to_string(),
-            status: task.status,
+            status: ViewableTaskStatus::from(task.status),
             created_at: TimestampAdapter::format(task.created_at),
         };
     }
 }
+
+pub type ViewTasksErrorViewModel = ViewTasksErrorModel;
