@@ -41,7 +41,7 @@ fn generate_tokens_from_struct_payload(payload: DefaultStructPayload) -> TokenSt
             fn clone(&self) -> Self {
                 return Self {
                     #(#field: self.#field.clone(), )*
-                }
+                };
             }
         }
 

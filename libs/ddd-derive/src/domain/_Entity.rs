@@ -73,47 +73,64 @@ fn generate_tokens_from_payload(payload: TransformedPayload) -> TokenStream {
 
     let id_field = fields
         .iter()
-        .find(|f| f.id.is_some() || f.ident.as_ref().map(|ident| ident == "id").unwrap_or(false))
-        .expect("Missing `id` field");
+        .find(|field| is_id_field(&field))
+        .unwrap();
 
     let id_ident = id_field.ident.as_ref().unwrap();
-    let id_ty = &id_field.ty;
+    let id_type = &id_field.ty;
 
     let fields = fields
         .iter()
-        .map(|field| {
-            let field_ident = field.ident.as_ref().unwrap();
-            quote! { #field_ident: self.#field_ident.clone(), }
-        });
+        .map(|field| field.ident.as_ref().unwrap());
 
     quote! {
         impl #generics ddd::domain::Entity for #ident #generics {
-            type Id = #id_ty;
+            type Id = #id_type;
 
             fn get_id(&self) -> &Self::Id {
-                &self.#id_ident
+                return &self.#id_ident;
             }
         }
 
         impl #generics ddd::domain::ValueObject for #ident #generics {}
 
+        impl #generics Clone for #ident #generics {
+            fn clone(&self) -> Self {
+                return Self {
+                    #(#fields: self.#fields.clone(), )*
+                };
+            }
+        }
+
         impl #generics PartialEq for #ident #generics {
             fn eq(&self, other: &Self) -> bool {
                 use ddd::domain::Entity;
 
-                self.get_id() == other.get_id()
+                return self.get_id() == other.get_id();
             }
         }
 
         impl #generics Eq for #ident #generics {}
-
-        impl #generics Clone for #ident #generics {
-            fn clone(&self) -> Self {
-                Self {
-                    #(#fields)*
-                }
-            }
-        }
     }.into()
 }
 
+fn is_id_field(field: &Field) -> bool {
+    return field_has_id_attribute(field)
+        || field_is_named_id(field);
+}
+
+fn field_has_id_attribute(field: &Field) -> bool {
+    return field.id.is_some();
+}
+
+fn field_is_named_id(field: &Field) -> bool {
+    const ALLOWED_IDENTS: [&'static str; 2] = [
+        "id",
+        "identifier",
+    ];
+
+    field.ident
+        .as_ref()
+        .map(|ident| ALLOWED_IDENTS.contains(&ident.to_string().as_str()))
+        .unwrap_or(false)
+}
