@@ -3,6 +3,26 @@ use quote::quote;
 
 use crate::utils::*;
 
+pub fn derive_entity(tokens: TokenStream) -> TokenStream {
+    let ast = match AbstractSyntaxTree::try_from(tokens) {
+        Ok(ast) => ast,
+        Err(error) => return TokenStream::from(error.into_compile_error()),
+    };
+
+    let payload = match EntityPayload::try_from(ast) {
+        Ok(payload) => payload,
+        Err(error) => return TokenStream::from(error.write_errors()),
+    };
+
+    let payload = BetterPayload {
+        ident: payload.ident,
+        generics: payload.generics,
+        fields: payload.data.take_struct().unwrap(),
+    };
+
+    return generate_tokens_from_payload(payload);
+}
+
 #[derive(darling::FromDeriveInput)]
 #[darling(attributes(entity), supports(struct_named))]
 struct EntityPayload {
@@ -20,42 +40,29 @@ impl TryFrom<AbstractSyntaxTree> for EntityPayload {
     }
 }
 
-#[derive(darling::FromMeta, Clone)]
-struct IdMarker;
-
-#[derive(darling::FromField, Clone)]
+#[derive(darling::FromField)]
 #[darling(attributes(entity))]
 struct EntityField {
     ident: Option<syn::Ident>,
     ty: syn::Type,
-
+    
     id: Option<IdMarker>,
 }
 
-pub fn derive_entity(tokens: TokenStream) -> TokenStream {
-    let ast = match AbstractSyntaxTree::try_from(tokens) {
-        Ok(ast) => ast,
-        Err(error) => return TokenStream::from(error.into_compile_error()),
-    };
+#[derive(darling::FromMeta)]
+struct IdMarker;
 
-    let payload = match EntityPayload::try_from(ast) {
-        Ok(payload) => payload,
-        Err(error) => return TokenStream::from(error.write_errors()),
-    };
-
-    let fields = payload.data.clone().take_struct().unwrap();
-
-    derive_entity_impl(payload, fields)
+struct BetterPayload {
+    ident: syn::Ident,
+    generics: syn::Generics,
+    fields: darling::ast::Fields<EntityField>,
 }
 
-fn derive_entity_impl(
-    payload: EntityPayload,
-    fields: darling::ast::Fields<EntityField>,
-) -> TokenStream {
-    let EntityPayload {
+fn generate_tokens_from_payload(payload: BetterPayload) -> TokenStream {
+    let BetterPayload {
         ident,
         generics,
-        ..
+        fields,
     } = payload;
 
     let id_field = fields
@@ -66,11 +73,12 @@ fn derive_entity_impl(
     let id_ident = id_field.ident.as_ref().unwrap();
     let id_ty = &id_field.ty;
 
-    // Generate clone implementation for all fields
-    let clone_fields = fields.iter().map(|f| {
-        let field_ident = f.ident.as_ref().unwrap();
-        quote! { #field_ident: self.#field_ident.clone(), }
-    });
+    let clone_fields = fields
+        .iter()
+        .map(|field| {
+            let field_ident = field.ident.as_ref().unwrap();
+            quote! { #field_ident: self.#field_ident.clone(), }
+        });
 
     quote! {
         impl #generics ddd::domain::Entity for #ident #generics {
