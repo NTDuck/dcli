@@ -22,7 +22,7 @@ pub fn derive_value_object(tokens: TokenStream) -> TokenStream {
                 fields,
             }.into();
         },
-        darling::ast::Data::Enum(variants) => {
+        darling::ast::Data::Enum(_variants) => {
             todo!()
         },
     }
@@ -52,56 +52,59 @@ struct StructPayload {
 
 impl Into<TokenStream> for StructPayload {
     fn into(self) -> TokenStream {
-        return generate_token_stream_for_struct(self);
+        let fields = match self.is_named_struct() {
+            true => self.generate_fields_for_named_struct(),
+            false => self.generate_fields_for_unnamed_struct(),
+        };
+
+        return self.generate_tokens_from_fields(fields);
     }
 }
 
-fn generate_token_stream_for_struct(payload: StructPayload) -> TokenStream {
-    let StructPayload {
-        ident, generics, fields,
-    } = payload;
+impl StructPayload {
+    fn is_named_struct(&self) -> bool {
+        return self.fields
+            .iter()
+            .all(|field| field.ident.is_some());
+    }
+    
+    fn generate_fields_for_named_struct(&self) -> Vec<syn::Member> {
+        return self.fields
+            .iter()
+            .filter_map(|field| field.ident.clone())
+            .map(|ident| syn::Member::Named(ident))
+            .collect();
+    }
 
-    let field = match is_named_struct(&fields) {
-        true => generate_fields_for_named_struct(fields),
-        false => generate_fields_for_unnamed_struct(fields),
-    };
+    fn generate_fields_for_unnamed_struct(&self) -> Vec<syn::Member> {
+        return (0..self.fields.len())
+            .map(|index| syn::Index::from(index))
+            .map(|index| syn::Member::Unnamed(index))
+            .collect();
+    }
 
-    return quote! {
-        impl #generics ddd::domain::ValueObject for #ident #generics {}
+    fn generate_tokens_from_fields(&self, field: Vec<syn::Member>) -> TokenStream {
+        let ident = &self.ident;
+        let generics = &self.generics;
 
-        impl #generics Clone for #ident #generics {
-            fn clone(&self) -> Self {
-                Self {
-                    #(#field: self.#field.clone(),)*
+        return quote! {
+            impl #generics ddd::domain::ValueObject for #ident #generics {}
+    
+            impl #generics Clone for #ident #generics {
+                fn clone(&self) -> Self {
+                    Self {
+                        #(#field: self.#field.clone(),)*
+                    }
                 }
             }
-        }
-
-        impl #generics PartialEq for #ident #generics {
-            fn eq(&self, other: &Self) -> bool {
-                true #( && self.#field == other.#field)*
+    
+            impl #generics PartialEq for #ident #generics {
+                fn eq(&self, other: &Self) -> bool {
+                    true #( && self.#field == other.#field)*
+                }
             }
-        }
-
-        impl #generics Eq for #ident #generics {}
-    }.into()
-}
-
-fn is_named_struct(fields: &darling::ast::Fields<syn::Field>) -> bool {
-    return fields
-        .iter()
-        .all(|field| field.ident.is_some());
-}
-
-fn generate_fields_for_named_struct(fields: darling::ast::Fields<syn::Field>) -> Vec<syn::Member> {
-    fields
-        .iter()
-        .filter_map(|field| field.ident.clone().map(syn::Member::Named)) // Convert Ident to Member::Named
-        .collect()
-}
-
-fn generate_fields_for_unnamed_struct(fields: darling::ast::Fields<syn::Field>) -> Vec<syn::Member> {
-    (0..fields.len())
-        .map(|i| syn::Member::Unnamed(syn::Index::from(i)))
-        .collect()
+    
+            impl #generics Eq for #ident #generics {}
+        }.into()
+    }
 }
