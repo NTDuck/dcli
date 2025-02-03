@@ -2,8 +2,8 @@ use domain::Task;
 use domain::TaskId;
 use domain::TaskStatus;
 
-use crate::dataclasses::pagination::PaginationRequest;
-use crate::dataclasses::pagination::PaginationResult;
+use crate::utils::dataclasses::pagination::PaginationRequest;
+use crate::utils::dataclasses::pagination::PaginationResult;
 
 pub trait TaskRepository {
     fn save(&mut self, task: &Task);

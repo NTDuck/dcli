@@ -13,7 +13,7 @@ impl TaskDescription {
 
     fn ensure_min_length(description: &String) -> Result<(), TaskDescriptionError> {
         if description.len() < Self::MIN_LENGTH {
-            return Err(TaskDescriptionError::TooShort {
+            return Err(TaskDescriptionError::LengthUnderflow {
                 actual_length: description.len(),
                 min_length_required: Self::MIN_LENGTH,
             });
@@ -24,7 +24,7 @@ impl TaskDescription {
 
     fn ensure_max_length(description: &String) -> Result<(), TaskDescriptionError> {
         if description.len() > Self::MAX_LENGTH {
-            return Err(TaskDescriptionError::TooLong {
+            return Err(TaskDescriptionError::LengthOverflow {
                 actual_length: description.len(),
                 max_length_allowed: Self::MAX_LENGTH,
             });
@@ -56,11 +56,11 @@ impl TryFrom<String> for TaskDescription {
 }
 
 pub enum TaskDescriptionError {
-    TooShort {
+    LengthUnderflow {
         actual_length: usize,
         min_length_required: usize,
     },
-    TooLong {
+    LengthOverflow {
         actual_length: usize,
         max_length_allowed: usize,
     },

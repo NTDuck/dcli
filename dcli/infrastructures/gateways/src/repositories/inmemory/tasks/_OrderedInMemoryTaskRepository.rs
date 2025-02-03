@@ -3,10 +3,10 @@ use domain::TaskId;
 use domain::TaskStatus;
 use indexmap::map::MutableKeys;
 use indexmap::IndexMap;
-use use_cases::dataclasses::pagination::PaginationRange;
-use use_cases::dataclasses::pagination::PaginationRequest;
-use use_cases::dataclasses::pagination::PaginationResult;
 use use_cases::gateways::repositories::tasks::TaskRepository;
+use use_cases::utils::dataclasses::pagination::PaginationRange;
+use use_cases::utils::dataclasses::pagination::PaginationRequest;
+use use_cases::utils::dataclasses::pagination::PaginationResult;
 
 use crate::utils::repositories::tasks::HashableTaskId;
 

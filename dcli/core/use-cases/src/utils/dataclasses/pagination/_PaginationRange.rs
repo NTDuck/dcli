@@ -1,6 +1,5 @@
+use crate::utils::dataclasses::pagination::PaginationProperties;
 use crate::utils::dataclasses::pagination::PaginationRequest;
-
-use super::PaginationProperties;
 
 #[derive(ddd::ValueObject)]
 pub struct PaginationRange {
