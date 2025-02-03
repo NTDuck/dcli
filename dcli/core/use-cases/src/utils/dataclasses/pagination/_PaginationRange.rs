@@ -2,6 +2,7 @@ use crate::utils::dataclasses::pagination::PaginationRequest;
 
 use super::PaginationProperties;
 
+#[derive(ddd::ValueObject)]
 pub struct PaginationRange {
     pub limit: usize,
     pub offset: usize,

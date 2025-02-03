@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(ddd::ValueObject, Copy, Hash)]
 pub struct Uuid(u128);
 
 impl Deref for Uuid {
