@@ -14,7 +14,7 @@ pub fn derive_entity(tokens: TokenStream) -> TokenStream {
         Err(error) => return TokenStream::from(error.write_errors()),
     };
 
-    let payload = TransformedPayload::from(payload);
+    let payload = StructPayload::from(payload);
 
     return generate_tokens_from_payload(payload);
 }
@@ -48,13 +48,13 @@ struct Field {
 #[derive(darling::FromMeta)]
 struct IdMarker;
 
-struct TransformedPayload {
+struct StructPayload {
     ident: syn::Ident,
     generics: syn::Generics,
     fields: darling::ast::Fields<Field>,
 }
 
-impl From<Payload> for TransformedPayload {
+impl From<Payload> for StructPayload {
     fn from(payload: Payload) -> Self {
         return Self {
             ident: payload.ident,
@@ -64,8 +64,8 @@ impl From<Payload> for TransformedPayload {
     }
 }
 
-fn generate_tokens_from_payload(payload: TransformedPayload) -> TokenStream {
-    let TransformedPayload {
+fn generate_tokens_from_payload(payload: StructPayload) -> TokenStream {
+    let StructPayload {
         ident,
         generics,
         fields,

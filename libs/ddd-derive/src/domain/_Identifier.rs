@@ -1,5 +1,3 @@
-use quote::quote;
-
 use crate::utils::*;
 
 pub fn derive_identifier(tokens: TokenStream) -> TokenStream {
@@ -14,24 +12,24 @@ pub fn derive_identifier(tokens: TokenStream) -> TokenStream {
     };
 
     match payload.data.clone() {
-        darling::ast::Data::Struct(fields) => {
-            let payload = DefaultStructPayload::from((payload, fields));
+        darling::ast::Data::Struct(_) => {
+            let payload = DefaultStructPayload::from(payload);
             return generate_tokens_from_struct_payload(payload);
         },
-        darling::ast::Data::Enum(_variants) => {
+        darling::ast::Data::Enum(_) => {
             todo!()
         },
     }
 }
 
 fn generate_tokens_from_struct_payload(payload: DefaultStructPayload) -> TokenStream {
+    use quote::quote;
+
     let DefaultStructPayload {
         ident,
         generics,
         fields,
     } = payload;
-
-    let field = fields;
 
     return quote! {
         impl #generics ddd::domain::Identifier for #ident #generics {}
@@ -40,14 +38,14 @@ fn generate_tokens_from_struct_payload(payload: DefaultStructPayload) -> TokenSt
         impl #generics Clone for #ident #generics {
             fn clone(&self) -> Self {
                 return Self {
-                    #(#field: self.#field.clone(), )*
+                    #(#fields: self.#fields.clone(), )*
                 };
             }
         }
 
         impl #generics PartialEq for #ident #generics {
             fn eq(&self, other: &Self) -> bool {
-                return true #( && self.#field == other.#field)*;
+                return true #( && self.#fields == other.#fields)*;
             }
         }
 
