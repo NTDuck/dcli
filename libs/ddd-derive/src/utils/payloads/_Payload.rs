@@ -4,13 +4,13 @@ use crate::utils::*;
 
 #[derive(darling::FromDeriveInput)]
 #[darling(supports(any))]
-pub struct Payload {
+pub struct DefaultPayload {
     pub ident: syn::Ident,
     pub generics: syn::Generics,
     pub data: darling::ast::Data<syn::Variant, syn::Field>,
 }
 
-impl TryFrom<AbstractSyntaxTree> for Payload {
+impl TryFrom<AbstractSyntaxTree> for DefaultPayload {
     type Error = darling::Error;
 
     fn try_from(ast: AbstractSyntaxTree) -> Result<Self, Self::Error> {

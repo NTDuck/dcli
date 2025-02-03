@@ -1,13 +1,13 @@
 use crate::utils::*;
 
-pub struct StructPayload {
+pub struct DefaultStructPayload {
     pub ident: syn::Ident,
     pub generics: syn::Generics,
     pub fields: Vec<syn::Member>,
 }
 
-impl From<(Payload, darling::ast::Fields<syn::Field>)> for StructPayload {
-    fn from((payload, fields): (Payload, darling::ast::Fields<syn::Field>)) -> Self {
+impl From<(DefaultPayload, darling::ast::Fields<syn::Field>)> for DefaultStructPayload {
+    fn from((payload, fields): (DefaultPayload, darling::ast::Fields<syn::Field>)) -> Self {
         let fields = match Self::is_named_struct(&fields) {
             true => Self::generate_fields_for_named_struct(&fields),
             false => Self::generate_fields_for_unnamed_struct(&fields),
@@ -21,7 +21,7 @@ impl From<(Payload, darling::ast::Fields<syn::Field>)> for StructPayload {
     }
 }
 
-impl StructPayload {
+impl DefaultStructPayload {
     fn is_named_struct(fields: &darling::ast::Fields<syn::Field>) -> bool {
         return fields
             .iter()

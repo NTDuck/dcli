@@ -9,29 +9,25 @@ pub fn derive_entity(tokens: TokenStream) -> TokenStream {
         Err(error) => return TokenStream::from(error.into_compile_error()),
     };
 
-    let payload = match EntityPayload::try_from(ast) {
+    let payload = match Payload::try_from(ast) {
         Ok(payload) => payload,
         Err(error) => return TokenStream::from(error.write_errors()),
     };
 
-    let payload = BetterPayload {
-        ident: payload.ident,
-        generics: payload.generics,
-        fields: payload.data.take_struct().unwrap(),
-    };
+    let payload = TransformedPayload::from(payload);
 
     return generate_tokens_from_payload(payload);
 }
 
 #[derive(darling::FromDeriveInput)]
 #[darling(attributes(entity), supports(struct_named))]
-struct EntityPayload {
+struct Payload {
     ident: syn::Ident,
     generics: syn::Generics,
-    data: darling::ast::Data<darling::util::Ignored, EntityField>,
+    data: darling::ast::Data<darling::util::Ignored, Field>,
 }
 
-impl TryFrom<AbstractSyntaxTree> for EntityPayload {
+impl TryFrom<AbstractSyntaxTree> for Payload {
     type Error = darling::Error;
 
     fn try_from(ast: AbstractSyntaxTree) -> Result<Self, Self::Error> {
@@ -42,7 +38,7 @@ impl TryFrom<AbstractSyntaxTree> for EntityPayload {
 
 #[derive(darling::FromField)]
 #[darling(attributes(entity))]
-struct EntityField {
+struct Field {
     ident: Option<syn::Ident>,
     ty: syn::Type,
     
@@ -52,14 +48,24 @@ struct EntityField {
 #[derive(darling::FromMeta)]
 struct IdMarker;
 
-struct BetterPayload {
+struct TransformedPayload {
     ident: syn::Ident,
     generics: syn::Generics,
-    fields: darling::ast::Fields<EntityField>,
+    fields: darling::ast::Fields<Field>,
 }
 
-fn generate_tokens_from_payload(payload: BetterPayload) -> TokenStream {
-    let BetterPayload {
+impl From<Payload> for TransformedPayload {
+    fn from(payload: Payload) -> Self {
+        return Self {
+            ident: payload.ident,
+            generics: payload.generics,
+            fields: payload.data.take_struct().unwrap(),
+        };
+    }
+}
+
+fn generate_tokens_from_payload(payload: TransformedPayload) -> TokenStream {
+    let TransformedPayload {
         ident,
         generics,
         fields,
@@ -73,7 +79,7 @@ fn generate_tokens_from_payload(payload: BetterPayload) -> TokenStream {
     let id_ident = id_field.ident.as_ref().unwrap();
     let id_ty = &id_field.ty;
 
-    let clone_fields = fields
+    let fields = fields
         .iter()
         .map(|field| {
             let field_ident = field.ident.as_ref().unwrap();
@@ -104,10 +110,10 @@ fn generate_tokens_from_payload(payload: BetterPayload) -> TokenStream {
         impl #generics Clone for #ident #generics {
             fn clone(&self) -> Self {
                 Self {
-                    #(#clone_fields)*
+                    #(#fields)*
                 }
             }
         }
-    }
-    .into()
+    }.into()
 }
+

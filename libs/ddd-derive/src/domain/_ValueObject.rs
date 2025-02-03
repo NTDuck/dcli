@@ -8,14 +8,14 @@ pub fn derive_value_object(tokens: TokenStream) -> TokenStream {
         Err(error) => return TokenStream::from(error.into_compile_error()),
     };
 
-    let payload = match Payload::try_from(ast) {
+    let payload = match DefaultPayload::try_from(ast) {
         Ok(payload) => payload,
         Err(error) => return TokenStream::from(error.write_errors()),
     };
 
     match payload.data.clone() {
         darling::ast::Data::Struct(fields) => {
-            let payload = StructPayload::from((payload, fields));
+            let payload = DefaultStructPayload::from((payload, fields));
             return generate_tokens_from_struct_payload(payload);
         },
         darling::ast::Data::Enum(_variants) => {
@@ -24,8 +24,8 @@ pub fn derive_value_object(tokens: TokenStream) -> TokenStream {
     }
 }
 
-fn generate_tokens_from_struct_payload(payload: StructPayload) -> TokenStream {
-    let StructPayload {
+fn generate_tokens_from_struct_payload(payload: DefaultStructPayload) -> TokenStream {
+    let DefaultStructPayload {
         ident,
         generics,
         fields,
