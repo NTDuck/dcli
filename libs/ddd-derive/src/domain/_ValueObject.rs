@@ -92,15 +92,15 @@ impl StructPayload {
     
             impl #generics Clone for #ident #generics {
                 fn clone(&self) -> Self {
-                    Self {
-                        #(#field: self.#field.clone(),)*
+                    return Self {
+                        #(#field: self.#field.clone(), )*
                     }
                 }
             }
     
             impl #generics PartialEq for #ident #generics {
                 fn eq(&self, other: &Self) -> bool {
-                    true #( && self.#field == other.#field)*
+                    return true #( && self.#field == other.#field)*;
                 }
             }
     
