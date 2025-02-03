@@ -8,8 +8,10 @@ use use_cases::dataclasses::pagination::PaginationRequest;
 use use_cases::dataclasses::pagination::PaginationResult;
 use use_cases::gateways::repositories::tasks::TaskRepository;
 
+use crate::utils::repositories::tasks::HashableTaskId;
+
 pub struct UnorderedInMemoryTaskRepository {
-    tasks_by_ids: HashMap<TaskId, Task>,
+    tasks_by_ids: HashMap<HashableTaskId, Task>,
 }
 
 impl UnorderedInMemoryTaskRepository {
@@ -22,16 +24,18 @@ impl UnorderedInMemoryTaskRepository {
 
 impl TaskRepository for UnorderedInMemoryTaskRepository {
     fn save(&mut self, task: &Task) {
-        self.tasks_by_ids
-            .insert(task.id, task.clone());
+        let task_id = HashableTaskId::from(task.id);
+        self.tasks_by_ids.insert(task_id, task.clone());
     }
 
     fn remove(&mut self, task_id: TaskId) {
+        let task_id = HashableTaskId::from(task_id);
         self.tasks_by_ids
             .remove(&task_id);
     }
 
     fn get(&self, task_id: TaskId) -> Option<Task> {
+        let task_id = HashableTaskId::from(task_id);
         return self.tasks_by_ids
             .get(&task_id)
             .cloned();
@@ -77,6 +81,7 @@ impl TaskRepository for UnorderedInMemoryTaskRepository {
     }
 
     fn contains(&self, task_id: TaskId) -> bool {
+        let task_id = HashableTaskId::from(task_id);
         return self.tasks_by_ids
             .contains_key(&task_id);
     }

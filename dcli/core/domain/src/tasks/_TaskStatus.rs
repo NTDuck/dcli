@@ -1,4 +1,4 @@
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Copy)]
 pub enum TaskStatus {
     Pending,
     InProgress,
