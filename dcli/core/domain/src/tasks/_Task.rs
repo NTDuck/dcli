@@ -2,7 +2,7 @@ use std::time::Instant;
 
 use crate::tasks::*;
 
-#[derive(ddd::Entity, Clone)]
+#[derive(ddd::Entity)]
 pub struct Task {
     pub id: TaskId,
     pub description: TaskDescription,

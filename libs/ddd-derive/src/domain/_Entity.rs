@@ -59,12 +59,18 @@ fn derive_entity_impl(
     } = payload;
 
     let id_field = fields
-        .into_iter()
+        .iter()
         .find(|f| f.id.is_some() || f.ident.as_ref().map(|ident| ident == "id").unwrap_or(false))
         .expect("Missing `id` field");
 
-    let id_ident = id_field.ident.unwrap();
-    let id_ty = id_field.ty;
+    let id_ident = id_field.ident.as_ref().unwrap();
+    let id_ty = &id_field.ty;
+
+    // Generate clone implementation for all fields
+    let clone_fields = fields.iter().map(|f| {
+        let field_ident = f.ident.as_ref().unwrap();
+        quote! { #field_ident: self.#field_ident.clone(), }
+    });
 
     quote! {
         impl #generics ddd::domain::Entity for #ident #generics {
@@ -86,6 +92,14 @@ fn derive_entity_impl(
         }
 
         impl #generics Eq for #ident #generics {}
+
+        impl #generics Clone for #ident #generics {
+            fn clone(&self) -> Self {
+                Self {
+                    #(#clone_fields)*
+                }
+            }
+        }
     }
     .into()
 }
