@@ -17,6 +17,6 @@ impl TryFrom<TokenStream> for AbstractSyntaxTree {
 
     fn try_from(tokens: TokenStream) -> Result<Self, Self::Error> {
         return syn::parse(tokens)
-            .map(|input| AbstractSyntaxTree(input));
+            .map(AbstractSyntaxTree);
     }
 }
