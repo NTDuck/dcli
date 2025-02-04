@@ -5,7 +5,9 @@ namespace!(domain);
 namespace!(utils);
 
 #[proc_macro_derive(Entity, attributes(ddd))]
-pub fn derive_entity(tokens: TokenStream) -> TokenStream { return domain::derive_entity(tokens); }
+pub fn derive_entity(tokens: TokenStream) -> TokenStream {
+    return domain::derive_entity(tokens);
+}
 
 #[proc_macro_derive(Identifier)]
 pub fn derive_identifier(tokens: TokenStream) -> TokenStream {

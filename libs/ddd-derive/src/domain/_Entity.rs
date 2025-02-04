@@ -24,7 +24,7 @@ pub fn derive_entity(tokens: TokenStream) -> TokenStream {
 struct Payload {
     ident: syn::Ident,
     generics: syn::Generics,
-    data: darling::ast::Data<darling::util::Ignored, Field>,
+    data: darling::ast::Data<darling::util::Ignored, EntityField>,
 }
 
 impl TryFrom<AbstractSyntaxTree> for Payload {
@@ -36,14 +36,7 @@ impl TryFrom<AbstractSyntaxTree> for Payload {
     }
 }
 
-#[derive(darling::FromField)]
-#[darling(attributes(ddd))]
-struct Field {
-    ident: Option<syn::Ident>,
-    ty: syn::Type,
-    
-    field: Option<FieldAttributes>,
-}
+type EntityField = Field<FieldAttributes>;
 
 #[derive(darling::FromMeta)]
 struct FieldAttributes {
@@ -56,7 +49,7 @@ struct IdMarker;
 struct StructPayload {
     ident: syn::Ident,
     generics: syn::Generics,
-    fields: darling::ast::Fields<Field>,
+    fields: darling::ast::Fields<EntityField>,
 }
 
 impl From<Payload> for StructPayload {
@@ -119,12 +112,12 @@ fn generate_tokens_from_payload(payload: StructPayload) -> TokenStream {
     }.into()
 }
 
-fn is_id_field(field: &Field) -> bool {
+fn is_id_field(field: &EntityField) -> bool {
     return field_has_id_attribute(field);
 }
 
-fn field_has_id_attribute(field: &Field) -> bool {
-    return field.field
+fn field_has_id_attribute(field: &EntityField) -> bool {
+    return field.attributes
         .as_ref()
         .map_or(false, |attributes| attributes.Identifier.is_some());
 }

@@ -4,7 +4,7 @@ use crate::tasks::*;
 
 #[derive(ddd::Entity)]
 pub struct Task {
-    #[ddd(field(Identifier))]
+    #[ddd(attributes(Identifier))]
     pub id: TaskId,
     pub description: TaskDescription,
     pub status: TaskStatus,
