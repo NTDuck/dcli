@@ -14,7 +14,7 @@
 ///
 /// A class-like module belongs to a namespace-like module.
 #[macro_export]
-macro_rules! class_mod {
+macro_rules! class {
     ($visibility:vis $module:ident) => {
         #[allow(non_snake_case)]
         mod $module;

@@ -1,3 +1,3 @@
-use layout::class_mod;
+use modules::*;
 
-class_mod!(pub _ViewTasksInteractor);
+class!(pub _ViewTasksInteractor);

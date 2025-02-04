@@ -1,6 +1,6 @@
-use layout::namespace_mod;
+use modules::*;
 
-namespace_mod!(pub domain);
+namespace!(pub domain);
 
 pub use domain::*;
 pub use ddd_derive::*;

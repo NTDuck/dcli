@@ -1,8 +1,8 @@
-use layout::namespace_mod;
-use proc_macro::TokenStream;
+use modules::*;
+use utils::TokenStream;
 
-namespace_mod!(domain);
-namespace_mod!(utils);
+namespace!(domain);
+namespace!(utils);
 
 #[proc_macro_derive(Entity, attributes(entity))]
 pub fn derive_entity(tokens: TokenStream) -> TokenStream {

@@ -1,7 +1,7 @@
-use layout::namespace_mod;
+use modules::namespace;
 
-namespace_mod!(read);
-namespace_mod!(write);
+namespace!(read);
+namespace!(write);
 
 pub use read::*;
 pub use write::*;

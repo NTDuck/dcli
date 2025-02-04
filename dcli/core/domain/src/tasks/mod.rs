@@ -1,6 +1,6 @@
-use layout::class_mod;
+use modules::*;
 
-class_mod!(pub _Task);
-class_mod!(pub _TaskId);
-class_mod!(pub _TaskDescription);
-class_mod!(pub _TaskStatus);
+class!(pub _Task);
+class!(pub _TaskId);
+class!(pub _TaskDescription);
+class!(pub _TaskStatus);

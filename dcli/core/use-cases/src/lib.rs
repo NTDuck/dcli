@@ -1,6 +1,6 @@
-use layout::namespace_mod;
+use modules::*;
 
-namespace_mod!(pub boundaries);
-namespace_mod!(pub interactors);
-namespace_mod!(pub gateways);
-namespace_mod!(pub utils);
+namespace!(pub boundaries);
+namespace!(pub interactors);
+namespace!(pub gateways);
+namespace!(pub utils);

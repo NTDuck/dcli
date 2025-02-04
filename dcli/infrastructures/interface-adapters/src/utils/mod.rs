@@ -1,3 +1,3 @@
-use layout::namespace_mod;
+use modules::*;
 
-namespace_mod!(pub adapters);
+namespace!(pub adapters);

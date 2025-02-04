@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-layout = { path = "../../../libs/layout" }
+modules = { path = "../../../libs/modules" }
+
 domain = { path = "../../core/domain" }
 use-cases = { path = "../../core/use-cases" }
 

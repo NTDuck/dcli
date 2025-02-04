@@ -1,3 +1,3 @@
-use layout::namespace_mod;
+use modules::*;
 
-namespace_mod!(pub inmemory);
+namespace!(pub inmemory);

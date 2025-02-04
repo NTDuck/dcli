@@ -1,5 +1,5 @@
-use layout::namespace_mod;
+use modules::*;
 
-namespace_mod!(pub repositories);
-namespace_mod!(pub factories);
-namespace_mod!(utils);
+namespace!(pub repositories);
+namespace!(pub factories);
+namespace!(utils);

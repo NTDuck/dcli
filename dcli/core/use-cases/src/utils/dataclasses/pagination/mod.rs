@@ -1,6 +1,6 @@
-use layout::class_mod;
+use modules::*;
 
-class_mod!(pub _PaginationRequest);
-class_mod!(pub _PaginationResponse);
-class_mod!(pub _PaginationRange);
-class_mod!(pub _PaginationProperties);
+class!(pub _PaginationRequest);
+class!(pub _PaginationResponse);
+class!(pub _PaginationRange);
+class!(pub _PaginationProperties);

@@ -11,7 +11,7 @@
 /// A namespace-like module can contain one or more class-like modules and/or
 /// namespace-like modules.
 #[macro_export]
-macro_rules! namespace_mod {
+macro_rules! namespace {
     ($visibility:vis $module:ident) => {
         $visibility mod $module;
     };

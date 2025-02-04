@@ -4,9 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-layout = { path = "../../../libs/layout" }
+modules = { path = "../../../libs/modules" }
+types = { path = "../../../libs/types" }
 ddd = { path = "../../../libs/ddd" }
 
 domain = { path = "../domain" }
-
-derive-new = "0.7.0"

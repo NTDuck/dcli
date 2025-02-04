@@ -1,4 +1,4 @@
-use layout::class_mod;
+use modules::*;
 
-class_mod!(pub _ViewTasksController);
-class_mod!(pub _CreateTaskController);
+class!(pub _ViewTasksController);
+class!(pub _CreateTaskController);

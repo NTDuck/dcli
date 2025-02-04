@@ -1,5 +1,5 @@
-use layout::class_mod;
+use modules::*;
 
-class_mod!(pub _Entity);
-class_mod!(pub _Identifier);
-class_mod!(pub _ValueObject);
+class!(pub _Entity);
+class!(pub _Identifier);
+class!(pub _ValueObject);

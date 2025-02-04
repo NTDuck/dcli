@@ -1,9 +1,8 @@
-use layout::class_mod;
-use layout::namespace_mod;
+use modules::*;
 
-namespace_mod!(pub payloads);
+namespace!(pub payloads);
 
-class_mod!(pub _TokenStream);
-class_mod!(pub _AbstractSyntaxTree);
+class!(pub _TokenStream);
+class!(pub _AbstractSyntaxTree);
 
 pub use payloads::*;

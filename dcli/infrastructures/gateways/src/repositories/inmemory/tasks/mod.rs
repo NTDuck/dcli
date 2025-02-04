@@ -1,4 +1,4 @@
-use layout::class_mod;
+use modules::*;
 
-class_mod!(pub _UnorderedInMemoryTaskRepository);
-class_mod!(pub _OrderedInMemoryTaskRepository);
+class!(pub _UnorderedInMemoryTaskRepository);
+class!(pub _OrderedInMemoryTaskRepository);

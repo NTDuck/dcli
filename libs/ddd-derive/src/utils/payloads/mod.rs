@@ -1,5 +1,5 @@
-use layout::class_mod;
+use modules::*;
 
-class_mod!(pub _DefaultPayload);
-class_mod!(pub _DefaultStructPayload);
-class_mod!(pub _DefaultEnumPayload);
+class!(pub _DefaultPayload);
+class!(pub _DefaultStructPayload);
+class!(pub _DefaultEnumPayload);

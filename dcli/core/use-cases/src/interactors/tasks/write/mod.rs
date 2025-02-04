@@ -1,7 +1,7 @@
-use layout::class_mod;
+use modules::*;
 
-class_mod!(pub _CreateTaskInteractor);
-class_mod!(pub _UpdateTaskDescriptionInteractor);
-class_mod!(pub _UpdateTaskStatusInteractor);
-class_mod!(pub _RemoveTaskInteractor);
-class_mod!(pub _ClearTasksInteractor);
+class!(pub _CreateTaskInteractor);
+class!(pub _UpdateTaskDescriptionInteractor);
+class!(pub _UpdateTaskStatusInteractor);
+class!(pub _RemoveTaskInteractor);
+class!(pub _ClearTasksInteractor);

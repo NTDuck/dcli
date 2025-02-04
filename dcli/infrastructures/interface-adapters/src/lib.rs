@@ -1,4 +1,4 @@
-use layout::namespace_mod;
+use modules::*;
 
-namespace_mod!(pub controllers);
-namespace_mod!(utils);
+namespace!(pub controllers);
+namespace!(utils);
