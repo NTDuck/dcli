@@ -1,7 +1,13 @@
 use domain::Uuid;
 use use_cases::gateways::factories::ids::UuidFactory;
 
-pub struct UuidV4Factory {}
+pub struct UuidV4Factory;
+
+impl UuidV4Factory {
+    pub fn new() -> Self {
+        return Self;
+    }
+}
 
 impl UuidFactory for UuidV4Factory {
     fn generate(&self) -> Uuid {

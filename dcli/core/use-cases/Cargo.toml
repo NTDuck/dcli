@@ -8,3 +8,5 @@ layout = { path = "../../../libs/layout" }
 ddd = { path = "../../../libs/ddd" }
 
 domain = { path = "../domain" }
+
+derive-new = "0.7.0"

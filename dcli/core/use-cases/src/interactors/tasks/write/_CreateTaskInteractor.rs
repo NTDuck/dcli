@@ -1,5 +1,6 @@
 use std::time::Instant;
 
+use derive_new::new;
 use domain::Task;
 use domain::TaskDescription;
 use domain::TaskDescriptionError;
@@ -12,6 +13,7 @@ use crate::boundaries::tasks::CreateTaskResponseModel;
 use crate::gateways::repositories::tasks::TaskRepository;
 use crate::gateways::factories::ids::UuidFactory;
 
+#[derive(new)]
 pub struct CreateTaskInteractor<'deps> {
     task_repository: &'deps mut dyn TaskRepository,
     uuid_factory: &'deps dyn UuidFactory,
