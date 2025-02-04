@@ -1,15 +1,22 @@
 use std::sync::Arc;
 use std::sync::RwLock;
+use std::usize;
 
 use console::utils::io::IoGateway;
 use gateways::factories::ids::UuidV4Factory;
 use gateways::repositories::inmemory::tasks::OrderedInMemoryTaskRepository;
 use interface_adapters::controllers::tasks::CreateTaskController;
+use interface_adapters::controllers::tasks::CreateTaskRequestObject;
 use interface_adapters::controllers::tasks::ViewTasksController;
+use interface_adapters::controllers::tasks::ViewTasksRequestObject;
+use interface_adapters::controllers::tasks::ViewTasksViewModel;
+use interface_adapters::controllers::tasks::ViewableTask;
+use use_cases::boundaries::tasks::CreateTaskErrorModel;
 use use_cases::gateways::factories::ids::UuidFactory;
 use use_cases::gateways::repositories::tasks::TaskRepository;
 use use_cases::interactors::tasks::CreateTaskInteractor;
 use use_cases::interactors::tasks::ViewTasksInteractor;
+use use_cases::utils::dataclasses::pagination::PaginationRequest;
 
 fn main() {
     // Gateways
@@ -27,12 +34,13 @@ fn main() {
     // I/O
     let io_gateway = IoGateway;
 
+    // Main loop
     loop {
         io_gateway.write("\
             Select a number:\n\
             [0] Exit\n\
-            [1] View all tasks\n\
-            [2] Create a task\n \
+            [1] Create a task\n\
+            [2] View all tasks\n \
         ");
         
         match io_gateway.read_line().trim() {
@@ -41,10 +49,61 @@ fn main() {
                 break;
             },
             "1" => {
+                io_gateway.write("Enter task description: ");
+                let task_description = io_gateway.read_line();
 
+                let request = CreateTaskRequestObject {
+                    task_description,
+                };
+                let response = create_task_controller.apply(request);
+
+                match response {
+                    Ok(_) => (),
+                    Err(error) => match error {
+                        CreateTaskErrorModel::TaskDescriptionLengthUnderflow {
+                            actual_length,
+                            min_length_required,
+                        } => io_gateway.write_line(
+                            &format!("Error: Task description must be at least {} characters long, yours only has {}.",
+                            min_length_required, actual_length,
+                        )),
+                        CreateTaskErrorModel::TaskDescriptionLengthOverflow {
+                            actual_length,
+                            max_length_allowed,
+                        } => io_gateway.write_line(&format!("Error: Task description must be at most {max_length_allowed} characters long, yours has {actual_length}.")),
+                    },
+                }
             },
             "2" => {
+                let request = ViewTasksRequestObject {
+                    pagination_request: PaginationRequest {
+                        page_number: 1,
+                        max_page_size: usize::MAX,
+                    },
+                };
+                let response = view_tasks_controller.apply(request);
 
+                match response {
+                    Ok(ViewTasksViewModel {
+                        tasks,
+                        page_size,
+                        page_number,
+                        max_page_number,
+                        ..
+                    }) => {
+                        io_gateway.write_line(&format!("Page {page_number} of {max_page_number}, found {page_size} tasks:"));
+                        tasks
+                            .into_iter()
+                            .for_each(|ViewableTask {
+                                description,
+                                created_at,
+                                ..
+                            }| {
+                                io_gateway.write(&format!(" - [ {created_at}] {description}"));
+                            });
+                    },
+                    Err(_) => (),
+                }
             },
             _ => {
                 io_gateway.write_line("Invalid number.");

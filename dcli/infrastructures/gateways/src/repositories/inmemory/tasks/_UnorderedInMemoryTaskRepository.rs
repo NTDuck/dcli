@@ -4,6 +4,7 @@ use domain::Task;
 use domain::TaskId;
 use domain::TaskStatus;
 use use_cases::gateways::repositories::tasks::TaskRepository;
+use use_cases::utils::dataclasses::pagination::PaginationProperties;
 use use_cases::utils::dataclasses::pagination::PaginationRange;
 use use_cases::utils::dataclasses::pagination::PaginationRequest;
 use use_cases::utils::dataclasses::pagination::PaginationResponse;
@@ -99,6 +100,7 @@ impl TaskRepository for UnorderedInMemoryTaskRepository {
 impl UnorderedInMemoryTaskRepository {
     fn calc_max_page_number(&self, max_page_size: usize) -> usize {
         let total_items_count = self.tasks_by_ids.len();
-        return total_items_count.div_ceil(max_page_size);
+        return total_items_count.div_ceil(max_page_size)
+            + PaginationProperties::MIN_PAGE_SIZE;
     }
 }
