@@ -1,3 +1,3 @@
 use modules::*;
 
-namespace!(utils);
+namespace!(pub utils);

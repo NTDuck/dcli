@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use std::sync::RwLock;
 
+use console::utils::io::IoGateway;
 use gateways::factories::ids::UuidV4Factory;
 use gateways::repositories::inmemory::tasks::OrderedInMemoryTaskRepository;
 use interface_adapters::controllers::tasks::CreateTaskController;
@@ -23,7 +24,11 @@ fn main() {
     let create_task_controller = CreateTaskController::new(&create_task_interactor);
     let view_tasks_controller = ViewTasksController::new(&view_tasks_interactor);
 
+    // I/O
+    let io_gateway = IoGateway;
+
     loop {
+        io_gateway.write_line("Hello world");
         break;
     }
 }
