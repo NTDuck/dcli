@@ -1,5 +1,6 @@
 use crate::utils::*;
 
+#[allow(dead_code)]
 pub struct DefaultEnumPayload {
     pub ident: syn::Ident,
     pub generics: syn::Generics,
