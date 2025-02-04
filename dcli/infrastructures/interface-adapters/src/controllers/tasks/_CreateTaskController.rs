@@ -6,11 +6,11 @@ use use_cases::boundaries::tasks::CreateTaskResponseModel;
 
 #[derive(New)]
 pub struct CreateTaskController<'bdrs> {
-    interactor: &'bdrs mut dyn CreateTaskBoundary,
+    interactor: &'bdrs dyn CreateTaskBoundary,
 }
 
 impl<'bdr> CreateTaskController<'bdr> {
-    pub fn apply(&mut self, request: CreateTaskRequestObject) -> Result<CreateTaskViewModel, CreateTaskErrorViewModel> {
+    pub fn apply(&self, request: CreateTaskRequestObject) -> Result<CreateTaskViewModel, CreateTaskErrorViewModel> {
         let request = request.into();
         return match self.interactor.apply(request) {
             Ok(response) => Ok(CreateTaskViewModel::from(response)),

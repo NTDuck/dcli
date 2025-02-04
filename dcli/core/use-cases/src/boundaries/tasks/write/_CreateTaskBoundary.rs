@@ -1,5 +1,5 @@
 pub trait CreateTaskBoundary {
-    fn apply(&mut self, request: CreateTaskRequestModel) -> Result<CreateTaskResponseModel, CreateTaskErrorModel>;
+    fn apply(&self, request: CreateTaskRequestModel) -> Result<CreateTaskResponseModel, CreateTaskErrorModel>;
 }
 
 pub struct CreateTaskRequestModel {

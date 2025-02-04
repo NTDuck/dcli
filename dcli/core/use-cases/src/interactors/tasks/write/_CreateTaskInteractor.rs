@@ -1,3 +1,5 @@
+use std::sync::Arc;
+use std::sync::RwLock;
 use std::time::Instant;
 
 use domain::Task;
@@ -14,13 +16,13 @@ use crate::gateways::repositories::tasks::TaskRepository;
 use crate::gateways::factories::ids::UuidFactory;
 
 #[derive(New)]
-pub struct CreateTaskInteractor<'deps> {
-    task_repository: &'deps mut dyn TaskRepository,
-    uuid_factory: &'deps dyn UuidFactory,
+pub struct CreateTaskInteractor {
+    task_repository: Arc<RwLock<dyn TaskRepository>>,
+    uuid_factory: Arc<RwLock<dyn UuidFactory>>,
 }
 
-impl<'deps> CreateTaskBoundary for CreateTaskInteractor<'deps> {
-    fn apply(&mut self, request: CreateTaskRequestModel) -> Result<CreateTaskResponseModel, CreateTaskErrorModel> {
+impl CreateTaskBoundary for CreateTaskInteractor {
+    fn apply(&self, request: CreateTaskRequestModel) -> Result<CreateTaskResponseModel, CreateTaskErrorModel> {
         let CreateTaskRequestModel {
             task_description,
         } = request;
@@ -45,14 +47,18 @@ impl<'deps> CreateTaskBoundary for CreateTaskInteractor<'deps> {
             }
         };
 
+        let uuid = self.uuid_factory.read().unwrap()
+            .generate();
+
         let task = Task {
-            id: self.uuid_factory.generate(),
+            id: uuid,
             description: task_description,
             status: TaskStatus::Pending,
             created_at: Instant::now(),
         };
 
-        self.task_repository.save(&task);
+        self.task_repository.write().unwrap()
+            .save(&task);
 
         return Ok(CreateTaskResponseModel);
     }
