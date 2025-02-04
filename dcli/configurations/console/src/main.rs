@@ -28,7 +28,28 @@ fn main() {
     let io_gateway = IoGateway;
 
     loop {
-        io_gateway.write_line("Hello world");
-        break;
+        io_gateway.write("\
+            Select a number:\n\
+            [0] Exit\n\
+            [1] View all tasks\n\
+            [2] Create a task\n \
+        ");
+        
+        match io_gateway.read_line().trim() {
+            "0" => {
+                io_gateway.write_line("Exit signal received.");
+                break;
+            },
+            "1" => {
+
+            },
+            "2" => {
+
+            },
+            _ => {
+                io_gateway.write_line("Invalid number.");
+                continue;
+            },
+        }
     }
 }
