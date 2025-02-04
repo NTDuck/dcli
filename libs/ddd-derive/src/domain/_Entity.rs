@@ -42,6 +42,11 @@ struct Field {
     ident: Option<syn::Ident>,
     ty: syn::Type,
     
+    field: Option<FieldAttributes>,
+}
+
+#[derive(darling::FromMeta)]
+struct FieldAttributes {
     Identifier: Option<IdMarker>,
 }
 
@@ -119,5 +124,7 @@ fn is_id_field(field: &Field) -> bool {
 }
 
 fn field_has_id_attribute(field: &Field) -> bool {
-    return field.Identifier.is_some();
+    return field.field
+        .as_ref()
+        .map_or(false, |attributes| attributes.Identifier.is_some());
 }
