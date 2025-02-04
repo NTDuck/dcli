@@ -20,7 +20,7 @@ pub fn derive_entity(tokens: TokenStream) -> TokenStream {
 }
 
 #[derive(darling::FromDeriveInput)]
-#[darling(attributes(entity), supports(struct_named))]
+#[darling(attributes(ddd), supports(struct_named))]
 struct Payload {
     ident: syn::Ident,
     generics: syn::Generics,
@@ -37,12 +37,12 @@ impl TryFrom<AbstractSyntaxTree> for Payload {
 }
 
 #[derive(darling::FromField)]
-#[darling(attributes(entity))]
+#[darling(attributes(ddd))]
 struct Field {
     ident: Option<syn::Ident>,
     ty: syn::Type,
     
-    id: Option<IdMarker>,
+    Identifier: Option<IdMarker>,
 }
 
 #[derive(darling::FromMeta)]
@@ -115,22 +115,9 @@ fn generate_tokens_from_payload(payload: StructPayload) -> TokenStream {
 }
 
 fn is_id_field(field: &Field) -> bool {
-    return field_has_id_attribute(field)
-        || field_is_named_id(field);
+    return field_has_id_attribute(field);
 }
 
 fn field_has_id_attribute(field: &Field) -> bool {
-    return field.id.is_some();
-}
-
-fn field_is_named_id(field: &Field) -> bool {
-    const ALLOWED_IDENTS: [&'static str; 2] = [
-        "id",
-        "identifier",
-    ];
-
-    field.ident
-        .as_ref()
-        .map(|ident| ALLOWED_IDENTS.contains(&ident.to_string().as_str()))
-        .unwrap_or(false)
+    return field.Identifier.is_some();
 }

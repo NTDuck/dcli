@@ -4,7 +4,7 @@ use utils::TokenStream;
 namespace!(domain);
 namespace!(utils);
 
-#[proc_macro_derive(Entity, attributes(entity))]
+#[proc_macro_derive(Entity, attributes(ddd))]
 pub fn derive_entity(tokens: TokenStream) -> TokenStream {
     return domain::derive_entity(tokens);
 }
