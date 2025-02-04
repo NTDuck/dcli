@@ -1,9 +1,12 @@
+use types::New;
+
 use crate::boundaries::tasks::ViewTasksBoundary;
 use crate::boundaries::tasks::ViewTasksErrorModel;
 use crate::boundaries::tasks::ViewTasksRequestModel;
 use crate::boundaries::tasks::ViewTasksResponseModel;
 use crate::gateways::repositories::tasks::TaskRepository;
 
+#[derive(New)]
 pub struct ViewTasksInteractor<'deps> {
     task_repository: &'deps dyn TaskRepository,
 }

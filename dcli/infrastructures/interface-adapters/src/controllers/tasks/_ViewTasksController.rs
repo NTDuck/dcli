@@ -1,5 +1,6 @@
 use domain::Task;
 use domain::TaskStatus;
+use types::New;
 use use_cases::boundaries::tasks::ViewTasksBoundary;
 use use_cases::boundaries::tasks::ViewTasksErrorModel;
 use use_cases::boundaries::tasks::ViewTasksRequestModel;
@@ -7,6 +8,7 @@ use use_cases::boundaries::tasks::ViewTasksResponseModel;
 
 use crate::utils::adapters::TimestampAdapter;
 
+#[derive(New)]
 pub struct ViewTasksController<'bdrs> {
     interactor: &'bdrs dyn ViewTasksBoundary,
 }

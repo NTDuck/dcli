@@ -1,8 +1,10 @@
+use types::New;
 use use_cases::boundaries::tasks::CreateTaskBoundary;
 use use_cases::boundaries::tasks::CreateTaskErrorModel;
 use use_cases::boundaries::tasks::CreateTaskRequestModel;
 use use_cases::boundaries::tasks::CreateTaskResponseModel;
 
+#[derive(New)]
 pub struct CreateTaskController<'bdrs> {
     interactor: &'bdrs mut dyn CreateTaskBoundary,
 }
