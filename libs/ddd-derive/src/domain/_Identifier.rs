@@ -43,6 +43,8 @@ fn generate_tokens_from_struct_payload(payload: DefaultStructPayload) -> TokenSt
             }
         }
 
+        impl #generics Copy for #ident #generics {}
+
         impl #generics PartialEq for #ident #generics {
             fn eq(&self, other: &Self) -> bool {
                 return true #( && self.#fields == other.#fields)*;
@@ -50,5 +52,11 @@ fn generate_tokens_from_struct_payload(payload: DefaultStructPayload) -> TokenSt
         }
 
         impl #generics Eq for #ident #generics {}
+
+        impl #generics std::hash::Hash for #ident #generics {
+            fn hash<Hasher: std::hash::Hasher>(&self, state: &mut Hasher) {
+                #(self.#fields.hash(state); )*
+            }
+        }
     }.into();
 }
