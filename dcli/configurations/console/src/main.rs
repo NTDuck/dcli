@@ -20,11 +20,13 @@ use use_cases::utils::dataclasses::pagination::PaginationRequest;
 
 fn main() {
     // Gateways
-    let task_repository: Arc<RwLock<dyn TaskRepository>> = Arc::new(RwLock::new(OrderedInMemoryTaskRepository::new()));
+    let task_repository: Arc<RwLock<dyn TaskRepository>> =
+        Arc::new(RwLock::new(OrderedInMemoryTaskRepository::new()));
     let uuid_factory: Arc<RwLock<dyn UuidFactory>> = Arc::new(RwLock::new(UuidV4Factory::new()));
 
     // Interactors
-    let create_task_interactor = CreateTaskInteractor::new(Arc::clone(&task_repository), Arc::clone(&uuid_factory));
+    let create_task_interactor =
+        CreateTaskInteractor::new(Arc::clone(&task_repository), Arc::clone(&uuid_factory));
     let view_tasks_interactor = ViewTasksInteractor::new(Arc::clone(&task_repository));
 
     // Controllers
@@ -36,13 +38,15 @@ fn main() {
 
     // Main loop
     loop {
-        io_gateway.write("\
+        io_gateway.write(
+            "\
             Select a number:\n\
             [0] Exit\n\
             [1] Create a task\n\
             [2] View all tasks\n \
-        ");
-        
+        ",
+        );
+
         match io_gateway.read_line().trim() {
             "0" => {
                 io_gateway.write_line("Exit signal received.");
@@ -52,9 +56,7 @@ fn main() {
                 io_gateway.write("Enter task description: ");
                 let task_description = io_gateway.read_line();
 
-                let request = CreateTaskRequestObject {
-                    task_description,
-                };
+                let request = CreateTaskRequestObject { task_description };
                 let response = create_task_controller.apply(request);
 
                 match response {
@@ -91,16 +93,18 @@ fn main() {
                         max_page_number,
                         ..
                     }) => {
-                        io_gateway.write_line(&format!("Page {page_number} of {max_page_number}, found {page_size} tasks:"));
-                        tasks
-                            .into_iter()
-                            .for_each(|ViewableTask {
-                                description,
-                                created_at,
-                                ..
-                            }| {
+                        io_gateway.write_line(&format!(
+                            "Page {page_number} of {max_page_number}, found {page_size} tasks:"
+                        ));
+                        tasks.into_iter().for_each(
+                            |ViewableTask {
+                                 description,
+                                 created_at,
+                                 ..
+                             }| {
                                 io_gateway.write(&format!(" - [ {created_at}] {description}"));
-                            });
+                            },
+                        );
                     },
                     Err(_) => (),
                 }

@@ -2,9 +2,9 @@
 
 ```
 rustup install nightly
-rustup override set nightly
 ```
 
 ```
+rustup run nightly cargo fmt
 cargo run
 ```
