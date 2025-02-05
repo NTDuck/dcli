@@ -9,6 +9,7 @@ modules = { path = "../modules" }
 syn = "2"
 quote = "1"
 darling = "0.20.10"
+proc-macro2 = "1.0.93"
 
 [lib]
 proc-macro = true

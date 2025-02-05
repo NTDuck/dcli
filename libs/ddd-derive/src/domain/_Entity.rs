@@ -1,4 +1,4 @@
-use crate::utils::tokens;
+use crate::utils::tokenize;
 use crate::utils::Field;
 use crate::utils::TokenStream;
 use crate::utils::StructAbstractSyntaxTree;
@@ -44,7 +44,7 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<EntityField>) -
     let id_field_ident = id_field.ident.as_ref().unwrap();
     let id_field_ty = &id_field.ty;
 
-    return tokens! {
+    return tokenize! {
         impl #generics ddd::domain::Entity for #ident #generics {
             type Id = #id_field_ty;
 

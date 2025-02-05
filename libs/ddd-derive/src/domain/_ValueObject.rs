@@ -1,5 +1,5 @@
 use crate::utils::generate_Clone_impl;
-use crate::utils::tokens;
+use crate::utils::tokenize;
 use crate::utils::Field;
 use crate::utils::TokenStream;
 use crate::utils::StructAbstractSyntaxTree;
@@ -29,7 +29,7 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> Toke
 
     let Clone_impl = generate_Clone_impl(&ident, &generics, &field_idents);
 
-    return tokens! {
+    return tokenize! {
         impl #generics ddd::domain::ValueObject for #ident #generics {}
 
         #Clone_impl

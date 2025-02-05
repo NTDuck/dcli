@@ -1,4 +1,4 @@
-use crate::utils::tokens;
+use crate::utils::tokenize;
 use crate::utils::Field;
 use crate::utils::TokenStream;
 use crate::utils::StructAbstractSyntaxTree;
@@ -26,7 +26,7 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> Toke
         ..
     } = ast;
 
-    return tokens! {
+    return tokenize! {
         impl #generics ddd::domain::Identifier for #ident #generics {}
         impl #generics ddd::domain::ValueObject for #ident #generics {}
 
