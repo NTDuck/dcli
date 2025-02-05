@@ -29,6 +29,14 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> Toke
     return tokenize! {
         impl #generics ddd::domain::ValueObject for #ident #generics {}
 
+        impl #generics std::fmt::Debug for #ident #generics {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.debug_struct(stringify!(#ident))
+                    #(.field(stringify!(#field_idents), &self.#field_idents))*
+                    .finish()
+            }
+        }        
+
         impl #generics Clone for #ident #generics {
             fn clone(&self) -> Self {
                 return Self {

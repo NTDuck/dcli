@@ -1,4 +1,6 @@
-#[derive(PartialEq, Eq)]
+use std::fmt::Debug;
+
+#[derive(Debug, PartialEq, Eq)]
 pub struct PaginationResponse<T> {
     pub items: Vec<T>,
     pub page_size: usize,
@@ -9,7 +11,7 @@ pub struct PaginationResponse<T> {
 
 impl<T> ddd::ValueObject for PaginationResponse<T>
 where
-    T: Clone + Eq,
+    T: Debug + Clone + Eq,
 {}
 
 impl<T> Clone for PaginationResponse<T>

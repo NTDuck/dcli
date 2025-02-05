@@ -1,1 +1,3 @@
-pub trait ValueObject: Clone + PartialEq + Eq {}
+use std::fmt::Debug;
+
+pub trait ValueObject: Debug + Clone + PartialEq + Eq {}
