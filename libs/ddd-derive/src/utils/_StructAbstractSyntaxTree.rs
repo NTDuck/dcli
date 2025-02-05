@@ -1,5 +1,5 @@
 use crate::utils::AbstractSyntaxTree;
-// use crate::utils::Field;
+use crate::utils::Field;
 
 pub struct StructAbstractSyntaxTree<Field>
 where
@@ -30,45 +30,35 @@ where
     }
 }
 
-// impl<Attribute> StructAbstractSyntaxTree<Field<Attribute>>
-// where
-//     Attribute: darling::FromMeta,
-// {
-//     fn is_named_struct(&self) -> bool {
-//         return self.fields
-//             .iter()
-//             .all(|field| field.ident.is_some());
-//     }
+impl<Attribute> StructAbstractSyntaxTree<Field<Attribute>>
+where
+    Attribute: darling::FromMeta,
+{
+    pub fn get_field_idents(&self) -> Vec<syn::Member> {
+        return match self.is_named_struct() {
+            true => self.generate_fields_for_named_struct(),
+            false => self.generate_fields_for_unnamed_struct(),
+        };
+    }
+
+    fn is_named_struct(&self) -> bool {
+        return self.fields
+            .iter()
+            .all(|field| field.ident.is_some());
+    }
     
-//     fn generate_fields_for_named_struct(&self) -> Vec<syn::Member> {
-//         return self.fields
-//             .iter()
-//             .filter_map(|field| field.ident.clone())
-//             .map(|ident| syn::Member::Named(ident))
-//             .collect();
-//     }
+    fn generate_fields_for_named_struct(&self) -> Vec<syn::Member> {
+        return self.fields
+            .iter()
+            .filter_map(|field| field.ident.clone())
+            .map(|ident| syn::Member::Named(ident))
+            .collect();
+    }
     
-//     fn generate_fields_for_unnamed_struct(&self) -> Vec<syn::Member> {
-//         return (0..self.fields.len())
-//             .map(|index| syn::Index::from(index))
-//             .map(|index| syn::Member::Unnamed(index))
-//             .collect();
-//     }
-// }
-
-// impl From<DefaultPayload> for DefaultStructPayload {
-//     fn from(payload: DefaultPayload) -> Self {
-//         let fields = payload.data.take_struct().unwrap();
-
-//         return Self {
-//             ident: payload.ident,
-//             generics: payload.generics,
-//             fields: match is_named_struct(&fields) {
-//                 true => generate_fields_for_named_struct(&fields),
-//                 false => generate_fields_for_unnamed_struct(&fields),
-//             },
-//         };
-//     }
-// }
-
-
+    fn generate_fields_for_unnamed_struct(&self) -> Vec<syn::Member> {
+        return (0..self.fields.len())
+            .map(|index| syn::Index::from(index))
+            .map(|index| syn::Member::Unnamed(index))
+            .collect();
+    }
+}

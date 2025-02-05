@@ -14,21 +14,16 @@ pub fn derive_identifier(tokens: TokenStream) -> TokenStream {
     }
 }
 
-type AbstractSyntaxTree = crate::utils::AbstractSyntaxTree<darling::util::Ignored, syn::Field>;
+type AbstractSyntaxTree = crate::utils::AbstractSyntaxTree<darling::util::Ignored, Field>;
 
-fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<syn::Field>) -> TokenStream {
+fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> TokenStream {
+    let field_idents = ast.get_field_idents();
+
     let StructAbstractSyntaxTree {
         ident,
         generics,
-        fields,
         ..
     } = ast;
-
-    let fields: Vec<_> = fields
-        .iter()
-        .filter_map(|field| field.ident.clone())
-        .map(|ident| syn::Member::Named(ident))
-        .collect();
 
     return quote! {
         impl #generics ddd::domain::Identifier for #ident #generics {}
@@ -37,14 +32,14 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<syn::Field>) ->
         impl #generics Clone for #ident #generics {
             fn clone(&self) -> Self {
                 return Self {
-                    #(#fields: self.#fields.clone(), )*
+                    #(#field_idents: self.#field_idents.clone(), )*
                 };
             }
         }
 
         impl #generics PartialEq for #ident #generics {
             fn eq(&self, other: &Self) -> bool {
-                return true #( && self.#fields == other.#fields)*;
+                return true #( && self.#field_idents == other.#field_idents)*;
             }
         }
 
