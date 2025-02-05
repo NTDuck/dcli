@@ -1,6 +1,8 @@
 use quote::quote;
 
-use crate::utils::*;
+use crate::utils::Field;
+use crate::utils::TokenStream;
+use crate::utils::StructAbstractSyntaxTree;
 
 pub fn derive_identifier(tokens: TokenStream) -> TokenStream {
     let ast = match AbstractSyntaxTree::try_from(tokens) {

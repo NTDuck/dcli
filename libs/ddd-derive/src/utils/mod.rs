@@ -1,6 +1,7 @@
 use modules::*;
 
-class!(pub _TokenStream);
-class!(pub _AbstractSyntaxTree);
-class!(pub _StructAbstractSyntaxTree);
-class!(pub _Field);
+namespace!(pub ast);
+namespace!(pub implementations);
+
+pub use ast::*;
+pub use implementations::*;
