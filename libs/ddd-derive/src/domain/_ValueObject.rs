@@ -1,7 +1,3 @@
-use crate::utils::generate_Clone_impl_for_struct_ast;
-use crate::utils::generate_Copy_impl_for_struct_ast;
-use crate::utils::generate_Eq_impl_for_struct_ast;
-use crate::utils::generate_PartialEq_impl_for_struct_ast;
 use crate::utils::tokenize;
 use crate::utils::Field;
 use crate::utils::TokenStream;
@@ -22,10 +18,8 @@ pub fn derive_value_object(tokens: TokenStream) -> TokenStream {
 type AbstractSyntaxTree = crate::utils::AbstractSyntaxTree<darling::util::Ignored, Field>;
 
 fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> TokenStream {
-    let Clone_impl = generate_Clone_impl_for_struct_ast(&ast);
-    let PartialEq_impl = generate_PartialEq_impl_for_struct_ast(&ast);
-    let Eq_impl = generate_Eq_impl_for_struct_ast(&ast);
-    
+    let field_idents = ast.get_field_idents();
+
     let StructAbstractSyntaxTree {
         ident,
         generics,
@@ -35,8 +29,26 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> Toke
     return tokenize! {
         impl #generics ddd::domain::ValueObject for #ident #generics {}
 
-        #Clone_impl
-        #PartialEq_impl
-        #Eq_impl
+        impl #generics Clone for #ident #generics {
+            fn clone(&self) -> Self {
+                return Self {
+                    #(#field_idents: self.#field_idents.clone()),*
+                };
+            }
+        }
+
+        impl #generics PartialEq for #ident #generics {
+            fn eq(&self, other: &Self) -> bool {
+                return true #( && self.#field_idents == other.#field_idents)*;
+            }
+        }
+
+        impl #generics Eq for #ident #generics {}
+
+        impl #generics std::hash::Hash for #ident #generics {
+            fn hash<Hasher: std::hash::Hasher>(&self, state: &mut Hasher) {
+                #(self.#field_idents.hash(state); )*
+            }
+        }
     };
 }
