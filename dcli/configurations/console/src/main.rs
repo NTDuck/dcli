@@ -102,7 +102,7 @@ fn main() {
                                  created_at,
                                  ..
                              }| {
-                                io_gateway.write(&format!(" - [ {created_at}] {description}"));
+                                io_gateway.write_line(&format!(" - [ {created_at}] {description}"));
                             },
                         );
                     },

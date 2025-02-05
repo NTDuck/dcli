@@ -4,6 +4,7 @@ use domain::TaskStatus;
 use indexmap::map::MutableKeys;
 use indexmap::IndexMap;
 use use_cases::gateways::repositories::tasks::TaskRepository;
+use use_cases::utils::dataclasses::pagination::PaginationProperties;
 use use_cases::utils::dataclasses::pagination::PaginationRange;
 use use_cases::utils::dataclasses::pagination::PaginationRequest;
 use use_cases::utils::dataclasses::pagination::PaginationResponse;
@@ -51,8 +52,11 @@ impl TaskRepository for OrderedInMemoryTaskRepository {
             page_size: page_size,
             max_page_size: pagination_request.max_page_size,
             page_number: pagination_request.page_number,
-            max_page_number: self.tasks_by_ids.len()
-                .div_ceil(pagination_request.max_page_size),
+            max_page_number: match self.tasks_by_ids.len() {
+                0 => PaginationProperties::MIN_PAGE_SIZE,
+                _ => self.tasks_by_ids.len()
+                    .div_ceil(pagination_request.max_page_size),
+            },
         };
     }
 
@@ -75,11 +79,16 @@ impl TaskRepository for OrderedInMemoryTaskRepository {
             page_size: page_size,
             max_page_size: pagination_request.max_page_size,
             page_number: pagination_request.page_number,
-            max_page_number: self.tasks_by_ids
-                .values()
-                .filter(|task| task.status == status)
-                .count()
-                .div_ceil(pagination_request.max_page_size),
+            max_page_number: {
+                let total_items_count = self.tasks_by_ids
+                    .values()
+                    .filter(|task| task.status == status)
+                    .count();
+                match total_items_count {
+                    0 => PaginationProperties::MIN_PAGE_SIZE,
+                    _ => total_items_count.div_ceil(pagination_request.max_page_size),
+                }
+            },
         };
     }
 
