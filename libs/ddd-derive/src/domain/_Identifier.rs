@@ -1,5 +1,4 @@
-use quote::quote;
-
+use crate::utils::tokens;
 use crate::utils::Field;
 use crate::utils::TokenStream;
 use crate::utils::StructAbstractSyntaxTree;
@@ -12,7 +11,7 @@ pub fn derive_identifier(tokens: TokenStream) -> TokenStream {
 
     return match ast.data.is_struct() {
         true => generate_tokens_from_struct_ast(StructAbstractSyntaxTree::from(ast)),
-        false => todo!()
+        false => todo!(),
     };
 }
 
@@ -27,7 +26,7 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> Toke
         ..
     } = ast;
 
-    return quote! {
+    return tokens! {
         impl #generics ddd::domain::Identifier for #ident #generics {}
         impl #generics ddd::domain::ValueObject for #ident #generics {}
 
@@ -54,5 +53,5 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> Toke
                 #(self.#field_idents.hash(state); )*
             }
         }
-    }.into();
+    };
 }

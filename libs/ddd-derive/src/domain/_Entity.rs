@@ -1,5 +1,4 @@
-use quote::quote;
-
+use crate::utils::tokens;
 use crate::utils::Field;
 use crate::utils::TokenStream;
 use crate::utils::StructAbstractSyntaxTree;
@@ -12,7 +11,7 @@ pub fn derive_entity(tokens: TokenStream) -> TokenStream {
 
     return match ast.data.is_struct() {
         true => generate_tokens_from_struct_ast(StructAbstractSyntaxTree::from(ast)),
-        false => TokenStream::from(quote! { "bofa" }),
+        false => todo!(),
     }
 }
 
@@ -45,7 +44,7 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<EntityField>) -
     let id_field_ident = id_field.ident.as_ref().unwrap();
     let id_field_ty = &id_field.ty;
 
-    quote! {
+    return tokens! {
         impl #generics ddd::domain::Entity for #ident #generics {
             type Id = #id_field_ty;
 
@@ -73,7 +72,7 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<EntityField>) -
         }
 
         impl #generics Eq for #ident #generics {}
-    }.into()
+    };
 }
 
 fn is_id_field(field: &EntityField) -> bool {
@@ -83,5 +82,6 @@ fn is_id_field(field: &EntityField) -> bool {
 fn field_has_id_attribute(field: &EntityField) -> bool {
     return field.attributes
         .as_ref()
-        .map_or(false, |attributes| attributes.Identifier.is_some());
+        .map_or(false,
+            |attributes| attributes.Identifier.is_some());
 }
