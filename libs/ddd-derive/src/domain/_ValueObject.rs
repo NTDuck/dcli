@@ -1,3 +1,4 @@
+use crate::utils::generate_Clone_impl;
 use crate::utils::tokens;
 use crate::utils::Field;
 use crate::utils::TokenStream;
@@ -26,16 +27,12 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> Toke
         ..
     } = ast;
 
+    let Clone_impl = generate_Clone_impl(&ident, &generics, &field_idents);
+
     return tokens! {
         impl #generics ddd::domain::ValueObject for #ident #generics {}
 
-        impl #generics Clone for #ident #generics {
-            fn clone(&self) -> Self {
-                return Self {
-                    #(#field_idents: self.#field_idents.clone()),*
-                };
-            }
-        }
+        #Clone_impl
 
         impl #generics PartialEq for #ident #generics {
             fn eq(&self, other: &Self) -> bool {
