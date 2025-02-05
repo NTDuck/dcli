@@ -5,12 +5,15 @@ use crate::utils::*;
 pub fn derive_identifier(tokens: TokenStream) -> TokenStream {
     let ast = match AbstractSyntaxTree::try_from(tokens) {
         Ok(ast) => ast,
-        Err(error) => return error.write_errors().into(),
+        Err(error) => {
+            eprintln!("darling error: {:?}", error);
+            return error.write_errors().into()
+        },
     };
 
     match ast.data.is_struct() {
         true => generate_tokens_from_struct_ast(StructAbstractSyntaxTree::from(ast)),
-        false => todo!(),
+        false => TokenStream::from(quote! { "bofa" }),
     }
 }
 
@@ -32,7 +35,7 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> Toke
         impl #generics Clone for #ident #generics {
             fn clone(&self) -> Self {
                 return Self {
-                    #(#field_idents: self.#field_idents.clone(), )*
+                    #(#field_idents: self.#field_idents.clone()),*
                 };
             }
         }

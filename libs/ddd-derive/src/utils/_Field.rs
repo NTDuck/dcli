@@ -1,6 +1,10 @@
 #[derive(darling::FromField)]
 #[darling(attributes(ddd))]
-pub struct Field<Attributes = ()> {
+#[allow(dead_code)]
+pub struct Field<Attributes = darling::util::Ignored>
+where
+    Attributes: darling::FromMeta,
+{
     pub attrs: Vec<syn::Attribute>,
     pub vis: syn::Visibility,
     pub ident: Option<syn::Ident>,

@@ -1,6 +1,7 @@
 use crate::utils::AbstractSyntaxTree;
 use crate::utils::Field;
 
+#[allow(dead_code)]
 pub struct StructAbstractSyntaxTree<Field>
 where
     Field: darling::FromField,
@@ -18,7 +19,7 @@ where
     Field: darling::FromField,
 {
     fn from(ast: AbstractSyntaxTree<Variant, Field>) -> Self {
-        assert!(ast.data.is_struct());
+        // assert!(ast.data.is_struct());
         
         return Self {
             attrs: ast.attrs,

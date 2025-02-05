@@ -11,7 +11,7 @@ pub fn derive_entity(tokens: TokenStream) -> TokenStream {
 
     return match ast.data.is_struct() {
         true => generate_tokens_from_struct_ast(StructAbstractSyntaxTree::from(ast)),
-        false => todo!(),
+        false => TokenStream::from(quote! { "bofa" }),
     }
 }
 
@@ -60,7 +60,7 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<EntityField>) -
         impl #generics Clone for #ident #generics {
             fn clone(&self) -> Self {
                 return Self {
-                    #(#fields: self.#fields.clone(), )*
+                    #(#fields: self.#fields.clone()),*
                 };
             }
         }
