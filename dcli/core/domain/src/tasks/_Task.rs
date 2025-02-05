@@ -1,6 +1,8 @@
 use std::time::Instant;
 
-use crate::tasks::*;
+use crate::tasks::TaskDescription;
+use crate::tasks::TaskId;
+use crate::tasks::TaskStatus;
 
 #[derive(ddd::Entity)]
 pub struct Task {
