@@ -5,10 +5,7 @@ use crate::utils::*;
 pub fn derive_identifier(tokens: TokenStream) -> TokenStream {
     let ast = match AbstractSyntaxTree::try_from(tokens) {
         Ok(ast) => ast,
-        Err(error) => {
-            eprintln!("darling error: {:?}", error);
-            return error.write_errors().into()
-        },
+        Err(error) => return error.write_errors().into(),
     };
 
     match ast.data.is_struct() {

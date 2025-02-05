@@ -5,10 +5,7 @@ use crate::utils::*;
 pub fn derive_value_object(tokens: TokenStream) -> TokenStream {
     let ast = match AbstractSyntaxTree::try_from(tokens) {
         Ok(ast) => ast,
-        Err(error) => {
-            eprintln!("darling error: {:?}", error);
-            return error.write_errors().into()
-        },
+        Err(error) => return error.write_errors().into(),
     };
 
     match ast.data.is_struct() {
@@ -17,9 +14,9 @@ pub fn derive_value_object(tokens: TokenStream) -> TokenStream {
     }
 }
 
-type AbstractSyntaxTree = crate::utils::AbstractSyntaxTree<darling::util::Ignored, Field>;
+type AbstractSyntaxTree = crate::utils::AbstractSyntaxTree<darling::util::Ignored, syn::Field>;
 
-fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> TokenStream {
+fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<syn::Field>) -> TokenStream {
     let field_idents = ast.get_field_idents();
 
     let StructAbstractSyntaxTree {

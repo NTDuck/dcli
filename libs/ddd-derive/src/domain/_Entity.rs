@@ -27,6 +27,8 @@ struct FieldAttributes {
 struct IdMarker;
 
 fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<EntityField>) -> TokenStream {
+    let fields_ident = ast.get_field_idents();
+
     let StructAbstractSyntaxTree {
         ident,
         generics,
@@ -39,19 +41,15 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<EntityField>) -
         .find(|field| is_id_field(&field))
         .unwrap();
 
-    let id_ident = id_field.ident.as_ref().unwrap();
-    let id_type = &id_field.ty;
-
-    let fields = fields
-        .iter()
-        .map(|field| field.ident.as_ref().unwrap());
+    let id_field_ident = id_field.ident.as_ref().unwrap();
+    let id_field_ty = &id_field.ty;
 
     quote! {
         impl #generics ddd::domain::Entity for #ident #generics {
-            type Id = #id_type;
+            type Id = #id_field_ty;
 
             fn get_id(&self) -> &Self::Id {
-                return &self.#id_ident;
+                return &self.#id_field_ident;
             }
         }
 
@@ -60,7 +58,7 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<EntityField>) -
         impl #generics Clone for #ident #generics {
             fn clone(&self) -> Self {
                 return Self {
-                    #(#fields: self.#fields.clone()),*
+                    #(#fields_ident: self.#fields_ident.clone()),*
                 };
             }
         }
