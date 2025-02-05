@@ -1,22 +1,30 @@
-use std::ops::Deref;
-
 use crate::utils::TokenStream;
 
-pub struct AbstractSyntaxTree(syn::DeriveInput);
-
-impl Deref for AbstractSyntaxTree {
-    type Target = syn::DeriveInput;
-
-    fn deref(&self) -> &Self::Target {
-        return &self.0;
-    }
+#[derive(darling::FromDeriveInput)]
+#[darling(supports(any))]
+pub struct AbstractSyntaxTree<Variant, Field>
+where 
+    Variant: darling::FromVariant,
+    Field: darling::FromField,
+{
+    pub attrs: Vec<syn::Attribute>,
+    pub vis: syn::Visibility,
+    pub ident: syn::Ident,
+    pub generics: syn::Generics,
+    pub data: darling::ast::Data<Variant, Field>,
 }
 
-impl TryFrom<TokenStream> for AbstractSyntaxTree {
-    type Error = syn::Error;
+impl<Variant, Field> TryFrom<TokenStream> for AbstractSyntaxTree<Variant, Field>
+where 
+    Variant: darling::FromVariant,
+    Field: darling::FromField,
+{
+    type Error = darling::Error;
 
     fn try_from(tokens: TokenStream) -> Result<Self, Self::Error> {
-        return syn::parse(tokens)
-            .map(AbstractSyntaxTree);
+        use darling::FromDeriveInput;
+
+        let derive_input = syn::parse(tokens)?;
+        return Self::from_derive_input(&derive_input);
     }
 }

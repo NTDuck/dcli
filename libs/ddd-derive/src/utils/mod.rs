@@ -1,8 +1,6 @@
 use modules::*;
 
-namespace!(pub payloads);
-
 class!(pub _TokenStream);
 class!(pub _AbstractSyntaxTree);
-
-pub use payloads::*;
+class!(pub _StructAbstractSyntaxTree);
+class!(pub _Field);

@@ -6,36 +6,16 @@ use crate::utils::*;
 pub fn derive_entity(tokens: TokenStream) -> TokenStream {
     let ast = match AbstractSyntaxTree::try_from(tokens) {
         Ok(ast) => ast,
-        Err(error) => return TokenStream::from(error.into_compile_error()),
+        Err(error) => return error.write_errors().into(),
     };
 
-    let payload = match Payload::try_from(ast) {
-        Ok(payload) => payload,
-        Err(error) => return TokenStream::from(error.write_errors()),
-    };
-
-    let payload = StructPayload::from(payload);
-
-    return generate_tokens_from_payload(payload);
-}
-
-#[derive(darling::FromDeriveInput)]
-#[darling(attributes(ddd), supports(struct_named))]
-struct Payload {
-    ident: syn::Ident,
-    generics: syn::Generics,
-    data: darling::ast::Data<darling::util::Ignored, EntityField>,
-}
-
-impl TryFrom<AbstractSyntaxTree> for Payload {
-    type Error = darling::Error;
-
-    fn try_from(ast: AbstractSyntaxTree) -> Result<Self, Self::Error> {
-        use darling::FromDeriveInput;
-        return Self::from_derive_input(&ast);
+    return match ast.data.is_struct() {
+        true => generate_tokens_from_struct_ast(StructAbstractSyntaxTree::from(ast)),
+        false => todo!(),
     }
 }
 
+type AbstractSyntaxTree = crate::utils::AbstractSyntaxTree<darling::util::Ignored, EntityField>;
 type EntityField = Field<FieldAttributes>;
 
 #[derive(darling::FromMeta)]
@@ -46,28 +26,13 @@ struct FieldAttributes {
 #[derive(darling::FromMeta)]
 struct IdMarker;
 
-struct StructPayload {
-    ident: syn::Ident,
-    generics: syn::Generics,
-    fields: darling::ast::Fields<EntityField>,
-}
-
-impl From<Payload> for StructPayload {
-    fn from(payload: Payload) -> Self {
-        return Self {
-            ident: payload.ident,
-            generics: payload.generics,
-            fields: payload.data.take_struct().unwrap(),
-        };
-    }
-}
-
-fn generate_tokens_from_payload(payload: StructPayload) -> TokenStream {
-    let StructPayload {
+fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<EntityField>) -> TokenStream {
+    let StructAbstractSyntaxTree {
         ident,
         generics,
         fields,
-    } = payload;
+        ..
+    } = ast;
 
     let id_field = fields
         .iter()

@@ -5,31 +5,30 @@ use crate::utils::*;
 pub fn derive_identifier(tokens: TokenStream) -> TokenStream {
     let ast = match AbstractSyntaxTree::try_from(tokens) {
         Ok(ast) => ast,
-        Err(error) => return TokenStream::from(error.into_compile_error()),
+        Err(error) => return error.write_errors().into(),
     };
 
-    let payload = match DefaultPayload::try_from(ast) {
-        Ok(payload) => payload,
-        Err(error) => return TokenStream::from(error.write_errors()),
-    };
-
-    match payload.data {
-        darling::ast::Data::Struct(_) => {
-            let payload = DefaultStructPayload::from(payload);
-            return generate_tokens_from_struct_payload(payload);
-        },
-        darling::ast::Data::Enum(_) => {
-            todo!()
-        },
+    match ast.data.is_struct() {
+        true => generate_tokens_from_struct_ast(StructAbstractSyntaxTree::from(ast)),
+        false => todo!(),
     }
 }
 
-fn generate_tokens_from_struct_payload(payload: DefaultStructPayload) -> TokenStream {
-    let DefaultStructPayload {
+type AbstractSyntaxTree = crate::utils::AbstractSyntaxTree<darling::util::Ignored, syn::Field>;
+
+fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<syn::Field>) -> TokenStream {
+    let StructAbstractSyntaxTree {
         ident,
         generics,
         fields,
-    } = payload;
+        ..
+    } = ast;
+
+    let fields: Vec<_> = fields
+        .iter()
+        .filter_map(|field| field.ident.clone())
+        .map(|ident| syn::Member::Named(ident))
+        .collect();
 
     return quote! {
         impl #generics ddd::domain::Identifier for #ident #generics {}
@@ -43,8 +42,6 @@ fn generate_tokens_from_struct_payload(payload: DefaultStructPayload) -> TokenSt
             }
         }
 
-        impl #generics Copy for #ident #generics {}
-
         impl #generics PartialEq for #ident #generics {
             fn eq(&self, other: &Self) -> bool {
                 return true #( && self.#fields == other.#fields)*;
@@ -52,11 +49,5 @@ fn generate_tokens_from_struct_payload(payload: DefaultStructPayload) -> TokenSt
         }
 
         impl #generics Eq for #ident #generics {}
-
-        impl #generics std::hash::Hash for #ident #generics {
-            fn hash<Hasher: std::hash::Hasher>(&self, state: &mut Hasher) {
-                #(self.#fields.hash(state); )*
-            }
-        }
     }.into();
 }
