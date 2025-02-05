@@ -22,8 +22,8 @@ impl OrderedInMemoryTaskRepository {
 }
 
 impl TaskRepository for OrderedInMemoryTaskRepository {
-    fn save(&mut self, task: &Task) {
-        self.tasks_by_ids.insert(task.id, task.clone());
+    fn save(&mut self, task: Task) {
+        self.tasks_by_ids.insert(task.id, task);
     }
 
     fn remove(&mut self, task_id: TaskId) {
@@ -31,9 +31,7 @@ impl TaskRepository for OrderedInMemoryTaskRepository {
     }
 
     fn get(&self, task_id: TaskId) -> Option<Task> {
-        return self.tasks_by_ids
-            .get(&task_id)
-            .cloned();
+        return self.tasks_by_ids.get(&task_id).cloned();
     }
 
     fn show(&self, pagination_request: PaginationRequest) -> PaginationResponse<Task> {

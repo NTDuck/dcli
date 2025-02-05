@@ -4,8 +4,8 @@ use std::ops::Deref;
 pub struct TaskDescription(String);
 
 impl TaskDescription {
-    const MIN_LENGTH: usize = 1;
-    const MAX_LENGTH: usize = 1024;
+    pub const MIN_LENGTH: usize = 1;
+    pub const MAX_LENGTH: usize = 1024;
 
     fn ensure_no_trailing_and_leading_whitespaces(description: String) -> String {
         return description.trim().to_string();

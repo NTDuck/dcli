@@ -19,7 +19,6 @@ macro_rules! class {
         #[allow(non_snake_case)]
         mod $module;
 
-        #[allow(unused_imports)]
         $visibility use $module::*;
     };
 }

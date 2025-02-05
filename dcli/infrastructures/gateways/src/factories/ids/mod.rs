@@ -1,3 +1,3 @@
 use modules::*;
 
-class!(pub _UuidV4Generator);
+class!(pub _UuidV4Factory);

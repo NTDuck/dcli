@@ -6,7 +6,7 @@ use crate::utils::dataclasses::pagination::PaginationRequest;
 use crate::utils::dataclasses::pagination::PaginationResponse;
 
 pub trait TaskRepository {
-    fn save(&mut self, task: &Task);
+    fn save(&mut self, task: Task);
     fn remove(&mut self, task_id: TaskId);
 
     fn get(&self, task_id: TaskId) -> Option<Task>;

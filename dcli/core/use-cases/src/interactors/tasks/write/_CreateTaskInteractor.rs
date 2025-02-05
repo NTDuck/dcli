@@ -58,7 +58,7 @@ impl CreateTaskBoundary for CreateTaskInteractor {
         };
 
         self.task_repository.write().unwrap()
-            .save(&task);
+            .save(task);
 
         return Ok(CreateTaskResponseModel);
     }
