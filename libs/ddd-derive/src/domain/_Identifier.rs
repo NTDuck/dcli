@@ -37,7 +37,7 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> Toke
             }
         }
 
-        impl #generics ddd::domain::Copy for #ident #generics {}
+        impl #generics Copy for #ident #generics {}
 
         impl #generics PartialEq for #ident #generics {
             fn eq(&self, other: &Self) -> bool {
