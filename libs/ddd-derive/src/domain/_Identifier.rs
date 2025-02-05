@@ -8,10 +8,10 @@ pub fn derive_identifier(tokens: TokenStream) -> TokenStream {
         Err(error) => return error.write_errors().into(),
     };
 
-    match ast.data.is_struct() {
+    return match ast.data.is_struct() {
         true => generate_tokens_from_struct_ast(StructAbstractSyntaxTree::from(ast)),
-        false => TokenStream::from(quote! { "bofa" }),
-    }
+        false => todo!()
+    };
 }
 
 type AbstractSyntaxTree = crate::utils::AbstractSyntaxTree<darling::util::Ignored, Field>;
@@ -37,6 +37,8 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> Toke
             }
         }
 
+        impl #generics ddd::domain::Copy for #ident #generics {}
+
         impl #generics PartialEq for #ident #generics {
             fn eq(&self, other: &Self) -> bool {
                 return true #( && self.#field_idents == other.#field_idents)*;
@@ -44,5 +46,11 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> Toke
         }
 
         impl #generics Eq for #ident #generics {}
+
+        impl #generics std::hash::Hash for #ident #generics {
+            fn hash<Hasher: std::hash::Hasher>(&self, state: &mut Hasher) {
+                #(self.#field_idents.hash(state); )*
+            }
+        }
     }.into();
 }

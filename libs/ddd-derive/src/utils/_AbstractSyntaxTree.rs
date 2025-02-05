@@ -7,10 +7,10 @@ where
     Variant: darling::FromVariant,
     Field: darling::FromField,
 {
-    pub attrs: Vec<syn::Attribute>,
-    pub vis: syn::Visibility,
     pub ident: syn::Ident,
     pub generics: syn::Generics,
+    pub vis: syn::Visibility,
+
     pub data: darling::ast::Data<Variant, Field>,
 }
 

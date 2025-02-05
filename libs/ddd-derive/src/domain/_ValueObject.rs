@@ -8,15 +8,15 @@ pub fn derive_value_object(tokens: TokenStream) -> TokenStream {
         Err(error) => return error.write_errors().into(),
     };
 
-    match ast.data.is_struct() {
+    return match ast.data.is_struct() {
         true => generate_tokens_from_struct_ast(StructAbstractSyntaxTree::from(ast)),
-        false => TokenStream::from(quote! { "bofa" }),
-    }
+        false => todo!()
+    };
 }
 
-type AbstractSyntaxTree = crate::utils::AbstractSyntaxTree<darling::util::Ignored, syn::Field>;
+type AbstractSyntaxTree = crate::utils::AbstractSyntaxTree<darling::util::Ignored, Field>;
 
-fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<syn::Field>) -> TokenStream {
+fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> TokenStream {
     let field_idents = ast.get_field_idents();
 
     let StructAbstractSyntaxTree {
