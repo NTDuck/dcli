@@ -1,11 +1,11 @@
-use std::marker::Unsize;
-use std::ops::CoerceUnsized;
+// use std::marker::Unsize;
+// use std::ops::CoerceUnsized;
 use std::ops::Deref;
 use std::ops::DerefMut;
 use std::sync::Arc;
 use std::sync::RwLock;
 
-#[repr(transparent)]
+// #[repr(transparent)]
 pub struct ArcRwLockSharedPointer<T: ?Sized>(Arc<RwLock<T>>);
 
 impl<T> ArcRwLockSharedPointer<T> {
@@ -21,9 +21,3 @@ impl<T> ArcRwLockSharedPointer<T> {
         return self.0.write().unwrap();
     }
 }
-
-impl<T, U> CoerceUnsized<ArcRwLockSharedPointer<U>> for ArcRwLockSharedPointer<T>
-where
-    T: Unsize<U>,
-    Arc<RwLock<T>>: CoerceUnsized<Arc<RwLock<U>>>,
-{}

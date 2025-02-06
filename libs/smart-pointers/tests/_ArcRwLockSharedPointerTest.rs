@@ -12,11 +12,21 @@ fn constructible() {
         }
     }
 
+    struct Service {
+        dep: ArcRwLockSharedPointer<Box<dyn Dep>>,
+    }
+
+    impl Service {
+        fn do_something(&self) {
+            self.dep.unwrap().read();
+            self.dep.unwrap_mut().write();
+        }
+    }
+
     struct DepImpl;
     impl Dep for DepImpl {}
 
     let dep: ArcRwLockSharedPointer<Box<dyn Dep>> = ArcRwLockSharedPointer::new(Box::new(DepImpl));
 
-    dep.unwrap().read();
-    dep.unwrap_mut().write();
+    let serv = Service { dep };
 }
