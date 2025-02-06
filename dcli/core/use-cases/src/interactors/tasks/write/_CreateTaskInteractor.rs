@@ -1,5 +1,3 @@
-use std::sync::Arc;
-use std::sync::RwLock;
 use std::time::Instant;
 
 use domain::Task;
@@ -14,11 +12,12 @@ use crate::boundaries::tasks::CreateTaskRequestModel;
 use crate::boundaries::tasks::CreateTaskResponseModel;
 use crate::gateways::repositories::tasks::TaskRepository;
 use crate::gateways::factories::ids::UuidFactory;
+use crate::utils::pointers::SharedPointer;
 
 #[derive(New)]
 pub struct CreateTaskInteractor {
-    task_repository: Arc<RwLock<dyn TaskRepository>>,
-    uuid_factory: Arc<RwLock<dyn UuidFactory>>,
+    task_repository: SharedPointer<Box<dyn TaskRepository>>,
+    uuid_factory: SharedPointer<Box<dyn UuidFactory>>,
 }
 
 impl CreateTaskBoundary for CreateTaskInteractor {
@@ -47,7 +46,7 @@ impl CreateTaskBoundary for CreateTaskInteractor {
             }
         };
 
-        let uuid = self.uuid_factory.read().unwrap()
+        let uuid = self.uuid_factory.unwrap()
             .generate();
 
         let task = Task {
@@ -57,7 +56,7 @@ impl CreateTaskBoundary for CreateTaskInteractor {
             created_at: Instant::now(),
         };
 
-        self.task_repository.write().unwrap()
+        self.task_repository.unwrap_mut()
             .save(task);
 
         return Ok(CreateTaskResponseModel);

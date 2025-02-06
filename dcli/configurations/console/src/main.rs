@@ -1,5 +1,3 @@
-use std::sync::Arc;
-use std::sync::RwLock;
 use std::usize;
 
 use console::utils::io::IoGateway;
@@ -17,17 +15,19 @@ use use_cases::gateways::repositories::tasks::TaskRepository;
 use use_cases::interactors::tasks::CreateTaskInteractor;
 use use_cases::interactors::tasks::ViewTasksInteractor;
 use use_cases::utils::dataclasses::pagination::PaginationRequest;
+use use_cases::utils::pointers::SharedPointer;
 
 fn main() {
     // Gateways
-    let task_repository: Arc<RwLock<dyn TaskRepository>> =
-        Arc::new(RwLock::new(OrderedInMemoryTaskRepository::new()));
-    let uuid_factory: Arc<RwLock<dyn UuidFactory>> = Arc::new(RwLock::new(UuidV4Factory::new()));
+    let task_repository: SharedPointer<Box<dyn TaskRepository>> =
+        SharedPointer::new(Box::new(OrderedInMemoryTaskRepository::new()));
+    let uuid_factory: SharedPointer<Box<dyn UuidFactory>> =
+        SharedPointer::new(Box::new(UuidV4Factory::new()));
 
     // Interactors
     let create_task_interactor =
-        CreateTaskInteractor::new(Arc::clone(&task_repository), Arc::clone(&uuid_factory));
-    let view_tasks_interactor = ViewTasksInteractor::new(Arc::clone(&task_repository));
+        CreateTaskInteractor::new(task_repository.clone(), uuid_factory.clone());
+    let view_tasks_interactor = ViewTasksInteractor::new(task_repository.clone());
 
     // Controllers
     let create_task_controller = CreateTaskController::new(&create_task_interactor);

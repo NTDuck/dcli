@@ -1,6 +1,3 @@
-use std::sync::Arc;
-use std::sync::RwLock;
-
 use types::New;
 
 use crate::boundaries::tasks::ViewTasksBoundary;
@@ -8,10 +5,11 @@ use crate::boundaries::tasks::ViewTasksErrorModel;
 use crate::boundaries::tasks::ViewTasksRequestModel;
 use crate::boundaries::tasks::ViewTasksResponseModel;
 use crate::gateways::repositories::tasks::TaskRepository;
+use crate::utils::pointers::SharedPointer;
 
 #[derive(New)]
 pub struct ViewTasksInteractor {
-    task_repository: Arc<RwLock<dyn TaskRepository>>,
+    task_repository: SharedPointer<Box<dyn TaskRepository>>,
 }
 
 impl ViewTasksBoundary for ViewTasksInteractor {
@@ -20,7 +18,7 @@ impl ViewTasksBoundary for ViewTasksInteractor {
             pagination_request,
         } = request;
 
-        let pagination_response = self.task_repository.read().unwrap()
+        let pagination_response = self.task_repository.unwrap()
             .show(pagination_request);
 
         return Ok(ViewTasksResponseModel { pagination_response });
