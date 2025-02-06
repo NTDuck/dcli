@@ -8,5 +8,6 @@ members = [
     "libs/modules",
     "libs/types",
     "libs/ddd", "libs/ddd-derive",
+    "libs/smart-pointers",
 ]
 resolver = "2"
