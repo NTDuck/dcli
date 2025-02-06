@@ -1,6 +1,6 @@
 use domain::Task;
 use domain::TaskStatus;
-use types::New;
+use lombok::New;
 use use_cases::boundaries::tasks::ViewTasksBoundary;
 use use_cases::boundaries::tasks::ViewTasksErrorModel;
 use use_cases::boundaries::tasks::ViewTasksRequestModel;

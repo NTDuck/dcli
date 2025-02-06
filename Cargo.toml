@@ -6,7 +6,7 @@ members = [
     "dcli/infrastructures/interface-adapters",
     "dcli/configurations/console",
     "libs/modules",
-    "libs/types",
+    "libs/lombok",
     "libs/ddd", "libs/ddd-derive",
 ]
 resolver = "2"

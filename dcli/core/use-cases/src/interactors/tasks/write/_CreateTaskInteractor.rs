@@ -4,7 +4,7 @@ use domain::Task;
 use domain::TaskDescription;
 use domain::TaskDescriptionError;
 use domain::TaskStatus;
-use types::New;
+use lombok::New;
 
 use crate::boundaries::tasks::CreateTaskBoundary;
 use crate::boundaries::tasks::CreateTaskErrorModel;

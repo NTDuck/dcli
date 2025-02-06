@@ -1,4 +1,4 @@
-use types::New;
+use lombok::New;
 
 use crate::boundaries::tasks::ViewTasksBoundary;
 use crate::boundaries::tasks::ViewTasksErrorModel;

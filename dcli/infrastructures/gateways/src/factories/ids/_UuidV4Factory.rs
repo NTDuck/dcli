@@ -1,5 +1,5 @@
 use domain::Uuid;
-use types::New;
+use lombok::New;
 use use_cases::gateways::factories::ids::UuidFactory;
 
 #[derive(New)]

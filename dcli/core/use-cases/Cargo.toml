@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 modules = { path = "../../../libs/modules" }
-types = { path = "../../../libs/types" }
+lombok = { path = "../../../libs/lombok" }
 ddd = { path = "../../../libs/ddd" }
 
 domain = { path = "../domain" }

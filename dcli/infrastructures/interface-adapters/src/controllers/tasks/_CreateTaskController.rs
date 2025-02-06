@@ -1,4 +1,4 @@
-use types::New;
+use lombok::New;
 use use_cases::boundaries::tasks::CreateTaskBoundary;
 use use_cases::boundaries::tasks::CreateTaskErrorModel;
 use use_cases::boundaries::tasks::CreateTaskRequestModel;
