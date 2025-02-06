@@ -1,21 +1,21 @@
 use crate::utils::tokenize;
+use crate::utils::AbstractSyntaxTree;
 use crate::utils::Field;
 use crate::utils::TokenStream;
 use crate::utils::StructAbstractSyntaxTree;
 
 pub fn derive_identifier(tokens: TokenStream) -> TokenStream {
-    let ast = match AbstractSyntaxTree::try_from(tokens) {
-        Ok(ast) => ast,
-        Err(error) => return error.write_errors().into(),
-    };
+    let ast: AbstractSyntaxTree::<darling::util::Ignored, Field> =
+        match AbstractSyntaxTree::try_from(tokens) {
+            Ok(ast) => ast,
+            Err(error) => return error.write_errors().into(),
+        };
 
     return match ast.data.is_struct() {
         true => generate_tokens_from_struct_ast(StructAbstractSyntaxTree::from(ast)),
         false => todo!(),
     };
 }
-
-type AbstractSyntaxTree = crate::utils::AbstractSyntaxTree<darling::util::Ignored, Field>;
 
 fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<Field>) -> TokenStream {
     let field_idents = ast.get_field_idents();

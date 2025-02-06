@@ -27,14 +27,11 @@ fn main() {
     // Interactors
     let create_task_interactor =
         CreateTaskInteractor::new(task_repository.clone(), uuid_factory.clone());
-    let view_tasks_interactor =
-        ViewTasksInteractor::new(task_repository.clone());
+    let view_tasks_interactor = ViewTasksInteractor::new(task_repository.clone());
 
     // Controllers
-    let create_task_controller =
-        CreateTaskController::new(&create_task_interactor);
-    let view_tasks_controller =
-        ViewTasksController::new(&view_tasks_interactor);
+    let create_task_controller = CreateTaskController::new(&create_task_interactor);
+    let view_tasks_controller = ViewTasksController::new(&view_tasks_interactor);
 
     // I/O
     let io_gateway = IoGateway;
