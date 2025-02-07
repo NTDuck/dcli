@@ -1,12 +1,6 @@
 [workspace]
 members = [
-    "dcli/core/domain",
-    "dcli/core/use-cases",
-    "dcli/infrastructures/gateways",
-    "dcli/infrastructures/interface-adapters",
-    "dcli/configurations/console",
-    "libs/modules",
-    "libs/lombok",
-    "libs/ddd", "libs/ddd-derive",
+    "dcli/*/*",
+    "libs/*",
 ]
 resolver = "2"
