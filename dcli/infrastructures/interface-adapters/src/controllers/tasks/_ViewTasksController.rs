@@ -1,6 +1,5 @@
 use domain::Task;
 use domain::TaskStatus;
-use lombok::New;
 use use_cases::boundaries::tasks::ViewTasksBoundary;
 use use_cases::boundaries::tasks::ViewTasksErrorModel;
 use use_cases::boundaries::tasks::ViewTasksRequestModel;
@@ -8,9 +7,16 @@ use use_cases::boundaries::tasks::ViewTasksResponseModel;
 
 use crate::utils::adapters::TimestampAdapter;
 
-#[derive(New)]
 pub struct ViewTasksController<'bdrs> {
     interactor: &'bdrs dyn ViewTasksBoundary,
+}
+
+impl<'bdrs> ViewTasksController<'bdrs> {
+    pub const fn new(interactor: &'bdrs dyn ViewTasksBoundary) -> Self {
+        return Self {
+            interactor,
+        };
+    }
 }
 
 impl<'bdrs> ViewTasksController<'bdrs> {

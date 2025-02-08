@@ -1,9 +1,0 @@
-[package]
-name = "lombok"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-modules = { path = "../modules" }
-
-derive-new = "0.7.0"

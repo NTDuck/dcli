@@ -4,7 +4,6 @@ use domain::Task;
 use domain::TaskDescription;
 use domain::TaskDescriptionError;
 use domain::TaskStatus;
-use lombok::New;
 
 use crate::boundaries::tasks::CreateTaskBoundary;
 use crate::boundaries::tasks::CreateTaskErrorModel;
@@ -14,10 +13,18 @@ use crate::gateways::repositories::tasks::TaskRepository;
 use crate::gateways::factories::ids::UuidFactory;
 use crate::utils::pointers::SharedPointer;
 
-#[derive(New)]
 pub struct CreateTaskInteractor {
     task_repository: SharedPointer<Box<dyn TaskRepository>>,
     uuid_factory: SharedPointer<Box<dyn UuidFactory>>,
+}
+
+impl CreateTaskInteractor {
+    pub const fn new(task_repository: SharedPointer<Box<dyn TaskRepository>>, uuid_factory: SharedPointer<Box<dyn UuidFactory>>) -> Self {
+        return Self {
+            task_repository,
+            uuid_factory,
+        };
+    }
 }
 
 impl CreateTaskBoundary for CreateTaskInteractor {

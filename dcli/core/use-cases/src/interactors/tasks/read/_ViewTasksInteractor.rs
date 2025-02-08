@@ -1,5 +1,3 @@
-use lombok::New;
-
 use crate::boundaries::tasks::ViewTasksBoundary;
 use crate::boundaries::tasks::ViewTasksErrorModel;
 use crate::boundaries::tasks::ViewTasksRequestModel;
@@ -7,9 +5,16 @@ use crate::boundaries::tasks::ViewTasksResponseModel;
 use crate::gateways::repositories::tasks::TaskRepository;
 use crate::utils::pointers::SharedPointer;
 
-#[derive(New)]
 pub struct ViewTasksInteractor {
     task_repository: SharedPointer<Box<dyn TaskRepository>>,
+}
+
+impl ViewTasksInteractor {
+    pub const fn new(task_repository: SharedPointer<Box<dyn TaskRepository>>) -> Self {
+        return Self {
+            task_repository,
+        };
+    }
 }
 
 impl ViewTasksBoundary for ViewTasksInteractor {

@@ -1,12 +1,18 @@
-use lombok::New;
 use use_cases::boundaries::tasks::CreateTaskBoundary;
 use use_cases::boundaries::tasks::CreateTaskErrorModel;
 use use_cases::boundaries::tasks::CreateTaskRequestModel;
 use use_cases::boundaries::tasks::CreateTaskResponseModel;
 
-#[derive(New)]
 pub struct CreateTaskController<'bdrs> {
     interactor: &'bdrs dyn CreateTaskBoundary,
+}
+
+impl<'bdrs> CreateTaskController<'bdrs> {
+    pub const fn new(interactor: &'bdrs dyn CreateTaskBoundary) -> Self {
+        return Self {
+            interactor,
+        };
+    }
 }
 
 impl<'bdr> CreateTaskController<'bdr> {
