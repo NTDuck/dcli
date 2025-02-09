@@ -54,24 +54,28 @@ impl ArcRwLockSharedPointerHandle {
     }
 
     fn as_ref<T>(&self) -> &Typed<T> {
-        let typed_ptr: *const Typed<T> =
-            (self.untyped.deref() as *const Untyped)
-                .cast();
+        let raw_ref = (self.untyped.deref() as *const Untyped)
+            .cast::<Typed<T>>();
 
-        let _ = std::mem::transmute::<Untyped, Typed<T>>;
+        Self::static_size_check::<T>();
 
         return unsafe {
-            &*typed_ptr
+            &*raw_ref
         };
     }
 
     fn as_mut<T>(&mut self) -> &mut Typed<T> {
-        let typed_ptr: *mut Typed<T> = 
-            (self.untyped.deref_mut() as *mut Untyped)
-                .cast();
+        let raw_mut = (self.untyped.deref_mut() as *mut Untyped)
+            .cast::<Typed<T>>();
+
+        Self::static_size_check::<T>();
 
         return unsafe {
-            &mut *typed_ptr
+            &mut *raw_mut
         };
+    }
+
+    fn static_size_check<T>() {
+        std::hint::black_box(std::mem::transmute::<Untyped, Typed<T>>);
     }
 }
