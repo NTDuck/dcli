@@ -2,17 +2,17 @@ use std::mem::ManuallyDrop;
 use std::ops::Deref;
 use std::ops::DerefMut;
 
-use use_cases::gateways::pointers::SharedPointerHandle;
+use use_cases::gateways::pointers::handles::abc::PointerHandle;
 
-use crate::utils::pointers::SharedPointerStrategy;
+use crate::pointers::strategies::abc::PointerStrategy;
 
-pub struct StrategizedSharePointerHandle<Strategy: SharedPointerStrategy> {
+pub struct StrategizedPointerHandle<Strategy: PointerStrategy> {
     untyped: ManuallyDrop<Strategy::Untyped>,
 }
 
-unsafe impl<Strategy> SharedPointerHandle for StrategizedSharePointerHandle<Strategy>
+unsafe impl<Strategy> PointerHandle for StrategizedPointerHandle<Strategy>
 where
-    Strategy: SharedPointerStrategy,
+    Strategy: PointerStrategy,
 {
     fn new<T>(obj: T) -> Self {
         let typed = Strategy::typed_from_obj(obj);
@@ -39,9 +39,9 @@ where
     }
 }
 
-impl<Strategy> StrategizedSharePointerHandle<Strategy>
+impl<Strategy> StrategizedPointerHandle<Strategy>
 where
-    Strategy: SharedPointerStrategy,
+    Strategy: PointerStrategy,
 {
     fn new_from_untyped(untyped: Strategy::Untyped) -> Self {
         return Self {

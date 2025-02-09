@@ -1,7 +1,7 @@
 use std::ops::Deref;
 use std::ops::DerefMut;
 
-pub unsafe trait SharedPointerHandle: Sized {
+pub unsafe trait PointerHandle: Sized {
     fn new<T>(obj: T) -> Self;
 
     fn unwrap<'br, T: 'br>(&'br self) -> impl Deref<Target = T> + 'br;

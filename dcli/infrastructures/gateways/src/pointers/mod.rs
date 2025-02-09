@@ -1,4 +1,4 @@
 use modules::*;
 
-namespace!(pub builtin);
-namespace!(pub triomphe);
+namespace!(pub handles);
+namespace!(pub strategies);

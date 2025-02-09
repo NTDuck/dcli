@@ -3,12 +3,12 @@ use std::mem::ManuallyDrop;
 use std::ops::Deref;
 use std::ops::DerefMut;
 
-use crate::gateways::pointers::SharedPointerHandle;
+use crate::gateways::pointers::handles::abc::PointerHandle;
 
 /// Inspired by [archery](https://github.com/orium/archery).
 /// 
 /// See: [Higher Kinded Types in Rust](https://joshlf.com/post/2018/10/18/rust-higher-kinded-types-already/)
-pub struct SharedPointer<T, Handle: SharedPointerHandle> {
+pub struct SharedPointer<T, Handle: PointerHandle> {
     handle: ManuallyDrop<Handle>,
     _marker: PhantomData<(
         T,   // Bind `T`
@@ -19,23 +19,23 @@ pub struct SharedPointer<T, Handle: SharedPointerHandle> {
 unsafe impl<T, Handle> Send for SharedPointer<T, Handle>
 where
     T: Sync + Send,
-    Handle: SharedPointerHandle + Send
+    Handle: PointerHandle + Send
 {}
 
 unsafe impl<T, Handle> Sync for SharedPointer<T, Handle>
 where
     T: Sync + Send,
-    Handle: SharedPointerHandle + Sync
+    Handle: PointerHandle + Sync
 {}
 
 impl<T, Handle> Unpin for SharedPointer<T, Handle>
 where
-    Handle: SharedPointerHandle,
+    Handle: PointerHandle,
 {}
 
 impl<T, Handle> SharedPointer<T, Handle>
 where
-    Handle: SharedPointerHandle,
+    Handle: PointerHandle,
 {
     pub fn new(obj: T) -> Self {
         let handle = Handle::new(obj);
@@ -60,7 +60,7 @@ where
 
 impl<T, Handle> Clone for SharedPointer<T, Handle>
 where
-    Handle: SharedPointerHandle,
+    Handle: PointerHandle,
 {
     fn clone(&self) -> Self {
         let handle = unsafe {
@@ -72,7 +72,7 @@ where
 
 impl<T, Handle> Drop for SharedPointer<T, Handle>
 where
-    Handle: SharedPointerHandle,
+    Handle: PointerHandle,
 {
     fn drop(&mut self) {
         unsafe {

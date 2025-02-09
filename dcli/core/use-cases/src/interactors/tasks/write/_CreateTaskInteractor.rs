@@ -9,17 +9,17 @@ use crate::boundaries::tasks::CreateTaskBoundary;
 use crate::boundaries::tasks::CreateTaskErrorModel;
 use crate::boundaries::tasks::CreateTaskRequestModel;
 use crate::boundaries::tasks::CreateTaskResponseModel;
-use crate::gateways::pointers::SharedPointerHandle;
+use crate::gateways::pointers::handles::abc::PointerHandle;
+use crate::gateways::pointers::SharedPointer;
 use crate::gateways::repositories::tasks::TaskRepository;
 use crate::gateways::factories::ids::UuidFactory;
-use crate::utils::pointers::SharedPointer;
 
-pub struct CreateTaskInteractor<Handle: SharedPointerHandle> {
+pub struct CreateTaskInteractor<Handle: PointerHandle> {
     task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
     uuid_factory: SharedPointer<Box<dyn UuidFactory>, Handle>,
 }
 
-impl<Handle: SharedPointerHandle> CreateTaskInteractor<Handle> {
+impl<Handle: PointerHandle> CreateTaskInteractor<Handle> {
     pub const fn new(task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>, uuid_factory: SharedPointer<Box<dyn UuidFactory>, Handle>) -> Self {
         return Self {
             task_repository,
@@ -28,7 +28,7 @@ impl<Handle: SharedPointerHandle> CreateTaskInteractor<Handle> {
     }
 }
 
-impl<Handle: SharedPointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> {
+impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> {
     fn apply(&self, request: CreateTaskRequestModel) -> Result<CreateTaskResponseModel, CreateTaskErrorModel> {
         let CreateTaskRequestModel {
             task_description,

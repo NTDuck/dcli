@@ -1,3 +1,5 @@
 use modules::*;
 
-class!(pub _SharedPointerHandle);
+namespace!(pub handles);
+
+class!(pub _SharedPointer);

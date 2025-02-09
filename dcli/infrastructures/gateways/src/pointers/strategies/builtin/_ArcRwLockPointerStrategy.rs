@@ -3,11 +3,11 @@ use std::ops::DerefMut;
 use std::sync::Arc;
 use std::sync::RwLock;
 
-use crate::utils::pointers::SharedPointerStrategy;
+use crate::pointers::strategies::abc::PointerStrategy;
 
-pub struct ArcRwLockShardPointerStrategy;
+pub struct ArcRwLockSharedPointerStrategy;
 
-impl SharedPointerStrategy for ArcRwLockShardPointerStrategy {
+impl PointerStrategy for ArcRwLockSharedPointerStrategy {
     type Typed<T> = Arc<RwLock<T>>;
     type Untyped = Self::Typed<()>;
 
@@ -27,10 +27,9 @@ impl SharedPointerStrategy for ArcRwLockShardPointerStrategy {
         return typed.write().unwrap();
     }
 
-    // fn into_untyped<T>(typed: Self::Typed<T>) -> Self::Untyped {
-    //     let raw_ref = Arc::into_raw(typed) as *const RwLock<()>;
-    //     return unsafe {
-    //         Arc::from_raw(raw_ref)
-    //     };
-    // }
+    fn into_untyped<T>(typed: Self::Typed<T>) -> Self::Untyped {
+        return unsafe {
+            std::mem::transmute(typed)
+        };
+    }
 }
