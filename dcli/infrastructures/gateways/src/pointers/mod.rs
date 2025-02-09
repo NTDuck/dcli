@@ -1,4 +1,4 @@
 use modules::*;
 
-class!(pub _ArcRwLockSharedPointerHandle);
-class!(pub _RcRefCellSharedPointerHandle);
+namespace!(pub builtin);
+namespace!(pub triomphe);
