@@ -3,7 +3,7 @@ use std::usize;
 use console::utils::io::IoGateway;
 use gateways::factories::ids::UuidV4Factory;
 use gateways::pointers::handles::StrategizedPointerHandle;
-use gateways::pointers::strategies::builtin::ArcRwLockSharedPointerStrategy;
+use gateways::pointers::strategies::triomphe::ArcRwLockSharedPointerStrategy;
 use gateways::repositories::inmemory::tasks::OrderedInMemoryTaskRepository;
 use interface_adapters::controllers::tasks::CreateTaskController;
 use interface_adapters::controllers::tasks::CreateTaskRequestObject;
