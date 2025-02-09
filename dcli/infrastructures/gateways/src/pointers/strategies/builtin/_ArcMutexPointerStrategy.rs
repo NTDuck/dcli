@@ -11,11 +11,17 @@ impl PointerStrategy for ArcMutexPointerStrategy {
     type Typed<T> = Arc<Mutex<T>>;
     type Untyped = Self::Typed<()>;
 
-    fn typed_from_obj<T>(obj: T) -> Self::Typed<T> {
+    fn into_typed<T>(obj: T) -> Self::Typed<T> {
         return Arc::new(Mutex::new(obj));
     }
 
-    fn shallow_copy_from_typed<T>(typed: &Self::Typed<T>) -> Self::Typed<T> {
+    fn into_untyped<T>(typed: Self::Typed<T>) -> Self::Untyped {
+        return unsafe {
+            std::mem::transmute(typed)
+        };
+    }
+
+    fn shallow_clone<T>(typed: &Self::Typed<T>) -> Self::Typed<T> {
         return Arc::clone(typed);
     }
 
@@ -25,11 +31,5 @@ impl PointerStrategy for ArcMutexPointerStrategy {
 
     fn unwrap_mut<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl DerefMut<Target = T> + 'br {
         return typed.lock().unwrap();
-    }
-
-    fn into_untyped<T>(typed: Self::Typed<T>) -> Self::Untyped {
-        return unsafe {
-            std::mem::transmute(typed)
-        };
     }
 }

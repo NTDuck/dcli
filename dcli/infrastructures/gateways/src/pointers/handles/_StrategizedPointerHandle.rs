@@ -15,7 +15,7 @@ where
     Strategy: PointerStrategy,
 {
     fn new<T>(obj: T) -> Self {
-        let typed = Strategy::typed_from_obj(obj);
+        let typed = Strategy::into_typed(obj);
         let untyped = Strategy::into_untyped(typed);
         return Self::new_from_untyped(untyped);
     }
@@ -28,8 +28,8 @@ where
         return Strategy::unwrap_mut(self.as_ref());
     }
 
-    unsafe fn shallow_copy<T>(&self) -> Self {
-        let typed = Strategy::shallow_copy_from_typed::<T>(self.as_ref());
+    unsafe fn shallow_clone<T>(&self) -> Self {
+        let typed = Strategy::shallow_clone::<T>(self.as_ref());
         let untyped = Strategy::into_untyped(typed);
         return Self::new_from_untyped(untyped);
     }
@@ -50,28 +50,24 @@ where
     }
 
     fn as_ref<T>(&self) -> &Strategy::Typed<T> {
-        let raw_ref = (self.untyped.deref() as *const Strategy::Untyped)
+        let raw_const_ptr = (self.untyped.deref() as *const Strategy::Untyped)
             .cast::<Strategy::Typed<T>>();
 
-        Self::static_size_check::<T>();
+        Strategy::static_binary_compatibility_check::<T>();
 
         return unsafe {
-            &*raw_ref
+            &*raw_const_ptr
         };
     }
 
     fn as_mut<T>(&mut self) -> &mut Strategy::Typed<T> {
-        let raw_mut = (self.untyped.deref_mut() as *mut Strategy::Untyped)
+        let raw_mut_ptr = (self.untyped.deref_mut() as *mut Strategy::Untyped)
             .cast::<Strategy::Typed<T>>();
 
-        Self::static_size_check::<T>();
+        Strategy::static_binary_compatibility_check::<T>();
 
         return unsafe {
-            &mut *raw_mut
+            &mut *raw_mut_ptr
         };
-    }
-
-    fn static_size_check<T>() {
-        std::hint::black_box(std::mem::transmute_copy::<Strategy::Untyped, Strategy::Typed<T>>);
     }
 }
