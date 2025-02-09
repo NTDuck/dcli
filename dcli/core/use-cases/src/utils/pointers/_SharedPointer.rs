@@ -64,7 +64,7 @@ where
 {
     fn clone(&self) -> Self {
         let handle = unsafe {
-            self.handle.clone::<T>()
+            self.handle.shallow_copy::<T>()
         };
         return Self::new_from_handle(handle);
     }

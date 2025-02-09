@@ -30,7 +30,7 @@ unsafe impl SharedPointerHandle for RcRefCellSharedPointerHandle {
             .borrow_mut();
     }
 
-    unsafe fn clone<T>(&self) -> Self {
+    unsafe fn shallow_copy<T>(&self) -> Self {
         let untyped = Rc::clone(self.as_ref());
         return Self::new_from_untyped(untyped);
     }

@@ -30,7 +30,7 @@ unsafe impl SharedPointerHandle for ArcMutexSharedPointerHandle {
             .lock().unwrap();
     }
 
-    unsafe fn clone<T>(&self) -> Self {
+    unsafe fn shallow_copy<T>(&self) -> Self {
         let untyped = Arc::clone(self.as_ref());
         return Self::new_from_untyped(untyped);
     }

@@ -2,8 +2,9 @@ use std::usize;
 
 use console::utils::io::IoGateway;
 use gateways::factories::ids::UuidV4Factory;
-use gateways::pointers::builtin::ArcRwLockSharedPointerHandle;
+use gateways::pointers::builtin::ArcRwLockShardPointerStrategy;
 use gateways::repositories::inmemory::tasks::OrderedInMemoryTaskRepository;
+use gateways::StrategizedSharePointerHandle;
 use interface_adapters::controllers::tasks::CreateTaskController;
 use interface_adapters::controllers::tasks::CreateTaskRequestObject;
 use interface_adapters::controllers::tasks::ViewTasksController;
@@ -20,7 +21,8 @@ use use_cases::utils::pointers::SharedPointer as ParameterizedSharedPointer;
 
 fn main() {
     // Gateways
-    type SharedPointerHandle = ArcRwLockSharedPointerHandle;
+    type SharedPointerStrategy = ArcRwLockShardPointerStrategy;
+    type SharedPointerHandle = StrategizedSharePointerHandle<SharedPointerStrategy>;
     type SharedPointer<T> = ParameterizedSharedPointer<T, SharedPointerHandle>;
 
     let task_repository: SharedPointer<Box<dyn TaskRepository>> =
