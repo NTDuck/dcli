@@ -1,4 +1,6 @@
 use std::mem::ManuallyDrop;
+use std::ops::Deref;
+use std::ops::DerefMut;
 use std::sync::Arc;
 use std::sync::RwLock;
 
@@ -20,11 +22,11 @@ unsafe impl SharedPointerHandle for ArcRwLockSharedPointerHandle {
         };
     }
     
-    fn unwrap<'a, T: 'a>(&'a self) -> impl std::ops::Deref<Target = T> + 'a {
+    fn unwrap<'a, T: 'a>(&'a self) -> impl Deref<Target = T> + 'a {
         return self.as_ref().read().unwrap();
     }
     
-    fn unwrap_mut<'a, T: 'a>(&'a self) -> impl std::ops::DerefMut<Target = T> + 'a {
+    fn unwrap_mut<'a, T: 'a>(&'a self) -> impl DerefMut<Target = T> + 'a {
         return self.as_ref().write().unwrap();
     }
 
@@ -55,17 +57,15 @@ impl ArcRwLockSharedPointerHandle {
     // }
 
     fn as_ref<T>(&self) -> &Typed<T> {
-        // let typed_ptr: *const Typed<T> =
-        //     (self.untyped.deref() as *const Untyped)
-        //         .cast::<std::alloc::sync::Typed<T>>();
+        let typed_ptr: *const Typed<T> =
+            (self.untyped.deref() as *const Untyped)
+                .cast();
 
-        // let _ = std::mem::transmute::<Untyped, Typed<T>>;
+        let _ = std::mem::transmute::<Untyped, Typed<T>>;
 
-        // return unsafe { &*typed_ptr };
-        let untyped: &Untyped = &self.untyped;
-
-        return unsafe {
-            std::mem::transmute(&untyped)
-        };
+        return unsafe { &*typed_ptr };
+        // return unsafe {
+        //     std::mem::transmute(&self.untyped)
+        // };
     }
 }
