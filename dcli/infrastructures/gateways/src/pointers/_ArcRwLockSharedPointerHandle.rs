@@ -16,45 +16,42 @@ pub struct ArcRwLockSharedPointerHandle {
 unsafe impl SharedPointerHandle for ArcRwLockSharedPointerHandle {
     fn new<T>(obj: T) -> Self {
         let typed = Arc::new(RwLock::new(obj));
-
-        return Self {
-            untyped: ManuallyDrop::new(Self::into_untyped(typed)),
-        };
+        let untyped = Self::into_untyped(typed);
+        return Self::new_from_untyped(untyped);
     }
     
     fn unwrap<'a, T: 'a>(&'a self) -> impl Deref<Target = T> + 'a {
-        return self.as_ref().read().unwrap();
+        return self.as_ref()
+            .read().unwrap();
     }
     
     fn unwrap_mut<'a, T: 'a>(&'a self) -> impl DerefMut<Target = T> + 'a {
-        return self.as_ref().write().unwrap();
+        return self.as_ref()
+            .write().unwrap();
     }
 
     unsafe fn clone<T>(&self) -> Self {
-        let typed = Arc::clone(self.as_ref());
-
-        return Self {
-            untyped: ManuallyDrop::new(typed),
-        };
+        let untyped = Arc::clone(self.as_ref());
+        return Self::new_from_untyped(untyped);
     }
 
     unsafe fn drop<T>(&mut self) {
-        ManuallyDrop::drop(&mut self.untyped);
+        std::ptr::drop_in_place(self.as_mut::<T>());
     }
 }
 
 impl ArcRwLockSharedPointerHandle {
+    fn new_from_untyped(untyped: Untyped) -> Self {
+        return Self {
+            untyped: ManuallyDrop::new(untyped),
+        };
+    }
+
     fn into_untyped<T>(typed: Typed<T>) -> Untyped {
         return unsafe {
             std::mem::transmute(typed)
         };
     }
-
-    // fn into_typed<T>(untyped: Untyped) -> Typed<T> {
-    //     return unsafe {
-    //         std::mem::transmute(untyped)
-    //     };
-    // }
 
     fn as_ref<T>(&self) -> &Typed<T> {
         let typed_ptr: *const Typed<T> =
@@ -63,9 +60,18 @@ impl ArcRwLockSharedPointerHandle {
 
         let _ = std::mem::transmute::<Untyped, Typed<T>>;
 
-        return unsafe { &*typed_ptr };
-        // return unsafe {
-        //     std::mem::transmute(&self.untyped)
-        // };
+        return unsafe {
+            &*typed_ptr
+        };
+    }
+
+    fn as_mut<T>(&mut self) -> &mut Typed<T> {
+        let typed_ptr: *mut Typed<T> = 
+            (self.untyped.deref_mut() as *mut Untyped)
+                .cast();
+
+        return unsafe {
+            &mut *typed_ptr
+        };
     }
 }

@@ -5,10 +5,15 @@ use std::ops::DerefMut;
 
 use crate::gateways::pointers::SharedPointerHandle;
 
+/// Inspired by [archery](https://github.com/orium/archery).
+/// 
+/// See: [Higher Kinded Types in Rust](https://joshlf.com/post/2018/10/18/rust-higher-kinded-types-already/)
 pub struct SharedPointer<T, Handle: SharedPointerHandle> {
     handle: ManuallyDrop<Handle>,
-    _marker: PhantomData<T>,
-    _marker_prevent_send_sync: PhantomData<*mut ()>,
+    _marker: PhantomData<(
+        T,   // Bind `T`
+        *mut (),   // Prevent `Send` and `Sync` auto implementation
+    )>,
 }
 
 unsafe impl<T, Handle> Send for SharedPointer<T, Handle>
@@ -23,6 +28,11 @@ where
     Handle: SharedPointerHandle + Sync
 {}
 
+impl<T, Handle> Unpin for SharedPointer<T, Handle>
+where
+    Handle: SharedPointerHandle,
+{}
+
 impl<T, Handle> SharedPointer<T, Handle>
 where
     Handle: SharedPointerHandle,
@@ -32,20 +42,19 @@ where
         return Self::new_from_handle(handle);
     }
 
-    fn new_from_handle(handle: Handle) -> Self {
-        return Self {
-            handle: ManuallyDrop::new(handle),
-            _marker: PhantomData,
-            _marker_prevent_send_sync: PhantomData,
-        };
-    }
-
     pub fn unwrap(&self) -> impl Deref<Target = T> + '_ {
         return self.handle.unwrap();
     }
 
     pub fn unwrap_mut(&self) -> impl DerefMut<Target = T> + '_ {
         return self.handle.unwrap_mut();
+    }
+
+    fn new_from_handle(handle: Handle) -> Self {
+        return Self {
+            handle: ManuallyDrop::new(handle),
+            _marker: PhantomData,
+        };
     }
 }
 
@@ -55,9 +64,7 @@ where
 {
     fn clone(&self) -> Self {
         let handle = unsafe {
-            self.handle
-                .deref()
-                .clone::<T>()
+            self.handle.clone::<T>()
         };
         return Self::new_from_handle(handle);
     }
