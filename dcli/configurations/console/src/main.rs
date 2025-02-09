@@ -2,6 +2,7 @@ use std::usize;
 
 use console::utils::io::IoGateway;
 use gateways::factories::ids::UuidV4Factory;
+use gateways::pointers::ArcRwLockSharedPointerHandle;
 use gateways::repositories::inmemory::tasks::OrderedInMemoryTaskRepository;
 use interface_adapters::controllers::tasks::CreateTaskController;
 use interface_adapters::controllers::tasks::CreateTaskRequestObject;
@@ -15,10 +16,13 @@ use use_cases::gateways::repositories::tasks::TaskRepository;
 use use_cases::interactors::tasks::CreateTaskInteractor;
 use use_cases::interactors::tasks::ViewTasksInteractor;
 use use_cases::utils::dataclasses::pagination::PaginationRequest;
-use use_cases::utils::pointers::SharedPointer;
+use use_cases::utils::pointers::SharedPointer as ParameterizedSharedPointer;
 
 fn main() {
     // Gateways
+    type SharedPointerHandle = ArcRwLockSharedPointerHandle;
+    type SharedPointer<T> = ParameterizedSharedPointer<T, SharedPointerHandle>;
+
     let task_repository: SharedPointer<Box<dyn TaskRepository>> =
         SharedPointer::new(Box::new(OrderedInMemoryTaskRepository::new()));
     let uuid_factory: SharedPointer<Box<dyn UuidFactory>> =

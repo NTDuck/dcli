@@ -1,3 +1,3 @@
 use modules::*;
 
-class!(pub _ArcRwLockSharedPointerType);
+class!(pub _ArcRwLockSharedPointerHandle);
