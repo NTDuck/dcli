@@ -1,3 +1,3 @@
 use modules::*;
 
-class!(_TaskRepositoryTest);
+namespace!(inmemory);
