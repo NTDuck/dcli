@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 /// Defines a namespace-like module.
 ///
 /// Namespace-like modules are directory-based,

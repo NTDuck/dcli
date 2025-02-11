@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 /// Defines a class-like module.
 ///
 /// Class-like modules are file-based,
