@@ -1,19 +1,17 @@
-mod save {
+use std::time::Instant;
 
-}
+use domain::Task;
+use domain::TaskDescription;
+use domain::TaskId;
+use domain::TaskStatus;
+use fake::Fake;
+use fake::Faker;
+use gateways::repositories::inmemory::tasks::OrderedInMemoryTaskRepository;
+use use_cases::gateways::repositories::tasks::TaskRepository;
 
-mod remove {
-
-}
-
-mod get {
-    use domain::Task;
-    use domain::TaskId;
-    use gateways::repositories::inmemory::tasks::OrderedInMemoryTaskRepository;
-    use use_cases::gateways::repositories::tasks::TaskRepository;
-
-    use super::utils::generate_random_task_id;
-    use super::utils::GivenRepositoryWithZeroTasks;
+mod test_get {
+    use super::*;
+    use super::utils::*;
 
     #[test]
     fn GivenRepositoryWithZeroTasks_WhenGettingAny_ExpectNone() {
@@ -21,6 +19,10 @@ mod get {
         let task_id = generate_random_task_id();
         let task = WhenGettingTaskWithId(&task_repository, task_id);
         
+        ExpectNone(task);
+    }
+
+    fn ExpectNone(task: Option<Task>) {
         assert!(task.is_none());
     }
 
@@ -49,15 +51,7 @@ mod get {
     }
 }
 
-mod show {
-
-}
-
-mod show_by_status {
-
-}
-
-mod contains {
+mod test_contains {
     #[test]
     fn GivenRepositoryWithZeroTasks_WhenCheckingIfAnyExists_ExpectFalse() {
         
@@ -84,25 +78,8 @@ mod contains {
     }
 }
 
-mod clear {
-
-}
-
-mod clear_by_status {
-
-}
-
 mod utils {
-    use std::time::Instant;
-
-    use domain::Task;
-    use domain::TaskDescription;
-    use domain::TaskId;
-    use domain::TaskStatus;
-    use fake::Fake;
-    use fake::Faker;
-    use gateways::repositories::inmemory::tasks::OrderedInMemoryTaskRepository;
-    use use_cases::gateways::repositories::tasks::TaskRepository;
+    use super::*;
 
     const NUMBER_OF_TASKS: usize = 42;
 
@@ -118,7 +95,6 @@ mod utils {
         let mut task_repository = OrderedInMemoryTaskRepository::new();
 
         (0..N)
-            .into_iter()
             .for_each(|_| {
                 let task = generate_random_task();
                 task_repository.save(task);
