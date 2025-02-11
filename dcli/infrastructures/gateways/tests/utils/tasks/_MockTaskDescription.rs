@@ -1,9 +1,9 @@
 use domain::TaskDescription;
 use fake::Dummy;
-use fake::faker::lorem::en::Sentence;
+use fake::faker::lorem::en::Word;
 
 #[derive(Dummy)]
-pub struct MockTaskDescription(#[dummy(faker = "Sentence(1..1024)")] String);
+pub struct MockTaskDescription(#[dummy(faker = "Word()")] String);
 
 impl Into<TaskDescription> for MockTaskDescription {
     fn into(self) -> TaskDescription {
