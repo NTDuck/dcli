@@ -1,8 +1,7 @@
-use std::time::Instant;
-
 use crate::tasks::TaskDescription;
 use crate::tasks::TaskId;
 use crate::tasks::TaskStatus;
+use crate::utils::Timestamp;
 
 #[derive(ddd::Entity)]
 pub struct Task {
@@ -11,5 +10,5 @@ pub struct Task {
     pub description: TaskDescription,
     pub status: TaskStatus,
 
-    pub created_at: Instant,
+    pub created_at: Timestamp,
 }

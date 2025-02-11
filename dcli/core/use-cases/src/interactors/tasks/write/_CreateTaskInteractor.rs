@@ -1,5 +1,4 @@
-use std::time::Instant;
-
+use domain::utils::Timestamp;
 use domain::Task;
 use domain::TaskDescription;
 use domain::TaskDescriptionError;
@@ -61,7 +60,7 @@ impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> 
             id: uuid,
             description: task_description,
             status: TaskStatus::Pending,
-            created_at: Instant::now(),
+            created_at: Timestamp::now(),
         };
 
         self.task_repository.unwrap_mut()

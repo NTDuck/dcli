@@ -5,7 +5,7 @@ use use_cases::boundaries::tasks::ViewTasksErrorModel;
 use use_cases::boundaries::tasks::ViewTasksRequestModel;
 use use_cases::boundaries::tasks::ViewTasksResponseModel;
 
-use crate::utils::adapters::TimestampAdapter;
+use crate::utils::formatters::TimestampFormatter;
 
 pub struct ViewTasksController<'bdrs> {
     interactor: &'bdrs dyn ViewTasksBoundary,
@@ -69,7 +69,7 @@ impl From<Task> for ViewableTask {
             id: *task.id,
             description: task.description.to_string(),
             status: ViewableTaskStatus::from(task.status),
-            created_at: TimestampAdapter::format(task.created_at),
+            created_at: TimestampFormatter::format(task.created_at),
         };
     }
 }

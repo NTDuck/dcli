@@ -1,3 +1,3 @@
 use modules::*;
 
-namespace!(pub adapters);
+namespace!(pub formatters);
