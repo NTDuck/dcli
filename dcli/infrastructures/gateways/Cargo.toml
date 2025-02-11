@@ -18,7 +18,9 @@ uuid = { version = "1.12", features = [
 indexmap = "2.7"
 
 [dev-dependencies]
-fake = { version = "3.0.1", features = []}
+fake = { version = "3.0.1", features = [
+    "derive",
+]}
 # mockall = "0.13.1"
 # proptest = "1.6.0"
 

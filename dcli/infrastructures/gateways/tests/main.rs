@@ -1,4 +1,4 @@
 use modules::*;
 
 namespace!(repositories);
-namespace!(utils);
+namespace!(pub(crate) utils);

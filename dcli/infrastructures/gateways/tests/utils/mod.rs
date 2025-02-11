@@ -1,3 +1,4 @@
 use modules::namespace;
 
-namespace!(tasks);
+namespace!(pub tasks);
+namespace!(pub ids);

@@ -55,6 +55,7 @@ impl TryFrom<String> for TaskDescription {
     }
 }
 
+#[derive(Debug)]
 pub enum TaskDescriptionError {
     LengthUnderflow {
         actual_length: usize,
