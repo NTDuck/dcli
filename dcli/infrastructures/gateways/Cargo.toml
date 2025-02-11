@@ -21,3 +21,7 @@ indexmap = "2.7"
 fake = { version = "3.0.1", features = []}
 # mockall = "0.13.1"
 # proptest = "1.6.0"
+
+[lib]
+test = false
+doctest = false
