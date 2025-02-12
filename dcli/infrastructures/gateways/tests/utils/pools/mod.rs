@@ -1,3 +1,3 @@
 use modules::*;
 
-namespace!(pub abc);
+namespace!(pub tasks);

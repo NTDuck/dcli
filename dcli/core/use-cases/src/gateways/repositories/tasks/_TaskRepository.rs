@@ -25,7 +25,10 @@ pub trait TaskRepository {
             .pageSize;
     }
 
-    fn contains(&self, taskId: TaskId) -> bool;
+    fn contains(&self, taskId: TaskId) -> bool {
+        return self.getById(taskId)
+            .is_some();
+    }
 
     fn clear(&mut self);
     fn clearByStatus(&mut self, status: TaskStatus);

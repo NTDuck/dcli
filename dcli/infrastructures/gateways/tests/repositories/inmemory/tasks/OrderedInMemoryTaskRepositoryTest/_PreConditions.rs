@@ -1,7 +1,4 @@
 use domain::Task;
-use domain::TaskId;
-use fake::Fake;
-use fake::Faker;
 use gateways::repositories::inmemory::tasks::InMemoryTaskRepository;
 use use_cases::gateways::repositories::tasks::TaskRepository;
 
@@ -16,7 +13,7 @@ pub fn GivenRepositoryWithOneTask() -> (impl TaskRepository, Task) {
     return (taskRepository, task);
 }
 
-pub fn GivenRepositoryWithManyTasks<const N: usize>() -> (impl TaskRepository, [Task; N]) {
+pub fn GivenRepositoryWithManyTasks() -> (impl TaskRepository, [Task; N]) {
     let mut taskRepository = InMemoryTaskRepository::new();
 
     let tasks: [Task; N] = std::array::from_fn(|_| GivenTask());
