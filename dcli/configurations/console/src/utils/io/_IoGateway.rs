@@ -3,7 +3,7 @@ use std::io::Write;
 pub struct IoGateway;
 
 impl IoGateway {
-    pub fn read_line(&self) -> String {
+    pub fn readLine(&self) -> String {
         std::io::stdout().flush().unwrap();
 
         let mut input = String::new();
@@ -22,7 +22,7 @@ impl IoGateway {
             .unwrap();
     }
     
-    pub fn write_line(&self, message: &str) {
+    pub fn writeLine(&self, message: &str) {
         self.write(message);
         self.write("\n");
     }

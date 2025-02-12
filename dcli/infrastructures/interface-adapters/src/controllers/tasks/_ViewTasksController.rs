@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use domain::Task;
 use domain::TaskStatus;
 use use_cases::boundaries::tasks::ViewTasksBoundary;
@@ -33,17 +35,17 @@ pub type ViewTasksRequestObject = ViewTasksRequestModel;
 
 pub struct ViewTasksViewModel {
     pub tasks: Vec<ViewableTask>,
-    pub page_size: usize,
-    pub max_page_size: usize,
-    pub page_number: usize,
-    pub max_page_number: usize,
+    pub pageSize: usize,
+    pub maxPageSize: usize,
+    pub pageNumber: usize,
+    pub maxPageNumber: usize,
 }
 
 pub struct ViewableTask {
     pub id: u128,
     pub description: String,
     pub status: ViewableTaskStatus,
-    pub created_at: String,
+    pub createdAt: String,
 }
 
 pub type ViewableTaskStatus = TaskStatus;
@@ -55,10 +57,10 @@ impl From<ViewTasksResponseModel> for ViewTasksViewModel {
                 .into_iter()
                 .map(|task| ViewableTask::from(task))
                 .collect(),
-            page_size: response.paginationResponse.pageSize,
-            max_page_size: response.paginationResponse.maxPageSize,
-            page_number: response.paginationResponse.pageNumber,
-            max_page_number: response.paginationResponse.maxPageNumber,
+            pageSize: response.paginationResponse.pageSize,
+            maxPageSize: response.paginationResponse.maxPageSize,
+            pageNumber: response.paginationResponse.pageNumber,
+            maxPageNumber: response.paginationResponse.maxPageNumber,
         };
     }
 }
@@ -66,10 +68,10 @@ impl From<ViewTasksResponseModel> for ViewTasksViewModel {
 impl From<Task> for ViewableTask {
     fn from(task: Task) -> Self {
         return ViewableTask {
-            id: *task.id,
-            description: task.description.to_string(),
+            id: task.id.deref().clone(),
+            description: task.description.deref().clone(),
             status: ViewableTaskStatus::from(task.status),
-            created_at: TimestampFormatter::format(task.createdAt),
+            createdAt: TimestampFormatter::format(task.createdAt),
         };
     }
 }

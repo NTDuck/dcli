@@ -1,3 +1,5 @@
+#![allow(non_snake_case)]
+
 use std::usize;
 
 use console::utils::io::IoGateway;
@@ -26,27 +28,27 @@ fn main() {
     type PointerStrategy = ArcRwLockSharedPointerStrategy;
     
     // Gateways
-    let task_repository: SharedPointer<Box<dyn TaskRepository>> =
+    let taskRepository: SharedPointer<Box<dyn TaskRepository>> =
         SharedPointer::new(Box::new(InMemoryTaskRepository::new()));
-    let uuid_factory: SharedPointer<Box<dyn UuidFactory>> =
+    let uuidFactory: SharedPointer<Box<dyn UuidFactory>> =
         SharedPointer::new(Box::new(UuidV4Factory::new()));
 
     // Interactors
-    let create_task_interactor =
-        CreateTaskInteractor::new(task_repository.clone(), uuid_factory.clone());
-    let view_tasks_interactor = 
-        ViewTasksInteractor::new(task_repository.clone());
+    let createTaskInteractor =
+        CreateTaskInteractor::new(taskRepository.clone(), uuidFactory.clone());
+    let viewTasksInteractor = 
+        ViewTasksInteractor::new(taskRepository.clone());
 
     // Controllers
-    let create_task_controller = CreateTaskController::new(&create_task_interactor);
-    let view_tasks_controller = ViewTasksController::new(&view_tasks_interactor);
+    let createTaskController = CreateTaskController::new(&createTaskInteractor);
+    let viewTasksController = ViewTasksController::new(&viewTasksInteractor);
 
     // I/O
-    let io_gateway = IoGateway;
+    let ioGateway = IoGateway;
 
     // Main loop
     loop {
-        io_gateway.write(
+        ioGateway.write(
             "\
             Select a number:\n\
             [0] Exit\n\
@@ -55,32 +57,32 @@ fn main() {
         ",
         );
 
-        match io_gateway.read_line().trim() {
+        match ioGateway.readLine().trim() {
             "0" => {
-                io_gateway.write_line("Exit signal received.");
+                ioGateway.writeLine("Exit signal received.");
                 break;
             },
             "1" => {
-                io_gateway.write("Enter task description: ");
-                let task_description = io_gateway.read_line();
+                ioGateway.write("Enter task description: ");
+                let task_description = ioGateway.readLine();
 
                 let request = CreateTaskRequestObject { taskDescription: task_description };
-                let response = create_task_controller.apply(request);
+                let response = createTaskController.apply(request);
 
                 match response {
                     Ok(_) => (),
                     Err(error) => match error {
                         CreateTaskErrorModel::TaskDescriptionLengthUnderflow {
-                            actualLength: actual_length,
-                            minLengthRequired: min_length_required,
-                        } => io_gateway.write_line(
+                            actualLength,
+                            minLengthRequired,
+                        } => ioGateway.writeLine(
                             &format!("Error: Task description must be at least {} characters long, yours only has {}.",
-                            min_length_required, actual_length,
+                            minLengthRequired, actualLength,
                         )),
                         CreateTaskErrorModel::TaskDescriptionLengthOverflow {
-                            actualLength: actual_length,
-                            maxLengthAllowed: max_length_allowed,
-                        } => io_gateway.write_line(&format!("Error: Task description must be at most {max_length_allowed} characters long, yours has {actual_length}.")),
+                            actualLength,
+                            maxLengthAllowed,
+                        } => ioGateway.writeLine(&format!("Error: Task description must be at most {maxLengthAllowed} characters long, yours has {actualLength}.")),
                     },
                 }
             },
@@ -91,26 +93,26 @@ fn main() {
                         maxPageSize: usize::MAX,
                     },
                 };
-                let response = view_tasks_controller.apply(request);
+                let response = viewTasksController.apply(request);
 
                 match response {
                     Ok(ViewTasksViewModel {
                         tasks,
-                        page_size,
-                        page_number,
-                        max_page_number,
+                        pageSize,
+                        pageNumber,
+                        maxPageNumber,
                         ..
                     }) => {
-                        io_gateway.write_line(&format!(
-                            "Page {page_number} of {max_page_number}, found {page_size} tasks:"
+                        ioGateway.writeLine(&format!(
+                            "Page {pageNumber} of {maxPageNumber}, found {pageSize} tasks:"
                         ));
                         tasks.into_iter().for_each(
                             |ViewableTask {
                                  description,
-                                 created_at,
+                                 createdAt: created_at,
                                  ..
                              }| {
-                                io_gateway.write_line(&format!(" - [ {created_at}] {description}"));
+                                ioGateway.writeLine(&format!(" - [ {created_at}] {description}"));
                             },
                         );
                     },
@@ -118,7 +120,7 @@ fn main() {
                 }
             },
             _ => {
-                io_gateway.write_line("Invalid number.");
+                ioGateway.writeLine("Invalid number.");
                 continue;
             },
         }
