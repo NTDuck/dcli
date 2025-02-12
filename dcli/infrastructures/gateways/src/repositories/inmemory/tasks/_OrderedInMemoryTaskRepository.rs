@@ -30,11 +30,11 @@ impl TaskRepository for OrderedInMemoryTaskRepository {
         self.tasks_by_ids.shift_remove(&task_id);
     }
 
-    fn get(&self, task_id: TaskId) -> Option<Task> {
+    fn getById(&self, task_id: TaskId) -> Option<Task> {
         return self.tasks_by_ids.get(&task_id).cloned();
     }
 
-    fn show_most_recent(&self, pagination_request: PaginationRequest) -> PaginationResponse<Task> {
+    fn showOrderedByCreatedAtDesc(&self, pagination_request: PaginationRequest) -> PaginationResponse<Task> {
         let pagination_range = PaginationRange::from(&pagination_request);
 
         let tasks: Vec<_> = self.tasks_by_ids
@@ -49,18 +49,18 @@ impl TaskRepository for OrderedInMemoryTaskRepository {
 
         return PaginationResponse {
             items: tasks,
-            page_size: page_size,
-            max_page_size: pagination_request.max_page_size,
-            page_number: pagination_request.page_number,
-            max_page_number: match self.tasks_by_ids.len() {
-                0 => PaginationProperties::MIN_PAGE_SIZE,
+            pageSize: page_size,
+            maxPageSize: pagination_request.maxPageSize,
+            pageNumber: pagination_request.pageNumber,
+            maxPageNumber: match self.tasks_by_ids.len() {
+                0 => PaginationProperties::MinPageSize,
                 _ => self.tasks_by_ids.len()
-                    .div_ceil(pagination_request.max_page_size),
+                    .div_ceil(pagination_request.maxPageSize),
             },
         };
     }
 
-    fn show_most_recent_by_status(&self, status: TaskStatus, pagination_request: PaginationRequest) -> PaginationResponse<Task> {
+    fn showByStatusOrderedByCreatedAtDesc(&self, status: TaskStatus, pagination_request: PaginationRequest) -> PaginationResponse<Task> {
         let pagination_range = PaginationRange::from(&pagination_request);
 
         let tasks: Vec<_> = self.tasks_by_ids
@@ -76,17 +76,17 @@ impl TaskRepository for OrderedInMemoryTaskRepository {
 
         return PaginationResponse {
             items: tasks,
-            page_size: page_size,
-            max_page_size: pagination_request.max_page_size,
-            page_number: pagination_request.page_number,
-            max_page_number: {
+            pageSize: page_size,
+            maxPageSize: pagination_request.maxPageSize,
+            pageNumber: pagination_request.pageNumber,
+            maxPageNumber: {
                 let total_items_count = self.tasks_by_ids
                     .values()
                     .filter(|task| task.status == status)
                     .count();
                 match total_items_count {
-                    0 => PaginationProperties::MIN_PAGE_SIZE,
-                    _ => total_items_count.div_ceil(pagination_request.max_page_size),
+                    0 => PaginationProperties::MinPageSize,
+                    _ => total_items_count.div_ceil(pagination_request.maxPageSize),
                 }
             },
         };
@@ -101,7 +101,7 @@ impl TaskRepository for OrderedInMemoryTaskRepository {
         self.tasks_by_ids.clear();
     }
 
-    fn clear_by_status(&mut self, status: TaskStatus) {
+    fn clearByStatus(&mut self, status: TaskStatus) {
         self.tasks_by_ids
             .retain2(|_, task| task.status != status);
     }

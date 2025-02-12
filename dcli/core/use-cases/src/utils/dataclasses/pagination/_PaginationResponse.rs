@@ -3,10 +3,10 @@ use std::fmt::Debug;
 #[derive(Debug, PartialEq, Eq)]
 pub struct PaginationResponse<T> {
     pub items: Vec<T>,
-    pub page_size: usize,
-    pub max_page_size: usize,
-    pub page_number: usize,
-    pub max_page_number: usize,
+    pub pageSize: usize,
+    pub maxPageSize: usize,
+    pub pageNumber: usize,
+    pub maxPageNumber: usize,
 }
 
 impl<T> ddd::ValueObject for PaginationResponse<T>
@@ -21,10 +21,10 @@ where
     fn clone(&self) -> Self {
         return Self {
             items: self.items.clone(),
-            page_size: self.page_size.clone(),
-            max_page_size: self.max_page_size.clone(),
-            page_number: self.page_number.clone(),
-            max_page_number: self.max_page_number.clone(),
+            pageSize: self.pageSize.clone(),
+            maxPageSize: self.maxPageSize.clone(),
+            pageNumber: self.pageNumber.clone(),
+            maxPageNumber: self.maxPageNumber.clone(),
         };
     }
 }

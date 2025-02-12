@@ -8,25 +8,25 @@ use crate::utils::dataclasses::pagination::PaginationResponse;
 
 pub trait TaskRepository {
     fn save(&mut self, task: Task);
-    fn remove(&mut self, task_id: TaskId);
+    fn remove(&mut self, taskId: TaskId);
 
-    fn get(&self, task_id: TaskId) -> Option<Task>;
+    fn getById(&self, taskId: TaskId) -> Option<Task>;
 
-    fn show_most_recent(&self, pagination_request: PaginationRequest) -> PaginationResponse<Task>;
-    fn show_most_recent_by_status(&self, status: TaskStatus, pagination_request: PaginationRequest) -> PaginationResponse<Task>;
+    fn showOrderedByCreatedAtDesc(&self, paginationRequest: PaginationRequest) -> PaginationResponse<Task>;
+    fn showByStatusOrderedByCreatedAtDesc(&self, status: TaskStatus, paginationRequest: PaginationRequest) -> PaginationResponse<Task>;
 
     fn size(&self) -> usize {
-        let pagination_request = PaginationRequest {
-            page_number: PaginationProperties::MIN_PAGE_SIZE,
-            max_page_size: usize::MAX,
+        let paginationRequest = PaginationRequest {
+            pageNumber: PaginationProperties::MinPageSize,
+            maxPageSize: usize::MAX,
         };
         
-        return self.show_most_recent(pagination_request)
-            .page_size;
+        return self.showOrderedByCreatedAtDesc(paginationRequest)
+            .pageSize;
     }
 
-    fn contains(&self, task_id: TaskId) -> bool;
+    fn contains(&self, taskId: TaskId) -> bool;
 
     fn clear(&mut self);
-    fn clear_by_status(&mut self, status: TaskStatus);
+    fn clearByStatus(&mut self, status: TaskStatus);
 }

@@ -8,12 +8,12 @@ pub struct PaginationRange {
 }
 
 impl From<&PaginationRequest> for PaginationRange {
-    fn from(pagination_request: &PaginationRequest) -> Self {
+    fn from(paginationRequest: &PaginationRequest) -> Self {
         return Self {
-            offset: pagination_request.page_number
-            .saturating_sub(PaginationProperties::MIN_PAGE_SIZE)
-            * pagination_request.max_page_size,
-            limit: pagination_request.max_page_size,
+            offset: paginationRequest.pageNumber
+                .saturating_sub(PaginationProperties::MinPageSize)
+            * paginationRequest.maxPageSize,
+            limit: paginationRequest.maxPageSize,
         };
     }
 }

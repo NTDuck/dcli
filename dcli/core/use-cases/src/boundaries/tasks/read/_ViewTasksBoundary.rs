@@ -8,11 +8,11 @@ pub trait ViewTasksBoundary {
 }
 
 pub struct ViewTasksRequestModel {
-    pub pagination_request: PaginationRequest,
+    pub paginationRequest: PaginationRequest,
 }
 
 pub struct ViewTasksResponseModel {
-    pub pagination_response: PaginationResponse<Task>,
+    pub paginationResponse: PaginationResponse<Task>,
 }
 
 pub struct ViewTasksErrorModel;

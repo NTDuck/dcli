@@ -51,14 +51,14 @@ pub type ViewableTaskStatus = TaskStatus;
 impl From<ViewTasksResponseModel> for ViewTasksViewModel {
     fn from(response: ViewTasksResponseModel) -> Self {
         return Self {
-            tasks: response.pagination_response.items
+            tasks: response.paginationResponse.items
                 .into_iter()
                 .map(|task| ViewableTask::from(task))
                 .collect(),
-            page_size: response.pagination_response.page_size,
-            max_page_size: response.pagination_response.max_page_size,
-            page_number: response.pagination_response.page_number,
-            max_page_number: response.pagination_response.max_page_number,
+            page_size: response.paginationResponse.pageSize,
+            max_page_size: response.paginationResponse.maxPageSize,
+            page_number: response.paginationResponse.pageNumber,
+            max_page_number: response.paginationResponse.maxPageNumber,
         };
     }
 }

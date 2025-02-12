@@ -1,4 +1,4 @@
-use domain::utils::Timestamp;
+use domain::utils::dataclasses::time::Timestamp;
 use domain::Task;
 use domain::TaskDescription;
 use domain::TaskDescriptionError;
@@ -14,15 +14,15 @@ use crate::gateways::repositories::tasks::TaskRepository;
 use crate::gateways::factories::ids::UuidFactory;
 
 pub struct CreateTaskInteractor<Handle: PointerHandle> {
-    task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
-    uuid_factory: SharedPointer<Box<dyn UuidFactory>, Handle>,
+    taskRepository: SharedPointer<Box<dyn TaskRepository>, Handle>,
+    uuidFactory: SharedPointer<Box<dyn UuidFactory>, Handle>,
 }
 
 impl<Handle: PointerHandle> CreateTaskInteractor<Handle> {
-    pub const fn new(task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>, uuid_factory: SharedPointer<Box<dyn UuidFactory>, Handle>) -> Self {
+    pub const fn new(taskRepository: SharedPointer<Box<dyn TaskRepository>, Handle>, uuidFactory: SharedPointer<Box<dyn UuidFactory>, Handle>) -> Self {
         return Self {
-            task_repository,
-            uuid_factory,
+            taskRepository,
+            uuidFactory,
         };
     }
 }
@@ -30,40 +30,40 @@ impl<Handle: PointerHandle> CreateTaskInteractor<Handle> {
 impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> {
     fn apply(&self, request: CreateTaskRequestModel) -> Result<CreateTaskResponseModel, CreateTaskErrorModel> {
         let CreateTaskRequestModel {
-            task_description,
+            taskDescription,
         } = request;
 
-        let task_description = match TaskDescription::try_from(task_description) {
-            Ok(description) => description,
+        let taskDescription = match TaskDescription::try_from(taskDescription) {
+            Ok(taskDescription) => taskDescription,
             Err(error) => match error {
                 TaskDescriptionError::LengthUnderflow {
-                    actualLength: actual_length,
-                    minLengthRequired: min_length_required,
+                    actualLength,
+                    minLengthRequired,
                 } => return Err(CreateTaskErrorModel::TaskDescriptionLengthUnderflow {
-                    actual_length: actual_length,
-                    min_length_required: min_length_required,
+                    actualLength,
+                    minLengthRequired,
                 }),
                 TaskDescriptionError::LengthOverflow {
-                    actualLength: actual_length,
-                    maxLengthAllowed: max_length_allowed,
+                    actualLength,
+                    maxLengthAllowed,
                 } => return Err(CreateTaskErrorModel::TaskDescriptionLengthOverflow {
-                    actual_length: actual_length,
-                    max_length_allowed: max_length_allowed,
+                    actualLength,
+                    maxLengthAllowed,
                 }),
             }
         };
 
-        let uuid = self.uuid_factory.unwrap()
+        let uuid = self.uuidFactory.unwrap()
             .generate();
 
         let task = Task {
             id: uuid,
-            description: task_description,
+            description: taskDescription,
             status: TaskStatus::Pending,
             createdAt: Timestamp::now(),
         };
 
-        self.task_repository.unwrap_mut()
+        self.taskRepository.unwrap_mut()
             .save(task);
 
         return Ok(CreateTaskResponseModel);

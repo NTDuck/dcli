@@ -64,31 +64,31 @@ fn main() {
                 io_gateway.write("Enter task description: ");
                 let task_description = io_gateway.read_line();
 
-                let request = CreateTaskRequestObject { task_description };
+                let request = CreateTaskRequestObject { taskDescription: task_description };
                 let response = create_task_controller.apply(request);
 
                 match response {
                     Ok(_) => (),
                     Err(error) => match error {
                         CreateTaskErrorModel::TaskDescriptionLengthUnderflow {
-                            actual_length,
-                            min_length_required,
+                            actualLength: actual_length,
+                            minLengthRequired: min_length_required,
                         } => io_gateway.write_line(
                             &format!("Error: Task description must be at least {} characters long, yours only has {}.",
                             min_length_required, actual_length,
                         )),
                         CreateTaskErrorModel::TaskDescriptionLengthOverflow {
-                            actual_length,
-                            max_length_allowed,
+                            actualLength: actual_length,
+                            maxLengthAllowed: max_length_allowed,
                         } => io_gateway.write_line(&format!("Error: Task description must be at most {max_length_allowed} characters long, yours has {actual_length}.")),
                     },
                 }
             },
             "2" => {
                 let request = ViewTasksRequestObject {
-                    pagination_request: PaginationRequest {
-                        page_number: 1,
-                        max_page_size: usize::MAX,
+                    paginationRequest: PaginationRequest {
+                        pageNumber: 1,
+                        maxPageSize: usize::MAX,
                     },
                 };
                 let response = view_tasks_controller.apply(request);

@@ -7,13 +7,13 @@ use crate::gateways::pointers::SharedPointer;
 use crate::gateways::repositories::tasks::TaskRepository;
 
 pub struct ViewTasksInteractor<Handle: PointerHandle> {
-    task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
+    taskRepository: SharedPointer<Box<dyn TaskRepository>, Handle>,
 }
 
 impl<Handle: PointerHandle> ViewTasksInteractor<Handle> {
-    pub const fn new(task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>) -> Self {
+    pub const fn new(taskRepository: SharedPointer<Box<dyn TaskRepository>, Handle>) -> Self {
         return Self {
-            task_repository,
+            taskRepository,
         };
     }
 }
@@ -21,12 +21,12 @@ impl<Handle: PointerHandle> ViewTasksInteractor<Handle> {
 impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksInteractor<Handle> {
     fn apply(&self, request: ViewTasksRequestModel) -> Result<ViewTasksResponseModel, ViewTasksErrorModel> {
         let ViewTasksRequestModel {
-            pagination_request,
+            paginationRequest,
         } = request;
 
-        let pagination_response = self.task_repository.unwrap()
-            .show_most_recent(pagination_request);
+        let paginationResponse = self.taskRepository.unwrap()
+            .showOrderedByCreatedAtDesc(paginationRequest);
 
-        return Ok(ViewTasksResponseModel { pagination_response });
+        return Ok(ViewTasksResponseModel { paginationResponse });
     }
 }

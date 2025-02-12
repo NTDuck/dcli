@@ -23,7 +23,7 @@ fn WhenGettingAny(task_repository: &impl TaskRepository) -> Option<Task> {
 }
 
 fn WhenGettingTaskWithId(task_repository: &impl TaskRepository, task_id: TaskId) -> Option<Task> {
-    return task_repository.get(task_id);
+    return task_repository.getById(task_id);
 }
 
 fn ExpectNone(task: Option<Task>) {
