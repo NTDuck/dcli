@@ -1,4 +1,4 @@
-use modules::namespace;
+use modules::*;
 
-namespace!(pub tasks);
-namespace!(pub ids);
+namespace!(pub mocks);
+namespace!(pub pools);

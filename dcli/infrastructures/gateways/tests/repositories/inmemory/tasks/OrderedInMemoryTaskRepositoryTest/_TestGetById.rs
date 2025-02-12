@@ -4,8 +4,6 @@ use fake::Faker;
 use fake::Fake;
 use use_cases::gateways::repositories::tasks::TaskRepository;
 
-use crate::utils::tasks::MockTaskId;
-
 use super::*;
 
 #[test]

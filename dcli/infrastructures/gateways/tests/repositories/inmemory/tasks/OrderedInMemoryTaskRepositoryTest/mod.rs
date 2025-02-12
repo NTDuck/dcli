@@ -1,6 +1,6 @@
 use modules::*;
 
-testGroup!(test_get);
+testGroup!(_TestGetById);
 
-class!(pub _Config);
 class!(pub _PreConditions);
+class!(pub _PostConditions);
