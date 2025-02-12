@@ -1,8 +1,5 @@
-mod _PreConditions;
-
 use modules::*;
 
-testGroup!(_test_getById);
+testGroup!(_getById);
 
-class!(pub _preconditions);
-class!(pub _postconditions);
+class!(pub _PreConditions);
