@@ -1,3 +1,5 @@
+#![allow(non_snake_case)]
+
 use modules::*;
 use utils::TokenStream;
 
@@ -5,14 +7,16 @@ namespace!(domain);
 namespace!(utils);
 
 #[proc_macro_derive(Entity, attributes(ddd))]
-pub fn derive_entity(tokens: TokenStream) -> TokenStream { return domain::derive_entity(tokens); }
+pub fn deriveEntity(tokens: TokenStream) -> TokenStream {
+    return domain::deriveEntity(tokens);
+}
 
 #[proc_macro_derive(Identifier)]
-pub fn derive_identifier(tokens: TokenStream) -> TokenStream {
-    return domain::derive_identifier(tokens);
+pub fn deriveIdentifier(tokens: TokenStream) -> TokenStream {
+    return domain::deriveIdentifier(tokens);
 }
 
 #[proc_macro_derive(ValueObject)]
-pub fn derive_value_object(tokens: TokenStream) -> TokenStream {
-    return domain::derive_value_object(tokens);
+pub fn deriveValueObject(tokens: TokenStream) -> TokenStream {
+    return domain::deriveValueObject(tokens);
 }

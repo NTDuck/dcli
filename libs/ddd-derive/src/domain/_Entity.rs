@@ -3,14 +3,14 @@ use crate::utils::Field;
 use crate::utils::TokenStream;
 use crate::utils::StructAbstractSyntaxTree;
 
-pub fn derive_entity(tokens: TokenStream) -> TokenStream {
+pub fn deriveEntity(tokens: TokenStream) -> TokenStream {
     let ast = match AbstractSyntaxTree::try_from(tokens) {
         Ok(ast) => ast,
         Err(error) => return error.write_errors().into(),
     };
 
     return match ast.data.is_struct() {
-        true => generate_tokens_from_struct_ast(StructAbstractSyntaxTree::from(ast)),
+        true => generateTokensFromStructAst(StructAbstractSyntaxTree::from(ast)),
         false => todo!(),
     }
 }
@@ -26,7 +26,7 @@ struct FieldAttributes {
 #[derive(darling::FromMeta)]
 struct IdMarker;
 
-fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<EntityField>) -> TokenStream {
+fn generateTokensFromStructAst(ast: StructAbstractSyntaxTree<EntityField>) -> TokenStream {
     let field_idents = ast.get_field_idents();
 
     let StructAbstractSyntaxTree {
@@ -38,7 +38,7 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<EntityField>) -
 
     let id_field = fields
         .iter()
-        .find(|field| is_id_field(&field))
+        .find(|field| isIdField(&field))
         .unwrap();
 
     let id_field_ident = id_field.ident.as_ref().unwrap();
@@ -48,7 +48,7 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<EntityField>) -
         impl #generics ddd::domain::Entity for #ident #generics {
             type Id = #id_field_ty;
 
-            fn get_id(&self) -> &Self::Id {
+            fn getId(&self) -> &Self::Id {
                 return &self.#id_field_ident;
             }
         }
@@ -75,7 +75,7 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<EntityField>) -
             fn eq(&self, other: &Self) -> bool {
                 use ddd::domain::Entity;
 
-                return self.get_id() == other.get_id();
+                return self.getId() == other.getId();
             }
         }
 
@@ -83,11 +83,11 @@ fn generate_tokens_from_struct_ast(ast: StructAbstractSyntaxTree<EntityField>) -
     };
 }
 
-fn is_id_field(field: &EntityField) -> bool {
-    return field_has_id_attribute(field);
+fn isIdField(field: &EntityField) -> bool {
+    return fieldHasIdAttribute(field);
 }
 
-fn field_has_id_attribute(field: &EntityField) -> bool {
+fn fieldHasIdAttribute(field: &EntityField) -> bool {
     return field.attributes
         .as_ref()
         .map_or(false,
