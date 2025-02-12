@@ -37,15 +37,15 @@ impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> 
             Ok(description) => description,
             Err(error) => match error {
                 TaskDescriptionError::LengthUnderflow {
-                    actual_length,
-                    min_length_required,
+                    actualLength: actual_length,
+                    minLengthRequired: min_length_required,
                 } => return Err(CreateTaskErrorModel::TaskDescriptionLengthUnderflow {
                     actual_length: actual_length,
                     min_length_required: min_length_required,
                 }),
                 TaskDescriptionError::LengthOverflow {
-                    actual_length,
-                    max_length_allowed,
+                    actualLength: actual_length,
+                    maxLengthAllowed: max_length_allowed,
                 } => return Err(CreateTaskErrorModel::TaskDescriptionLengthOverflow {
                     actual_length: actual_length,
                     max_length_allowed: max_length_allowed,
@@ -60,7 +60,7 @@ impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> 
             id: uuid,
             description: task_description,
             status: TaskStatus::Pending,
-            created_at: Timestamp::now(),
+            createdAt: Timestamp::now(),
         };
 
         self.task_repository.unwrap_mut()

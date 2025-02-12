@@ -1,7 +1,7 @@
 use crate::tasks::TaskDescription;
 use crate::tasks::TaskId;
 use crate::tasks::TaskStatus;
-use crate::utils::Timestamp;
+use crate::utils::dataclasses::time::Timestamp;
 
 #[derive(ddd::Entity)]
 pub struct Task {
@@ -10,5 +10,5 @@ pub struct Task {
     pub description: TaskDescription,
     pub status: TaskStatus,
 
-    pub created_at: Timestamp,
+    pub createdAt: Timestamp,
 }

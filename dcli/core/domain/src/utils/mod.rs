@@ -1,3 +1,3 @@
 use modules::*;
 
-class!(pub _Timestamp);
+namespace!(pub dataclasses);

@@ -69,7 +69,7 @@ impl From<Task> for ViewableTask {
             id: *task.id,
             description: task.description.to_string(),
             status: ViewableTaskStatus::from(task.status),
-            created_at: TimestampFormatter::format(task.created_at),
+            created_at: TimestampFormatter::format(task.createdAt),
         };
     }
 }
