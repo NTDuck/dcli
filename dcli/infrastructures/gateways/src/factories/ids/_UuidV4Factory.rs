@@ -1,4 +1,4 @@
-use domain::Uuid;
+use domain::utils::dataclasses::ids::Uuid;
 use use_cases::gateways::factories::ids::UuidFactory;
 
 pub struct UuidV4Factory;

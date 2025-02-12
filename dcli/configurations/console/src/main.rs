@@ -4,7 +4,7 @@ use console::utils::io::IoGateway;
 use gateways::factories::ids::UuidV4Factory;
 use gateways::pointers::handles::StrategizedPointerHandle;
 use gateways::pointers::strategies::triomphe::ArcRwLockSharedPointerStrategy;
-use gateways::repositories::inmemory::tasks::OrderedInMemoryTaskRepository;
+use gateways::repositories::inmemory::tasks::InMemoryTaskRepository;
 use interface_adapters::controllers::tasks::CreateTaskController;
 use interface_adapters::controllers::tasks::CreateTaskRequestObject;
 use interface_adapters::controllers::tasks::ViewTasksController;
@@ -27,7 +27,7 @@ fn main() {
     
     // Gateways
     let task_repository: SharedPointer<Box<dyn TaskRepository>> =
-        SharedPointer::new(Box::new(OrderedInMemoryTaskRepository::new()));
+        SharedPointer::new(Box::new(InMemoryTaskRepository::new()));
     let uuid_factory: SharedPointer<Box<dyn UuidFactory>> =
         SharedPointer::new(Box::new(UuidV4Factory::new()));
 

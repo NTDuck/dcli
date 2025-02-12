@@ -1,3 +1,3 @@
 use modules::*;
 
-class!(pub _OrderedInMemoryTaskRepository);
+class!(pub _InMemoryTaskRepository);
