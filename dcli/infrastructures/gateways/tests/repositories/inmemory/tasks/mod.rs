@@ -1,3 +1,3 @@
 use modules::*;
 
-test_suite!(OrderedInMemoryTaskRepositoryTest);
+testSuite!(OrderedInMemoryTaskRepositoryTest);

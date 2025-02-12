@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 
-mod _Class;
-mod _Namespace;
+mod _class;
+mod _namespace;
 
-mod _TestSuite;
-mod _TestGroup;
+mod _testSuite;
+mod _testGroup;

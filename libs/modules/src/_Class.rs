@@ -3,8 +3,6 @@
 /// Class-like modules are file-based,
 /// follow underscore-prefixed PascalCase naming conventions,
 /// and may contain one or a few tightly-coupled type declaration(s).
-/// Visibility of declared items is public within the containing namespace (i.e.
-/// the parent namespace-like module).
 ///
 /// Example: `_MyClass.rs`
 ///
@@ -15,6 +13,7 @@
 macro_rules! class {
     ($visibility:vis $module:ident) => {
         #[allow(non_snake_case)]
+        #[allow(non_upper_case_globals)]
         mod $module;
 
         $visibility use $module::*;

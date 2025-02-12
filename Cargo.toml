@@ -2,5 +2,14 @@
 members = [
     "dcli/*/*",
     "libs/*",
+    "libs/modules",
 ]
 resolver = "2"
+
+[workspace.lints.rust]
+non_snake_case = { level = "allow" }
+non_upper_case_globals = { level = "allow" }
+
+[workspace.metadata.rust-analyzer]
+# diagnostics.disabled = ["non_snake_case", "non_camel_case_types"]
+diagnostics.disabled = ["unconventional_variable_names"]

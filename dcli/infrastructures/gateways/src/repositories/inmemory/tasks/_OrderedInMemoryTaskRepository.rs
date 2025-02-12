@@ -34,7 +34,7 @@ impl TaskRepository for OrderedInMemoryTaskRepository {
         return self.tasks_by_ids.get(&task_id).cloned();
     }
 
-    fn show(&self, pagination_request: PaginationRequest) -> PaginationResponse<Task> {
+    fn show_most_recent(&self, pagination_request: PaginationRequest) -> PaginationResponse<Task> {
         let pagination_range = PaginationRange::from(&pagination_request);
 
         let tasks: Vec<_> = self.tasks_by_ids
@@ -60,7 +60,7 @@ impl TaskRepository for OrderedInMemoryTaskRepository {
         };
     }
 
-    fn show_by_status(&self, status: TaskStatus, pagination_request: PaginationRequest) -> PaginationResponse<Task> {
+    fn show_most_recent_by_status(&self, status: TaskStatus, pagination_request: PaginationRequest) -> PaginationResponse<Task> {
         let pagination_range = PaginationRange::from(&pagination_request);
 
         let tasks: Vec<_> = self.tasks_by_ids

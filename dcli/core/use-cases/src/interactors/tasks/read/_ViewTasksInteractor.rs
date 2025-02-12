@@ -25,7 +25,7 @@ impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksInteractor<Handle> {
         } = request;
 
         let pagination_response = self.task_repository.unwrap()
-            .show(pagination_request);
+            .show_most_recent(pagination_request);
 
         return Ok(ViewTasksResponseModel { pagination_response });
     }
