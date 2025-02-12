@@ -11,25 +11,25 @@ impl PointerStrategy for RcRefCellPointerStrategy {
     type Typed<T> = Rc<RefCell<T>>;
     type Untyped = Self::Typed<()>;
 
-    fn into_typed<T>(obj: T) -> Self::Typed<T> {
+    fn intoTyped<T>(obj: T) -> Self::Typed<T> {
         return Rc::new(RefCell::new(obj));
     }
     
-    fn into_untyped<T>(typed: Self::Typed<T>) -> Self::Untyped {
+    fn intoUntyped<T>(typed: Self::Typed<T>) -> Self::Untyped {
         return unsafe {
             std::mem::transmute(typed)
         };
     }
 
-    fn shallow_clone<T>(typed: &Self::Typed<T>) -> Self::Typed<T> {
+    fn shallowClone<T>(typed: &Self::Typed<T>) -> Self::Typed<T> {
         return Rc::clone(typed);
     }
 
-    fn unwrap<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl Deref<Target = T> + 'br {
+    fn read<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl Deref<Target = T> + 'br {
         return typed.borrow();
     }
 
-    fn unwrap_mut<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl DerefMut<Target = T> + 'br {
+    fn write<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl DerefMut<Target = T> + 'br {
         return typed.borrow_mut();
     }
 }

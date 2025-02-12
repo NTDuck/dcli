@@ -15,27 +15,27 @@ where
     Strategy: PointerStrategy,
 {
     fn new<T>(obj: T) -> Self {
-        let typed = Strategy::into_typed(obj);
-        let untyped = Strategy::into_untyped(typed);
-        return Self::new_from_untyped(untyped);
+        let typed = Strategy::intoTyped(obj);
+        let untyped = Strategy::intoUntyped(typed);
+        return Self::newFromUntyped(untyped);
     }
     
-    fn unwrap<'br, T: 'br>(&'br self) -> impl Deref<Target = T> + 'br {
-        return Strategy::unwrap(self.as_ref());
+    fn read<'br, T: 'br>(&'br self) -> impl Deref<Target = T> + 'br {
+        return Strategy::read(self.asTypedRef());
     }
     
-    fn unwrap_mut<'br, T: 'br>(&'br self) -> impl DerefMut<Target = T> + 'br {
-        return Strategy::unwrap_mut(self.as_ref());
+    fn write<'br, T: 'br>(&'br self) -> impl DerefMut<Target = T> + 'br {
+        return Strategy::write(self.asTypedRef());
     }
 
-    unsafe fn shallow_clone<T>(&self) -> Self {
-        let typed = Strategy::shallow_clone::<T>(self.as_ref());
-        let untyped = Strategy::into_untyped(typed);
-        return Self::new_from_untyped(untyped);
+    unsafe fn shallowClone<T>(&self) -> Self {
+        let typed = Strategy::shallowClone::<T>(self.asTypedRef());
+        let untyped = Strategy::intoUntyped(typed);
+        return Self::newFromUntyped(untyped);
     }
 
     unsafe fn drop<T>(&mut self) {
-        std::ptr::drop_in_place(self.as_mut::<T>());
+        std::ptr::drop_in_place(self.asTypedMut::<T>());
     }
 }
 
@@ -43,31 +43,31 @@ impl<Strategy> StrategizedPointerHandle<Strategy>
 where
     Strategy: PointerStrategy,
 {
-    fn new_from_untyped(untyped: Strategy::Untyped) -> Self {
+    fn newFromUntyped(untyped: Strategy::Untyped) -> Self {
         return Self {
             untyped: ManuallyDrop::new(untyped),
         };
     }
 
-    fn as_ref<T>(&self) -> &Strategy::Typed<T> {
-        let raw_const_ptr = (self.untyped.deref() as *const Strategy::Untyped)
+    fn asTypedRef<T>(&self) -> &Strategy::Typed<T> {
+        let rawConstPointer = (self.untyped.deref() as *const Strategy::Untyped)
             .cast::<Strategy::Typed<T>>();
 
-        Strategy::static_binary_compatibility_check::<T>();
+        Strategy::checkBinaryCompatibility::<T>();
 
         return unsafe {
-            &*raw_const_ptr
+            &*rawConstPointer
         };
     }
 
-    fn as_mut<T>(&mut self) -> &mut Strategy::Typed<T> {
-        let raw_mut_ptr = (self.untyped.deref_mut() as *mut Strategy::Untyped)
+    fn asTypedMut<T>(&mut self) -> &mut Strategy::Typed<T> {
+        let rawMutPointer = (self.untyped.deref_mut() as *mut Strategy::Untyped)
             .cast::<Strategy::Typed<T>>();
 
-        Strategy::static_binary_compatibility_check::<T>();
+        Strategy::checkBinaryCompatibility::<T>();
 
         return unsafe {
-            &mut *raw_mut_ptr
+            &mut *rawMutPointer
         };
     }
 }

@@ -39,18 +39,23 @@ where
 {
     pub fn new(obj: T) -> Self {
         let handle = Handle::new(obj);
-        return Self::new_from_handle(handle);
+        return Self::from(handle);
     }
 
-    pub fn unwrap(&self) -> impl Deref<Target = T> + '_ {
-        return self.handle.unwrap();
+    pub fn read(&self) -> impl Deref<Target = T> + '_ {
+        return self.handle.read();
     }
 
-    pub fn unwrap_mut(&self) -> impl DerefMut<Target = T> + '_ {
-        return self.handle.unwrap_mut();
+    pub fn write(&self) -> impl DerefMut<Target = T> + '_ {
+        return self.handle.write();
     }
+}
 
-    fn new_from_handle(handle: Handle) -> Self {
+impl<T, Handle> From<Handle> for SharedPointer<T, Handle>
+where
+    Handle: PointerHandle,
+{
+    fn from(handle: Handle) -> Self {
         return Self {
             handle: ManuallyDrop::new(handle),
             _marker: PhantomData,
@@ -64,9 +69,9 @@ where
 {
     fn clone(&self) -> Self {
         let handle = unsafe {
-            self.handle.shallow_clone::<T>()
+            self.handle.shallowClone::<T>()
         };
-        return Self::new_from_handle(handle);
+        return Self::from(handle);
     }
 }
 

@@ -53,7 +53,7 @@ impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> 
             }
         };
 
-        let uuid = self.uuidFactory.unwrap()
+        let uuid = self.uuidFactory.read()
             .generate();
 
         let task = Task {
@@ -63,7 +63,7 @@ impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> 
             createdAt: Timestamp::now(),
         };
 
-        self.taskRepository.unwrap_mut()
+        self.taskRepository.write()
             .save(task);
 
         return Ok(CreateTaskResponseModel);
