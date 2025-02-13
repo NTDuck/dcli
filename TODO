@@ -1,6 +1,5 @@
 - Full test coverage
 - CI/CD
-- Clean up
-+ refactor
 - syn
 - View
+- Docker
