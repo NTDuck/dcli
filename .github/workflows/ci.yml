@@ -15,17 +15,17 @@ concurrency:
 
 jobs:
   lint:
-    uses: ./.github/workflows/sub/lint.yml
+    uses: ./.github/workflows/lint.yml
 
   build:
     needs: lint
-    uses: ./.github/workflows/sub/build.yml
+    uses: ./.github/workflows/build.yml
 
   test:
     needs: build
-    uses: ./.github/workflows/sub/test.yml
+    uses: ./.github/workflows/test.yml
 
   deploy:
     if: github.event_name == 'pull_request' && github.base_ref == 'master'
     needs: test
-    uses: ./.github/workflows/sub/deploy.yml
+    uses: ./.github/workflows/deploy.yml
