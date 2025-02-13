@@ -16,7 +16,7 @@ use use_cases::gateways::pointers::SharedPointer as ParameterizedSharedPointer;
 use use_cases::gateways::repositories::tasks::TaskRepository;
 use use_cases::interactors::tasks::CreateTaskInteractor;
 use use_cases::interactors::tasks::ViewTasksInteractor;
-use use_cases::utils::dataclasses::pagination::UnboundedPaginationRequest;
+use use_cases::utils::dataclasses::pagination::PaginationProperties;
 
 fn main() {
     // Shared pointer type
@@ -97,7 +97,7 @@ fn handleTaskCreation(ioGateway: &IoGateway, controller: &CreateTaskController) 
 
 fn handleTasksView(ioGateway: &IoGateway, controller: &ViewTasksController) {
     let request = ViewTasksRequestObject {
-        paginationRequest: UnboundedPaginationRequest,
+        paginationRequest: PaginationProperties::UnboundedPaginationRequest,
     };
 
     match controller.apply(request) {

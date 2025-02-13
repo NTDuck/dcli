@@ -2,9 +2,9 @@ use domain::Task;
 use domain::TaskId;
 use domain::TaskStatus;
 
+use crate::utils::dataclasses::pagination::PaginationProperties;
 use crate::utils::dataclasses::pagination::PaginationRequest;
 use crate::utils::dataclasses::pagination::PaginationResponse;
-use crate::utils::dataclasses::pagination::UnboundedPaginationRequest;
 
 pub trait TaskRepository {
     fn save(&mut self, task: Task);
@@ -16,7 +16,7 @@ pub trait TaskRepository {
     fn showByStatusOrderedByCreatedAtDesc(&self, status: TaskStatus, paginationRequest: PaginationRequest) -> PaginationResponse<Task>;
 
     fn size(&self) -> usize {
-        return self.showOrderedByCreatedAtDesc(UnboundedPaginationRequest)
+        return self.showOrderedByCreatedAtDesc(PaginationProperties::UnboundedPaginationRequest)
             .pageSize;
     }
 
