@@ -1,23 +1,31 @@
-name: Rust CI with Cargo
+name: CI
 
 on:
   push:
+    branches: [ "*" ]
   pull_request:
+    branches: [ $default-branch ]
 
-env: 
+env:
   CARGO_TERM_COLOR: always
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
-  build_and_test:
-    runs-on: ${{ matrix.os }}
+  lint:
+    uses: ./.github/actions/lint.yml
 
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        toolchain: [stable, beta, nightly]
+  build:
+    needs: lint
+    uses: ./.github/actions/build.yml
 
-    steps:
-      - uses: actions/checkout@v4
-      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
-      - run: cargo build --verbose
-      - run: cargo test --verbose
+  test:
+    needs: build
+    uses: ./.github/actions/test.yml
+
+  deploy:
+    if: github.event_name == 'pull_request' && github.base_ref == 'master'
+    needs: test
+    uses: ./.github/actions/deploy.yml
