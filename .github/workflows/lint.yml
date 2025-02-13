@@ -8,8 +8,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ubuntu-latest
-        channel: nightly
+        os:
+          - ubuntu-latest
+        channel:
+          - nightly
 
     runs-on: ${{ matrix.os }}
     steps:
