@@ -21,15 +21,15 @@ fn GivenRepositoryContainingOneTask_WhenGettingIt_ExpectCorrectTask() {
 #[test]
 fn GivenRepositoryContainingOneTask_WhenGettingAnyOther_ExpectNone() {
     let taskRepository = GivenRepositoryContainingOneTaskWithId(0);
-    let retrievedTask = WhenGettingTaskById(&taskRepository, 1);
+    let retrievedTask = WhenGettingTaskById(&taskRepository, 1234);
     ExpectNone(retrievedTask);
 }
 
 #[test]
 fn GivenRepositoryContainingManyTasks_WhenGettingAnExistingOne_ExpectCorrectTask() {
     let taskRepository = GivenRepositoryContainingManyTasksWithIds([0, 1, 2, 3, 4]);
-    let retrievedTask = WhenGettingTaskById(&taskRepository, 2);
-    ExpectCorrectTask(retrievedTask, 2);
+    let retrievedTask = WhenGettingTaskById(&taskRepository, 0);
+    ExpectCorrectTask(retrievedTask, 0);
 }
 
 #[test]

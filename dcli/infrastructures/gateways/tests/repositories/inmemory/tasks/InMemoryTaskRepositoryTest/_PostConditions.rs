@@ -9,3 +9,11 @@ pub fn ExpectCorrectTask(retrievedTask: Option<Task>, givenTaskId: u128) {
     assert!(retrievedTask.is_some());
     assert_eq!(retrievedTask.unwrap().id, TaskId::from(givenTaskId));
 }
+
+pub fn ExpectFalse(predicate: bool) {
+    assert!(!predicate);
+}
+
+pub fn ExpectTrue(predicate: bool) {
+    assert!(predicate);
+}
