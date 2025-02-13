@@ -18,14 +18,16 @@ jobs:
     uses: ./.github/workflows/lint.yml
 
   build:
-    needs: lint
     uses: ./.github/workflows/build.yml
 
   test:
-    needs: build
+    needs:
+      - build
     uses: ./.github/workflows/test.yml
 
   deploy:
     if: github.event_name == 'pull_request' && github.base_ref == 'master'
-    needs: test
+    needs:
+      - build
+      - test
     uses: ./.github/workflows/deploy.yml

@@ -23,7 +23,7 @@ fn main() {
     type SharedPointer<T> = ParameterizedSharedPointer<T, PointerHandle>;
     type PointerHandle = StrategizedPointerHandle<PointerStrategy>;
     type PointerStrategy = ArcRwLockSharedPointerStrategy;
-    
+
     // Gateways
     let taskRepository: SharedPointer<Box<dyn TaskRepository>> =
         SharedPointer::new(Box::new(InMemoryTaskRepository::new()));
@@ -33,8 +33,7 @@ fn main() {
     // Interactors
     let createTaskInteractor =
         CreateTaskInteractor::new(taskRepository.clone(), uuidFactory.clone());
-    let viewTasksInteractor = 
-        ViewTasksInteractor::new(taskRepository.clone());
+    let viewTasksInteractor = ViewTasksInteractor::new(taskRepository.clone());
 
     // Controllers
     let createTaskController = CreateTaskController::new(&createTaskInteractor);
@@ -58,7 +57,7 @@ fn main() {
             "0" => {
                 ioGateway.writeLine("Exit signal received.");
                 break;
-            }
+            },
             "1" => handleTaskCreation(&ioGateway, &createTaskController),
             "2" => handleTasksView(&ioGateway, &viewTasksController),
             _ => ioGateway.writeLine("Invalid number."),
@@ -70,9 +69,7 @@ fn handleTaskCreation(ioGateway: &IoGateway, controller: &CreateTaskController) 
     ioGateway.write("Enter task description: ");
     let taskDescription = ioGateway.readLine();
 
-    let request = CreateTaskRequestObject {
-        taskDescription,
-    };
+    let request = CreateTaskRequestObject { taskDescription };
 
     match controller.apply(request) {
         Ok(_) => (),
@@ -108,14 +105,16 @@ fn handleTasksView(ioGateway: &IoGateway, controller: &ViewTasksController) {
             maxPageNumber,
             ..
         }) => {
-            ioGateway.writeLine(&format!("Page {pageNumber} of {maxPageNumber}, found {pageSize} tasks:"));
+            ioGateway.writeLine(&format!(
+                "Page {pageNumber} of {maxPageNumber}, found {pageSize} tasks:"
+            ));
             tasks
                 .into_iter()
                 .map(|task| (task.description, task.createdAt))
                 .for_each(|(description, createdAt)| {
                     ioGateway.writeLine(&format!(" - [{createdAt}] {description}"));
                 });
-        }
+        },
         Err(_) => (),
     }
 }
