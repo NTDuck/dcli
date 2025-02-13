@@ -10,11 +10,11 @@ pub fn GivenRepositoryContainingZeroTasks() -> impl TaskRepository {
     return GivenRepositoryContainingManyTasksWithIds([]);
 }
 
-pub fn GivenRepositoryContainingOneTaskWithId(taskId: TaskId) -> impl TaskRepository {
+pub fn GivenRepositoryContainingOneTaskWithId(taskId: u128) -> impl TaskRepository {
     return GivenRepositoryContainingManyTasksWithIds([taskId]);
 }
 
-pub fn GivenRepositoryContainingManyTasksWithIds<const N: usize>(taskIds: [TaskId; N]) -> impl TaskRepository {
+pub fn GivenRepositoryContainingManyTasksWithIds<const N: usize>(taskIds: [u128; N]) -> impl TaskRepository {
     let mut taskRepository = InMemoryTaskRepository::new();
 
     let tasks = mockTasksWithIds(taskIds);

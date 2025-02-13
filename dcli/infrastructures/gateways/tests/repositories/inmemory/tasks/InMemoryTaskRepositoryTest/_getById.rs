@@ -3,7 +3,7 @@ use domain::Task;
 use domain::TaskId;
 use use_cases::gateways::repositories::tasks::TaskRepository;
 
-use crate::repositories::inmemory::tasks::OrderedInMemoryTaskRepositoryTest::*;
+use crate::repositories::inmemory::tasks::InMemoryTaskRepositoryTest::*;
 
 #[test]
 fn GivenRepositoryContainingZeroTasks_WhenGettingAny_ExpectNone() {
@@ -63,13 +63,4 @@ fn WhenGettingAny(taskRepository: &impl TaskRepository) -> Option<Task> {
 
 fn WhenGettingById(taskRepository: &impl TaskRepository, taskId: TaskId) -> Option<Task> {
     return taskRepository.getById(taskId);
-}
-
-fn ExpectNone(retrievedTask: Option<Task>) {
-    assert!(retrievedTask.is_none());
-}
-
-fn ExpectCorrectTask(retrievedTask: Option<Task>, givenTaskId: TaskId) {
-    assert!(retrievedTask.is_some());
-    assert_eq!(retrievedTask.unwrap().id, givenTaskId);
 }
