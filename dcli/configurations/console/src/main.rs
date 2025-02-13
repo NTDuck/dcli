@@ -1,7 +1,5 @@
 #![allow(non_snake_case)]
 
-use std::usize;
-
 use console::utils::io::IoGateway;
 use gateways::factories::ids::UuidV4Factory;
 use gateways::pointers::handles::StrategizedPointerHandle;
@@ -12,14 +10,13 @@ use interface_adapters::controllers::tasks::CreateTaskRequestObject;
 use interface_adapters::controllers::tasks::ViewTasksController;
 use interface_adapters::controllers::tasks::ViewTasksRequestObject;
 use interface_adapters::controllers::tasks::ViewTasksViewModel;
-use interface_adapters::controllers::tasks::ViewableTask;
 use use_cases::boundaries::tasks::CreateTaskErrorModel;
 use use_cases::gateways::factories::ids::UuidFactory;
 use use_cases::gateways::pointers::SharedPointer as ParameterizedSharedPointer;
 use use_cases::gateways::repositories::tasks::TaskRepository;
 use use_cases::interactors::tasks::CreateTaskInteractor;
 use use_cases::interactors::tasks::ViewTasksInteractor;
-use use_cases::utils::dataclasses::pagination::PaginationRequest;
+use use_cases::utils::dataclasses::pagination::UnboundedPaginationRequest;
 
 fn main() {
     // Shared pointer type
@@ -61,68 +58,64 @@ fn main() {
             "0" => {
                 ioGateway.writeLine("Exit signal received.");
                 break;
-            },
-            "1" => {
-                ioGateway.write("Enter task description: ");
-                let task_description = ioGateway.readLine();
-
-                let request = CreateTaskRequestObject { taskDescription: task_description };
-                let response = createTaskController.apply(request);
-
-                match response {
-                    Ok(_) => (),
-                    Err(error) => match error {
-                        CreateTaskErrorModel::TaskDescriptionLengthUnderflow {
-                            actualLength,
-                            minLengthRequired,
-                        } => ioGateway.writeLine(
-                            &format!("Error: Task description must be at least {} characters long, yours only has {}.",
-                            minLengthRequired, actualLength,
-                        )),
-                        CreateTaskErrorModel::TaskDescriptionLengthOverflow {
-                            actualLength,
-                            maxLengthAllowed,
-                        } => ioGateway.writeLine(&format!("Error: Task description must be at most {maxLengthAllowed} characters long, yours has {actualLength}.")),
-                    },
-                }
-            },
-            "2" => {
-                let request = ViewTasksRequestObject {
-                    paginationRequest: PaginationRequest {
-                        pageNumber: 1,
-                        maxPageSize: usize::MAX,
-                    },
-                };
-                let response = viewTasksController.apply(request);
-
-                match response {
-                    Ok(ViewTasksViewModel {
-                        tasks,
-                        pageSize,
-                        pageNumber,
-                        maxPageNumber,
-                        ..
-                    }) => {
-                        ioGateway.writeLine(&format!(
-                            "Page {pageNumber} of {maxPageNumber}, found {pageSize} tasks:"
-                        ));
-                        tasks.into_iter().for_each(
-                            |ViewableTask {
-                                 description,
-                                 createdAt: created_at,
-                                 ..
-                             }| {
-                                ioGateway.writeLine(&format!(" - [ {created_at}] {description}"));
-                            },
-                        );
-                    },
-                    Err(_) => (),
-                }
-            },
-            _ => {
-                ioGateway.writeLine("Invalid number.");
-                continue;
-            },
+            }
+            "1" => handleTaskCreation(&ioGateway, &createTaskController),
+            "2" => handleTasksView(&ioGateway, &viewTasksController),
+            _ => ioGateway.writeLine("Invalid number."),
         }
+    }
+}
+
+fn handleTaskCreation(ioGateway: &IoGateway, controller: &CreateTaskController) {
+    ioGateway.write("Enter task description: ");
+    let taskDescription = ioGateway.readLine();
+
+    let request = CreateTaskRequestObject {
+        taskDescription,
+    };
+
+    match controller.apply(request) {
+        Ok(_) => (),
+        Err(CreateTaskErrorModel::TaskDescriptionLengthUnderflow {
+            actualLength,
+            minLengthRequired,
+        }) => {
+            ioGateway.writeLine(&format!(
+                "Error: Task description must be at least {minLengthRequired} characters long, yours only has {actualLength}."
+            ));
+        },
+        Err(CreateTaskErrorModel::TaskDescriptionLengthOverflow {
+            actualLength,
+            maxLengthAllowed,
+        }) => {
+            ioGateway.writeLine(&format!(
+                "Error: Task description must be at most {maxLengthAllowed} characters long, yours has {actualLength}."
+            ));
+        },
+    }
+}
+
+fn handleTasksView(ioGateway: &IoGateway, controller: &ViewTasksController) {
+    let request = ViewTasksRequestObject {
+        paginationRequest: UnboundedPaginationRequest,
+    };
+
+    match controller.apply(request) {
+        Ok(ViewTasksViewModel {
+            tasks,
+            pageSize,
+            pageNumber,
+            maxPageNumber,
+            ..
+        }) => {
+            ioGateway.writeLine(&format!("Page {pageNumber} of {maxPageNumber}, found {pageSize} tasks:"));
+            tasks
+                .into_iter()
+                .map(|task| (task.description, task.createdAt))
+                .for_each(|(description, createdAt)| {
+                    ioGateway.writeLine(&format!(" - [{createdAt}] {description}"));
+                });
+        }
+        Err(_) => (),
     }
 }
