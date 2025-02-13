@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct PaginationResponse<T> {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PaginationResponse<T: ddd::ValueObject> {
     pub items: Vec<T>,
     pub pageSize: usize,
     pub maxPageSize: usize,
@@ -11,20 +11,5 @@ pub struct PaginationResponse<T> {
 
 impl<T> ddd::ValueObject for PaginationResponse<T>
 where
-    T: Debug + Clone + Eq,
+    T: ddd::ValueObject
 {}
-
-impl<T> Clone for PaginationResponse<T>
-where
-    T: Clone,
-{
-    fn clone(&self) -> Self {
-        return Self {
-            items: self.items.clone(),
-            pageSize: self.pageSize.clone(),
-            maxPageSize: self.maxPageSize.clone(),
-            pageNumber: self.pageNumber.clone(),
-            maxPageNumber: self.maxPageNumber.clone(),
-        };
-    }
-}
