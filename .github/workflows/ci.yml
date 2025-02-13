@@ -2,30 +2,30 @@ name: CI
 
 on:
   push:
-    # branches: [ "*" ]
+    branches: [ "*" ]
   pull_request:
-    # branches: [ "master" ]
+    branches: [ "master" ]
 
-# env:
-#   CARGO_TERM_COLOR: always
+env:
+  CARGO_TERM_COLOR: always
 
-# concurrency:
-#   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-#   cancel-in-progress: true
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   lint:
-    uses: ./.github/actions/lint.yml
+    uses: ./.github/workflows/sub/lint.yml
 
   build:
     needs: lint
-    uses: ./.github/actions/build.yml
+    uses: ./.github/workflows/sub/build.yml
 
   test:
     needs: build
-    uses: ./.github/actions/test.yml
+    uses: ./.github/workflows/sub/test.yml
 
   deploy:
     if: github.event_name == 'pull_request' && github.base_ref == 'master'
     needs: test
-    uses: ./.github/actions/deploy.yml
+    uses: ./.github/workflows/sub/deploy.yml
