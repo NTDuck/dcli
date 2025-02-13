@@ -1,4 +1,3 @@
-use domain::utils::dataclasses::ids::Uuid;
 use domain::Task;
 use domain::TaskId;
 use use_cases::gateways::repositories::tasks::TaskRepository;
@@ -8,59 +7,39 @@ use crate::repositories::inmemory::tasks::InMemoryTaskRepositoryTest::*;
 #[test]
 fn GivenRepositoryContainingZeroTasks_WhenGettingAny_ExpectNone() {
     let taskRepository = GivenRepositoryContainingZeroTasks();
-    let retrievedTask = WhenGettingAny(&taskRepository);
+    let retrievedTask = WhenGettingTaskById(&taskRepository, 1234);
     ExpectNone(retrievedTask);
 }
 
 #[test]
 fn GivenRepositoryContainingOneTask_WhenGettingIt_ExpectCorrectTask() {
-    let givenTaskId = Uuid::from(0);
-    let taskRepository = GivenRepositoryContainingOneTaskWithId(givenTaskId);
-    let retrievedTask = WhenGettingById(&taskRepository, givenTaskId);
-    ExpectCorrectTask(retrievedTask, givenTaskId);
+    let taskRepository = GivenRepositoryContainingOneTaskWithId(0);
+    let retrievedTask = WhenGettingTaskById(&taskRepository, 0);
+    ExpectCorrectTask(retrievedTask, 0);
 }
 
 #[test]
 fn GivenRepositoryContainingOneTask_WhenGettingAnyOther_ExpectNone() {
-    let givenTaskId = Uuid::from(0);
-    let taskRepository = GivenRepositoryContainingOneTaskWithId(givenTaskId);
-
-    let anotherTaskId = Uuid::from(1);
-    let retrievedTask = WhenGettingById(&taskRepository, anotherTaskId);
-
+    let taskRepository = GivenRepositoryContainingOneTaskWithId(0);
+    let retrievedTask = WhenGettingTaskById(&taskRepository, 1);
     ExpectNone(retrievedTask);
 }
 
 #[test]
 fn GivenRepositoryContainingManyTasks_WhenGettingAnExistingOne_ExpectCorrectTask() {
-    let givenTaskIds = [0, 1, 2, 3, 4];
-    let givenTaskIds: [_; 5] =
-        std::array::from_fn(|index| TaskId::from(givenTaskIds[index]));
-    let taskRepository = GivenRepositoryContainingManyTasksWithIds(givenTaskIds);
-
-    let existingTaskId = TaskId::from(0);
-    let retrievedTask = WhenGettingById(&taskRepository, existingTaskId);
-
-    ExpectCorrectTask(retrievedTask, existingTaskId);
+    let taskRepository = GivenRepositoryContainingManyTasksWithIds([0, 1, 2, 3, 4]);
+    let retrievedTask = WhenGettingTaskById(&taskRepository, 2);
+    ExpectCorrectTask(retrievedTask, 2);
 }
 
 #[test]
 fn GivenRepositoryContainingManyTasks_WhenGettingANotExistingOne_ExpectNone() {
-    let givenTaskIds = [0, 1, 2, 3, 4];
-    let givenTaskIds: [_; 5] =
-        std::array::from_fn(|index| TaskId::from(givenTaskIds[index]));
-    let taskRepository = GivenRepositoryContainingManyTasksWithIds(givenTaskIds);
-
-    let notExistingTaskId = TaskId::from(6);
-    let retrievedTask = WhenGettingById(&taskRepository, notExistingTaskId);
-
+    let taskRepository = GivenRepositoryContainingManyTasksWithIds([0, 1, 2, 3, 4]);
+    let retrievedTask = WhenGettingTaskById(&taskRepository, 1234);
     ExpectNone(retrievedTask);
 }
 
-fn WhenGettingAny(taskRepository: &impl TaskRepository) -> Option<Task> {
-    return WhenGettingById(taskRepository, mockTaskId());
-}
-
-fn WhenGettingById(taskRepository: &impl TaskRepository, taskId: TaskId) -> Option<Task> {
+fn WhenGettingTaskById(taskRepository: &impl TaskRepository, taskId: u128) -> Option<Task> {
+    let taskId = TaskId::from(taskId);
     return taskRepository.getById(taskId);
 }

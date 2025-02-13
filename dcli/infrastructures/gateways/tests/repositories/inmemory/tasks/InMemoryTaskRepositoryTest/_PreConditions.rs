@@ -17,6 +17,7 @@ pub fn GivenRepositoryContainingOneTaskWithId(taskId: u128) -> impl TaskReposito
 pub fn GivenRepositoryContainingManyTasksWithIds<const N: usize>(taskIds: [u128; N]) -> impl TaskRepository {
     let mut taskRepository = InMemoryTaskRepository::new();
 
+    let taskIds: [_; N] = std::array::from_fn(|i| TaskId::from(taskIds[i]));
     let tasks = mockTasksWithIds(taskIds);
     tasks
         .into_iter()
@@ -26,7 +27,7 @@ pub fn GivenRepositoryContainingManyTasksWithIds<const N: usize>(taskIds: [u128;
 }
 
 fn mockTasksWithIds<const N: usize>(taskIds: [TaskId; N]) -> [Task; N] {
-    return std::array::from_fn(|i| mockTaskWithId(TaskId::from(taskIds[i])));
+    return std::array::from_fn(|i| mockTaskWithId(taskIds[i]));
 }
 
 fn mockTaskWithId(taskId: TaskId) -> Task {
@@ -38,6 +39,3 @@ fn mockTaskWithId(taskId: TaskId) -> Task {
     };
 }
 
-pub fn mockTaskId() -> TaskId {
-    return TaskId::from(rand::random::<u128>());
-}
