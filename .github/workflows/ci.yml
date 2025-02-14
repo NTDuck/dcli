@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - "*"
-  pull_request:
-    branches:
-      - $default-branch
 
 env:
   CARGO_TERM_COLOR: always
@@ -26,10 +23,3 @@ jobs:
     needs:
       - build
     uses: ./.github/workflows/test.yml
-
-  deploy:
-    if: github.event_name == 'pull_request' && github.ref_name == ${{ github.event.repository.default_branch }}
-    needs:
-      - build
-      - test
-    uses: ./.github/workflows/deploy.yml

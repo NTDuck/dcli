@@ -1,0 +1,20 @@
+name: CD
+
+on:
+  pull_request:
+    branches:
+      - $default-branch
+
+  workflow_run:
+    workflows:
+      - "CI"
+    types:
+      - completed
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  publish:
+    if: github.event.workflow_run.conclusion == 'success'
+    uses: ./.github/workflows/publish.yml
