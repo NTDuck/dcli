@@ -1,3 +1,4 @@
+#![allow(clippy::all)]
 #![allow(non_snake_case)]
 
 use console::utils::io::IoGateway;

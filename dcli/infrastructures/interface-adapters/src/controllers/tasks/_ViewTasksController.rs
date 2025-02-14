@@ -21,7 +21,7 @@ impl<'bdrs> ViewTasksController<'bdrs> {
     }
 }
 
-impl<'bdrs> ViewTasksController<'bdrs> {
+impl ViewTasksController<'_> {
     pub fn apply(&self, request: ViewTasksRequestObject) -> Result<ViewTasksViewModel, ViewTasksErrorViewModel> {
         let request = request.into();
         return match self.interactor.apply(request) {
@@ -55,7 +55,7 @@ impl From<ViewTasksResponseModel> for ViewTasksViewModel {
         return Self {
             tasks: response.paginationResponse.items
                 .into_iter()
-                .map(|task| ViewableTask::from(task))
+                .map(ViewableTask::from)
                 .collect(),
             pageSize: response.paginationResponse.pageSize,
             maxPageSize: response.paginationResponse.maxPageSize,
@@ -68,7 +68,7 @@ impl From<ViewTasksResponseModel> for ViewTasksViewModel {
 impl From<Task> for ViewableTask {
     fn from(task: Task) -> Self {
         return ViewableTask {
-            id: task.id.deref().clone(),
+            id: *task.id,
             description: task.description.deref().clone(),
             status: ViewableTaskStatus::from(task.status),
             createdAt: TimestampFormatter::format(task.createdAt),

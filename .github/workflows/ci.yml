@@ -17,15 +17,19 @@ jobs:
     uses: ./.github/workflows/lint.yml
 
   build:
+    needs:
+      - lint
     uses: ./.github/workflows/build.yml
 
   test:
     needs:
+      - lint
       - build
     uses: ./.github/workflows/test.yml
 
   dependencies-check:
     needs:
+      - lint
       - build
       - test
     uses: ./.github/workflows/dependencies-check.yml

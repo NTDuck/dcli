@@ -8,12 +8,16 @@ resolver = "2"
 
 # https://doc.rust-lang.org/rustc/lints/listing/index.html
 [workspace.lints.rust]
-non_snake_case = { level = "allow" }
-non_upper_case_globals = { level = "allow" }
+non_snake_case = "allow"
+non_upper_case_globals = "allow"
 
 # https://rust-lang.github.io/rust-clippy/stable/index.html
 [workspace.lints.clippy]
+missing_safety_doc = "allow"
 needless_return = "allow"
+useless_conversion = "allow"
+new_without_default = "allow"
+missing_transmute_annotations = "allow"
 
 [workspace.metadata.rust-analyzer]
 diagnostics.disabled = ["unconventional_variable_names"]

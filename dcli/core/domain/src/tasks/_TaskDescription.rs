@@ -18,25 +18,25 @@ impl TaskDescription {
     const MIN_LENGTH: usize = 1;
     const MAX_LENGTH: usize = 1024;
 
-    fn normalize(description: &String) -> String {
+    fn normalize(description: &str) -> String {
         let description = Self::removeTrailingAndLeadingWhitespaces(description);
 
         return description;
     }
 
-    fn removeTrailingAndLeadingWhitespaces(description: &String) -> String {
+    fn removeTrailingAndLeadingWhitespaces(description: &str) -> String {
         return description.trim()
             .to_string();
     }
 
-    fn verify(description: &String) -> Result<(), TaskDescriptionError> {
+    fn verify(description: &str) -> Result<(), TaskDescriptionError> {
         Self::ensureNoLengthUnderflow(description)?;
         Self::ensureNoLengthOverflow(description)?;
 
         return Ok(());
     }
 
-    fn ensureNoLengthUnderflow(description: &String) -> Result<(), TaskDescriptionError> {
+    fn ensureNoLengthUnderflow(description: &str) -> Result<(), TaskDescriptionError> {
         if description.len() < Self::MIN_LENGTH {
             return Err(TaskDescriptionError::LengthUnderflow {
                 actualLength: description.len(),
@@ -47,7 +47,7 @@ impl TaskDescription {
         return Ok(());
     }
 
-    fn ensureNoLengthOverflow(description: &String) -> Result<(), TaskDescriptionError> {
+    fn ensureNoLengthOverflow(description: &str) -> Result<(), TaskDescriptionError> {
         if description.len() > Self::MAX_LENGTH {
             return Err(TaskDescriptionError::LengthOverflow {
                 actualLength: description.len(),

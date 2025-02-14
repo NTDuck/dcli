@@ -38,7 +38,7 @@ fn generateTokensFromStructAst(ast: StructAbstractSyntaxTree<EntityField>) -> To
 
     let id_field = fields
         .iter()
-        .find(|field| isIdField(&field))
+        .find(|field| isIdField(field))
         .unwrap();
 
     let id_field_ident = id_field.ident.as_ref().unwrap();
@@ -90,6 +90,5 @@ fn isIdField(field: &EntityField) -> bool {
 fn fieldHasIdAttribute(field: &EntityField) -> bool {
     return field.attributes
         .as_ref()
-        .map_or(false,
-            |attributes| attributes.Identifier.is_some());
+        .is_some_and(|attributes| attributes.Identifier.is_some());
 }

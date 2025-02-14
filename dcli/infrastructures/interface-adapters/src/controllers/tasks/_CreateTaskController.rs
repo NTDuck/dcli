@@ -15,7 +15,7 @@ impl<'bdrs> CreateTaskController<'bdrs> {
     }
 }
 
-impl<'bdr> CreateTaskController<'bdr> {
+impl CreateTaskController<'_> {
     pub fn apply(&self, request: CreateTaskRequestObject) -> Result<CreateTaskViewModel, CreateTaskErrorViewModel> {
         let request = request.into();
         return match self.interactor.apply(request) {
