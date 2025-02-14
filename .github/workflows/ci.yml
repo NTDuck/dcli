@@ -23,3 +23,9 @@ jobs:
     needs:
       - build
     uses: ./.github/workflows/test.yml
+
+  dependencies-check:
+    needs:
+      - build
+      - test
+    uses: ./.github/workflows/dependencies-check.yml

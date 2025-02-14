@@ -1,18 +1,18 @@
-name: Lint
+name: Security & Vulnerability scanning
 
 on:
   workflow_call:
 
 jobs:
-  cargo-fmt:
+  cargo-deny:
     strategy:
       fail-fast: false
       matrix:
         os:
           - ubuntu-latest
         channel:
-          - nightly
-
+          - stable
+      
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -20,13 +20,13 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.channel }}
-          components: rustfmt
 
-      - run: cargo fmt --all -- --check
-  
-  cargo-clippy:
+      - uses: EmbarkStudios/cargo-deny-action@v2
+      
+
+  cargo-audit:
     needs:
-      - cargo-fmt
+      - cargo-deny
 
     strategy:
       fail-fast: false
@@ -43,6 +43,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.channel }}
-          components: clippy
 
-      - run: cargo clippy --workspace --all-targets --all-features -- -Dwarnings
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit
+
+      - run: cargo audit
