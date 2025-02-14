@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  _:
+  cargo-check:
     strategy:
       fail-fast: false
       matrix:

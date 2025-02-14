@@ -1,10 +1,10 @@
-name: Deploy
+name: Publish
 
 on:
   workflow_call:
 
 jobs:
-  _:
+  build-and-upload-artifacts:
     strategy:
       matrix:
         os:
@@ -35,4 +35,3 @@ jobs:
             target/release/dcli
             target/release/dcli.exe
           if-no-files-found: ignore
-
