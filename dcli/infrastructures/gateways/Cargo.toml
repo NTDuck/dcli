@@ -21,3 +21,6 @@ indexmap = "2.7"
 [lib]
 test = false
 doctest = false
+
+[lints]
+workspace = true

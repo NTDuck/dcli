@@ -6,10 +6,14 @@ members = [
 ]
 resolver = "2"
 
+# https://doc.rust-lang.org/rustc/lints/listing/index.html
 [workspace.lints.rust]
 non_snake_case = { level = "allow" }
 non_upper_case_globals = { level = "allow" }
 
+# https://rust-lang.github.io/rust-clippy/stable/index.html
+[workspace.lints.clippy]
+needless_return = "allow"
+
 [workspace.metadata.rust-analyzer]
-# diagnostics.disabled = ["non_snake_case", "non_camel_case_types"]
 diagnostics.disabled = ["unconventional_variable_names"]

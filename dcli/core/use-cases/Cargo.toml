@@ -8,3 +8,6 @@ modules = { path = "../../../libs/modules" }
 ddd = { path = "../../../libs/ddd" }
 
 domain = { path = "../domain" }
+
+[lints]
+workspace = true

@@ -34,7 +34,7 @@ jobs:
         os:
           - ubuntu-latest
         channel:
-          - stable
+          - nightly
 
     runs-on: ${{ matrix.os }}
     steps:

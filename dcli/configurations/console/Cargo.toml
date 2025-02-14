@@ -9,3 +9,6 @@ modules = { path = "../../../libs/modules" }
 use-cases = { path = "../../core/use-cases" }
 gateways = { path = "../../infrastructures/gateways" }
 interface-adapters = { path = "../../infrastructures/interface-adapters" }
+
+[lints]
+workspace = true

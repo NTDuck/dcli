@@ -6,3 +6,6 @@ edition = "2021"
 [dependencies]
 modules = { path = "../../../libs/modules" }
 ddd = { path = "../../../libs/ddd" }
+
+[lints]
+workspace = true

@@ -10,3 +10,6 @@ domain = { path = "../../core/domain" }
 use-cases = { path = "../../core/use-cases" }
 
 chrono = "0.4.39"
+
+[lints]
+workspace = true
