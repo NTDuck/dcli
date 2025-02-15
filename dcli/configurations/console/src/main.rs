@@ -47,11 +47,8 @@ fn main() {
     loop {
         ioGateway.write(
             "\
-            Select a number:\n\
-            [0] Exit\n\
-            [1] Create a task\n\
-            [2] View all tasks\n \
-        ",
+            Select a number:\n[0] Exit\n[1] Create a task\n[2] View all \
+             tasks\n ",
         );
 
         match ioGateway.readLine().trim() {
@@ -66,11 +63,16 @@ fn main() {
     }
 }
 
-fn handleTaskCreation(ioGateway: &IoGateway, controller: &CreateTaskController) {
+fn handleTaskCreation(
+    ioGateway: &IoGateway,
+    controller: &CreateTaskController,
+) {
     ioGateway.write("Enter task description: ");
     let taskDescription = ioGateway.readLine();
 
-    let request = CreateTaskRequestObject { taskDescription };
+    let request = CreateTaskRequestObject {
+        taskDescription,
+    };
 
     match controller.apply(request) {
         Ok(_) => (),
@@ -79,7 +81,8 @@ fn handleTaskCreation(ioGateway: &IoGateway, controller: &CreateTaskController) 
             minLengthRequired,
         }) => {
             ioGateway.writeLine(&format!(
-                "Error: Task description must be at least {minLengthRequired} characters long, yours only has {actualLength}."
+                "Error: Task description must be at least {minLengthRequired} \
+                 characters long, yours only has {actualLength}."
             ));
         },
         Err(CreateTaskErrorModel::TaskDescriptionLengthOverflow {
@@ -87,7 +90,8 @@ fn handleTaskCreation(ioGateway: &IoGateway, controller: &CreateTaskController) 
             maxLengthAllowed,
         }) => {
             ioGateway.writeLine(&format!(
-                "Error: Task description must be at most {maxLengthAllowed} characters long, yours has {actualLength}."
+                "Error: Task description must be at most {maxLengthAllowed} \
+                 characters long, yours has {actualLength}."
             ));
         },
     }
@@ -113,7 +117,8 @@ fn handleTasksView(ioGateway: &IoGateway, controller: &ViewTasksController) {
                 .into_iter()
                 .map(|task| (task.description, task.createdAt))
                 .for_each(|(description, createdAt)| {
-                    ioGateway.writeLine(&format!(" - [{createdAt}] {description}"));
+                    ioGateway
+                        .writeLine(&format!(" - [{createdAt}] {description}"));
                 });
         },
         Err(_) => (),

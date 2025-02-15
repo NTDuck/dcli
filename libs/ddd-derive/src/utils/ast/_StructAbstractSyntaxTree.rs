@@ -1,7 +1,7 @@
 use crate::utils::AbstractSyntaxTree;
 use crate::utils::Field;
 
-pub struct StructAbstractSyntaxTree<Field>
+pub(crate) struct StructAbstractSyntaxTree<Field>
 where
     Field: darling::FromField,
 {
@@ -35,7 +35,7 @@ impl<Attribute> StructAbstractSyntaxTree<Field<Attribute>>
 where
     Attribute: darling::FromMeta,
 {
-    pub fn get_field_idents(&self) -> Vec<syn::Member> {
+    pub(crate) fn get_field_idents(&self) -> Vec<syn::Member> {
         return match self.is_named_struct() {
             true => self.generate_fields_for_named_struct(),
             false => self.generate_fields_for_unnamed_struct(),

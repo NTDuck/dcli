@@ -3,5 +3,5 @@
 mod _class;
 mod _namespace;
 
-mod _testSuite;
 mod _testGroup;
+mod _testSuite;

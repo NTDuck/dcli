@@ -3,7 +3,7 @@ use crate::utils::Field;
 use crate::utils::TokenStream;
 use crate::utils::StructAbstractSyntaxTree;
 
-pub fn deriveEntity(tokens: TokenStream) -> TokenStream {
+pub(crate) fn deriveEntity(tokens: TokenStream) -> TokenStream {
     let ast = match AbstractSyntaxTree::try_from(tokens) {
         Ok(ast) => ast,
         Err(error) => return error.write_errors().into(),

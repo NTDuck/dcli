@@ -4,7 +4,7 @@ use crate::utils::Field;
 use crate::utils::TokenStream;
 use crate::utils::StructAbstractSyntaxTree;
 
-pub fn deriveValueObject(tokens: TokenStream) -> TokenStream {
+pub(crate) fn deriveValueObject(tokens: TokenStream) -> TokenStream {
     let ast: AbstractSyntaxTree::<darling::util::Ignored, Field> =
         match AbstractSyntaxTree::try_from(tokens) {
             Ok(ast) => ast,

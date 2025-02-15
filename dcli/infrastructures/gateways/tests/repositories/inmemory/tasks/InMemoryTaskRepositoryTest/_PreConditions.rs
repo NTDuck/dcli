@@ -6,15 +6,15 @@ use domain::TaskStatus;
 use gateways::repositories::inmemory::tasks::InMemoryTaskRepository;
 use use_cases::gateways::repositories::tasks::TaskRepository;
 
-pub fn GivenRepositoryContainingZeroTasks() -> impl TaskRepository {
+pub(crate) fn GivenRepositoryContainingZeroTasks() -> impl TaskRepository {
     return GivenRepositoryContainingManyTasksWithIds([]);
 }
 
-pub fn GivenRepositoryContainingOneTaskWithId(taskId: u128) -> impl TaskRepository {
+pub(crate) fn GivenRepositoryContainingOneTaskWithId(taskId: u128) -> impl TaskRepository {
     return GivenRepositoryContainingManyTasksWithIds([taskId]);
 }
 
-pub fn GivenRepositoryContainingManyTasksWithIds<const N: usize>(taskIds: [u128; N]) -> impl TaskRepository {
+pub(crate) fn GivenRepositoryContainingManyTasksWithIds<const N: usize>(taskIds: [u128; N]) -> impl TaskRepository {
     let mut taskRepository = InMemoryTaskRepository::new();
 
     let taskIds: [_; N] = std::array::from_fn(|i| TaskId::from(taskIds[i]));

@@ -2,7 +2,7 @@ use crate::utils::TokenStream;
 
 #[derive(darling::FromDeriveInput)]
 #[darling(supports(any))]
-pub struct AbstractSyntaxTree<Variant, Field>
+pub(crate) struct AbstractSyntaxTree<Variant, Field>
 where 
     Variant: darling::FromVariant,
     Field: darling::FromField,

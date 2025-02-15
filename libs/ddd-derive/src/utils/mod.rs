@@ -2,4 +2,4 @@ use modules::*;
 
 namespace!(pub ast);
 
-pub use ast::*;
+pub(crate) use ast::*;

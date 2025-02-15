@@ -1,4 +1,4 @@
-pub type TokenStream = proc_macro::TokenStream;
+pub(crate) type TokenStream = proc_macro::TokenStream;
 
 macro_rules! tokenize {
     ($($tokens:tt)*) => {{
