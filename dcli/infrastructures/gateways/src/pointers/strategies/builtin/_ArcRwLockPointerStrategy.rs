@@ -17,7 +17,7 @@ impl PointerStrategy for ArcRwLockSharedPointerStrategy {
     
     fn intoUntyped<T>(typed: Self::Typed<T>) -> Self::Untyped {
         return unsafe {
-            std::mem::transmute(typed)
+            std::mem::transmute::<Self::Typed<T>, Self::Untyped>(typed)
         };
     }
 

@@ -5,6 +5,6 @@ rustup install nightly
 ```
 
 ```
-rustup run nightly cargo fmt
+cargo +nightly fmt
 cargo run
 ```
