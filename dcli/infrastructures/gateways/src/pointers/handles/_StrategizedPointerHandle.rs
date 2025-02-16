@@ -35,7 +35,9 @@ where
     }
 
     unsafe fn drop<T>(&mut self) {
-        std::ptr::drop_in_place(self.asTypedMut::<T>());
+        unsafe {
+            std::ptr::drop_in_place(self.asTypedMut::<T>());
+        }
     }
 }
 
