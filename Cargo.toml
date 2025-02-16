@@ -2,7 +2,6 @@
 members = [
     "dcli/*/*",
     "libs/*",
-    "libs/modules",
 ]
 resolver = "2"
 
