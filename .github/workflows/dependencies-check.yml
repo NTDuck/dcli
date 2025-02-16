@@ -12,6 +12,12 @@ jobs:
           - ubuntu-latest
         channel:
           - stable
+        check:
+          - advisories
+          # - bans licenses sources
+
+    # Prevent sudden announcement of a new advisory from failing CI:
+    continue-on-error: ${{ matrix.check == 'advisories' }}
       
     runs-on: ${{ matrix.os }}
     steps:
@@ -22,7 +28,8 @@ jobs:
           toolchain: ${{ matrix.channel }}
 
       - uses: EmbarkStudios/cargo-deny-action@v2
-      
+        with:
+          command: check ${{ matrix.check }}
 
   cargo-audit:
     needs:
