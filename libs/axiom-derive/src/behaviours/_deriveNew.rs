@@ -1,3 +1,5 @@
+use quote::quote;
+
 pub fn deriveNew(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse_macro_input!(tokens as syn::DeriveInput);
 
@@ -10,32 +12,24 @@ pub fn deriveNew(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     return proc_macro::TokenStream::from(tokens);
 }
 
-
-macro_rules! tokenize {
-    ($($tokens:tt)*) => {
-        (quote::quote_spanned!(proc_macro2::Span::call_site() => $($tokens)*))
-    }
-}
-
 fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
-    let syn::Data::Struct(data) = &ast.data else {
-        panic!()
-    };
     let fields = &data.fields;
 
-    match fields {
+    return match fields {
         syn::Fields::Named(fields) => {
             let structIdent = &ast.ident;
             let structGenerics = &ast.generics;
 
-            let fieldIdents = fields.named
+            let fieldIdents: Vec<_> = fields.named
                 .iter()
-                .map(|field| &field.ident);
-            let fieldTypes = fields.named
+                .map(|field| &field.ident)
+                .collect();
+            let fieldTypes: Vec<_> = fields.named
                 .iter()
-                .map(|field| &field.ty);
+                .map(|field| &field.ty)
+                .collect();
 
-            return tokenize! {
+            quote! {
                 impl #structGenerics #structIdent {
                     pub fn new(#(#fieldIdents: #fieldTypes),*) -> Self {
                         return Self {
@@ -49,13 +43,15 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
             let structIdent = &ast.ident;
             let structGenerics = &ast.generics;
 
-            let fieldIndices = (0..fields.unnamed.len())
-                .map(syn::Index::from);
-            let fieldTypes = fields.unnamed
+            let fieldIndices: Vec<_> = (0..fields.unnamed.len())
+                .map(syn::Index::from)
+                .collect();
+            let fieldTypes: Vec<_> = fields.unnamed
                 .iter()
-                .map(|field| &field.ty);
+                .map(|field| &field.ty)
+                .collect();
 
-            return tokenize! {
+            quote! {
                 impl #structGenerics #structIdent {
                     pub fn new(#(#fieldIndices: #fieldTypes),*) -> Self {
                         return Self {
@@ -69,19 +65,29 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
             let structIdent = &ast.ident;
             let structGenerics = &ast.generics;
             
-            return tokenize! {
+            return quote! {
                 impl #structGenerics #structIdent {
                     pub fn new() -> Self {
                         return Self;
                     }
                 }
-            }
+            };
         },
-    }
-
-    todo!()
+    };
 }
 
 fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
+    let variantFns = data.variants
+        .iter()
+        .map(|variant| {
+            match &variant.fields {
+                syn::Fields::Named(fields) => {
+                    
+                },
+                syn::Fields::Unnamed(fields_unnamed) => todo!(),
+                syn::Fields::Unit => todo!(),
+            }
+        });
+
     todo!()
 }
