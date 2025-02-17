@@ -1,0 +1,15 @@
+[package]
+name = "axiom"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+derive = { package = "axiom-derive", path = "../axiom-derive" }
+layout = { package = "axiom-layout", path = "../axiom-layout" }
+
+serde = "1.0"
+
+derive-new = "0.7"
+
+[lints]
+workspace = true

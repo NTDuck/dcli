@@ -1,0 +1,3 @@
+pub fn deriveNew(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    todo!()
+}

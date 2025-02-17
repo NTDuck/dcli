@@ -22,4 +22,5 @@ missing_safety_doc = "allow"
 useless_conversion = "allow"
 
 [workspace.metadata.rust-analyzer]
-diagnostics.disabled = ["unconventional_variable_names"]
+# See: https://rust-analyzer.github.io/book/diagnostics.html
+diagnostics.disabled = ["incorrect-ident-case"]

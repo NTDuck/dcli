@@ -1,5 +1,5 @@
 use std::hash::Hash;
 
-use crate::ddd::domain::ValueObject;
+use crate::interfaces::ddd::domain::ValueObject;
 
 pub trait Identifier: ValueObject + Copy + Hash {}

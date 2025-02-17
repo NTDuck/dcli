@@ -1,4 +1,4 @@
-use modules::*;
+use layout::*;
 
 namespace!(pub domain);
 

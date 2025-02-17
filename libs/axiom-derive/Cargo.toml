@@ -1,10 +1,10 @@
 [package]
-name = "lombok-derive"
+name = "axiom-derive"
 version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
-modules = { path = "../modules" }
+layout = { package = "axiom-layout", path = "../axiom-layout" }
 
 syn = "2.0"
 quote = "1.0"
