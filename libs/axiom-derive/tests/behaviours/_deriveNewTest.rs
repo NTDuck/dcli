@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use axiom_derive::New;
 
 #[derive(New, PartialEq, Debug)]
@@ -103,5 +105,46 @@ fn testStructWithUnnamedFieldsAndLifetimes() {
     let factoryConstructedInstance = StructWithUnnamedFieldsAndLifetimes::new(&text, &number, &flag);
     let manuallyConstructedInstance = StructWithUnnamedFieldsAndLifetimes(&text, &number, &flag);
     
+    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+}
+
+#[derive(New, PartialEq, Debug)]
+struct StructWithNamedFieldsAndBoundedGenerics<T, U>
+where
+    T: ?Sized,
+    U: Debug + Clone + Copy + PartialEq + PartialOrd,
+{
+    pointer: Box<T>,
+    vector: Vec<U>,
+}
+
+#[test]
+fn testStructWithNamedFieldsAndBoundedGenerics() {
+    let factoryConstructedInstance = StructWithNamedFieldsAndBoundedGenerics::new(
+        Box::new("tomfoolery".to_owned()),
+        vec![0, 1, 2, 3, 4, 5],
+    );
+    let manuallyConstructedInstance = StructWithNamedFieldsAndBoundedGenerics {
+        pointer: Box::new("tomfoolery".to_owned()),
+        vector: vec![0, 1, 2, 3, 4, 5],
+    };
+
+    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+}
+
+#[derive(New, PartialEq, Debug)]
+struct StructWithUnnamedFieldsAndBoundedGenerics<T: ?Sized, U: Debug + Clone + Copy + PartialEq + PartialOrd>(Box<T>, Vec<U>);
+
+#[test]
+fn testStructWithUnnamedFieldsAndBoundedGenerics() {
+    let factoryConstructedInstance = StructWithUnnamedFieldsAndBoundedGenerics::new(
+        Box::new("tomfoolery".to_owned()),
+        vec![0, 1, 2, 3, 4, 5],
+    );
+    let manuallyConstructedInstance = StructWithUnnamedFieldsAndBoundedGenerics (
+        Box::new("tomfoolery".to_owned()),
+        vec![0, 1, 2, 3, 4, 5],
+    );
+
     assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
