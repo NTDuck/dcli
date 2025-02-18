@@ -32,7 +32,7 @@ pub fn deriveNew(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
 //     return crate::interfaces::ddd::domain::deriveIdentifier(tokens);
 // }
 
-// #[proc_macro_derive(ValueObject)]
-// pub fn deriveValueObject(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
-//     return crate::interfaces::ddd::domain::deriveValueObject(tokens);
-// }
+#[proc_macro_derive(ValueObject)]
+pub fn deriveValueObject(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    return crate::interfaces::ddd::domain::deriveValueObject(tokens);
+}
