@@ -15,11 +15,11 @@ pub fn deriveNew(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
 fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
     let fields = &data.fields;
 
+    let structIdent = &ast.ident;
+    let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
+
     return match fields {
         syn::Fields::Named(fields) => {
-            let structIdent = &ast.ident;
-            let (structImplGenerics, structTypeGenerics, structWhereClause) = &ast.generics.split_for_impl();
-
             let fieldIdents: Vec<_> = fields.named
                 .iter()
                 .map(|field| &field.ident)
@@ -38,9 +38,6 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
             }
         },
         syn::Fields::Unnamed(fields) => {
-            let structIdent = &ast.ident;
-            let (structImplGenerics, structTypeGenerics, structWhereClause) = &ast.generics.split_for_impl();
-
             let fieldIdents: Vec<_> = (0..fields.unnamed.len())
                 .map(|index| syn::Ident::new(
                     &format!("f{index}"),
@@ -61,11 +58,8 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
             }
         },
         syn::Fields::Unit => {
-            let structIdent = &ast.ident;
-            let structGenerics = &ast.generics;
-            
             return quote! {
-                impl #structGenerics #structIdent {
+                impl #structImplGenerics #structIdent #structTypeGenerics #structWhereClause {
                     pub fn new() -> Self {
                         return Self;
                     }
@@ -79,10 +73,14 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
     let variantImpls = data.variants
         .iter()
         .map(|variant| {
+            let variantIdent = &variant.ident;
+            let methodIdent = syn::Ident::new(
+                &format!("new{variantIdent}"),
+                proc_macro2::Span::call_site(),
+            );
+
             match &variant.fields {
                 syn::Fields::Named(fields) => {
-                    let variantIdent = &variant.ident;
-        
                     let fieldIdents: Vec<_> = fields.named
                         .iter()
                         .map(|field| &field.ident)
@@ -93,22 +91,26 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
                         .collect();
 
                     quote! {
-                        pub fn #variantIdent(#(#fieldIdents: #fieldTypes),*) -> Self {
+                        pub fn #methodIdent(#(#fieldIdents: #fieldTypes),*) -> Self {
                             return Self::#variantIdent { #(#fieldIdents),* };
                         }
                     }
                 },
                 syn::Fields::Unnamed(fields) => {
-                    let variantIdent = &variant.ident;
-
+                    let fieldIdents: Vec<_> = (0..fields.unnamed.len())
+                        .map(|index| syn::Ident::new(
+                            &format!("f{index}"),
+                            proc_macro2::Span::call_site(),
+                        ))
+                        .collect();
                     let fieldTypes: Vec<_> = fields.unnamed
                         .iter()
                         .map(|field| &field.ty)
                         .collect();
 
                     quote! {
-                        pub fn #variantIdent(#(#fieldTypes: #fieldTypes),*) -> Self {
-                            return Self::#variantIdent ( #(#fieldTypes),* );
+                        pub fn #methodIdent(#(#fieldIdents: #fieldTypes),*) -> Self {
+                            return Self::#variantIdent ( #(#fieldIdents),* );
                         }
                     }
                 },
@@ -116,7 +118,7 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
                     let variantIdent = &variant.ident;
 
                     quote! {
-                        pub fn #variantIdent() -> Self {
+                        pub fn #methodIdent() -> Self {
                             return Self::#variantIdent;
                         }
                     }
@@ -125,9 +127,10 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
         });
 
     let structIdent = &ast.ident;
+    let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
 
     return quote! {
-        impl #structIdent {
+        impl #structImplGenerics #structIdent #structTypeGenerics #structWhereClause {
             #(#variantImpls)*
         }
     };
