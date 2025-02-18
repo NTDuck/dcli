@@ -211,3 +211,73 @@ fn testStructWithUnnamedFieldsAndLifetimesAndBoundedGenerics() {
 
     assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
+
+#[derive(New, PartialEq, Debug)]
+enum EnumWithOnlyVariants {
+    Quid,
+    Pro,
+    Quo,
+}
+
+#[test]
+fn testEnumWithOnlyVariants() {
+    let factoryConstructedInstance = EnumWithOnlyVariants::newQuid();
+    let manuallyConstructedInstance = EnumWithOnlyVariants::Quid;
+
+    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+
+    let factoryConstructedInstance = EnumWithOnlyVariants::newPro();
+    let manuallyConstructedInstance = EnumWithOnlyVariants::Pro;
+
+    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+
+    let factoryConstructedInstance = EnumWithOnlyVariants::newQuo();
+    let manuallyConstructedInstance = EnumWithOnlyVariants::Quo;
+
+    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+}
+
+#[derive(New, PartialEq, Debug)]
+enum EnumWithStructAndTupleVariants {
+    Quid,
+    Pro(String, u64, bool),
+    Quo {
+        text: String,
+        number: u64,
+        flag: bool,
+    },
+}
+
+#[test]
+fn testEnumWithStructAndTupleVariants() {
+    let factoryConstructedInstance = EnumWithStructAndTupleVariants::newQuid();
+    let manuallyConstructedInstance = EnumWithStructAndTupleVariants::Quid;
+
+    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+
+    let factoryConstructedInstance = EnumWithStructAndTupleVariants::newPro(
+        "tomfoolery".to_owned(),
+        42,
+        false,
+    );
+    let manuallyConstructedInstance = EnumWithStructAndTupleVariants::Pro(
+        "tomfoolery".to_owned(),
+        42,
+        false,
+    );
+
+    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+
+    let factoryConstructedInstance = EnumWithStructAndTupleVariants::newQuo(
+        "tomfoolery".to_owned(),
+        42,
+        false,
+    );
+    let manuallyConstructedInstance = EnumWithStructAndTupleVariants::Quo {
+        text: "tomfoolery".to_owned(),
+        number: 42,
+        flag: false,
+    };
+
+    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+}
