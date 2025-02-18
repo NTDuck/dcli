@@ -211,16 +211,3 @@ fn testStructWithUnnamedFieldsAndLifetimesAndBoundedGenerics() {
 
     assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
-
-enum EnumWithOnlyUnitVariants {
-    Quid,
-    Pro,
-    Quo,
-}
-
-#[test]
-fn testEnumWithOnlyUnitVariants() {
-    // assert_eq!(EnumWithOnlyUnitVariants::newQuid(), EnumWithOnlyUnitVariants::Quid);
-    // assert_eq!(EnumWithOnlyUnitVariants::newPro(), EnumWithOnlyUnitVariants::Pro);
-    // assert_eq!(EnumWithOnlyUnitVariants::newQuo(), EnumWithOnlyUnitVariants::Quo);
-}
