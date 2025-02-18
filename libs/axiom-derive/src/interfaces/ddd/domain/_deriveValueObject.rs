@@ -5,6 +5,7 @@ pub fn deriveValueObject(tokens: proc_macro::TokenStream) -> proc_macro::TokenSt
 
     let tokens = match &ast.data {
         syn::Data::Struct(data) => deriveForStruct(&ast, data),
+        syn::Data::Enum(data) => deriveForEnum(&ast, &data),
         _ => panic!(),
     };
 
@@ -119,5 +120,94 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
                 impl #structImplGenerics Eq for #structIdent #structTypeGenerics #structWhereClause {}
             }
         },
+    };
+}
+
+fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
+    let variants = &data.variants;
+
+    let structIdent = &ast.ident;
+    let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
+
+    let variantDebugImpls: Vec<_> = variants
+        .iter()
+        .map(|variant| {
+            let variantIdent = &variant.ident;
+
+            match &variant.fields {
+                syn::Fields::Unit => {
+                    quote! {
+                        #structIdent::#variantIdent => write!(formatter, stringify!(#variantIdent)),
+                    }
+                }
+                _ => todo!(),
+            }
+        })
+        .collect();
+
+    let variantCloneImpls: Vec<_> = variants
+        .iter()
+        .map(|variant| {
+            let variantIdent = &variant.ident;
+
+            match &variant.fields {
+                syn::Fields::Unit => {
+                    quote! {
+                        #structIdent::#variantIdent => #structIdent::#variantIdent,
+                    }
+                }
+                _ => todo!(),
+            }
+        })
+        .collect();
+
+    let variantPartialEqImpls: Vec<_> = variants
+        .iter()
+        .map(|variant| {
+            let variantIdent = &variant.ident;
+
+            match &variant.fields {
+                syn::Fields::Unit => {
+                    quote! {
+                        // (#structIdent::#variantIdent, #structIdent::#variantIdent) => core::mem::discriminant(self) == core::mem::discriminant(other),
+                        (#structIdent::#variantIdent, #structIdent::#variantIdent) => true,
+                    }
+                }
+                _ => todo!(),
+            }
+        })
+        .collect();
+
+    return quote! {
+        impl #structImplGenerics axiom::interfaces::ddd::domain::ValueObject for #structIdent #structTypeGenerics #structWhereClause {}
+
+        impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
+            fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                return match self {
+                    #(#variantDebugImpls)*
+                    _ => unreachable!(),
+                };
+            }
+        }
+
+        impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
+            fn clone(&self) -> Self {
+                return match self {
+                    #(#variantCloneImpls)*
+                    _ => unreachable!(),
+                };
+            }
+        }
+
+        impl #structImplGenerics PartialEq for #structIdent #structTypeGenerics #structWhereClause {
+            fn eq(&self, other: &Self) -> bool {
+                return match (self, other) {
+                    #(#variantPartialEqImpls)*
+                    _ => false,
+                };
+            }
+        }
+
+        impl #structImplGenerics Eq for #structIdent #structTypeGenerics #structWhereClause {}
     };
 }

@@ -137,3 +137,30 @@ fn testStructWithUnnamedFieldsAndBoundedGenerics() {
     assert_eq!(instance, clonedInstance);               // PartialEq
     assert_eq!(instance, instance);                     // Eq        
 }
+
+#[derive(ValueObject)]
+enum EnumWithOnlyUnitVariants {
+    Quid,
+    Pro,
+    Quo,
+}
+
+#[test]
+fn testEnumWithOnlyUnitVariants() {
+
+}
+
+enum EnumWithStructAndTupleVariants {
+    Quid,
+    Pro(String, u64, bool),
+    Quo {
+        text: String,
+        number: u64,
+        flag: bool,
+    },
+}
+
+#[test]
+fn testEnumWithStructAndTupleVariants() {
+
+}
