@@ -282,7 +282,7 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
             fn eq(&self, other: &Self) -> bool {
                 return match (self, other) {
                     #( #variantPartialEqImpls, )*
-                    _ => core::mem::discriminant(self) == core::mem::discriminant(other),
+                    _ => false,
                 };
             }
         }
