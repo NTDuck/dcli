@@ -175,25 +175,25 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
                         .map(|field| &field.ident)
                         .collect::<Vec<_>>();
 
-                    quote! {
+                    return quote! {
                         Self::#variantIdent { #( #fieldIdents, )* } => 
                             Self::#variantIdent { #( #fieldIdents: #fieldIdents.clone(), )* }
-                    }
+                    };
                 },
                 syn::Fields::Unnamed(fields) => {
                     let fieldIdents = (0..fields.unnamed.len())
                         .map(|index| format_ident!("arg{index}"))
                         .collect::<Vec<_>>();
 
-                    quote! {
+                    return quote! {
                         Self::#variantIdent(#( #fieldIdents, )*) => 
                             Self::#variantIdent(#( #fieldIdents.clone(), )*)
-                    }
+                    };
                 },
                 syn::Fields::Unit => {
-                    quote! {
+                    return quote! {
                         Self::#variantIdent => Self::#variantIdent
-                    }
+                    };
                 },
             }
         })
@@ -219,14 +219,14 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
                         .map(|ident| format_ident!("{}Rhs", ident.as_ref().unwrap()))
                         .collect::<Vec<_>>();
                     
-                    quote! {
+                    return quote! {
                         (
                             Self::#variantIdent { #( #fieldIdents: #lhsFieldIdents, )* },
                             Self::#variantIdent { #( #fieldIdents: #rhsFieldIdents, )* },
                         ) => {
                             return #( #lhsFieldIdents == #rhsFieldIdents && )* true;
                         }
-                    }
+                    };
                 },
                 syn::Fields::Unnamed(fields) => {
                     let fieldIdents = (0..fields.unnamed.len())
@@ -241,19 +241,19 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
                         .map(|ident| quote::format_ident!("{}Rhs", ident))
                         .collect::<Vec<_>>();
                     
-                    quote! {
+                    return quote! {
                         (
                             Self::#variantIdent(#( #lhsFieldIdents, )*),
                             Self::#variantIdent(#( #rhsFieldIdents, )*)
                         ) => {
                             return #( #lhsFieldIdents == #rhsFieldIdents && )* true;
                         }
-                    }
+                    };
                 },
                 syn::Fields::Unit => {
-                    quote! {
+                    return quote! {
                         (Self::#variantIdent, Self::#variantIdent) => true
-                    }
+                    };
                 },
             }
         })

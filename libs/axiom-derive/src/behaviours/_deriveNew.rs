@@ -1,3 +1,4 @@
+use quote::format_ident;
 use quote::quote;
 
 pub fn deriveNew(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -17,44 +18,41 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
 
-    return match fields {
+    match fields {
         syn::Fields::Named(fields) => {
-            let fieldIdents: Vec<_> = fields.named
+            let fieldIdents = fields.named
                 .iter()
                 .map(|field| &field.ident)
-                .collect();
-            let fieldTypes: Vec<_> = fields.named
+                .collect::<Vec<_>>();
+            let fieldTypes = fields.named
                 .iter()
                 .map(|field| &field.ty)
-                .collect();
+                .collect::<Vec<_>>();
 
-            quote! {
+            return quote! {
                 impl #structImplGenerics #structIdent #structTypeGenerics #structWhereClause {
-                    pub fn new(#(#fieldIdents: #fieldTypes),*) -> Self {
-                        return Self { #(#fieldIdents),* };
+                    pub fn new(#( #fieldIdents: #fieldTypes, )*) -> Self {
+                        return Self { #( #fieldIdents, )* };
                     }
                 }
-            }
+            };
         },
         syn::Fields::Unnamed(fields) => {
-            let fieldIdents: Vec<_> = (0..fields.unnamed.len())
-                .map(|index| syn::Ident::new(
-                    &format!("arg{index}"),
-                    proc_macro2::Span::call_site(),
-                ))
-                .collect();
-            let fieldTypes: Vec<_> = fields.unnamed
+            let fieldIdents = (0..fields.unnamed.len())
+                .map(|index| format_ident!("arg{index}"))
+                .collect::<Vec<_>>();
+            let fieldTypes = fields.unnamed
                 .iter()
                 .map(|field| &field.ty)
-                .collect();
+                .collect::<Vec<_>>();
 
-            quote! {
+            return quote! {
                 impl #structImplGenerics #structIdent #structTypeGenerics #structWhereClause {
-                    pub fn new(#(#fieldIdents: #fieldTypes),*) -> Self {
-                        return Self ( #(#fieldIdents),* );
+                    pub fn new(#( #fieldIdents: #fieldTypes, )*) -> Self {
+                        return Self( #( #fieldIdents, )* );
                     }
                 }
-            }
+            };
         },
         syn::Fields::Unit => {
             return quote! {
@@ -65,6 +63,5 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
                 }
             };
         },
-    };
+    }
 }
-
