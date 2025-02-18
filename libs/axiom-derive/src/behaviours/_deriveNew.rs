@@ -32,9 +32,7 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
             quote! {
                 impl #structGenerics #structIdent {
                     pub fn new(#(#fieldIdents: #fieldTypes),*) -> Self {
-                        return Self {
-                            #(#fieldIdents),*
-                        };
+                        return Self { #(#fieldIdents),* };
                     }
                 }
             }
@@ -43,9 +41,6 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
             let structIdent = &ast.ident;
             let structGenerics = &ast.generics;
 
-            let fieldIndices: Vec<_> = (0..fields.unnamed.len())
-                .map(syn::Index::from)
-                .collect();
             let fieldTypes: Vec<_> = fields.unnamed
                 .iter()
                 .map(|field| &field.ty)
@@ -53,10 +48,8 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
 
             quote! {
                 impl #structGenerics #structIdent {
-                    pub fn new(#(#fieldIndices: #fieldTypes),*) -> Self {
-                        return Self {
-                            #(#fieldIndices),*
-                        };
+                    pub fn new(#(#fieldTypes: #fieldTypes),*) -> Self {
+                        return Self ( #(#fieldTypes),* );
                     }
                 }
             }
@@ -77,17 +70,59 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
 }
 
 fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
-    let variantFns = data.variants
+    let variantImpls = data.variants
         .iter()
         .map(|variant| {
             match &variant.fields {
                 syn::Fields::Named(fields) => {
-                    
+                    let variantIdent = &variant.ident;
+        
+                    let fieldIdents: Vec<_> = fields.named
+                        .iter()
+                        .map(|field| &field.ident)
+                        .collect();
+                    let fieldTypes: Vec<_> = fields.named
+                        .iter()
+                        .map(|field| &field.ty)
+                        .collect();
+
+                    quote! {
+                        pub fn #variantIdent(#(#fieldIdents: #fieldTypes),*) -> Self {
+                            return Self::#variantIdent { #(#fieldIdents),* };
+                        }
+                    }
                 },
-                syn::Fields::Unnamed(fields_unnamed) => todo!(),
-                syn::Fields::Unit => todo!(),
+                syn::Fields::Unnamed(fields) => {
+                    let variantIdent = &variant.ident;
+
+                    let fieldTypes: Vec<_> = fields.unnamed
+                        .iter()
+                        .map(|field| &field.ty)
+                        .collect();
+
+                    quote! {
+                        pub fn #variantIdent(#(#fieldTypes: #fieldTypes),*) -> Self {
+                            return Self::#variantIdent ( #(#fieldTypes),* );
+                        }
+                    }
+                },
+                syn::Fields::Unit => {
+                    let variantIdent = &variant.ident;
+
+                    quote! {
+                        pub fn #variantIdent() -> Self {
+                            return Self::#variantIdent;
+                        }
+                    }
+                },
             }
         });
 
-    todo!()
+    let structIdent = &ast.ident;
+
+    return quote! {
+        impl #structIdent {
+            #(#variantImpls)*
+        }
+    };
 }
