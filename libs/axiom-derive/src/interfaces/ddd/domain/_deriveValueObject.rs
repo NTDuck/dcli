@@ -28,40 +28,37 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
                 .map(|field| &field.ty)
                 .collect();
 
-                quote! {
-                    impl #structImplGenerics axiom::interfaces::ddd::domain::ValueObject for #structIdent #structTypeGenerics #structWhereClause {}
-    
-                    impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
-                        fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                            return formatter.debug_struct(stringify!(#structIdent))
-                                #(.field(stringify!(#fieldIdents), &self.#fieldIdents))*
-                                .finish();
-                        }
+            quote! {
+                impl #structImplGenerics axiom::interfaces::ddd::domain::ValueObject for #structIdent #structTypeGenerics #structWhereClause {}
+
+                impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
+                    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        return formatter.debug_struct(stringify!(#structIdent))
+                            #(.field(stringify!(#fieldIdents), &self.#fieldIdents))*
+                            .finish();
                     }
-    
-                    impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
-                        fn clone(&self) -> Self {
-                            return Self {
-                                #(#fieldIdents: self.#fieldIdents.clone()),*
-                            };
-                        }
-                    }
-    
-                    impl #structImplGenerics PartialEq for #structIdent #structTypeGenerics #structWhereClause {
-                        fn eq(&self, other: &Self) -> bool {
-                            return true #( && self.#fieldIdents == other.#fieldIdents)*;
-                        }
-                    }
-    
-                    impl #structImplGenerics Eq for #structIdent #structTypeGenerics #structWhereClause {}
                 }
+
+                impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
+                    fn clone(&self) -> Self {
+                        return Self {
+                            #(#fieldIdents: self.#fieldIdents.clone()),*
+                        };
+                    }
+                }
+
+                impl #structImplGenerics PartialEq for #structIdent #structTypeGenerics #structWhereClause {
+                    fn eq(&self, other: &Self) -> bool {
+                        return true #( && self.#fieldIdents == other.#fieldIdents)*;
+                    }
+                }
+
+                impl #structImplGenerics Eq for #structIdent #structTypeGenerics #structWhereClause {}
+            }
         },
         syn::Fields::Unnamed(fields) => {
-            let fieldIdents: Vec<_> = (0..fields.unnamed.len())
-                .map(|index| syn::Ident::new(
-                    &format!("f{index}"),
-                    proc_macro2::Span::call_site(),
-                ))
+            let fieldIndices: Vec<_> = (0..fields.unnamed.len())
+                .map(syn::Index::from)
                 .collect();
             let fieldTypes: Vec<_> = fields.unnamed
                 .iter()
@@ -69,7 +66,31 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
                 .collect();
 
             quote! {
-                
+                impl #structImplGenerics axiom::interfaces::ddd::domain::ValueObject for #structIdent #structTypeGenerics #structWhereClause {}
+        
+                impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
+                    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        return formatter.debug_tuple(stringify!(#structIdent))
+                            #(.field(&self.#fieldIndices))*
+                            .finish();
+                    }
+                }
+        
+                impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
+                    fn clone(&self) -> Self {
+                        return Self(
+                            #(self.#fieldIndices.clone()),*
+                        );
+                    }
+                }
+        
+                impl #structImplGenerics PartialEq for #structIdent #structTypeGenerics #structWhereClause {
+                    fn eq(&self, other: &Self) -> bool {
+                        return true #( && self.#fieldIndices == other.#fieldIndices)*;
+                    }
+                }
+        
+                impl #structImplGenerics Eq for #structIdent #structTypeGenerics #structWhereClause {}
             }
         },
         syn::Fields::Unit => {
