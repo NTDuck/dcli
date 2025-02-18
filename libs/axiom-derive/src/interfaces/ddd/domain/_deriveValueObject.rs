@@ -1,3 +1,4 @@
+use quote::format_ident;
 use quote::quote;
 
 pub fn deriveValueObject(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -18,24 +19,21 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
 
-    return match fields {
+    match fields {
         syn::Fields::Named(fields) => {
-            let fieldIdents: Vec<_> = fields.named
+            let fieldIdents = fields.named
                 .iter()
                 .map(|field| &field.ident)
-                .collect();
-            let fieldTypes: Vec<_> = fields.named
-                .iter()
-                .map(|field| &field.ty)
-                .collect();
+                .collect::<Vec<_>>();
 
-            quote! {
+            return quote! {
                 impl #structImplGenerics axiom::interfaces::ddd::domain::ValueObject for #structIdent #structTypeGenerics #structWhereClause {}
 
                 impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
                     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                        return formatter.debug_struct(stringify!(#structIdent))
-                            #(.field(stringify!(#fieldIdents), &self.#fieldIdents))*
+                        return formatter
+                            .debug_struct(stringify!(#structIdent))
+                            #( .field(stringify!(#fieldIdents), &self.#fieldIdents) )*
                             .finish();
                     }
                 }
@@ -43,64 +41,60 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
                 impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
                     fn clone(&self) -> Self {
                         return Self {
-                            #(#fieldIdents: self.#fieldIdents.clone()),*
+                            #( #fieldIdents: self.#fieldIdents.clone(), )*
                         };
                     }
                 }
 
                 impl #structImplGenerics PartialEq for #structIdent #structTypeGenerics #structWhereClause {
                     fn eq(&self, other: &Self) -> bool {
-                        return true #( && self.#fieldIdents == other.#fieldIdents)*;
+                        return #( self.#fieldIdents == other.#fieldIdents && )* true;
                     }
                 }
 
                 impl #structImplGenerics Eq for #structIdent #structTypeGenerics #structWhereClause {}
-            }
+            };
         },
         syn::Fields::Unnamed(fields) => {
-            let fieldIndices: Vec<_> = (0..fields.unnamed.len())
+            let fieldIndices = (0..fields.unnamed.len())
                 .map(syn::Index::from)
-                .collect();
-            let fieldTypes: Vec<_> = fields.unnamed
-                .iter()
-                .map(|field| &field.ty)
-                .collect();
+                .collect::<Vec<_>>();
 
-            quote! {
+            return quote! {
                 impl #structImplGenerics axiom::interfaces::ddd::domain::ValueObject for #structIdent #structTypeGenerics #structWhereClause {}
         
                 impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
                     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                        return formatter.debug_tuple(stringify!(#structIdent))
-                            #(.field(&self.#fieldIndices))*
+                        return formatter
+                            .debug_tuple(stringify!(#structIdent))
+                            #( .field(&self.#fieldIndices) )*
                             .finish();
                     }
                 }
         
                 impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
                     fn clone(&self) -> Self {
-                        return Self(
-                            #(self.#fieldIndices.clone()),*
-                        );
+                        return Self( #( self.#fieldIndices.clone(), )* );
                     }
                 }
         
                 impl #structImplGenerics PartialEq for #structIdent #structTypeGenerics #structWhereClause {
                     fn eq(&self, other: &Self) -> bool {
-                        return true #( && self.#fieldIndices == other.#fieldIndices)*;
+                        return #( self.#fieldIndices == other.#fieldIndices && )* true;
                     }
                 }
         
                 impl #structImplGenerics Eq for #structIdent #structTypeGenerics #structWhereClause {}
-            }
+            };
         },
         syn::Fields::Unit => {
-            quote! {
+            return quote! {
                 impl #structImplGenerics axiom::interfaces::ddd::domain::ValueObject for #structIdent #structTypeGenerics #structWhereClause {}
 
                 impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
                     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                        return formatter.debug_struct(stringify!(#structIdent))
+                        return formatter
+                            .debug_struct(stringify!(#structIdent))
                             .finish();
                     }
                 }
@@ -118,148 +112,142 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
                 }
 
                 impl #structImplGenerics Eq for #structIdent #structTypeGenerics #structWhereClause {}
-            }
+            };
         },
-    };
+    }
 }
 
 fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
     let variants = &data.variants;
 
-    let structIdent = &ast.ident;
-    let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
+    let enumIdent = &ast.ident;
+    let (enumImplGenerics, enumTypeGenerics, enumWhereClause) = ast.generics.split_for_impl();
 
-    let variantDebugImpls: Vec<_> = variants
+    let variantDebugImpls = variants
         .iter()
         .map(|variant| -> proc_macro2::TokenStream {
             let variantIdent = &variant.ident;
 
             match &variant.fields {
                 syn::Fields::Named(fields) => {
-                    let fieldIdents: Vec<_> = fields.named
+                    let fieldIdents = fields.named
                         .iter()
                         .map(|field| &field.ident)
-                        .collect();
+                        .collect::<Vec<_>>();
 
-                    quote! {
-                        #structIdent::#variantIdent {
-                            #(#fieldIdents),*
-                        } => formatter
-                            .debug_struct(stringify!(#structIdent))
-                            #(.field(stringify!(#fieldIdents), #fieldIdents))*
+                    return quote! {
+                        Self::#variantIdent { #( #fieldIdents, )* } => formatter
+                            .debug_struct(stringify!(#enumIdent))
+                            #( .field(stringify!(#fieldIdents), #fieldIdents) )*
                             .finish(),
-                    }
+                    };
                 },
                 syn::Fields::Unnamed(fields) => {
-                    let fieldIdents: Vec<_> = (0..fields.unnamed.len())
-                        .map(|index| syn::Ident::new(
-                            &format!("arg{index}"),
-                            proc_macro2::Span::call_site(),
-                        ))
-                        .collect();
+                    let fieldIdents = (0..fields.unnamed.len())
+                        .map(|index| format_ident!("arg{index}"))
+                        .collect::<Vec<_>>();
 
-                    quote! {
-                        #structIdent::#variantIdent(#(#fieldIdents),*) => formatter
-                            .debug_tuple(stringify!(#structIdent))
-                            #(.field(#fieldIdents))*
+                    return quote! {
+                        Self::#variantIdent(#( #fieldIdents, )*) => formatter
+                            .debug_tuple(stringify!(#enumIdent))
+                            #( .field(#fieldIdents) )*
                             .finish(),
-                    }
+                    };
                 }
                 syn::Fields::Unit => {
-                    quote! {
-                        #structIdent::#variantIdent => write!(formatter, stringify!(#variantIdent)),
-                    }
+                    return quote! {
+                        Self::#variantIdent => write!(formatter, stringify!(#variantIdent)),
+                    };
                 },
             }
         })
-        .collect();
+        .collect::<Vec<_>>();
 
-    let variantCloneImpls: Vec<_> = variants
+    let variantCloneImpls = variants
         .iter()
         .map(|variant| {
             let variantIdent = &variant.ident;
 
             match &variant.fields {
                 syn::Fields::Named(fields) => {
-                    let fieldIdents: Vec<_> = fields.named
+                    let fieldIdents = fields.named
                         .iter()
                         .map(|field| &field.ident)
-                        .collect();
+                        .collect::<Vec<_>>();
 
                     quote! {
-                        Self::#variantIdent {
-                            #(#fieldIdents),*
-                        } => Self::#variantIdent {
-                            #(#fieldIdents: #fieldIdents.clone(),)*
-                        },
+                        Self::#variantIdent { #( #fieldIdents, )* } => 
+                            Self::#variantIdent { #( #fieldIdents: #fieldIdents.clone(), )* },
                     }
                 },
                 syn::Fields::Unnamed(fields) => {
-                    let fieldIdents: Vec<_> = (0..fields.unnamed.len())
-                        .map(|index| syn::Ident::new(
-                            &format!("arg{index}"),
-                            proc_macro2::Span::call_site(),
-                        ))
-                        .collect();
+                    let fieldIdents = (0..fields.unnamed.len())
+                        .map(|index| format_ident!("arg{index}"))
+                        .collect::<Vec<_>>();
 
                     quote! {
-                        Self::#variantIdent(#(#fieldIdents,)*) => 
-                            Self::#variantIdent(#(#fieldIdents.clone(),)*),
+                        Self::#variantIdent(#( #fieldIdents, )*) => 
+                            Self::#variantIdent(#( #fieldIdents.clone(), )*),
                     }
                 },
                 syn::Fields::Unit => {
                     quote! {
-                        #structIdent::#variantIdent => #structIdent::#variantIdent,
+                        Self::#variantIdent => Self::#variantIdent,
                     }
                 },
             }
         })
-        .collect();
+        .collect::<Vec<_>>();
 
-    let variantPartialEqImpls: Vec<_> = variants
+    let variantPartialEqImpls = variants
         .iter()
         .map(|variant| {
             let variantIdent = &variant.ident;
 
             match &variant.fields {
                 syn::Fields::Named(fields) => {
-                    let fieldIdents: Vec<_> = fields.named
+                    let fieldIdents = fields.named
                         .iter()
                         .map(|field| &field.ident)
-                        .collect();
-                    let lhsFieldIdents: Vec<_> = fieldIdents
+                        .collect::<Vec<_>>();
+                    let lhsFieldIdents = fieldIdents
                         .iter()
-                        .map(|ident| quote::format_ident!("{}Lhs", ident.as_ref().unwrap()))
-                        .collect();
-                    let rhsFieldIdents: Vec<_> = fieldIdents
+                        .map(|ident| format_ident!("{}Lhs", ident.as_ref().unwrap()))
+                        .collect::<Vec<_>>();
+                    let rhsFieldIdents = fieldIdents
                         .iter()
-                        .map(|ident| quote::format_ident!("{}Rhs", ident.as_ref().unwrap()))
-                        .collect();
+                        .map(|ident| format_ident!("{}Rhs", ident.as_ref().unwrap()))
+                        .collect::<Vec<_>>();
                     
                     quote! {
-                        (Self::#variantIdent { #(#fieldIdents: #lhsFieldIdents,)* }, Self::#variantIdent { #(#fieldIdents: #rhsFieldIdents,)* }) => {
-                            true #( && #lhsFieldIdents == #rhsFieldIdents)* 
+                        (
+                            Self::#variantIdent { #( #fieldIdents: #lhsFieldIdents, )* },
+                            Self::#variantIdent { #( #fieldIdents: #rhsFieldIdents, )* },
+                        ) => {
+                            return #( #lhsFieldIdents == #rhsFieldIdents && )* true;
                         },
                     }
                 },
                 syn::Fields::Unnamed(fields) => {
-                    let fieldIdents: Vec<_> = (0..fields.unnamed.len())
-                        .map(|index| syn::Ident::new(
-                            &format!("arg{index}"),
-                            proc_macro2::Span::call_site(),
-                        ))
-                        .collect();
+                    let fieldIdents = (0..fields.unnamed.len())
+                        .map(|index| format_ident!("arg{index}"))
+                        .collect::<Vec<_>>();
                     let lhsFieldIdents: Vec<_> = fieldIdents
                         .iter()
                         .map(|ident| quote::format_ident!("{}Lhs", ident))
-                        .collect();
+                        .collect::<Vec<_>>();
                     let rhsFieldIdents: Vec<_> = fieldIdents
                         .iter()
                         .map(|ident| quote::format_ident!("{}Rhs", ident))
-                        .collect();
+                        .collect::<Vec<_>>();
                     
                     quote! {
-                        (Self::#variantIdent(#(#lhsFieldIdents,)*), Self::#variantIdent(#(#rhsFieldIdents,)*)) => true #( && #lhsFieldIdents == #rhsFieldIdents)*,
+                        (
+                            Self::#variantIdent(#( #lhsFieldIdents, )*),
+                            Self::#variantIdent(#( #rhsFieldIdents, )*)
+                        ) => {
+                            return #( #lhsFieldIdents == #rhsFieldIdents && )* true;
+                        },
                     }
                 },
                 syn::Fields::Unit => {
@@ -269,36 +257,36 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
                 },
             }
         })
-        .collect();
+        .collect::<Vec<_>>();
 
     return quote! {
-        impl #structImplGenerics axiom::interfaces::ddd::domain::ValueObject for #structIdent #structTypeGenerics #structWhereClause {}
+        impl #enumImplGenerics axiom::interfaces::ddd::domain::ValueObject for #enumIdent #enumTypeGenerics #enumWhereClause {}
 
-        impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
+        impl #enumImplGenerics std::fmt::Debug for #enumIdent #enumTypeGenerics #enumWhereClause {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return match self {
-                    #(#variantDebugImpls)*
+                    #( #variantDebugImpls )*
                 };
             }
         }
 
-        impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
+        impl #enumImplGenerics Clone for #enumIdent #enumTypeGenerics #enumWhereClause {
             fn clone(&self) -> Self {
                 return match self {
-                    #(#variantCloneImpls)*
+                    #( #variantCloneImpls )*
                 };
             }
         }
 
-        impl #structImplGenerics PartialEq for #structIdent #structTypeGenerics #structWhereClause {
+        impl #enumImplGenerics PartialEq for #enumIdent #enumTypeGenerics #enumWhereClause {
             fn eq(&self, other: &Self) -> bool {
                 return match (self, other) {
-                    #(#variantPartialEqImpls)*
+                    #( #variantPartialEqImpls )*
                     _ => core::mem::discriminant(self) == core::mem::discriminant(other),
                 };
             }
         }
 
-        impl #structImplGenerics Eq for #structIdent #structTypeGenerics #structWhereClause {}
+        impl #enumImplGenerics Eq for #enumIdent #enumTypeGenerics #enumWhereClause {}
     };
 }
