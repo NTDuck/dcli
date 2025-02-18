@@ -39,7 +39,7 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
         syn::Fields::Unnamed(fields) => {
             let fieldIdents: Vec<_> = (0..fields.unnamed.len())
                 .map(|index| syn::Ident::new(
-                    &format!("f{index}"),
+                    &format!("arg{index}"),
                     proc_macro2::Span::call_site(),
                 ))
                 .collect();

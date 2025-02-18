@@ -138,6 +138,7 @@ fn testStructWithUnnamedFieldsAndBoundedGenerics() {
     assert_eq!(instance, instance);                     // Eq        
 }
 
+#[allow(dead_code)]
 #[derive(ValueObject)]
 enum EnumWithOnlyUnitVariants {
     Quid,
@@ -150,6 +151,8 @@ fn testEnumWithOnlyUnitVariants() {
 
 }
 
+#[allow(dead_code)]
+#[derive(ValueObject)]
 enum EnumWithStructAndTupleVariants {
     Quid,
     Pro(String, u64, bool),
