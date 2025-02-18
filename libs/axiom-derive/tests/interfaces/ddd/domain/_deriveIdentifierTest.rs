@@ -1,23 +1,30 @@
 use std::fmt::Debug;
+use std::hash::DefaultHasher;
+use std::hash::Hash;
+use std::hash::Hasher;
 
-use axiom::interfaces::ddd::domain::ValueObject;
-use axiom_derive::ValueObject;
+use axiom::interfaces::ddd::domain::Identifier;
+use axiom_derive::Identifier;
 
-// Allow `ValueObject` usage
+// Allow `Identifier` usage
 // without adding `axiom` as a dependency
 pub mod axiom {
     pub mod interfaces {
         pub mod ddd {
             pub mod domain {
-                use std::fmt::Debug;
+                #![allow(dead_code)]
 
+                use std::fmt::Debug;
+                use std::hash::Hash;
+
+                pub trait Identifier: ValueObject + Hash {}
                 pub trait ValueObject: Debug + Send + Sync + Clone + PartialEq + Eq {}
             }
         }
     }
 }
 
-#[derive(ValueObject)]
+#[derive(Identifier)]
 struct UnitStruct;
 
 #[test]
@@ -31,9 +38,13 @@ fn testUnitStruct() {
     let clonedInstance = instance.clone();              // Clone
     assert_eq!(instance, clonedInstance);               // PartialEq
     assert_eq!(instance, instance);                     // Eq
+
+    let mut hasher = DefaultHasher::new();
+    instance.hash(&mut hasher);                         // Hash
+    let _ = hasher.finish();
 }
 
-#[derive(ValueObject)]
+#[derive(Identifier)]
 struct StructWithNoFields {}
 
 #[test]
@@ -46,10 +57,14 @@ fn testStructWithNoFields() {
     
     let clonedInstance = instance.clone();              // Clone
     assert_eq!(instance, clonedInstance);               // PartialEq
-    assert_eq!(instance, instance);                     // Eq    
+    assert_eq!(instance, instance);                     // Eq
+
+    let mut hasher = DefaultHasher::new();
+    instance.hash(&mut hasher);                         // Hash
+    let _ = hasher.finish();
 }
 
-#[derive(ValueObject)]
+#[derive(Identifier)]
 struct StructWithNamedFields {
     text: String,
     number: u64,
@@ -70,10 +85,14 @@ fn testStructWithNamedFields() {
     
     let clonedInstance = instance.clone();              // Clone
     assert_eq!(instance, clonedInstance);               // PartialEq
-    assert_eq!(instance, instance);                     // Eq    
+    assert_eq!(instance, instance);                     // Eq
+
+    let mut hasher = DefaultHasher::new();
+    instance.hash(&mut hasher);                         // Hash
+    let _ = hasher.finish();
 }
 
-#[derive(ValueObject)]
+#[derive(Identifier)]
 struct StructWithUnnamedFields(String, u64, bool);
 
 #[test]
@@ -90,14 +109,18 @@ fn testStructWithUnnamedFields() {
     
     let clonedInstance = instance.clone();              // Clone
     assert_eq!(instance, clonedInstance);               // PartialEq
-    assert_eq!(instance, instance);                     // Eq    
+    assert_eq!(instance, instance);                     // Eq
+
+    let mut hasher = DefaultHasher::new();
+    instance.hash(&mut hasher);                         // Hash
+    let _ = hasher.finish();
 }
 
-#[derive(ValueObject)]
+#[derive(Identifier)]
 struct StructWithNamedFieldsAndBoundedGenerics<T, U>
 where
-    T: Sized + Debug + Send + Sync + Clone + PartialEq,
-    U: Debug + Send + Sync + Clone + Copy + PartialEq + PartialOrd,
+    T: Sized + Debug + Send + Sync + Clone + PartialEq + Hash,
+    U: Debug + Send + Sync + Clone + Copy + PartialEq + PartialOrd + Hash,
 {
     pointer: Box<T>,
     vector: Vec<U>,
@@ -116,11 +139,15 @@ fn testStructWithNamedFieldsAndBoundedGenerics() {
     
     let clonedInstance = instance.clone();              // Clone
     assert_eq!(instance, clonedInstance);               // PartialEq
-    assert_eq!(instance, instance);                     // Eq    
+    assert_eq!(instance, instance);                     // Eq
+
+    let mut hasher = DefaultHasher::new();
+    instance.hash(&mut hasher);                         // Hash
+    let _ = hasher.finish();
 }
 
-#[derive(ValueObject)]
-struct StructWithUnnamedFieldsAndBoundedGenerics<T: Sized + Debug + Send + Sync + Clone + PartialEq, U: Debug + Send + Sync + Clone + Copy + PartialEq + PartialOrd>(Box<T>, Vec<U>);
+#[derive(Identifier)]
+struct StructWithUnnamedFieldsAndBoundedGenerics<T: Sized + Debug + Send + Sync + Clone + PartialEq + Hash, U: Debug + Send + Sync + Clone + Copy + PartialEq + PartialOrd + Hash>(Box<T>, Vec<U>);
 
 #[test]
 fn testStructWithUnnamedFieldsAndBoundedGenerics() {
@@ -135,91 +162,9 @@ fn testStructWithUnnamedFieldsAndBoundedGenerics() {
     
     let clonedInstance = instance.clone();              // Clone
     assert_eq!(instance, clonedInstance);               // PartialEq
-    assert_eq!(instance, instance);                     // Eq        
-}
-
-#[allow(dead_code)]
-#[derive(ValueObject)]
-enum EnumWithOnlyUnitVariants {
-    Quid,
-    Pro,
-    Quo,
-}
-
-#[test]
-fn testEnumWithOnlyUnitVariants() {
-    let instance = EnumWithOnlyUnitVariants::Quid;
+    assert_eq!(instance, instance);                     // Eq
     
-    let _: &dyn Debug = &instance;                      // Debug
-    let _: &dyn Send = &instance;                       // Send
-    let _: &dyn Sync = &instance;                       // Sync
-    
-    let clonedInstance = instance.clone();              // Clone
-    assert_eq!(instance, clonedInstance);               // PartialEq
-    assert_eq!(instance, instance);                     // Eq    
-}
-
-#[allow(dead_code)]
-#[derive(ValueObject)]
-enum EnumWithStructAndTupleVariants {
-    Quid,
-    Pro(String, u64, bool),
-    Quo {
-        text: String,
-        number: u64,
-        flag: bool,
-    },
-}
-
-#[test]
-fn testEnumWithStructAndTupleVariants() {
-    let instance = EnumWithStructAndTupleVariants::Quo {
-        text: "tomfoolery".to_owned(),
-        number: 42,
-        flag: false,
-    };
-    
-    let _: &dyn Debug = &instance;                      // Debug
-    let _: &dyn Send = &instance;                       // Send
-    let _: &dyn Sync = &instance;                       // Sync
-    
-    let clonedInstance = instance.clone();              // Clone
-    assert_eq!(instance, clonedInstance);               // PartialEq
-    assert_eq!(instance, instance);                     // Eq    
-}
-
-#[allow(dead_code)]
-#[derive(ValueObject)]
-enum EnumWithStructAndTupleVariantsAndBoundedGenerics<T>
-where
-    T: ValueObject,
-{
-    Quid,
-    Pro(Vec<T>, u64, bool),
-    Quo {
-        vector: Vec<T>,
-        number: u64,
-        flag: bool,
-    },
-}
-
-#[test]
-fn testEnumWithStructAndTupleVariantsAndBoundedGenerics() {
-    let instance = EnumWithStructAndTupleVariantsAndBoundedGenerics::Quo {
-        vector: vec![
-            EnumWithOnlyUnitVariants::Quid,
-            EnumWithOnlyUnitVariants::Pro,
-            EnumWithOnlyUnitVariants::Quo,
-        ],
-        number: 42,
-        flag: false,
-    };
-    
-    let _: &dyn Debug = &instance;                      // Debug
-    let _: &dyn Send = &instance;                       // Send
-    let _: &dyn Sync = &instance;                       // Sync
-    
-    let clonedInstance = instance.clone();              // Clone
-    assert_eq!(instance, clonedInstance);               // PartialEq
-    assert_eq!(instance, instance);                     // Eq    
+    let mut hasher = DefaultHasher::new();
+    instance.hash(&mut hasher);                         // Hash
+    let _ = hasher.finish();
 }
