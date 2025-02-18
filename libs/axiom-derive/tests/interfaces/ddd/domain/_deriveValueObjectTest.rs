@@ -14,27 +14,61 @@ pub mod axiom {
 #[derive(ValueObject)]
 struct UnitStruct;
 
+#[test]
+fn testUnitStruct() {
+    static instance: UnitStruct = UnitStruct;
+    
+    let _: &dyn std::fmt::Debug = &instance;            // Debug
+    let _: &dyn Send = &instance;                       // Send
+    let _: &dyn Sync = &instance;                       // Sync
+    
+    let clonedInstance = instance.clone();              // Clone
+    assert_eq!(instance, clonedInstance);               // PartialEq
+    assert_eq!(instance, instance);                     // Eq
+    
+    let _: &'static UnitStruct = &instance;             // 'static
+}
+
+#[derive(ValueObject)]
 struct StructWithNoFields {}
 
+#[test]
+fn testStructWithNoFields() {
+    static instance: StructWithNoFields = StructWithNoFields {};
+    
+    let _: &dyn std::fmt::Debug = &instance;            // Debug
+    let _: &dyn Send = &instance;                       // Send
+    let _: &dyn Sync = &instance;                       // Sync
+    
+    let clonedInstance = instance.clone();              // Clone
+    assert_eq!(instance, clonedInstance);               // PartialEq
+    assert_eq!(instance, instance);                     // Eq
+    
+    let _: &'static StructWithNoFields = &instance;     // 'static
+}
 
+#[derive(ValueObject)]
 struct StructWithNamedFields {
-    text: String,
+    text: &'static str,
     number: u64,
     flag: bool,
 }
 
 #[test]
-fn testUnitStruct() {
-    let instance = UnitStruct;
-
+fn testStructWithNamedFields() {
+    static instance: StructWithNamedFields = StructWithNamedFields {
+        text: "tomfoolery",
+        number: 42,
+        flag: false,
+    };
+    
     let _: &dyn std::fmt::Debug = &instance;            // Debug
     let _: &dyn Send = &instance;                       // Send
     let _: &dyn Sync = &instance;                       // Sync
-
+    
     let clonedInstance = instance.clone();              // Clone
     assert_eq!(instance, clonedInstance);               // PartialEq
     assert_eq!(instance, instance);                     // Eq
     
-    static Instance: UnitStruct = UnitStruct;
-    let _: &'static UnitStruct = &Instance;             // 'static
+    let _: &'static StructWithNamedFields = &instance;  // 'static
 }

@@ -11,7 +11,6 @@ pub fn deriveValueObject(tokens: proc_macro::TokenStream) -> proc_macro::TokenSt
     return proc_macro::TokenStream::from(tokens);
 }
 
-// pub trait ValueObject: Debug + Send + Sync + Clone + PartialEq + Eq + 'static {}
 fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
     let fields = &data.fields;
 
@@ -29,9 +28,33 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
                 .map(|field| &field.ty)
                 .collect();
 
-            quote! {
-                
-            }
+                quote! {
+                    impl #structImplGenerics axiom::interfaces::ddd::domain::ValueObject for #structIdent #structTypeGenerics #structWhereClause {}
+    
+                    impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
+                        fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                            return formatter.debug_struct(stringify!(#structIdent))
+                                #(.field(stringify!(#fieldIdents), &self.#fieldIdents))*
+                                .finish();
+                        }
+                    }
+    
+                    impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
+                        fn clone(&self) -> Self {
+                            return Self {
+                                #(#fieldIdents: self.#fieldIdents.clone()),*
+                            };
+                        }
+                    }
+    
+                    impl #structImplGenerics PartialEq for #structIdent #structTypeGenerics #structWhereClause {
+                        fn eq(&self, other: &Self) -> bool {
+                            return true #( && self.#fieldIdents == other.#fieldIdents)*;
+                        }
+                    }
+    
+                    impl #structImplGenerics Eq for #structIdent #structTypeGenerics #structWhereClause {}
+                }
         },
         syn::Fields::Unnamed(fields) => {
             let fieldIdents: Vec<_> = (0..fields.unnamed.len())
@@ -50,7 +73,7 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
             }
         },
         syn::Fields::Unit => {
-            return quote! {
+            quote! {
                 impl #structImplGenerics axiom::interfaces::ddd::domain::ValueObject for #structIdent #structTypeGenerics #structWhereClause {}
 
                 impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
@@ -73,7 +96,7 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
                 }
 
                 impl #structImplGenerics Eq for #structIdent #structTypeGenerics #structWhereClause {}
-            };
+            }
         },
     };
 }
