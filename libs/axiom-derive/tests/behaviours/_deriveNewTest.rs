@@ -88,3 +88,20 @@ fn testStructWithNamedFieldsAndLifetimes() {
 
     assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
+
+#[derive(New, PartialEq, Debug)]
+struct StructWithUnnamedFieldsAndLifetimes<'a, 'b, 'c>(&'a str, &'b u64, &'c bool);
+
+#[test]
+fn testStructWithUnnamedFieldsAndLifetimes() {
+    let (text, number, flag) = (
+        "tomfoolery".to_owned(),
+        42,
+        false,
+    );
+
+    let factoryConstructedInstance = StructWithUnnamedFieldsAndLifetimes::new(&text, &number, &flag);
+    let manuallyConstructedInstance = StructWithUnnamedFieldsAndLifetimes(&text, &number, &flag);
+    
+    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+}

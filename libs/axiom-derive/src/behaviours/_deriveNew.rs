@@ -41,6 +41,9 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
             let structIdent = &ast.ident;
             let (structImplGenerics, structTypeGenerics, structWhereClause) = &ast.generics.split_for_impl();
 
+            let fieldIdents: Vec<_> = (0..fields.unnamed.len())
+                .map(|index| syn::Ident::new(&format!("_{index}"), proc_macro2::Span::call_site()))
+                .collect();
             let fieldTypes: Vec<_> = fields.unnamed
                 .iter()
                 .map(|field| &field.ty)
@@ -48,8 +51,8 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
 
             quote! {
                 impl #structImplGenerics #structIdent #structTypeGenerics #structWhereClause {
-                    pub fn new(#(#fieldTypes: #fieldTypes),*) -> Self {
-                        return Self ( #(#fieldTypes),* );
+                    pub fn new(#(#fieldIdents: #fieldTypes),*) -> Self {
+                        return Self ( #(#fieldIdents),* );
                     }
                 }
             }
