@@ -53,10 +53,14 @@ struct StructWithUnnamedFields(String, u64, bool);
 #[test]
 fn testStructWithUnnamedFields() {
     let factoryConstructedInstance = StructWithUnnamedFields::new(
-        "tomfoolery".to_owned(), 42, false,
+        "tomfoolery".to_owned(),
+        42,
+        false,
     );
     let manuallyConstructedInstance = StructWithUnnamedFields(
-        "tomfoolery".to_owned(), 42, false,
+        "tomfoolery".to_owned(),
+        42,
+        false,
     );
 
     assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
@@ -102,8 +106,16 @@ fn testStructWithUnnamedFieldsAndLifetimes() {
         false,
     );
 
-    let factoryConstructedInstance = StructWithUnnamedFieldsAndLifetimes::new(&text, &number, &flag);
-    let manuallyConstructedInstance = StructWithUnnamedFieldsAndLifetimes(&text, &number, &flag);
+    let factoryConstructedInstance = StructWithUnnamedFieldsAndLifetimes::new(
+        &text,
+        &number,
+        &flag,
+    );
+    let manuallyConstructedInstance = StructWithUnnamedFieldsAndLifetimes(
+        &text,
+        &number,
+        &flag,
+    );
     
     assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
@@ -144,6 +156,57 @@ fn testStructWithUnnamedFieldsAndBoundedGenerics() {
     let manuallyConstructedInstance = StructWithUnnamedFieldsAndBoundedGenerics (
         Box::new("tomfoolery".to_owned()),
         vec![0, 1, 2, 3, 4, 5],
+    );
+
+    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+}
+
+#[derive(New, PartialEq, Debug)]
+struct StructedWithNamedFieldsAndLifetimesAndBoundedGenerics<'a, 'b, T, U>
+where
+    T: ?Sized,
+    U: Debug + Clone + Copy + PartialEq + PartialOrd,
+{
+    pointer: &'a Box<T>,
+    vector: &'b Vec<U>,
+}
+
+#[test]
+fn testStructWithNamedFieldsAndLifetimesAndBoundedGenerics() {
+    let (pointer, vector) = (
+        Box::new("tomfoolery".to_owned()),
+        vec![0, 1, 2, 3, 4, 5],
+    );
+
+    let factoryConstructedInstance = StructedWithNamedFieldsAndLifetimesAndBoundedGenerics::new(
+        &pointer,
+        &vector,
+    );
+    let manuallyConstructedInstance = StructedWithNamedFieldsAndLifetimesAndBoundedGenerics {
+        pointer: &pointer,
+        vector: &vector,
+    };
+
+    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+}
+
+#[derive(New, PartialEq, Debug)]
+struct StructWithUnnamedFieldsAndLifetimesAndBoundedGenerics<'a, 'b, T: ?Sized, U: Debug + Clone + Copy + PartialEq + PartialOrd>(&'a Box<T>, &'b Vec<U>);
+
+#[test]
+fn testStructWithUnnamedFieldsAndLifetimesAndBoundedGenerics() {
+    let (pointer, vector) = (
+        Box::new("tomfoolery".to_owned()),
+        vec![0, 1, 2, 3, 4, 5],
+    );
+
+    let factoryConstructedInstance = StructWithUnnamedFieldsAndLifetimesAndBoundedGenerics::new(
+        &pointer,
+        &vector,
+    );
+    let manuallyConstructedInstance = StructWithUnnamedFieldsAndLifetimesAndBoundedGenerics(
+        &pointer,
+        &vector,
     );
 
     assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
