@@ -3,23 +3,23 @@ use std::fmt::Debug;
 use axiom_derive::New;
 
 #[derive(New, PartialEq, Debug)]
-struct StructWithNoFields {}
-
-#[test]
-fn testStructWithNoFields() {
-    let factoryConstructedInstance = StructWithNoFields::new();
-    let manuallyConstructedInstance = StructWithNoFields {};
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
-}
-
-#[derive(New, PartialEq, Debug)]
 struct UnitStruct;
 
 #[test]
 fn testUnitStruct() {
     let factoryConstructedInstance = UnitStruct::new();
     let manuallyConstructedInstance = UnitStruct;
+
+    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+}
+
+#[derive(New, PartialEq, Debug)]
+struct StructWithNoFields {}
+
+#[test]
+fn testStructWithNoFields() {
+    let factoryConstructedInstance = StructWithNoFields::new();
+    let manuallyConstructedInstance = StructWithNoFields {};
 
     assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
