@@ -139,7 +139,7 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
                         Self::#variantIdent { #( #fieldIdents, )* } => formatter
                             .debug_struct(stringify!(#enumIdent))
                             #( .field(stringify!(#fieldIdents), #fieldIdents) )*
-                            .finish(),
+                            .finish()
                     };
                 },
                 syn::Fields::Unnamed(fields) => {
@@ -151,12 +151,12 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
                         Self::#variantIdent(#( #fieldIdents, )*) => formatter
                             .debug_tuple(stringify!(#enumIdent))
                             #( .field(#fieldIdents) )*
-                            .finish(),
+                            .finish()
                     };
                 }
                 syn::Fields::Unit => {
                     return quote! {
-                        Self::#variantIdent => write!(formatter, stringify!(#variantIdent)),
+                        Self::#variantIdent => write!(formatter, stringify!(#variantIdent))
                     };
                 },
             }
@@ -177,7 +177,7 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
 
                     quote! {
                         Self::#variantIdent { #( #fieldIdents, )* } => 
-                            Self::#variantIdent { #( #fieldIdents: #fieldIdents.clone(), )* },
+                            Self::#variantIdent { #( #fieldIdents: #fieldIdents.clone(), )* }
                     }
                 },
                 syn::Fields::Unnamed(fields) => {
@@ -187,12 +187,12 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
 
                     quote! {
                         Self::#variantIdent(#( #fieldIdents, )*) => 
-                            Self::#variantIdent(#( #fieldIdents.clone(), )*),
+                            Self::#variantIdent(#( #fieldIdents.clone(), )*)
                     }
                 },
                 syn::Fields::Unit => {
                     quote! {
-                        Self::#variantIdent => Self::#variantIdent,
+                        Self::#variantIdent => Self::#variantIdent
                     }
                 },
             }
@@ -225,7 +225,7 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
                             Self::#variantIdent { #( #fieldIdents: #rhsFieldIdents, )* },
                         ) => {
                             return #( #lhsFieldIdents == #rhsFieldIdents && )* true;
-                        },
+                        }
                     }
                 },
                 syn::Fields::Unnamed(fields) => {
@@ -247,12 +247,12 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
                             Self::#variantIdent(#( #rhsFieldIdents, )*)
                         ) => {
                             return #( #lhsFieldIdents == #rhsFieldIdents && )* true;
-                        },
+                        }
                     }
                 },
                 syn::Fields::Unit => {
                     quote! {
-                        (Self::#variantIdent, Self::#variantIdent) => true,
+                        (Self::#variantIdent, Self::#variantIdent) => true
                     }
                 },
             }
@@ -265,7 +265,7 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
         impl #enumImplGenerics std::fmt::Debug for #enumIdent #enumTypeGenerics #enumWhereClause {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return match self {
-                    #( #variantDebugImpls )*
+                    #( #variantDebugImpls, )*
                 };
             }
         }
@@ -273,7 +273,7 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
         impl #enumImplGenerics Clone for #enumIdent #enumTypeGenerics #enumWhereClause {
             fn clone(&self) -> Self {
                 return match self {
-                    #( #variantCloneImpls )*
+                    #( #variantCloneImpls, )*
                 };
             }
         }
@@ -281,7 +281,7 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
         impl #enumImplGenerics PartialEq for #enumIdent #enumTypeGenerics #enumWhereClause {
             fn eq(&self, other: &Self) -> bool {
                 return match (self, other) {
-                    #( #variantPartialEqImpls )*
+                    #( #variantPartialEqImpls, )*
                     _ => core::mem::discriminant(self) == core::mem::discriminant(other),
                 };
             }
