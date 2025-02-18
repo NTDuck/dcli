@@ -18,7 +18,7 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
     return match fields {
         syn::Fields::Named(fields) => {
             let structIdent = &ast.ident;
-            let structGenerics = &ast.generics;
+            let (structImplGenerics, structTypeGenerics, structWhereClause) = &ast.generics.split_for_impl();
 
             let fieldIdents: Vec<_> = fields.named
                 .iter()
@@ -30,7 +30,7 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
                 .collect();
 
             quote! {
-                impl #structGenerics #structIdent {
+                impl #structImplGenerics #structIdent #structTypeGenerics #structWhereClause {
                     pub fn new(#(#fieldIdents: #fieldTypes),*) -> Self {
                         return Self { #(#fieldIdents),* };
                     }
@@ -39,7 +39,7 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
         },
         syn::Fields::Unnamed(fields) => {
             let structIdent = &ast.ident;
-            let structGenerics = &ast.generics;
+            let (structImplGenerics, structTypeGenerics, structWhereClause) = &ast.generics.split_for_impl();
 
             let fieldTypes: Vec<_> = fields.unnamed
                 .iter()
@@ -47,7 +47,7 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
                 .collect();
 
             quote! {
-                impl #structGenerics #structIdent {
+                impl #structImplGenerics #structIdent #structTypeGenerics #structWhereClause {
                     pub fn new(#(#fieldTypes: #fieldTypes),*) -> Self {
                         return Self ( #(#fieldTypes),* );
                     }

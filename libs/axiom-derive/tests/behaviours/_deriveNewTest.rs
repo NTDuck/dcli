@@ -61,13 +61,30 @@ fn testStructWithUnnamedFields() {
 }
 
 #[derive(New, PartialEq, Debug)]
-struct StructWithNamedFieldsAndLifetimes {
-    text: String,
-    number: u64,
-    flag: bool,
+struct StructWithNamedFieldsAndLifetimes<'a, 'b, 'c> {
+    text: &'a str,
+    number: &'b u64,
+    flag: &'c bool,
 }
 
 #[test]
-fn testStrutWithNamedFieldsAndLifetimes() {
-    
+fn testStructWithNamedFieldsAndLifetimes() {
+    let (text, number, flag) = (
+        "tomfoolery".to_owned(),
+        42,
+        false,
+    );
+
+    let factoryConstructedInstance = StructWithNamedFieldsAndLifetimes::new(
+        &text,
+        &number,
+        &flag,
+    );
+    let manuallyConstructedInstance = StructWithNamedFieldsAndLifetimes {
+        text: &text,
+        number: &number,
+        flag: &flag,
+    };
+
+    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
