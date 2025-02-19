@@ -6,7 +6,7 @@ pub fn deriveValueObject(tokens: proc_macro::TokenStream) -> proc_macro::TokenSt
 
     let tokens = match &ast.data {
         syn::Data::Struct(data) => deriveForStruct(&ast, data),
-        syn::Data::Enum(data) => deriveForEnum(&ast, &data),
+        syn::Data::Enum(data) => deriveForEnum(&ast, data),
         _ => panic!(),
     };
 
