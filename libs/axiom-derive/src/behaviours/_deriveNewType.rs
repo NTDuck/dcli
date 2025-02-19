@@ -14,9 +14,6 @@ pub fn deriveNewType(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream
 fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
     let fields = &data.fields;
 
-    let structIdent = &ast.ident;
-    let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
-
     let syn::Fields::Unnamed(fields) = fields else {
         panic!("Newtypes must be a single-field tuple struct")
     };
@@ -26,6 +23,14 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
     };
 
     let field = fields.unnamed.first().unwrap();
+
+    return deriveForSingleFieldUnnamedStruct(ast, field);
+}
+
+fn deriveForSingleFieldUnnamedStruct(ast: &syn::DeriveInput, field: &syn::Field) -> proc_macro2::TokenStream {
+    let structIdent = &ast.ident;
+    let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
+
     let fieldType = &field.ty;
 
     return quote! {
