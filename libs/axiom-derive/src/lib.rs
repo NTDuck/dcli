@@ -22,7 +22,7 @@ pub fn deriveDataTransferObject(tokens: TokenStream) -> TokenStream {
     return crate::interfaces::deriveDataTransferObject(tokens);
 }
 
-#[proc_macro_derive(Entity)]
+#[proc_macro_derive(Entity, attributes(axiom))]
 pub fn deriveEntity(tokens: TokenStream) -> TokenStream {
     return crate::interfaces::ddd::domain::deriveEntity(tokens);
 }

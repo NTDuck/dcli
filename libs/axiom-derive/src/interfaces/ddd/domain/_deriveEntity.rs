@@ -1,3 +1,4 @@
+use darling::FromDeriveInput;
 use quote::quote;
 
 pub fn deriveEntity(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -11,7 +12,6 @@ pub fn deriveEntity(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream 
     return proc_macro::TokenStream::from(tokens);
 }
 
-
 fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
     let fields = &data.fields;
 
@@ -22,6 +22,10 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
 }
 
 fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
+    let darlingAst = DarlingAbstractSyntaxTree::from_derive_input(&ast);
+    let darlingFields = darlingAst.unwrap().data
+        .take_struct().unwrap();
+
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
 
@@ -30,16 +34,24 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
         .map(|field| &field.ident)
         .collect::<Vec<_>>();
 
-    let identifierField = getIdentifierFieldForNamedStruct(fields)
-        .expect(&format!(
-            "Struct {} must have one field implementing `axiom::interfaces::ddd::domain::Identifier` with one of the following names: {}",
-            structIdent.to_string(),
-            AcceptedFieldIdents
-                .iter()
-                .map(|fieldIdent| format!("`{}`", fieldIdent))
-                .collect::<Vec<_>>()
-                .join(", "),
-        ));
+    // let identifierField = getIdentifierFieldForNamedStruct(fields)
+    //     .expect(&format!(
+    //         "Struct {} must have one field implementing `axiom::interfaces::ddd::domain::Identifier` with one of the following names: {}",
+    //         structIdent.to_string(),
+    //         AcceptedFieldIdents
+    //             .iter()
+    //             .map(|fieldIdent| format!("`{}`", fieldIdent))
+    //             .collect::<Vec<_>>()
+    //             .join(", "),
+    //     ));
+
+    let identifierField = darlingFields
+        .iter()
+        .find(|field| field.attributes
+            .as_ref()
+            .is_some_and(|attrs| attrs.Identifier.is_some()))
+        .expect("Must have one field annotated `#[axiom(attributes(Identifier))]");
+
     let identifierFieldIdent = &identifierField.ident;
     let identifierFieldType = &identifierField.ty;
 
@@ -83,14 +95,36 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
     };
 }
 
-fn getIdentifierFieldForNamedStruct(fields: &syn::FieldsNamed) -> Option<syn::Field> {
-    return fields.named
-    .iter()
-    .find(|field| field.ident.as_ref()
-    .map_or(false, |ident| {
-        return AcceptedFieldIdents.contains(&ident.to_string().as_str());
-    }))
-    .cloned();
+// fn getIdentifierFieldForNamedStruct(fields: &syn::FieldsNamed) -> Option<syn::Field> {
+//     return fields.named
+//     .iter()
+//     .find(|field| field.ident.as_ref()
+//     .map_or(false, |ident| {
+//         return AcceptedFieldIdents.contains(&ident.to_string().as_str());
+//     }))
+//     .cloned();
+// }
+
+// const AcceptedFieldIdents: [&str; 2] = ["id", "identifier"];
+
+#[derive(darling::FromDeriveInput)]
+#[darling(supports(struct_named))]
+struct DarlingAbstractSyntaxTree {
+    data: darling::ast::Data<darling::util::Ignored, DarlingField>,
 }
 
-const AcceptedFieldIdents: [&str; 2] = ["id", "identifier"];
+#[derive(darling::FromField)]
+#[darling(attributes(axiom))]
+struct DarlingField {
+    ident: Option<syn::Ident>,
+    ty: syn::Type,
+    attributes: Option<DarlingFieldAttributes>,
+}
+
+#[derive(darling::FromMeta)]
+struct DarlingFieldAttributes {
+    Identifier: Option<IdentifierMarker>,
+}
+
+#[derive(darling::FromMeta)]
+struct IdentifierMarker;

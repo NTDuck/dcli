@@ -38,6 +38,7 @@ impl From<u128> for Uuid {
 #[allow(dead_code)]
 #[derive(Entity)]
 struct StructWithNamedFields {
+    #[axiom(attributes(Identifier))]
     id: Uuid,
     text: String,
     number: u64,
