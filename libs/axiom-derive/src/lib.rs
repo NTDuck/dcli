@@ -17,10 +17,10 @@ pub fn deriveNewType(tokens: TokenStream) -> TokenStream {
     return crate::behaviours::deriveNewType(tokens);
 }
 
-// #[proc_macro_derive(DataTransferObject)]
-// pub fn deriveDataTransferObject(tokens: proc_macro::TokenStream) ->
-// proc_macro::TokenStream {     return
-// crate::interfaces::deriveDataTransferObject(tokens); }
+#[proc_macro_derive(DataTransferObject)]
+pub fn deriveDataTransferObject(tokens: TokenStream) -> TokenStream {
+    return crate::interfaces::deriveDataTransferObject(tokens);
+}
 
 // #[proc_macro_derive(Entity)]
 // pub fn deriveEntity(tokens: proc_macro::TokenStream) ->
