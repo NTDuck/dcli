@@ -168,3 +168,97 @@ fn testStructWithUnnamedFieldsAndBoundedGenerics() {
     instance.hash(&mut hasher);                         // Hash
     let _ = hasher.finish();
 }
+
+#[allow(dead_code)]
+#[derive(Identifier)]
+enum EnumWithOnlyUnitVariants {
+    Quid,
+    Pro,
+    Quo,
+}
+
+#[test]
+fn testEnumWithOnlyUnitVariants() {
+    let instance = EnumWithOnlyUnitVariants::Quid;
+    
+    let _: &dyn Debug = &instance;                      // Debug
+    let _: &dyn Send = &instance;                       // Send
+    let _: &dyn Sync = &instance;                       // Sync
+    
+    let clonedInstance = instance.clone();              // Clone
+    assert_eq!(instance, clonedInstance);               // PartialEq
+    assert_eq!(instance, instance);                     // Eq    
+        
+    let mut hasher = DefaultHasher::new();
+    instance.hash(&mut hasher);                         // Hash
+    let _ = hasher.finish();
+}
+
+#[allow(dead_code)]
+#[derive(Identifier)]
+enum EnumWithStructAndTupleVariants {
+    Quid,
+    Pro(String, u64, bool),
+    Quo {
+        text: String,
+        number: u64,
+        flag: bool,
+    },
+}
+
+#[test]
+fn testEnumWithStructAndTupleVariants() {
+    let instance = EnumWithStructAndTupleVariants::Quo {
+        text: "tomfoolery".to_owned(),
+        number: 42,
+        flag: false,
+    };
+
+    let _: &dyn Debug = &&instance;                     // Debug
+    let _: &dyn Send = &instance;                       // Send
+    let _: &dyn Sync = &instance;                       // Sync
+    
+    let clonedInstance = instance.clone();              // Clone
+    assert_eq!(instance, clonedInstance);               // PartialEq
+    assert_eq!(instance, instance);                     // Eq
+    
+    let mut hasher = DefaultHasher::new();
+    instance.hash(&mut hasher);                         // Hash
+    let _ = hasher.finish();
+}
+
+#[allow(dead_code)]
+#[derive(Identifier)]
+enum EnumWithStructAndTupleVariantsAndBoundedGenerics<T>
+where
+    T: Identifier,
+{
+    Quid,
+    Pro(Vec<T>, u64, bool),
+    Quo {
+        vector: Vec<T>,
+        number: u64,
+        flag: bool,
+    },
+}
+
+#[test]
+fn testEnumWithStructAndTupleVariantsAndBoundedGenerics() {
+    let instance = EnumWithStructAndTupleVariantsAndBoundedGenerics::Quo {
+        vector: vec![UnitStruct],
+        number: 42,
+        flag: false,
+    };
+
+    let _: &dyn Debug = &&instance;                     // Debug
+    let _: &dyn Send = &instance;                       // Send
+    let _: &dyn Sync = &instance;                       // Sync
+    
+    let clonedInstance = instance.clone();              // Clone
+    assert_eq!(instance, clonedInstance);               // PartialEq
+    assert_eq!(instance, instance);                     // Eq
+    
+    let mut hasher = DefaultHasher::new();
+    instance.hash(&mut hasher);                         // Hash
+    let _ = hasher.finish();
+}

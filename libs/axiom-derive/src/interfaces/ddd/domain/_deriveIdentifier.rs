@@ -281,6 +281,44 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
         })
         .collect::<Vec<_>>();
 
+    let variantHashImpls = variants
+        .iter()
+        .map(|variant| {
+            let variantIdent = &variant.ident;
+
+            match &variant.fields {
+                syn::Fields::Named(fields) => {
+                    let fieldIdents = fields.named
+                        .iter()
+                        .map(|field| &field.ident)
+                        .collect::<Vec<_>>();
+                    
+                    return quote! {
+                        Self::#variantIdent { #( #fieldIdents, )* } => {
+                            #( #fieldIdents.hash(state); )*
+                        }
+                    };
+                },
+                syn::Fields::Unnamed(fields) => {
+                    let fieldIdents = (0..fields.unnamed.len())
+                        .map(|index| format_ident!("arg{index}"))
+                        .collect::<Vec<_>>();
+                    
+                    return quote! {
+                        Self::#variantIdent(#( #fieldIdents, )*) => {
+                            #( #fieldIdents.hash(state); )*
+                        }
+                    };
+                },
+                syn::Fields::Unit => {
+                    return quote! {
+                        Self::#variantIdent => {}
+                    };
+                },
+            }
+        })
+        .collect::<Vec<_>>();
+
     return quote! {
         impl #enumImplGenerics axiom::interfaces::ddd::domain::ValueObject for #enumIdent #enumTypeGenerics #enumWhereClause {}
 
@@ -310,5 +348,15 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
         }
 
         impl #enumImplGenerics Eq for #enumIdent #enumTypeGenerics #enumWhereClause {}
+
+        impl #enumImplGenerics std::hash::Hash for #enumIdent #enumTypeGenerics #enumWhereClause {
+            fn hash<Hasher: std::hash::Hasher>(&self, state: &mut Hasher) {
+                core::mem::discriminant(self).hash(state);
+
+                match self {
+                    #( #variantHashImpls, )*
+                }
+            }
+        }
     };
 }
