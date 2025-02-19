@@ -35,6 +35,7 @@ impl From<u128> for Uuid {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Entity)]
 struct StructWithNamedFields {
     id: Uuid,

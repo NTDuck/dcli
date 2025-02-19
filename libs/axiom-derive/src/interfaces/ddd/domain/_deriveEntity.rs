@@ -31,7 +31,15 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
         .collect::<Vec<_>>();
 
     let identifierField = getIdentifierFieldForNamedStruct(fields)
-        .expect("Missing field Identifier");
+        .expect(&format!(
+            "Struct {} must have one field implementing `axiom::interfaces::ddd::domain::Identifier` with one of the following names: {}",
+            structIdent.to_string(),
+            AcceptedFieldIdents
+                .iter()
+                .map(|fieldIdent| format!("`{}`", fieldIdent))
+                .collect::<Vec<_>>()
+                .join(", "),
+        ));
     let identifierFieldIdent = &identifierField.ident;
     let identifierFieldType = &identifierField.ty;
 
@@ -39,7 +47,6 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
         impl #structImplGenerics axiom::interfaces::ddd::domain::Entity for #structIdent #structTypeGenerics #structWhereClause {
             type Id = #identifierFieldType;
 
-            #[inline(always)]
             fn getId(&self) -> &Self::Id {
                 return &self.#identifierFieldIdent;
             }
@@ -77,10 +84,13 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
 }
 
 fn getIdentifierFieldForNamedStruct(fields: &syn::FieldsNamed) -> Option<syn::Field> {
-    const AcceptedFieldIdents: [&str; 2] = ["id", "identifier"];
-    
     return fields.named
-        .iter()
-        .find(|field| field.ident.as_ref().map_or(false, |ident| AcceptedFieldIdents.contains(&ident.to_string().as_str())))
-        .cloned();
+    .iter()
+    .find(|field| field.ident.as_ref()
+    .map_or(false, |ident| {
+        return AcceptedFieldIdents.contains(&ident.to_string().as_str());
+    }))
+    .cloned();
 }
+
+const AcceptedFieldIdents: [&str; 2] = ["id", "identifier"];
