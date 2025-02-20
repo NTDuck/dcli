@@ -33,8 +33,13 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
         .expect(&format!(
             "Struct `{}` must have one field implementing \
             `axiom::interfaces::ddd::domain::Identifier` \
-            and annotated `#[axiom(attributes(Identifier))]`",
+            and annotated {}",
             structIdent.to_string(),
+            AcceptedAttributes
+                .iter()
+                .map(|attr| format!("`#[axiom(attributes({attr}))]`"))
+                .collect::<Vec<_>>()
+                .join(", "),
         ));
 
     let identifierFieldIdent = &identifierField.ident;
@@ -81,38 +86,52 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
 }
 
 fn getIdentifierFieldForNamedStruct(fields: &syn::FieldsNamed) -> Option<&syn::Field> {
-    return fields.named
-        .iter()
-        .find(|field| {
-            field.attrs
-                .iter()
-                .filter(|attr| attr.path().is_ident("axiom"))
-                .filter_map(|attr| attr.meta.require_list().ok())
-                .flat_map(|metaList| metaList
-                    .parse_args_with(syn::punctuated::Punctuated::<syn::Meta, syn::Token![,]>::parse_terminated)
-                    .ok())
-                .flat_map(extractAttributesFromMetaList)
-                .any(|attribute| attribute == "Identifier")
-        });
-    
-    fn extractAttributesFromMetaList(punctuated: syn::punctuated::Punctuated<syn::Meta, syn::Token![,]>) -> Vec<String> {
-        punctuated.into_iter()
-            .filter_map(|meta| match meta {
-                syn::Meta::List(meta_list) if meta_list.path.is_ident("attributes") => Some(meta_list),
-                _ => None
-            })
-            .flat_map(|meta_list| 
-                meta_list.parse_args_with(syn::punctuated::Punctuated::<syn::Path, syn::Token![,]>::parse_terminated).ok()
-            )
-            .flat_map(|punctuated| 
-                punctuated.into_iter().filter_map(|path| path.get_ident().map(|ident| ident.to_string()))
-            )
-            .collect()
-    }
+    return fields.named.iter().find(|field| {
+        field.attrs
+            .iter()
+            .filter_map(|attr| extractNestedMetaListsFromAttr(attr, "axiom"))
+            .flat_map(|metaList| extractNestedMetaListsFromMetaList(&metaList, "attributes"))
+            .flat_map(extractNestedAttrIdentsFromMetaList)
+            .any(|attrIdent| AcceptedAttributes.contains(&attrIdent.as_str()))
+    });
 }
 
-// const AcceptedAttributes: [&str; 3] = [
-//     "Identifier",
-//     "ddd::Identifier",
-//     "ddd::domain::Identifier",
-// ];
+fn extractNestedMetaListsFromAttr(attr: &syn::Attribute, expectedAttrIdent: &str) -> Option<syn::MetaList> {
+    if !attr.path().is_ident(expectedAttrIdent) {
+        return None;
+    }
+        
+    return attr.meta.require_list().ok().cloned()
+}
+
+fn extractNestedMetaListsFromMetaList(metaList: &syn::MetaList, expectedAttrIdent: &str) -> Vec<syn::MetaList> {
+    return metaList
+        .parse_args_with(syn::punctuated::Punctuated::<syn::Meta, syn::Token![,]>::parse_terminated)
+        .map(|punctuated| punctuated
+            .into_iter()
+            .filter_map(|meta| meta
+                .path()
+                .is_ident(expectedAttrIdent)
+                .then(|| meta.require_list().ok())
+                .flatten()
+                .cloned())
+            .collect())
+        .unwrap_or_default();
+}
+
+fn extractNestedAttrIdentsFromMetaList(metaList: syn::MetaList) -> Vec<String> {
+    return metaList
+        .parse_args_with(syn::punctuated::Punctuated::<syn::Path, syn::Token![,]>::parse_terminated)
+        .ok()
+        .map(|punctuated| punctuated
+            .into_iter()
+            .map(|path| quote::ToTokens::to_token_stream(&path).to_string())
+            .collect())
+        .unwrap_or_default();
+}
+
+const AcceptedAttributes: [&str; 3] = [
+    "Identifier",
+    "ddd::Identifier",
+    "ddd::domain::Identifier",
+];
