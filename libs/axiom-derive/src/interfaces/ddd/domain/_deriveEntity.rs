@@ -84,13 +84,26 @@ fn getIdentifierFieldForNamedStruct(fields: &syn::FieldsNamed) -> Option<&syn::F
     return fields.named
         .iter()
         .find(|field| {
-            field.attrs
+            return field.attrs
                 .iter()
                 .filter(|attr| attr.path().is_ident("axiom"))
-                .any(|attr| attr.meta.require_list().ok()
-                    .map_or(false, |metaList| {
-                        return metaList.tokens.to_string() == "attributes(Identifier)";
-                    })
-                )
+                .filter_map(|attr| attr.meta.require_list().ok())
+                .filter_map(|metaList| {
+                    let tokens = metaList.tokens.to_string();
+                    tokens.strip_prefix("attributes(")
+                          .and_then(|s| s.strip_suffix(")"))
+                          .map(|s| s.to_string())
+                })
+                .flat_map(|metaList| metaList
+                    .split(',')
+                    .map(|attr| attr.trim().to_string())
+                    .collect::<Vec<_>>())
+                .any(|attr| attr == "Identifier");
         });
 }
+
+// const AcceptedAttributes: [&str; 3] = [
+//     "Identifier",
+//     "ddd::Identifier",
+//     "ddd::domain::Identifier",
+// ];
