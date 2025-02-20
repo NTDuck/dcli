@@ -32,6 +32,8 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
         .map(|field| &field.ident)
         .collect::<Vec<_>>();
 
+    let numberOfFields = fields.named.len();
+
     return quote! {
         impl #structImplGenerics axiom::interfaces::DataTransferObject for #structIdent #structTypeGenerics #structWhereClause {}
 
@@ -51,6 +53,19 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
                 };
             }
         }
+        
+        impl #structImplGenerics serde::Serialize for #structIdent #structTypeGenerics #structWhereClause {
+            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+            where
+                S: serde::Serializer,
+            {
+                use serde::ser::SerializeStruct;
+
+                let mut state = serializer.serialize_struct(stringify!(#structIdent), #numberOfFields)?;
+                #( state.serialize_field(stringify!(#fieldIdents), &self.#fieldIdents)?; )*
+                return state.end();
+            }
+        }
     };
 }
 
@@ -61,6 +76,8 @@ fn deriveForUnnamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -
     let fieldIndices = (0..fields.unnamed.len())
         .map(syn::Index::from)
         .collect::<Vec<_>>();
+
+    let numberOfFields = fields.unnamed.len();
 
     return quote! {
         impl #structImplGenerics axiom::interfaces::DataTransferObject for #structIdent #structTypeGenerics #structWhereClause {}
@@ -77,6 +94,19 @@ fn deriveForUnnamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -
         impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
             fn clone(&self) -> Self {
                 return Self( #( self.#fieldIndices.clone(), )* );
+            }
+        }
+
+        impl #structImplGenerics serde::Serialize for #structIdent #structTypeGenerics #structWhereClause {
+            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+            where
+                S: serde::Serializer,
+            {
+                use serde::ser::SerializeTuple;
+
+                let mut state = serializer.serialize_tuple(#numberOfFields)?;
+                #( state.serialize_element(&self.#fieldIndices)?; )*
+                return state.end();
             }
         }
     };
@@ -100,6 +130,15 @@ fn deriveForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
         impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
             fn clone(&self) -> Self {
                 return Self;
+            }
+        }
+
+        impl #structImplGenerics serde::Serialize for #structIdent #structTypeGenerics #structWhereClause {
+            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+            where
+                S: serde::Serializer,
+            {
+                return serializer.serialize_unit_struct(stringify!(#structIdent));
             }
         }
     };

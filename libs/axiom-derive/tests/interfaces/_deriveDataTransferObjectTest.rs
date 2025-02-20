@@ -19,7 +19,7 @@ pub mod axiom {
     }
 }
 
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObject, Deserialize)]
 struct UnitStruct;
 
 #[test]
@@ -27,7 +27,7 @@ fn testUnitStruct() {
     verifyTraitBounds(UnitStruct);
 }
 
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObject, Deserialize)]
 struct StructWithNoNamedFields {}
 
 #[test]
@@ -35,7 +35,7 @@ fn testStructWithNoNamedFields() {
     verifyTraitBounds(StructWithNoNamedFields {});
 }
 
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObject, Deserialize)]
 struct StructWithNoUnnamedFields();
 
 #[test]
@@ -43,7 +43,7 @@ fn testStructWithNoUnnamedFields() {
     verifyTraitBounds(StructWithNoUnnamedFields());
 }
 
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObject, Deserialize)]
 struct StructWithNamedFields {
     text: String,
     number: u64,
@@ -59,7 +59,7 @@ fn testStructWithNamedFields() {
     });
 }
 
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObject, Deserialize)]
 struct StructWithUnnamedFields(String, u64, bool);
 
 #[test]
