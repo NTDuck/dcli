@@ -1,15 +1,8 @@
-use std::ops::Deref;
+use axiom::behaviours::NewType;
+use axiom::interfaces::ddd;
 
-#[derive(ddd::Identifier)]
+#[derive(ddd::Identifier, NewType)]
 pub struct Uuid(u128);
-
-impl Deref for Uuid {
-    type Target = u128;
-
-    fn deref(&self) -> &Self::Target {
-        return &self.0;
-    }
-}
 
 impl From<u128> for Uuid {
     fn from(uuid: u128) -> Self {

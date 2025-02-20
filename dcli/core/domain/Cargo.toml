@@ -4,8 +4,9 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
-modules = { path = "../../../libs/modules" }
-ddd = { path = "../../../libs/ddd" }
+axiom = { path = "../../../libs/axiom" }
+
+serde = { version = "1.0", features = ["derive"] }
 
 [lints]
 workspace = true

@@ -1,4 +1,4 @@
-use modules::*;
+use axiom::macros::layout::*;
 
 namespace!(pub repositories);
 namespace!(pub factories);

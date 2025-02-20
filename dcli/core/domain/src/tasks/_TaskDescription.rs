@@ -1,6 +1,10 @@
-use std::ops::Deref;
+use axiom::behaviours::NewType;
+use axiom::interfaces::ddd;
+use axiom::interfaces::DataTransferObject;
+use serde::Deserialize;
+use serde::Serialize;
 
-#[derive(ddd::ValueObject)]
+#[derive(ddd::ValueObject, NewType)]
 pub struct TaskDescription(String);
 
 impl TryFrom<String> for TaskDescription {
@@ -59,7 +63,7 @@ impl TaskDescription {
     }
 }
 
-#[derive(Debug)]
+#[derive(DataTransferObject, Serialize, Deserialize)]
 pub enum TaskDescriptionError {
     LengthUnderflow {
         actualLength: usize,
@@ -69,12 +73,4 @@ pub enum TaskDescriptionError {
         actualLength: usize,
         maxLengthAllowed: usize,
     },
-}
-
-impl Deref for TaskDescription {
-    type Target = String;
-
-    fn deref(&self) -> &Self::Target {
-        return &self.0;
-    }
 }
