@@ -6,3 +6,5 @@ pub trait Entity: ValueObject {
 
     fn getId(&self) -> &Self::Id;
 }
+
+pub use derive::Entity;

@@ -1,2 +1,1 @@
-// Temporary until custom implementation is supplied
-pub use derive_new::new as New;
+pub use derive::New as New;
