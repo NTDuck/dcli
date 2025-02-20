@@ -1,6 +1,0 @@
-lint: rustc-cargo, clippy-cargo, rustfmt.toml, clippy.toml
-replace () with !
-syn
-then refactor
-and make auto refactor per push req
-then pull req to master
