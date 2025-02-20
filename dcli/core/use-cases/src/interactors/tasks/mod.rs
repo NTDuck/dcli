@@ -1,7 +1,4 @@
-use modules::namespace;
+use axiom::macros::layout::*;
 
-namespace!(read);
-namespace!(write);
-
-pub use read::*;
-pub use write::*;
+class!(pub _CreateTaskInteractor);
+class!(pub _ViewTasksInteractor);

@@ -1,3 +1,4 @@
+use axiom::behaviours::New;
 use domain::utils::dataclasses::time::Timestamp;
 use domain::Task;
 use domain::TaskDescription;
@@ -8,23 +9,15 @@ use crate::boundaries::tasks::CreateTaskBoundary;
 use crate::boundaries::tasks::CreateTaskErrorModel;
 use crate::boundaries::tasks::CreateTaskRequestModel;
 use crate::boundaries::tasks::CreateTaskResponseModel;
-use crate::gateways::pointers::handles::abc::PointerHandle;
+use crate::gateways::pointers::PointerHandle;
 use crate::gateways::pointers::SharedPointer;
 use crate::gateways::repositories::tasks::TaskRepository;
 use crate::gateways::factories::ids::UuidFactory;
 
+#[derive(New)]
 pub struct CreateTaskInteractor<Handle: PointerHandle> {
     taskRepository: SharedPointer<Box<dyn TaskRepository>, Handle>,
     uuidFactory: SharedPointer<Box<dyn UuidFactory>, Handle>,
-}
-
-impl<Handle: PointerHandle> CreateTaskInteractor<Handle> {
-    pub const fn new(taskRepository: SharedPointer<Box<dyn TaskRepository>, Handle>, uuidFactory: SharedPointer<Box<dyn UuidFactory>, Handle>) -> Self {
-        return Self {
-            taskRepository,
-            uuidFactory,
-        };
-    }
 }
 
 impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> {

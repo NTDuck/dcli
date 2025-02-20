@@ -3,10 +3,18 @@ name = "use-cases"
 version = "0.1.0"
 edition.workspace = true
 
+[features]
+default = ["boundaries", "interactors", "gateways"]
+boundaries = []
+interactors = []
+gateways = []
+
 [dependencies]
 axiom = { path = "../../../libs/axiom" }
 
 domain = { path = "../domain" }
+
+serde = { version = "1.0", features = ["derive"] }
 
 [lints]
 workspace = true

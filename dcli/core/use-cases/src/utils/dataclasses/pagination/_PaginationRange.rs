@@ -1,7 +1,11 @@
+use axiom::interfaces::DataTransferObject;
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::utils::dataclasses::pagination::PaginationProperties;
 use crate::utils::dataclasses::pagination::PaginationRequest;
 
-#[derive()]
+#[derive(DataTransferObject, Serialize, Deserialize)]
 pub struct PaginationRange {
     pub offset: usize,
     pub limit: usize,
@@ -12,7 +16,7 @@ impl From<&PaginationRequest> for PaginationRange {
         return Self {
             offset: paginationRequest.pageNumber
                 .saturating_sub(PaginationProperties::MinPageSize)
-            * paginationRequest.maxPageSize,
+                * paginationRequest.maxPageSize,
             limit: paginationRequest.maxPageSize,
         };
     }

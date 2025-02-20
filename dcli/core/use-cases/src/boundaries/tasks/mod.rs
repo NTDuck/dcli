@@ -1,7 +1,4 @@
-use modules::*;
+use axiom::macros::layout::*;
 
-namespace!(read);
-namespace!(write);
-
-pub use read::*;
-pub use write::*;
+class!(pub _CreateTaskBoundary);
+class!(pub _ViewTasksBoundary);
