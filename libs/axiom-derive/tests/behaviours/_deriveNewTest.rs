@@ -7,21 +7,32 @@ struct UnitStruct;
 
 #[test]
 fn testUnitStruct() {
-    let factoryConstructedInstance = UnitStruct::new();
-    let manuallyConstructedInstance = UnitStruct;
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+    verifyTraitBounds(
+        UnitStruct::new(),
+        UnitStruct,
+    );
 }
 
 #[derive(New, PartialEq, Debug)]
-struct StructWithNoFields {}
+struct StructWithNoNamedFields {}
 
 #[test]
-fn testStructWithNoFields() {
-    let factoryConstructedInstance = StructWithNoFields::new();
-    let manuallyConstructedInstance = StructWithNoFields {};
+fn testStructWithNoNamedFields() {
+    verifyTraitBounds(
+        StructWithNoNamedFields::new(),
+        StructWithNoNamedFields {},
+    );
+}
 
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+#[derive(New, PartialEq, Debug)]
+struct StructWithNoUnnamedFields();
+
+#[test]
+fn testStructWithNoUnnamedFields() {
+    verifyTraitBounds(
+        StructWithNoUnnamedFields::new(),
+        StructWithNoUnnamedFields(),
+    );
 }
 
 #[derive(New, PartialEq, Debug)]
@@ -33,18 +44,18 @@ struct StructWithNamedFields {
 
 #[test]
 fn testStructWithNamedFields() {
-    let factoryConstructedInstance = StructWithNamedFields::new(
-        "tomfoolery".to_owned(),
-        42,
-        false,
+    verifyTraitBounds(
+        StructWithNamedFields::new(
+            "tomfoolery".to_owned(),
+            42,
+            false,
+        ),
+        StructWithNamedFields {
+            text: "tomfoolery".to_owned(),
+            number: 42,
+            flag: false,
+        },
     );
-    let manuallyConstructedInstance = StructWithNamedFields {
-        text: "tomfoolery".to_owned(),
-        number: 42,
-        flag: false,
-    };
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
 
 #[derive(New, PartialEq, Debug)]
@@ -52,18 +63,18 @@ struct StructWithUnnamedFields(String, u64, bool);
 
 #[test]
 fn testStructWithUnnamedFields() {
-    let factoryConstructedInstance = StructWithUnnamedFields::new(
-        "tomfoolery".to_owned(),
-        42,
-        false,
+    verifyTraitBounds(
+        StructWithUnnamedFields::new(
+            "tomfoolery".to_owned(),
+            42,
+            false,
+        ),
+        StructWithUnnamedFields(
+            "tomfoolery".to_owned(),
+            42,
+            false,
+        ),
     );
-    let manuallyConstructedInstance = StructWithUnnamedFields(
-        "tomfoolery".to_owned(),
-        42,
-        false,
-    );
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
 
 #[derive(New, PartialEq, Debug)]
@@ -81,18 +92,18 @@ fn testStructWithNamedFieldsAndLifetimes() {
         false,
     );
 
-    let factoryConstructedInstance = StructWithNamedFieldsAndLifetimes::new(
-        &text,
-        &number,
-        &flag,
+    verifyTraitBounds(
+        StructWithNamedFieldsAndLifetimes::new(
+            &text,
+            &number,
+            &flag,
+        ),
+        StructWithNamedFieldsAndLifetimes {
+            text: &text,
+            number: &number,
+            flag: &flag,
+        },
     );
-    let manuallyConstructedInstance = StructWithNamedFieldsAndLifetimes {
-        text: &text,
-        number: &number,
-        flag: &flag,
-    };
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
 
 #[derive(New, PartialEq, Debug)]
@@ -106,18 +117,18 @@ fn testStructWithUnnamedFieldsAndLifetimes() {
         false,
     );
 
-    let factoryConstructedInstance = StructWithUnnamedFieldsAndLifetimes::new(
-        &text,
-        &number,
-        &flag,
+    verifyTraitBounds(
+        StructWithUnnamedFieldsAndLifetimes::new(
+            &text,
+            &number,
+            &flag,
+        ),
+        StructWithUnnamedFieldsAndLifetimes(
+            &text,
+            &number,
+            &flag,
+        ),
     );
-    let manuallyConstructedInstance = StructWithUnnamedFieldsAndLifetimes(
-        &text,
-        &number,
-        &flag,
-    );
-    
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
 
 #[derive(New, PartialEq, Debug)]
@@ -132,16 +143,16 @@ where
 
 #[test]
 fn testStructWithNamedFieldsAndBoundedGenerics() {
-    let factoryConstructedInstance = StructWithNamedFieldsAndBoundedGenerics::new(
-        Box::new("tomfoolery".to_owned()),
-        vec![0, 1, 2, 3, 4, 5],
+    verifyTraitBounds(
+        StructWithNamedFieldsAndBoundedGenerics::new(
+            Box::new("tomfoolery".to_owned()),
+            vec![0, 1, 2, 3, 4, 5],
+        ),
+        StructWithNamedFieldsAndBoundedGenerics {
+            pointer: Box::new("tomfoolery".to_owned()),
+            vector: vec![0, 1, 2, 3, 4, 5],
+        },
     );
-    let manuallyConstructedInstance = StructWithNamedFieldsAndBoundedGenerics {
-        pointer: Box::new("tomfoolery".to_owned()),
-        vector: vec![0, 1, 2, 3, 4, 5],
-    };
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
 
 #[derive(New, PartialEq, Debug)]
@@ -149,16 +160,16 @@ struct StructWithUnnamedFieldsAndBoundedGenerics<T: ?Sized, U: Debug + Clone + C
 
 #[test]
 fn testStructWithUnnamedFieldsAndBoundedGenerics() {
-    let factoryConstructedInstance = StructWithUnnamedFieldsAndBoundedGenerics::new(
-        Box::new("tomfoolery".to_owned()),
-        vec![0, 1, 2, 3, 4, 5],
+    verifyTraitBounds(
+        StructWithUnnamedFieldsAndBoundedGenerics::new(
+            Box::new("tomfoolery".to_owned()),
+            vec![0, 1, 2, 3, 4, 5],
+        ),
+        StructWithUnnamedFieldsAndBoundedGenerics (
+            Box::new("tomfoolery".to_owned()),
+            vec![0, 1, 2, 3, 4, 5],
+        ),
     );
-    let manuallyConstructedInstance = StructWithUnnamedFieldsAndBoundedGenerics (
-        Box::new("tomfoolery".to_owned()),
-        vec![0, 1, 2, 3, 4, 5],
-    );
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
 
 #[derive(New, PartialEq, Debug)]
@@ -178,16 +189,16 @@ fn testStructWithNamedFieldsAndLifetimesAndBoundedGenerics() {
         vec![0, 1, 2, 3, 4, 5],
     );
 
-    let factoryConstructedInstance = StructedWithNamedFieldsAndLifetimesAndBoundedGenerics::new(
-        &pointer,
-        &vector,
+    verifyTraitBounds(
+        StructedWithNamedFieldsAndLifetimesAndBoundedGenerics::new(
+            &pointer,
+            &vector,
+        ),
+        StructedWithNamedFieldsAndLifetimesAndBoundedGenerics {
+            pointer: &pointer,
+            vector: &vector,
+        },
     );
-    let manuallyConstructedInstance = StructedWithNamedFieldsAndLifetimesAndBoundedGenerics {
-        pointer: &pointer,
-        vector: &vector,
-    };
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
 
 #[derive(New, PartialEq, Debug)]
@@ -200,16 +211,16 @@ fn testStructWithUnnamedFieldsAndLifetimesAndBoundedGenerics() {
         vec![0, 1, 2, 3, 4, 5],
     );
 
-    let factoryConstructedInstance = StructWithUnnamedFieldsAndLifetimesAndBoundedGenerics::new(
-        &pointer,
-        &vector,
+    verifyTraitBounds(
+        StructWithUnnamedFieldsAndLifetimesAndBoundedGenerics::new(
+            &pointer,
+            &vector,
+        ),
+        StructWithUnnamedFieldsAndLifetimesAndBoundedGenerics(
+            &pointer,
+            &vector,
+        ),
     );
-    let manuallyConstructedInstance = StructWithUnnamedFieldsAndLifetimesAndBoundedGenerics(
-        &pointer,
-        &vector,
-    );
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
 }
 
 #[derive(New, PartialEq, Debug)]
@@ -221,20 +232,18 @@ enum EnumWithOnlyVariants {
 
 #[test]
 fn testEnumWithOnlyVariants() {
-    let factoryConstructedInstance = EnumWithOnlyVariants::newQuid();
-    let manuallyConstructedInstance = EnumWithOnlyVariants::Quid;
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
-
-    let factoryConstructedInstance = EnumWithOnlyVariants::newPro();
-    let manuallyConstructedInstance = EnumWithOnlyVariants::Pro;
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
-
-    let factoryConstructedInstance = EnumWithOnlyVariants::newQuo();
-    let manuallyConstructedInstance = EnumWithOnlyVariants::Quo;
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+    verifyTraitBounds(
+        EnumWithOnlyVariants::newQuid(),
+        EnumWithOnlyVariants::Quid,
+    );
+    verifyTraitBounds(
+        EnumWithOnlyVariants::newPro(),
+        EnumWithOnlyVariants::Pro,
+    );
+    verifyTraitBounds(
+        EnumWithOnlyVariants::newQuo(),
+        EnumWithOnlyVariants::Quo,
+    );
 }
 
 #[derive(New, PartialEq, Debug)]
@@ -250,34 +259,79 @@ enum EnumWithStructAndTupleVariants {
 
 #[test]
 fn testEnumWithStructAndTupleVariants() {
-    let factoryConstructedInstance = EnumWithStructAndTupleVariants::newQuid();
-    let manuallyConstructedInstance = EnumWithStructAndTupleVariants::Quid;
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
-
-    let factoryConstructedInstance = EnumWithStructAndTupleVariants::newPro(
-        "tomfoolery".to_owned(),
-        42,
-        false,
+    verifyTraitBounds(
+        EnumWithStructAndTupleVariants::newQuid(),
+        EnumWithStructAndTupleVariants::Quid,
     );
-    let manuallyConstructedInstance = EnumWithStructAndTupleVariants::Pro(
-        "tomfoolery".to_owned(),
-        42,
-        false,
+    verifyTraitBounds(
+        EnumWithStructAndTupleVariants::newPro(
+            "tomfoolery".to_owned(),
+            42,
+            false,
+        ),
+        EnumWithStructAndTupleVariants::Pro(
+            "tomfoolery".to_owned(),
+            42,
+            false,
+        ),
     );
-
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
-
-    let factoryConstructedInstance = EnumWithStructAndTupleVariants::newQuo(
-        "tomfoolery".to_owned(),
-        42,
-        false,
+    verifyTraitBounds(
+        EnumWithStructAndTupleVariants::newQuo(
+            "tomfoolery".to_owned(),
+            42,
+            false,
+        ),
+        EnumWithStructAndTupleVariants::Quo {
+            text: "tomfoolery".to_owned(),
+            number: 42,
+            flag: false,
+        },
     );
-    let manuallyConstructedInstance = EnumWithStructAndTupleVariants::Quo {
-        text: "tomfoolery".to_owned(),
-        number: 42,
-        flag: false,
-    };
+}
 
-    assert_eq!(factoryConstructedInstance, manuallyConstructedInstance);
+#[derive(New, PartialEq, Debug)]
+enum EnumWithStructAndTupleVariantsAndBoundedGenerics<T> {
+    Quid,
+    Pro(Vec<T>, u64, bool),
+    Quo {
+        vector: Vec<T>,
+        number: u64,
+        flag: bool,
+    },
+}
+
+#[test]
+fn testEnumWithStructAndTupleVariantsAndBoundedGenerics() {
+    verifyTraitBounds(
+        EnumWithStructAndTupleVariantsAndBoundedGenerics::<UnitStruct>::newQuid(),
+        EnumWithStructAndTupleVariantsAndBoundedGenerics::Quid,
+    );
+    verifyTraitBounds(
+        EnumWithStructAndTupleVariantsAndBoundedGenerics::newPro(
+            vec![0, 1, 2, 3, 4],
+            42,
+            false,
+        ),
+        EnumWithStructAndTupleVariantsAndBoundedGenerics::Pro(
+            vec![0, 1, 2, 3, 4],
+            42,
+            false,
+        ),
+    );
+    verifyTraitBounds(
+        EnumWithStructAndTupleVariantsAndBoundedGenerics::newQuo(
+            vec![0, 1, 2, 3, 4],
+            42,
+            false,
+        ),
+        EnumWithStructAndTupleVariantsAndBoundedGenerics::Quo {
+            vector: vec![0, 1, 2, 3, 4],
+            number: 42,
+            flag: false,
+        },
+    );
+}
+
+fn verifyTraitBounds<T: Debug + PartialEq>(factoryConstructed: T, manuallyConstructed: T) {
+    assert_eq!(factoryConstructed, manuallyConstructed);
 }
