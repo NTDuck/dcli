@@ -84,22 +84,31 @@ fn getIdentifierFieldForNamedStruct(fields: &syn::FieldsNamed) -> Option<&syn::F
     return fields.named
         .iter()
         .find(|field| {
-            return field.attrs
+            field.attrs
                 .iter()
                 .filter(|attr| attr.path().is_ident("axiom"))
                 .filter_map(|attr| attr.meta.require_list().ok())
-                .filter_map(|metaList| {
-                    let tokens = metaList.tokens.to_string();
-                    tokens.strip_prefix("attributes(")
-                          .and_then(|s| s.strip_suffix(")"))
-                          .map(|s| s.to_string())
-                })
                 .flat_map(|metaList| metaList
-                    .split(',')
-                    .map(|attr| attr.trim().to_string())
-                    .collect::<Vec<_>>())
-                .any(|attr| attr == "Identifier");
+                    .parse_args_with(syn::punctuated::Punctuated::<syn::Meta, syn::Token![,]>::parse_terminated)
+                    .ok())
+                .flat_map(extractAttributesFromMetaList)
+                .any(|attribute| attribute == "Identifier")
         });
+    
+    fn extractAttributesFromMetaList(punctuated: syn::punctuated::Punctuated<syn::Meta, syn::Token![,]>) -> Vec<String> {
+        punctuated.into_iter()
+            .filter_map(|meta| match meta {
+                syn::Meta::List(meta_list) if meta_list.path.is_ident("attributes") => Some(meta_list),
+                _ => None
+            })
+            .flat_map(|meta_list| 
+                meta_list.parse_args_with(syn::punctuated::Punctuated::<syn::Path, syn::Token![,]>::parse_terminated).ok()
+            )
+            .flat_map(|punctuated| 
+                punctuated.into_iter().filter_map(|path| path.get_ident().map(|ident| ident.to_string()))
+            )
+            .collect()
+    }
 }
 
 // const AcceptedAttributes: [&str; 3] = [
