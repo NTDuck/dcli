@@ -1,6 +1,8 @@
+use std::fmt::Debug;
+
+use axiom::interfaces::ddd::domain::Entity;
 use axiom_derive::Entity;
 use axiom_derive::Identifier;
-use axiom_derive::NewType;
 
 // Allow `Entity` usage
 // without adding `axiom` as a dependency
@@ -8,8 +10,6 @@ pub mod axiom {
     pub mod interfaces {
         pub mod ddd {
             pub mod domain {
-                #![allow(dead_code)]
-
                 use std::fmt::Debug;
                 use std::hash::Hash;
 
@@ -19,23 +19,15 @@ pub mod axiom {
                     fn getId(&self) -> &Self::Id;
                 }
 
+                #[allow(dead_code)]
                 pub trait Identifier: ValueObject + Hash {}
+
                 pub trait ValueObject: Debug + Send + Sync + Clone + PartialEq + Eq {}
             }
         }
     }
 }
 
-#[derive(Identifier, NewType)]
-struct Uuid(u128);
-
-impl From<u128> for Uuid {
-    fn from(arg0: u128) -> Self {
-        return Self(arg0);
-    }
-}
-
-#[allow(dead_code)]
 #[derive(Entity)]
 struct StructWithNamedFields {
     #[axiom(attributes(ddd::Identifier))]
@@ -47,5 +39,42 @@ struct StructWithNamedFields {
 
 #[test]
 fn testStructWithNamedFields() {
-
+    verifyTraitBounds(StructWithNamedFields {
+        id: Uuid::default(),
+        text: "tomfoolery".to_owned(),
+        number: 42,
+        flag: false,
+    });
 }
+
+#[derive(Entity)]
+struct StructWithNamedFieldsAndBoundedGenerics<T, U>
+where
+    T: Debug + Send + Sync + Clone + PartialEq + Eq,
+    U: Debug + Send + Sync + Clone + PartialEq + Eq,
+{
+    #[axiom(attributes(ddd::Identifier))]
+    id: Uuid,
+    pointer: Box<T>,
+    vector: Vec<U>,
+}
+
+#[test]
+fn testStructWithNamedFieldsAndBoundedGenerics() {
+    verifyTraitBounds(StructWithNamedFieldsAndBoundedGenerics {
+        id: Uuid::default(),
+        pointer: Box::new("tomfoolery".to_owned()),
+        vector: vec![0, 1, 2, 3, 4, 5],
+    });
+}
+
+#[derive(Identifier)]
+struct Uuid(u128);
+
+impl Default for Uuid {
+    fn default() -> Self {
+        return Self(42);
+    }
+}
+
+fn verifyTraitBounds(_: impl Entity) {}
