@@ -3,7 +3,7 @@
 use axiom::interfaces::DataTransferObject;
 use axiom_derive::DataTransferObject;
 use serde::Deserialize;
-use serde::Serialize;
+// use serde::Serialize;
 
 // Allow `DataTransferObject` usage
 // without adding `axiom` as a dependency
@@ -14,7 +14,6 @@ pub mod axiom {
         use serde::Serialize;
         use serde::Deserialize;
 
-        #[allow(dead_code)]
         pub trait DataTransferObject: Debug + Send + Sync + Clone + Serialize + for<'de> Deserialize<'de> {}
     }
 }
@@ -103,8 +102,7 @@ fn testStructWithUnnamedFields() {
 //     ));
 // }
 
-#[allow(dead_code)]
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObject, Deserialize)]
 enum EnumWithOnlyUnitVariants {
     Quid,
     Pro,
@@ -118,7 +116,7 @@ fn testEnumWithOnlyUnitVariants() {
     verifyTraitBounds(EnumWithOnlyUnitVariants::Quo);
 }
 
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObject, Deserialize)]
 enum EnumWithStructAndTupleVariants {
     Quid,
     Pro(String, u64, bool),

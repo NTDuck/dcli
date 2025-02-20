@@ -165,6 +165,15 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
         })
         .collect::<Vec<_>>();
 
+    let variantSerializeImpls = variants
+        .iter()
+        .map(|variant| match &variant.fields {
+            syn::Fields::Named(fields) => deriveSerializeForNamedVariant(ast, variant, fields),
+            syn::Fields::Unnamed(fields) => deriveSerializeForUnnamedVariant(ast, variant, fields),
+            syn::Fields::Unit => deriveSerializeForUnitVariant(ast, variant),
+        })
+        .collect::<Vec<_>>();
+
     let enumIdent = &ast.ident;
     let (enumImplGenerics, enumTypeGenerics, enumWhereClause) = ast.generics.split_for_impl();
 
@@ -184,6 +193,17 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
                 return match self {
                     #( #variantCloneImpls, )*
                 };
+            }
+        }
+
+        impl #enumImplGenerics serde::Serialize for #enumIdent #enumTypeGenerics #enumWhereClause {
+            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+            where
+                S: serde::Serializer,
+            {
+                match self {
+                    #( #variantSerializeImpls, )*
+                }
             }
         }
     };
@@ -259,4 +279,80 @@ fn deriveCloneForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream
     return quote! {
         Self::#variantIdent => Self::#variantIdent
     };
+}
+
+fn deriveSerializeForNamedVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
+    let enumIdent = &ast.ident;
+    let variantIdent = &variant.ident;
+    let variantIndex = getVariantIndex(ast, variant).unwrap();
+    let fieldIdents = fields.named
+        .iter()
+        .map(|field| &field.ident)
+        .collect::<Vec<_>>();
+    let numberOfFields = fields.named.len();
+
+    return quote! {
+        Self::#variantIdent { #( #fieldIdents, )* } => {
+            use serde::ser::SerializeStructVariant;
+            
+            let mut state = serializer.serialize_struct_variant(
+                stringify!(#enumIdent),
+                #variantIndex,
+                stringify!(#variantIdent),
+                #numberOfFields,
+            )?;
+            #( state.serialize_field(stringify!(#fieldIdents), #fieldIdents)?; )*
+            return state.end();
+        }
+    };
+}
+
+fn deriveSerializeForUnnamedVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
+    let enumIdent = &ast.ident;
+    let variantIdent = &variant.ident;
+    let variantIndex = getVariantIndex(ast, variant).unwrap();
+    let fieldIdents = (0..fields.unnamed.len())
+        .map(|index| format_ident!("arg{index}"))
+        .collect::<Vec<_>>();
+    let numberOfFields = fields.unnamed.len();
+
+    return quote! {
+        Self::#variantIdent(#( #fieldIdents, )*) => {
+            use serde::ser::SerializeTupleVariant;
+            
+            let mut state = serializer.serialize_tuple_variant(
+                stringify!(#enumIdent),
+                #variantIndex,
+                stringify!(#variantIdent),
+                #numberOfFields,
+            )?;
+            #( state.serialize_field(#fieldIdents)?; )*
+            return state.end();
+        }
+    };
+}
+
+fn deriveSerializeForUnitVariant(ast: &syn::DeriveInput, variant: &syn::Variant) -> proc_macro2::TokenStream {
+    let enumIdent = &ast.ident;
+    let variantIdent = &variant.ident;
+    let variantIndex = getVariantIndex(ast, variant).unwrap();
+
+    return quote! {
+        Self::#variantIdent => serializer.serialize_unit_variant(
+            stringify!(#enumIdent),
+            #variantIndex,
+            stringify!(#variantIdent),
+        )
+    };
+}
+
+fn getVariantIndex(ast: &syn::DeriveInput, variant: &syn::Variant) -> Option<u32> {
+    if let syn::Data::Enum(data) = &ast.data {
+        return data.variants
+            .iter()
+            .position(|v| v.ident == variant.ident)
+            .map(|index| index as u32);
+    } else {
+        return None;
+    }
 }
