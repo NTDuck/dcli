@@ -1,6 +1,3 @@
-use std::fmt::Debug;
-use std::hash::Hash;
-
 use axiom::interfaces::ddd::domain::Identifier;
 use axiom_derive::Identifier;
 
@@ -76,8 +73,8 @@ fn testStructWithUnnamedFields() {
 #[derive(Identifier)]
 struct StructWithNamedFieldsAndBoundedGenerics<T, U>
 where
-    T: Debug + Send + Sync + Clone + PartialEq + Eq + Hash,
-    U: Debug + Send + Sync + Clone + PartialEq + Eq + Hash,
+    T: Identifier,
+    U: Identifier,
 {
     pointer: Box<T>,
     vector: Vec<U>,
@@ -86,22 +83,22 @@ where
 #[test]
 fn testStructWithNamedFieldsAndBoundedGenerics() {
     verifyTraitBounds(StructWithNamedFieldsAndBoundedGenerics {
-        pointer: Box::new("tomfoolery".to_owned()),
-        vector: vec![0, 1, 2, 3, 4, 5],
+        pointer: Box::new(UnitStruct),
+        vector: vec![UnitStruct],
     });
 }
 
 #[derive(Identifier)]
 struct StructWithUnnamedFieldsAndBoundedGenerics<
-    T: Debug + Send + Sync + Clone + PartialEq + Eq + Hash,
-    U: Debug + Send + Sync + Clone + PartialEq + Eq + Hash
+    T: Identifier,
+    U: Identifier,
 >(Box<T>, Vec<U>);
 
 #[test]
 fn testStructWithUnnamedFieldsAndBoundedGenerics() {
     verifyTraitBounds(StructWithUnnamedFieldsAndBoundedGenerics (
-        Box::new("tomfoolery".to_owned()),
-        vec![0, 1, 2, 3, 4, 5],
+        Box::new(UnitStruct),
+        vec![UnitStruct],
     ));
 }
 

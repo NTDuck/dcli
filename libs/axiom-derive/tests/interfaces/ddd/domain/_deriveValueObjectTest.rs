@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 use axiom::interfaces::ddd::domain::ValueObject;
 use axiom_derive::ValueObject;
 
@@ -72,8 +70,8 @@ fn testStructWithUnnamedFields() {
 #[derive(ValueObject)]
 struct StructWithNamedFieldsAndBoundedGenerics<T, U>
 where
-    T: Debug + Send + Sync + Clone + PartialEq + Eq,
-    U: Debug + Send + Sync + Clone + PartialEq + Eq,
+    T: ValueObject,
+    U: ValueObject,
 {
     pointer: Box<T>,
     vector: Vec<U>,
@@ -82,22 +80,22 @@ where
 #[test]
 fn testStructWithNamedFieldsAndBoundedGenerics() {
     verifyTraitBounds(StructWithNamedFieldsAndBoundedGenerics {
-        pointer: Box::new("tomfoolery".to_owned()),
-        vector: vec![0, 1, 2, 3, 4, 5],
+        pointer: Box::new(UnitStruct),
+        vector: vec![UnitStruct],
     });
 }
 
 #[derive(ValueObject)]
 struct StructWithUnnamedFieldsAndBoundedGenerics<
-    T: Debug + Send + Sync + Clone + PartialEq + Eq,
-    U: Debug + Send + Sync + Clone + PartialEq + Eq
+    T: ValueObject,
+    U: ValueObject
 >(Box<T>, Vec<U>);
 
 #[test]
 fn testStructWithUnnamedFieldsAndBoundedGenerics() {
     verifyTraitBounds(StructWithUnnamedFieldsAndBoundedGenerics (
-        Box::new("tomfoolery".to_owned()),
-        vec![0, 1, 2, 3, 4, 5],
+        Box::new(UnitStruct),
+        vec![UnitStruct],
     ));
 }
 

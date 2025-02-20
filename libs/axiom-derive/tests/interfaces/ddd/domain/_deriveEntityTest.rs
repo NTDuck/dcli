@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 use axiom::interfaces::ddd::domain::Entity;
 use axiom_derive::Entity;
 use axiom_derive::Identifier;
@@ -50,8 +48,8 @@ fn testStructWithNamedFields() {
 #[derive(Entity)]
 struct StructWithNamedFieldsAndBoundedGenerics<T, U>
 where
-    T: Debug + Send + Sync + Clone + PartialEq + Eq,
-    U: Debug + Send + Sync + Clone + PartialEq + Eq,
+    T: Entity,
+    U: Entity,
 {
     #[axiom(attributes(ddd::Identifier))]
     id: Uuid,
@@ -61,10 +59,17 @@ where
 
 #[test]
 fn testStructWithNamedFieldsAndBoundedGenerics() {
+    let structWithNamedFields = StructWithNamedFields {
+        id: Uuid::default(),
+        text: "tomfoolery".to_owned(),
+        number: 42,
+        flag: false,
+    };
+
     verifyTraitBounds(StructWithNamedFieldsAndBoundedGenerics {
         id: Uuid::default(),
-        pointer: Box::new("tomfoolery".to_owned()),
-        vector: vec![0, 1, 2, 3, 4, 5],
+        pointer: Box::new(structWithNamedFields.clone()),
+        vector: vec![structWithNamedFields.clone()],
     });
 }
 
