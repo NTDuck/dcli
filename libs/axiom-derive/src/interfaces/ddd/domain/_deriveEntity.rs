@@ -125,7 +125,11 @@ fn extractNestedAttrIdentsFromMetaList(metaList: syn::MetaList) -> Vec<String> {
         .ok()
         .map(|punctuated| punctuated
             .into_iter()
-            .map(|path| quote::ToTokens::to_token_stream(&path).to_string())
+            .map(|path| path.segments
+                .iter()
+                .map(|segment| segment.ident.to_string())
+                .collect::<Vec<_>>()
+                .join(SegmentSeparator))
             .collect())
         .unwrap_or_default();
 }
@@ -134,4 +138,5 @@ const AcceptedAttributes: [&str; 3] = [
     "Identifier",
     "ddd::Identifier",
     "ddd::domain::Identifier",
-];
+];  
+const SegmentSeparator: &str = "::";
