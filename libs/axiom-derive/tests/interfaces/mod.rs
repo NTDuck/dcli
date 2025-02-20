@@ -2,4 +2,4 @@ use layout::*;
 
 namespace!(ddd);
 
-class!(_deriveDataTransferObjectTest);
+class!(_deriveSerdelessDataTransferObjectTest);

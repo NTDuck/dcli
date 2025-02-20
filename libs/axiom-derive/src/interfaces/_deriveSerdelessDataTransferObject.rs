@@ -1,7 +1,7 @@
 use quote::format_ident;
 use quote::quote;
 
-pub fn deriveDataTransferObject(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn deriveSerdelessDataTransferObject(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse_macro_input!(tokens as syn::DeriveInput);
 
     let tokens = match &ast.data {
@@ -32,8 +32,6 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
         .map(|field| &field.ident)
         .collect::<Vec<_>>();
 
-    let numberOfFields = fields.named.len();
-
     return quote! {
         impl #structImplGenerics axiom::interfaces::DataTransferObject for #structIdent #structTypeGenerics #structWhereClause {}
 
@@ -53,19 +51,6 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
                 };
             }
         }
-        
-        impl #structImplGenerics serde::Serialize for #structIdent #structTypeGenerics #structWhereClause {
-            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-            where
-                S: serde::Serializer,
-            {
-                use serde::ser::SerializeStruct;
-
-                let mut state = serializer.serialize_struct(stringify!(#structIdent), #numberOfFields)?;
-                #( state.serialize_field(stringify!(#fieldIdents), &self.#fieldIdents)?; )*
-                return state.end();
-            }
-        }
     };
 }
 
@@ -76,8 +61,6 @@ fn deriveForUnnamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -
     let fieldIndices = (0..fields.unnamed.len())
         .map(syn::Index::from)
         .collect::<Vec<_>>();
-
-    let numberOfFields = fields.unnamed.len();
 
     return quote! {
         impl #structImplGenerics axiom::interfaces::DataTransferObject for #structIdent #structTypeGenerics #structWhereClause {}
@@ -94,19 +77,6 @@ fn deriveForUnnamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -
         impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
             fn clone(&self) -> Self {
                 return Self( #( self.#fieldIndices.clone(), )* );
-            }
-        }
-
-        impl #structImplGenerics serde::Serialize for #structIdent #structTypeGenerics #structWhereClause {
-            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-            where
-                S: serde::Serializer,
-            {
-                use serde::ser::SerializeTuple;
-
-                let mut state = serializer.serialize_tuple(#numberOfFields)?;
-                #( state.serialize_element(&self.#fieldIndices)?; )*
-                return state.end();
             }
         }
     };
@@ -130,15 +100,6 @@ fn deriveForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
         impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
             fn clone(&self) -> Self {
                 return Self;
-            }
-        }
-
-        impl #structImplGenerics serde::Serialize for #structIdent #structTypeGenerics #structWhereClause {
-            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-            where
-                S: serde::Serializer,
-            {
-                return serializer.serialize_unit_struct(stringify!(#structIdent));
             }
         }
     };
@@ -165,15 +126,6 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
         })
         .collect::<Vec<_>>();
 
-    let variantSerializeImpls = variants
-        .iter()
-        .map(|variant| match &variant.fields {
-            syn::Fields::Named(fields) => deriveSerializeForNamedVariant(ast, variant, fields),
-            syn::Fields::Unnamed(fields) => deriveSerializeForUnnamedVariant(ast, variant, fields),
-            syn::Fields::Unit => deriveSerializeForUnitVariant(ast, variant),
-        })
-        .collect::<Vec<_>>();
-
     let enumIdent = &ast.ident;
     let (enumImplGenerics, enumTypeGenerics, enumWhereClause) = ast.generics.split_for_impl();
 
@@ -193,17 +145,6 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
                 return match self {
                     #( #variantCloneImpls, )*
                 };
-            }
-        }
-
-        impl #enumImplGenerics serde::Serialize for #enumIdent #enumTypeGenerics #enumWhereClause {
-            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-            where
-                S: serde::Serializer,
-            {
-                match self {
-                    #( #variantSerializeImpls, )*
-                }
             }
         }
     };
@@ -279,80 +220,4 @@ fn deriveCloneForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream
     return quote! {
         Self::#variantIdent => Self::#variantIdent
     };
-}
-
-fn deriveSerializeForNamedVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
-    let enumIdent = &ast.ident;
-    let variantIdent = &variant.ident;
-    let variantIndex = getVariantIndex(ast, variant).unwrap();
-    let fieldIdents = fields.named
-        .iter()
-        .map(|field| &field.ident)
-        .collect::<Vec<_>>();
-    let numberOfFields = fields.named.len();
-
-    return quote! {
-        Self::#variantIdent { #( #fieldIdents, )* } => {
-            use serde::ser::SerializeStructVariant;
-            
-            let mut state = serializer.serialize_struct_variant(
-                stringify!(#enumIdent),
-                #variantIndex,
-                stringify!(#variantIdent),
-                #numberOfFields,
-            )?;
-            #( state.serialize_field(stringify!(#fieldIdents), #fieldIdents)?; )*
-            return state.end();
-        }
-    };
-}
-
-fn deriveSerializeForUnnamedVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
-    let enumIdent = &ast.ident;
-    let variantIdent = &variant.ident;
-    let variantIndex = getVariantIndex(ast, variant).unwrap();
-    let fieldIdents = (0..fields.unnamed.len())
-        .map(|index| format_ident!("arg{index}"))
-        .collect::<Vec<_>>();
-    let numberOfFields = fields.unnamed.len();
-
-    return quote! {
-        Self::#variantIdent(#( #fieldIdents, )*) => {
-            use serde::ser::SerializeTupleVariant;
-            
-            let mut state = serializer.serialize_tuple_variant(
-                stringify!(#enumIdent),
-                #variantIndex,
-                stringify!(#variantIdent),
-                #numberOfFields,
-            )?;
-            #( state.serialize_field(#fieldIdents)?; )*
-            return state.end();
-        }
-    };
-}
-
-fn deriveSerializeForUnitVariant(ast: &syn::DeriveInput, variant: &syn::Variant) -> proc_macro2::TokenStream {
-    let enumIdent = &ast.ident;
-    let variantIdent = &variant.ident;
-    let variantIndex = getVariantIndex(ast, variant).unwrap();
-
-    return quote! {
-        Self::#variantIdent => serializer.serialize_unit_variant(
-            stringify!(#enumIdent),
-            #variantIndex,
-            stringify!(#variantIdent),
-        )
-    };
-}
-
-fn getVariantIndex(ast: &syn::DeriveInput, variant: &syn::Variant) -> Option<u32> {
-    if let syn::Data::Enum(data) = &ast.data {
-        return data.variants
-            .iter()
-            .position(|v| v.ident == variant.ident)
-            .map(|index| index as u32);
-    } else {
-        return None;
-    }
 }
