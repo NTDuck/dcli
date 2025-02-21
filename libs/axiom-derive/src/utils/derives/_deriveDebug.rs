@@ -2,6 +2,16 @@ use quote::quote;
 
 use crate::utils::ast::*;
 
+pub fn deriveDebugForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
+    let fields = &data.fields;
+
+    return match fields {
+        syn::Fields::Named(fields) => deriveDebugForNamedStruct(ast, fields),
+        syn::Fields::Unnamed(fields) => deriveDebugForTupleStruct(ast, fields),
+        syn::Fields::Unit => deriveDebugForUnitStruct(ast),
+    };
+}
+
 pub fn deriveDebugForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
