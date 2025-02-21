@@ -31,7 +31,7 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
     return quote! {
         impl #structImplGenerics axiom::interfaces::ddd::domain::Identifier for #structIdent #structTypeGenerics #structWhereClauseWithIdentifierBounds {}
 
-        impl #structImplGenerics axiom::interfaces::ddd::domain::Identifier for #structIdent #structTypeGenerics #structWhereClauseWithValueObjectBounds {}
+        impl #structImplGenerics axiom::interfaces::ddd::domain::ValueObject for #structIdent #structTypeGenerics #structWhereClauseWithValueObjectBounds {}
 
         #structDebugImpl
         #structCloneImpl
