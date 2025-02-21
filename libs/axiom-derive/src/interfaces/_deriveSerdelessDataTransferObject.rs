@@ -120,11 +120,18 @@ fn deriveForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
 fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
     let variants = &data.variants;
 
+    let enumIdent = &ast.ident;
+    let (enumImplGenerics, enumTypeGenerics, _) = ast.generics.split_for_impl();
+
+    let dataTransferObjectBoundedEnumWhereClause = getDataTransferObjectBoundedWhereClause(ast);
+    let debugBoundedEnumWhereClause = getDebugBoundedWhereClauseFromDeriveInput(ast);
+    let cloneBoundedEnumWhereClause = getCloneBoundedWhereClauseFromDeriveInput(ast);
+    
     let variantDebugImpls = variants
         .iter()
         .map(|variant| match &variant.fields {
-            syn::Fields::Named(fields) => deriveDebugForNamedVariant(ast, variant, fields),
-            syn::Fields::Unnamed(fields) => deriveDebugForUnnamedVariant(ast, variant, fields),
+            syn::Fields::Named(fields) => deriveDebugForStructVariant(ast, variant, fields),
+            syn::Fields::Unnamed(fields) => deriveDebugForTupleVariant(ast, variant, fields),
             syn::Fields::Unit => deriveDebugForUnitVariant(variant),
         })
         .collect::<Vec<_>>();
@@ -138,13 +145,10 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
         })
         .collect::<Vec<_>>();
 
-    let enumIdent = &ast.ident;
-    let (enumImplGenerics, enumTypeGenerics, enumWhereClause) = ast.generics.split_for_impl();
-
     return quote! {
-        impl #enumImplGenerics axiom::interfaces::DataTransferObject for #enumIdent #enumTypeGenerics #enumWhereClause {}
+        impl #enumImplGenerics axiom::interfaces::DataTransferObject for #enumIdent #enumTypeGenerics #dataTransferObjectBoundedEnumWhereClause {}
 
-        impl #enumImplGenerics std::fmt::Debug for #enumIdent #enumTypeGenerics #enumWhereClause {
+        impl #enumImplGenerics std::fmt::Debug for #enumIdent #enumTypeGenerics #debugBoundedEnumWhereClause {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return match self {
                     #( #variantDebugImpls, )*
@@ -152,7 +156,7 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
             }
         }
 
-        impl #enumImplGenerics Clone for #enumIdent #enumTypeGenerics #enumWhereClause {
+        impl #enumImplGenerics Clone for #enumIdent #enumTypeGenerics #cloneBoundedEnumWhereClause {
             fn clone(&self) -> Self {
                 return match self {
                     #( #variantCloneImpls, )*
@@ -162,7 +166,7 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
     };
 }
 
-fn deriveDebugForNamedVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
+fn deriveDebugForStructVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let enumIdent = &ast.ident;
     let variantIdent = &variant.ident;
     let fieldIdents = fields.named
@@ -178,7 +182,7 @@ fn deriveDebugForNamedVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fi
     };
 }
 
-fn deriveDebugForUnnamedVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
+fn deriveDebugForTupleVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let enumIdent = &ast.ident;
     let variantIdent = &variant.ident;
     let fieldIdents = (0..fields.unnamed.len())

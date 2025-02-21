@@ -135,42 +135,30 @@ fn testEnumWithStructAndTupleVariants() {
     });
 }
 
-// #[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
-// enum EnumWithStructAndTupleVariantsAndBoundedGenerics<T>
-// where
-//     T: DataTransferObject,
-//     Vec<T>: for<'a> Deserialize<'a>,
-// {
-//     Quid,
-//     Pro(Vec<T>, u64, bool),
-//     Quo {
-//         vector: Vec<T>,
-//         number: u64,
-//         flag: bool,
-//     },
-// }
+#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
+enum EnumWithStructAndTupleVariantsAndBoundedGenerics<T> {
+    Quid,
+    Pro(Vec<T>, u64, bool),
+    Quo {
+        vector: Vec<T>,
+        number: u64,
+        flag: bool,
+    },
+}
 
-// #[test]
-// fn testEnumWithStructAndTupleVariantsAndBoundedGenerics() {
-//     verifyTraitBounds(EnumWithStructAndTupleVariantsAndBoundedGenerics::<UnitStruct>::Quid);
-//     verifyTraitBounds(EnumWithStructAndTupleVariantsAndBoundedGenerics::Pro(
-//         vec![
-//             EnumWithOnlyUnitVariants::Quid,
-//             EnumWithOnlyUnitVariants::Pro,
-//             EnumWithOnlyUnitVariants::Quo,
-//         ],
-//         42,
-//         false,
-//     ));
-//     verifyTraitBounds(EnumWithStructAndTupleVariantsAndBoundedGenerics::Quo {
-//         vector: vec![
-//             EnumWithOnlyUnitVariants::Quid,
-//             EnumWithOnlyUnitVariants::Pro,
-//             EnumWithOnlyUnitVariants::Quo,
-//         ],
-//         number: 42,
-//         flag: false,
-//     });
-// }
+#[test]
+fn testEnumWithStructAndTupleVariantsAndBoundedGenerics() {
+    verifyTraitBounds(EnumWithStructAndTupleVariantsAndBoundedGenerics::<UnitStruct>::Quid);
+    verifyTraitBounds(EnumWithStructAndTupleVariantsAndBoundedGenerics::Pro(
+        vec![UnitStruct, UnitStruct, UnitStruct],
+        42,
+        false,
+    ));
+    verifyTraitBounds(EnumWithStructAndTupleVariantsAndBoundedGenerics::Quo {
+        vector: vec![UnitStruct, UnitStruct, UnitStruct],
+        number: 42,
+        flag: false,
+    });
+}
 
 fn verifyTraitBounds(_: impl DataTransferObject) {}

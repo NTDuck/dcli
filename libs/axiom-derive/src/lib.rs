@@ -4,6 +4,7 @@ use layout::*;
 
 namespace!(behaviours);
 namespace!(interfaces);
+namespace!(utils);
 
 use proc_macro::TokenStream;
 
