@@ -2,4 +2,4 @@ use layout::*;
 
 namespace!(pub ddd);
 
-class!(pub _deriveSerdelessDataTransferObject);
+class!(pub _deriveDataTransferObjectWithoutSerde);

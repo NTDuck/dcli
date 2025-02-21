@@ -78,14 +78,24 @@ pub fn deriveCloneForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_
         })
         .collect::<Vec<_>>();
 
-    return quote! {
-        impl #enumImplGenerics Clone for #enumIdent #enumTypeGenerics #enumWhereClauseWithCloneBounds {
-            fn clone(&self) -> Self {
-                return match self {
-                    #( #variantCloneImpls, )*
-                };
+    if variants.is_empty() {
+        return quote! {
+            impl #enumImplGenerics Clone for #enumIdent #enumTypeGenerics #enumWhereClauseWithCloneBounds {
+                fn clone(&self) -> Self {
+                    match *self {}
+                }
             }
-        }
+        };
+    } else {
+        return quote! {
+            impl #enumImplGenerics Clone for #enumIdent #enumTypeGenerics #enumWhereClauseWithCloneBounds {
+                fn clone(&self) -> Self {
+                    return match self {
+                        #( #variantCloneImpls, )*
+                    };
+                }
+            }
+        };
     }
 }
 

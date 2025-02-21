@@ -82,14 +82,24 @@ pub fn deriveDebugForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_
         })
         .collect::<Vec<_>>();
 
-    return quote! {
-        impl #enumImplGenerics std::fmt::Debug for #enumIdent #enumTypeGenerics #enumWhereClauseWithDebugBounds {
-            fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                return match self {
-                    #( #variantDebugImpls, )*
-                };
+    if variants.is_empty() {
+        return quote! {
+            impl #enumImplGenerics std::fmt::Debug for #enumIdent #enumTypeGenerics #enumWhereClauseWithDebugBounds {
+                fn fmt(&self, _: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    match *self {}
+                }
             }
-        }
+        };
+    } else {
+        return quote! {
+            impl #enumImplGenerics std::fmt::Debug for #enumIdent #enumTypeGenerics #enumWhereClauseWithDebugBounds {
+                fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    return match self {
+                        #( #variantDebugImpls, )*
+                    };
+                }
+            }
+        };
     }
 }
 

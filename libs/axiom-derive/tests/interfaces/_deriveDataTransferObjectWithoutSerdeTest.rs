@@ -94,6 +94,14 @@ fn testStructWithUnnamedFieldsAndBoundedGenerics() {
 }
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
+enum EnumWithNoVariants {}
+
+#[test]
+fn testEnumWithNoVariants() {
+
+}
+
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 enum EnumWithOnlyUnitVariants {
     Quid,
     Pro,
