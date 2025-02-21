@@ -70,37 +70,30 @@ fn testStructWithUnnamedFields() {
     ));
 }
 
-// #[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
-// struct StructWithNamedFieldsAndBoundedGenerics<T, U>
-// where
-//     T: Debug + Send + Sync + Clone + Serialize + for<'de> Deserialize<'de>,
-//     U: Debug + Send + Sync + Clone + Serialize + for<'de> Deserialize<'de>,
-// {
-//     pointer: Box<T>,
-//     vector: Vec<U>,
-// }
+#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
+struct StructWithNamedFieldsAndBoundedGenerics<T, U> {
+    pointer: Box<T>,
+    vector: Vec<U>,
+}
 
-// #[test]
-// fn testStructWithNamedFieldsAndBoundedGenerics() {
-//     verifyTraitBounds(StructWithNamedFieldsAndBoundedGenerics {
-//         pointer: Box::new("tomfoolery".to_owned()),
-//         vector: vec![0, 1, 2, 3, 4, 5],
-//     });
-// }
+#[test]
+fn testStructWithNamedFieldsAndBoundedGenerics() {
+    verifyTraitBounds(StructWithNamedFieldsAndBoundedGenerics {
+        pointer: Box::new(UnitStruct),
+        vector: vec![UnitStruct, UnitStruct, UnitStruct],
+    });
+}
 
-// #[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
-// struct StructWithUnnamedFieldsAndBoundedGenerics<
-//     T: Debug + Send + Sync + Clone + Serialize + for<'de> Deserialize<'de>,
-//     U: Debug + Send + Sync + Clone + Serialize + for<'de> Deserialize<'de>,
-// >(Box<T>, Vec<U>);
+#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
+struct StructWithUnnamedFieldsAndBoundedGenerics<T, U>(Box<T>, Vec<U>);
 
-// #[test]
-// fn testStructWithUnnamedFieldsAndBoundedGenerics() {
-//     verifyTraitBounds(StructWithUnnamedFieldsAndBoundedGenerics (
-//         Box::new("tomfoolery".to_owned()),
-//         vec![0, 1, 2, 3, 4, 5],
-//     ));
-// }
+#[test]
+fn testStructWithUnnamedFieldsAndBoundedGenerics() {
+    verifyTraitBounds(StructWithUnnamedFieldsAndBoundedGenerics (
+        Box::new(UnitStruct),
+        vec![UnitStruct, UnitStruct, UnitStruct],
+    ));
+}
 
 #[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
 enum EnumWithOnlyUnitVariants {

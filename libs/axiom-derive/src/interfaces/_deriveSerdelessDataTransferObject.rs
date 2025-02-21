@@ -25,7 +25,11 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
 
 fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
-    let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
+    let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
+
+    let dataTransferObjectBoundedStructWhereClause = getDataTransferObjectBoundedWhereClause(ast);
+    let debugBoundedStructWhereClause = getDebugBoundedWhereClauseFromDeriveInput(ast);
+    let cloneBoundedStructWhereClause = getCloneBoundedWhereClauseFromDeriveInput(ast);
 
     let fieldIdents = fields.named
         .iter()
@@ -33,9 +37,9 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
         .collect::<Vec<_>>();
 
     return quote! {
-        impl #structImplGenerics axiom::interfaces::DataTransferObject for #structIdent #structTypeGenerics #structWhereClause {}
+        impl #structImplGenerics axiom::interfaces::DataTransferObject for #structIdent #structTypeGenerics #dataTransferObjectBoundedStructWhereClause {}
 
-        impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
+        impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #debugBoundedStructWhereClause {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return formatter
                     .debug_struct(stringify!(#structIdent))
@@ -44,7 +48,7 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
             }
         }
 
-        impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
+        impl #structImplGenerics Clone for #structIdent #structTypeGenerics #cloneBoundedStructWhereClause {
             fn clone(&self) -> Self {
                 return Self {
                     #( #fieldIdents: self.#fieldIdents.clone(), )*
@@ -56,16 +60,20 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
 
 fn deriveForUnnamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
-    let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
+    let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
+
+    let dataTransferObjectBoundedStructWhereClause = getDataTransferObjectBoundedWhereClause(ast);
+    let debugBoundedStructWhereClause = getDebugBoundedWhereClauseFromDeriveInput(ast);
+    let cloneBoundedStructWhereClause = getCloneBoundedWhereClauseFromDeriveInput(ast);
 
     let fieldIndices = (0..fields.unnamed.len())
         .map(syn::Index::from)
         .collect::<Vec<_>>();
 
     return quote! {
-        impl #structImplGenerics axiom::interfaces::DataTransferObject for #structIdent #structTypeGenerics #structWhereClause {}
+        impl #structImplGenerics axiom::interfaces::DataTransferObject for #structIdent #structTypeGenerics #dataTransferObjectBoundedStructWhereClause {}
 
-        impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
+        impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #debugBoundedStructWhereClause {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return formatter
                     .debug_tuple(stringify!(#structIdent))
@@ -74,7 +82,7 @@ fn deriveForUnnamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -
             }
         }
 
-        impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
+        impl #structImplGenerics Clone for #structIdent #structTypeGenerics #cloneBoundedStructWhereClause {
             fn clone(&self) -> Self {
                 return Self( #( self.#fieldIndices.clone(), )* );
             }
@@ -84,12 +92,16 @@ fn deriveForUnnamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -
 
 fn deriveForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
-    let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
+    let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
+
+    let dataTransferObjectBoundedStructWhereClause = getDataTransferObjectBoundedWhereClause(ast);
+    let debugBoundedStructWhereClause = getDebugBoundedWhereClauseFromDeriveInput(ast);
+    let cloneBoundedStructWhereClause = getCloneBoundedWhereClauseFromDeriveInput(ast);
 
     return quote! {
-        impl #structImplGenerics axiom::interfaces::DataTransferObject for #structIdent #structTypeGenerics #structWhereClause {}
+        impl #structImplGenerics axiom::interfaces::DataTransferObject for #structIdent #structTypeGenerics #dataTransferObjectBoundedStructWhereClause {}
 
-        impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
+        impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #debugBoundedStructWhereClause {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return formatter
                     .debug_struct(stringify!(#structIdent))
@@ -97,7 +109,7 @@ fn deriveForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
             }
         }
 
-        impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
+        impl #structImplGenerics Clone for #structIdent #structTypeGenerics #cloneBoundedStructWhereClause {
             fn clone(&self) -> Self {
                 return Self;
             }
@@ -220,4 +232,69 @@ fn deriveCloneForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream
     return quote! {
         Self::#variantIdent => Self::#variantIdent
     };
+}
+
+fn getDataTransferObjectBoundedWhereClause(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    let genericIdents = getGenericIdentsFromDeriveInput(ast);
+    let bounds = genericIdents
+        .iter()
+        .map(|ident| quote! {
+            #ident: axiom::interfaces::DataTransferObject
+        });
+
+    let (_, _, whereClause) = ast.generics.split_for_impl();
+    
+    return getBoundedWhereClauseFromBoundsAndWhereClause(bounds, whereClause);
+}
+
+fn getDebugBoundedWhereClauseFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    let genericIdents = getGenericIdentsFromDeriveInput(ast);
+    let bounds = genericIdents
+        .iter()
+        .map(|ident| quote! {
+            #ident: std::fmt::Debug
+        });
+
+    let (_, _, whereClause) = ast.generics.split_for_impl();
+    
+    return getBoundedWhereClauseFromBoundsAndWhereClause(bounds, whereClause);
+}
+
+fn getCloneBoundedWhereClauseFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    let genericIdents = getGenericIdentsFromDeriveInput(ast);
+    let bounds = genericIdents
+        .iter()
+        .map(|ident| quote! {
+            #ident: Clone
+        });
+
+    let (_, _, whereClause) = ast.generics.split_for_impl();
+    
+    return getBoundedWhereClauseFromBoundsAndWhereClause(bounds, whereClause);
+}
+
+fn getGenericIdentsFromDeriveInput(ast: &syn::DeriveInput) -> Vec<&syn::Ident> {
+    return ast.generics.params
+        .iter()
+        .filter_map(|param| {
+            if let syn::GenericParam::Type(ty) = param {
+                return Some(&ty.ident);
+            } else {
+                return None;
+            }
+        })
+        .collect::<Vec<_>>();
+}
+
+fn getBoundedWhereClauseFromBoundsAndWhereClause(bounds: impl Iterator<Item = proc_macro2::TokenStream>, whereClause: Option<&syn::WhereClause>) -> proc_macro2::TokenStream {
+    if whereClause.is_some() {
+        return quote! {
+            #whereClause,
+            #( #bounds, )*
+        };
+    } else {
+        return quote! {
+            where #( #bounds, )*
+        };
+    }
 }
