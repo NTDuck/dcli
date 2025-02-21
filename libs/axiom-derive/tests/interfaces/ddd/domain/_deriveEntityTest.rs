@@ -45,29 +45,31 @@ fn testStructWithNamedFields() {
     });
 }
 
-// #[derive(Entity)]
-// struct StructWithNamedFieldsAndBoundedGenerics<T, U> {
-//     #[axiom(attributes(ddd::Identifier))]
-//     id: Uuid,
-//     pointer: Box<T>,
-//     vector: Vec<U>,
-// }
+// Requires trait bounds to compile,
+// which is unprecedented
+#[derive(Entity)]
+struct StructWithNamedFieldsAndBoundedGenerics<T: Entity, U: Entity> {
+    #[axiom(attributes(ddd::Identifier))]
+    id: Uuid,
+    pointer: Box<T>,
+    vector: Vec<U>,
+}
 
-// #[test]
-// fn testStructWithNamedFieldsAndBoundedGenerics() {
-//     let structWithNamedFields = StructWithNamedFields {
-//         id: Uuid(42),
-//         text: "tomfoolery".to_owned(),
-//         number: 42,
-//         flag: false,
-//     };
+#[test]
+fn testStructWithNamedFieldsAndBoundedGenerics() {
+    let structWithNamedFields = StructWithNamedFields {
+        id: Uuid(42),
+        text: "tomfoolery".to_owned(),
+        number: 42,
+        flag: false,
+    };
 
-//     verifyTraitBounds(StructWithNamedFieldsAndBoundedGenerics {
-//         id: Uuid(42),
-//         pointer: Box::new(structWithNamedFields.clone()),
-//         vector: vec![structWithNamedFields.clone()],
-//     });
-// }
+    verifyTraitBounds(StructWithNamedFieldsAndBoundedGenerics {
+        id: Uuid(42),
+        pointer: Box::new(structWithNamedFields.clone()),
+        vector: vec![structWithNamedFields.clone()],
+    });
+}
 
 #[derive(Identifier)]
 struct Uuid(u128);
