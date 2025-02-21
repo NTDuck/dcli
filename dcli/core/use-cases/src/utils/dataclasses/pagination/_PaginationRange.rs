@@ -1,11 +1,11 @@
-use axiom::interfaces::DataTransferObject;
+use axiom::interfaces::SerdelessDataTransferObject;
 use serde::Deserialize;
 use serde::Serialize;
 
 use crate::utils::dataclasses::pagination::PaginationProperties;
 use crate::utils::dataclasses::pagination::PaginationRequest;
 
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
 pub struct PaginationRange {
     pub offset: usize,
     pub limit: usize,

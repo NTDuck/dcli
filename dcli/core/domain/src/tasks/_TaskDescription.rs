@@ -1,7 +1,8 @@
 use axiom::behaviours::NewType;
 use axiom::interfaces::ddd;
-use axiom::interfaces::DataTransferObject;
+use axiom::interfaces::SerdelessDataTransferObject;
 use serde::Deserialize;
+use serde::Serialize;
 
 #[derive(ddd::ValueObject, NewType)]
 pub struct TaskDescription(String);
@@ -62,7 +63,7 @@ impl TaskDescription {
     }
 }
 
-#[derive(DataTransferObject, Deserialize)]
+#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
 pub enum TaskDescriptionError {
     LengthUnderflow {
         actualLength: usize,

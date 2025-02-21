@@ -1,8 +1,8 @@
-use axiom::interfaces::DataTransferObject;
+use axiom::interfaces::SerdelessDataTransferObject;
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
 pub struct PaginationRequest {
     pub pageNumber: usize,
     pub maxPageSize: usize,

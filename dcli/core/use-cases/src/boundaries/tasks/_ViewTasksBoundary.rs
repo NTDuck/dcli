@@ -1,6 +1,6 @@
 use std::time::Instant;
 
-use axiom::interfaces::DataTransferObject;
+use axiom::interfaces::SerdelessDataTransferObject;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -11,17 +11,17 @@ pub trait ViewTasksBoundary {
     fn apply(&self, request: ViewTasksRequestModel) -> Result<ViewTasksResponseModel, ViewTasksErrorModel>;
 }
 
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
 pub struct ViewTasksRequestModel {
     pub paginationRequest: PaginationRequest,
 }
 
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
 pub struct ViewTasksResponseModel {
     pub paginationResponse: PaginationResponse<Task>,
 }
 
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
 pub struct Task {
     pub id: u128,
     pub description: String,
@@ -29,12 +29,12 @@ pub struct Task {
     pub createdAt: Instant,
 }
 
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
 pub enum TaskStatus {
     Pending,
     InProgress,
     Completed,
 }
 
-#[derive(DataTransferObject, Serialize, Deserialize)]
+#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
 pub struct ViewTasksErrorModel;
