@@ -15,7 +15,7 @@ pub fn deriveCloneForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> p
 fn deriveCloneForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
-    let structWhereClauseWithCloneBounds = getWhereClauseWithCloneBoundsFromDeriveInput(ast);
+    let structWhereClauseWithCloneBounds = generateWhereClauseWithCloneBoundsFromDeriveInput(ast);
 
     let fieldIdents = getFieldIdentsFromNamedFields(fields);
 
@@ -33,7 +33,7 @@ fn deriveCloneForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) 
 fn deriveCloneForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
-    let structWhereClauseWithCloneBounds = getWhereClauseWithCloneBoundsFromDeriveInput(ast);
+    let structWhereClauseWithCloneBounds = generateWhereClauseWithCloneBoundsFromDeriveInput(ast);
 
     let fieldIndices = getFieldIndicesFromUnnamedFields(fields);
 
@@ -51,7 +51,7 @@ fn deriveCloneForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed
 fn deriveCloneForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
-    let structWhereClauseWithCloneBounds = getWhereClauseWithCloneBoundsFromDeriveInput(ast);
+    let structWhereClauseWithCloneBounds = generateWhereClauseWithCloneBoundsFromDeriveInput(ast);
 
     return quote! {
         impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClauseWithCloneBounds {
@@ -67,7 +67,7 @@ pub fn deriveCloneForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_
 
     let enumIdent = &ast.ident;
     let (enumImplGenerics, enumTypeGenerics, _) = ast.generics.split_for_impl();
-    let enumWhereClauseWithCloneBounds = getWhereClauseWithCloneBoundsFromDeriveInput(ast);
+    let enumWhereClauseWithCloneBounds = generateWhereClauseWithCloneBoundsFromDeriveInput(ast);
 
     let variantCloneImpls = variants
         .iter()
@@ -127,15 +127,11 @@ fn deriveCloneForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream
     };
 }
 
-fn getWhereClauseWithCloneBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
-    let (_, _, whereClause) = ast.generics.split_for_impl();
-
-    let genericIdents = getGenericIdentsFromDeriveInput(ast);
-    let cloneBounds = genericIdents
-        .iter()
-        .map(|ident| quote! {
-            #ident: Clone
-        });
-    
-    return getWhereClauseWithTraitBoundsFromWhereClauseAndTraitBounds(whereClause, cloneBounds);
+fn generateWhereClauseWithCloneBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    return generateWhereClauseWithTraitBoundsFromDeriveInput(
+        |T| quote! {
+            #T: Clone
+        },
+        ast,
+    );
 }

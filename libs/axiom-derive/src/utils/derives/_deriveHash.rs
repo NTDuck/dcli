@@ -16,7 +16,7 @@ pub fn deriveHashForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> pr
 fn deriveHashForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
-    let structWhereClauseWithHashBounds = getWhereClauseWithHashBoundsFromDeriveInput(ast);
+    let structWhereClauseWithHashBounds = generateWhereClauseWithHashBoundsFromDeriveInput(ast);
 
     let fieldIdents = getFieldIdentsFromNamedFields(fields);
 
@@ -32,7 +32,7 @@ fn deriveHashForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -
 fn deriveHashForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
-    let structWhereClauseWithHashBounds = getWhereClauseWithHashBoundsFromDeriveInput(ast);
+    let structWhereClauseWithHashBounds = generateWhereClauseWithHashBoundsFromDeriveInput(ast);
 
     let fieldIndices = getFieldIndicesFromUnnamedFields(fields);
 
@@ -48,7 +48,7 @@ fn deriveHashForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed)
 fn deriveHashForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
-    let structWhereClauseWithHashBounds = getWhereClauseWithHashBoundsFromDeriveInput(ast);
+    let structWhereClauseWithHashBounds = generateWhereClauseWithHashBoundsFromDeriveInput(ast);
 
     return quote! {
         impl #structImplGenerics std::hash::Hash for #structIdent #structTypeGenerics #structWhereClauseWithHashBounds {
@@ -62,7 +62,7 @@ pub fn deriveHashForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_m
 
     let enumIdent = &ast.ident;
     let (enumImplGenerics, enumTypeGenerics, _) = ast.generics.split_for_impl();
-    let enumWhereClauseWithHashBounds = getWhereClauseWithHashBoundsFromDeriveInput(ast);
+    let enumWhereClauseWithHashBounds = generateWhereClauseWithHashBoundsFromDeriveInput(ast);
 
     let variantHashImpls = variants
         .iter()
@@ -135,15 +135,11 @@ fn deriveHashForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream 
     };
 }
 
-fn getWhereClauseWithHashBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
-    let (_, _, whereClause) = ast.generics.split_for_impl();
-
-    let genericIdents = getGenericIdentsFromDeriveInput(ast);
-    let hashBounds = genericIdents
-        .iter()
-        .map(|ident| quote! {
-            #ident: std::hash::Hash
-        });
-    
-    return getWhereClauseWithTraitBoundsFromWhereClauseAndTraitBounds(whereClause, hashBounds);
+fn generateWhereClauseWithHashBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    return generateWhereClauseWithTraitBoundsFromDeriveInput(
+        |T| quote! {
+            #T: std::hash::Hash
+        },
+        ast,
+    );
 }

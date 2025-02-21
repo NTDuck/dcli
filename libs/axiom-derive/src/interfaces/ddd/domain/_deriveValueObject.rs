@@ -19,7 +19,7 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
 
-    let structWhereClauseWithValueObjectBounds = getWhereClauseWithValueObjectBoundsFromDeriveInput(ast);
+    let structWhereClauseWithValueObjectBounds = generateWhereClauseWithValueObjectBoundsFromDeriveInput(ast);
     
     let structDebugImpl = deriveDebugForStruct(ast, data);
     let structCloneImpl = deriveCloneForStruct(ast, data);
@@ -40,7 +40,7 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
     let enumIdent = &ast.ident;
     let (enumImplGenerics, enumTypeGenerics, _) = ast.generics.split_for_impl();
 
-    let enumWhereClauseWithValueObjectBounds = getWhereClauseWithValueObjectBoundsFromDeriveInput(ast);
+    let enumWhereClauseWithValueObjectBounds = generateWhereClauseWithValueObjectBoundsFromDeriveInput(ast);
 
     let enumDebugImpl = deriveDebugForEnum(ast, data);
     let enumCloneImpl = deriveCloneForEnum(ast, data);
@@ -57,15 +57,11 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
     };
 }
 
-fn getWhereClauseWithValueObjectBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
-    let (_, _, whereClause) = ast.generics.split_for_impl();
-
-    let genericIdents = getGenericIdentsFromDeriveInput(ast);
-    let valueObjectBounds = genericIdents
-        .iter()
-        .map(|ident| quote! {
-            #ident: axiom::interfaces::ddd::domain::ValueObject
-        });
-    
-    return getWhereClauseWithTraitBoundsFromWhereClauseAndTraitBounds(whereClause, valueObjectBounds);
+fn generateWhereClauseWithValueObjectBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    return generateWhereClauseWithTraitBoundsFromDeriveInput(
+        |T| quote! {
+            #T: axiom::interfaces::ddd::domain::ValueObject
+        },
+        ast,
+    );
 }

@@ -1,5 +1,7 @@
 use quote::quote;
 
+use crate::utils::ast::*;
+
 pub fn deriveEntity(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse_macro_input!(tokens as syn::DeriveInput);
 
@@ -22,12 +24,16 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
 
 fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
-    let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
+    let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
 
-    let fieldIdents = fields.named
-        .iter()
-        .map(|field| &field.ident)
-        .collect::<Vec<_>>();
+    let structWhereClauseWithEntityBounds = generateWhereClauseWithEntityBoundsFromDeriveInput(ast);
+    let structWhereClauseWithValueObjectBounds = generateWhereClauseWithValueObjectBoundsFromDeriveInput(ast);
+    let structWhereClauseWithDebugBounds = generateWhereClauseWithDebugBoundsFromDeriveInput(ast);
+    let structWhereClauseWithCloneBounds = generateWhereClauseWithCloneBoundsFromDeriveInput(ast);
+    let structWhereClauseWithPartialEqBounds = generateWhereClauseWithPartialEqBoundsFromDeriveInput(ast);
+    let structWhereClauseWithEqBounds = generateWhereClauseWithEqBoundsFromDeriveInput(ast);
+
+    let fieldIdents = getFieldIdentsFromNamedFields(fields);
 
     let identifierField = getIdentifierFieldForNamedStruct(fields)
         .expect(&format!(
@@ -46,17 +52,18 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
     let identifierFieldType = &identifierField.ty;
 
     return quote! {
-        impl #structImplGenerics axiom::interfaces::ddd::domain::Entity for #structIdent #structTypeGenerics #structWhereClause {
+        impl #structImplGenerics axiom::interfaces::ddd::domain::Entity for #structIdent #structTypeGenerics #structWhereClauseWithEntityBounds {
             type Id = #identifierFieldType;
 
+            #[inline(always)]
             fn getId(&self) -> &Self::Id {
                 return &self.#identifierFieldIdent;
             }
         }
 
-        impl #structImplGenerics axiom::interfaces::ddd::domain::ValueObject for #structIdent #structTypeGenerics #structWhereClause {}
+        impl #structImplGenerics axiom::interfaces::ddd::domain::ValueObject for #structIdent #structTypeGenerics #structWhereClauseWithValueObjectBounds {}
 
-        impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClause {
+        impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClauseWithDebugBounds {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return formatter
                     .debug_struct(stringify!(#structIdent))
@@ -65,7 +72,7 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
             }
         }
 
-        impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClause {
+        impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClauseWithCloneBounds {
             fn clone(&self) -> Self {
                 return Self {
                     #( #fieldIdents: self.#fieldIdents.clone(), )*
@@ -73,7 +80,7 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
             }
         }
 
-        impl #structImplGenerics PartialEq for #structIdent #structTypeGenerics #structWhereClause {
+        impl #structImplGenerics PartialEq for #structIdent #structTypeGenerics #structWhereClauseWithPartialEqBounds {
             fn eq(&self, other: &Self) -> bool {
                 use axiom::interfaces::ddd::domain::Entity;
                 
@@ -81,8 +88,62 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
             }
         }
 
-        impl #structImplGenerics Eq for #structIdent #structTypeGenerics #structWhereClause {}
+        impl #structImplGenerics Eq for #structIdent #structTypeGenerics #structWhereClauseWithEqBounds {}
     };
+}
+
+fn generateWhereClauseWithEntityBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    return generateWhereClauseWithTraitBoundsFromDeriveInput(
+        |T| quote! {
+            #T: axiom::interfaces::ddd::domain::Entity
+        },
+        ast,
+    );
+}
+
+fn generateWhereClauseWithValueObjectBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    return generateWhereClauseWithTraitBoundsFromDeriveInput(
+        |T| quote! {
+            #T: axiom::interfaces::ddd::domain::ValueObject
+        },
+        ast,
+    );
+}
+
+fn generateWhereClauseWithDebugBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    return generateWhereClauseWithTraitBoundsFromDeriveInput(
+        |T| quote! {
+            #T: std::fmt::Debug
+        },
+        ast,
+    );
+}
+
+fn generateWhereClauseWithCloneBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    return generateWhereClauseWithTraitBoundsFromDeriveInput(
+        |T| quote! {
+            #T: Clone
+        },
+        ast,
+    );
+}
+
+fn generateWhereClauseWithPartialEqBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    return generateWhereClauseWithTraitBoundsFromDeriveInput(
+        |T| quote! {
+            #T: PartialEq
+        },
+        ast,
+    );
+}
+
+fn generateWhereClauseWithEqBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    return generateWhereClauseWithTraitBoundsFromDeriveInput(
+        |T| quote! {
+            #T: Eq
+        },
+        ast,
+    );
 }
 
 fn getIdentifierFieldForNamedStruct(fields: &syn::FieldsNamed) -> Option<&syn::Field> {
@@ -138,5 +199,6 @@ const AcceptedAttributes: [&str; 3] = [
     "Identifier",
     "ddd::Identifier",
     "ddd::domain::Identifier",
-];  
+];
+
 const SegmentSeparator: &str = "::";

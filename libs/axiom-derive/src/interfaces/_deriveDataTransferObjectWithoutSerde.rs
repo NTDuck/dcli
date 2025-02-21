@@ -19,7 +19,7 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
 
-    let structWhereClauseWithDataTransferObjectBounds = getWhereClauseWithDataTransferObjectBoundsFromDeriveInput(ast);
+    let structWhereClauseWithDataTransferObjectBounds = generateWhereClauseWithDataTransferObjectBoundsFromDeriveInput(ast);
     
     let structDebugImpl = deriveDebugForStruct(ast, data);
     let structCloneImpl = deriveCloneForStruct(ast, data);
@@ -36,7 +36,7 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
     let enumIdent = &ast.ident;
     let (enumImplGenerics, enumTypeGenerics, _) = ast.generics.split_for_impl();
 
-    let enumWhereClauseWithDataTransferObjectBounds = getWhereClauseWithDataTransferObjectBoundsFromDeriveInput(ast);
+    let enumWhereClauseWithDataTransferObjectBounds = generateWhereClauseWithDataTransferObjectBoundsFromDeriveInput(ast);
 
     let enumDebugImpl = deriveDebugForEnum(ast, data);
     let enumCloneImpl = deriveCloneForEnum(ast, data);
@@ -49,15 +49,11 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
     };
 }
 
-fn getWhereClauseWithDataTransferObjectBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
-    let (_, _, whereClause) = ast.generics.split_for_impl();
-
-    let genericIdents = getGenericIdentsFromDeriveInput(ast);
-    let dataTransferObjectBounds = genericIdents
-        .iter()
-        .map(|ident| quote! {
-            #ident: axiom::interfaces::DataTransferObject
-        });
-    
-    return getWhereClauseWithTraitBoundsFromWhereClauseAndTraitBounds(whereClause, dataTransferObjectBounds);
+fn generateWhereClauseWithDataTransferObjectBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    return generateWhereClauseWithTraitBoundsFromDeriveInput(
+        |T| quote! {
+            #T: axiom::interfaces::DataTransferObject
+        },
+        ast,
+    );
 }

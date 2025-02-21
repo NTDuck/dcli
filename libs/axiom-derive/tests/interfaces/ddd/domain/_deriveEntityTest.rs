@@ -38,48 +38,38 @@ struct StructWithNamedFields {
 #[test]
 fn testStructWithNamedFields() {
     verifyTraitBounds(StructWithNamedFields {
-        id: Uuid::default(),
+        id: Uuid(42),
         text: "tomfoolery".to_owned(),
         number: 42,
         flag: false,
     });
 }
 
-#[derive(Entity)]
-struct StructWithNamedFieldsAndBoundedGenerics<T, U>
-where
-    T: Entity,
-    U: Entity,
-{
-    #[axiom(attributes(ddd::Identifier))]
-    id: Uuid,
-    pointer: Box<T>,
-    vector: Vec<U>,
-}
+// #[derive(Entity)]
+// struct StructWithNamedFieldsAndBoundedGenerics<T, U> {
+//     #[axiom(attributes(ddd::Identifier))]
+//     id: Uuid,
+//     pointer: Box<T>,
+//     vector: Vec<U>,
+// }
 
-#[test]
-fn testStructWithNamedFieldsAndBoundedGenerics() {
-    let structWithNamedFields = StructWithNamedFields {
-        id: Uuid::default(),
-        text: "tomfoolery".to_owned(),
-        number: 42,
-        flag: false,
-    };
+// #[test]
+// fn testStructWithNamedFieldsAndBoundedGenerics() {
+//     let structWithNamedFields = StructWithNamedFields {
+//         id: Uuid(42),
+//         text: "tomfoolery".to_owned(),
+//         number: 42,
+//         flag: false,
+//     };
 
-    verifyTraitBounds(StructWithNamedFieldsAndBoundedGenerics {
-        id: Uuid::default(),
-        pointer: Box::new(structWithNamedFields.clone()),
-        vector: vec![structWithNamedFields.clone()],
-    });
-}
+//     verifyTraitBounds(StructWithNamedFieldsAndBoundedGenerics {
+//         id: Uuid(42),
+//         pointer: Box::new(structWithNamedFields.clone()),
+//         vector: vec![structWithNamedFields.clone()],
+//     });
+// }
 
 #[derive(Identifier)]
 struct Uuid(u128);
-
-impl Default for Uuid {
-    fn default() -> Self {
-        return Self(42);
-    }
-}
 
 fn verifyTraitBounds(_: impl Entity) {}

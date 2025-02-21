@@ -16,7 +16,7 @@ pub fn derivePartialEqForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) 
 fn derivePartialEqForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
-    let structWhereClauseWithPartialEqBounds = getWhereClauseWithPartialEqBoundsFromDeriveInput(ast);
+    let structWhereClauseWithPartialEqBounds = generateWhereClauseWithPartialEqBoundsFromDeriveInput(ast);
 
     let fieldIdents = getFieldIdentsFromNamedFields(fields);
 
@@ -33,7 +33,7 @@ fn derivePartialEqForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNam
 fn derivePartialEqForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
-    let structWhereClauseWithPartialEqBounds = getWhereClauseWithPartialEqBoundsFromDeriveInput(ast);
+    let structWhereClauseWithPartialEqBounds = generateWhereClauseWithPartialEqBoundsFromDeriveInput(ast);
 
     let fieldIndices = getFieldIndicesFromUnnamedFields(fields);
 
@@ -49,7 +49,7 @@ fn derivePartialEqForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnn
 fn derivePartialEqForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
-    let structWhereClauseWithPartialEqBounds = getWhereClauseWithPartialEqBoundsFromDeriveInput(ast);
+    let structWhereClauseWithPartialEqBounds = generateWhereClauseWithPartialEqBoundsFromDeriveInput(ast);
 
     return quote! {
         impl #structImplGenerics PartialEq for #structIdent #structTypeGenerics #structWhereClauseWithPartialEqBounds {
@@ -65,7 +65,7 @@ pub fn derivePartialEqForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> p
 
     let enumIdent = &ast.ident;
     let (enumImplGenerics, enumTypeGenerics, _) = ast.generics.split_for_impl();
-    let enumWhereClauseWithPartialEqBounds = getWhereClauseWithPartialEqBoundsFromDeriveInput(ast);
+    let enumWhereClauseWithPartialEqBounds = generateWhereClauseWithPartialEqBoundsFromDeriveInput(ast);
 
     let variantPartialEqImpls = variants
         .iter()
@@ -140,17 +140,13 @@ fn derivePartialEqForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenSt
     };
 }
 
-fn getWhereClauseWithPartialEqBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
-    let (_, _, whereClause) = ast.generics.split_for_impl();
-
-    let genericIdents = getGenericIdentsFromDeriveInput(ast);
-    let traitBounds = genericIdents
-        .iter()
-        .map(|ident| quote! {
-            #ident: PartialEq
-        });
-    
-    return getWhereClauseWithTraitBoundsFromWhereClauseAndTraitBounds(whereClause, traitBounds);
+fn generateWhereClauseWithPartialEqBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    return generateWhereClauseWithTraitBoundsFromDeriveInput(
+        |T| quote! {
+            #T: PartialEq
+        },
+        ast,
+    );
 }
 
 fn getIdentsWithSelfPrefixed(idents: &Vec<syn::Ident>) -> Vec<syn::Ident> {

@@ -1,8 +1,12 @@
 use quote::format_ident;
-use quote::quote;
 
-pub fn getGenericIdentsFromDeriveInput(ast: &syn::DeriveInput) -> Vec<&syn::Ident> {
-    return ast.generics.params
+pub fn generateWhereClauseWithTraitBoundsFromDeriveInput(
+    traitBounds: impl Fn(&syn::Ident) -> proc_macro2::TokenStream,
+    ast: &syn::DeriveInput,
+) -> proc_macro2::TokenStream {
+    let (_, _, whereClause) = ast.generics.split_for_impl();
+
+    let traitBounds = ast.generics.params
         .iter()
         .filter_map(|param| {
             if let syn::GenericParam::Type(ty) = param {
@@ -11,23 +15,18 @@ pub fn getGenericIdentsFromDeriveInput(ast: &syn::DeriveInput) -> Vec<&syn::Iden
                 return None;
             }
         })
-        .collect();
-}
-
-pub fn getWhereClauseWithTraitBoundsFromWhereClauseAndTraitBounds(
-    whereClause: Option<&syn::WhereClause>,
-    traitBounds: impl Iterator<Item = proc_macro2::TokenStream>
-) -> proc_macro2::TokenStream {
+        .map(traitBounds);
+    
     if whereClause.is_some() {
-        return quote! {
+        quote::quote! {
             #whereClause,
             #( #traitBounds, )*
-        };
+        }
     } else {
-        return quote! {
+        quote::quote! {
             where
                 #( #traitBounds, )*
-        };
+        }
     }
 }
 

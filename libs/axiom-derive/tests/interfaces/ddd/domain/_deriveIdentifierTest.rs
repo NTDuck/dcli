@@ -95,12 +95,13 @@ fn testStructWithUnnamedFieldsAndBoundedGenerics() {
     ));
 }
 
+#[allow(dead_code)]
 #[derive(Identifier)]
 enum EnumWithNoVariants {}
 
 #[test]
 fn testEnumWithNoVariants() {
-
+    // Can't instantiate `EnumWithNoVariants`
 }
 
 #[derive(Identifier)]
