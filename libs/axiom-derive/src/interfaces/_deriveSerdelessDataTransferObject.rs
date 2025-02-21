@@ -3,7 +3,7 @@ use quote::quote;
 use crate::utils::ast::*;
 use crate::utils::derives::*;
 
-pub fn deriveSerdelessDataTransferObject(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn deriveDataTransferObjectWithoutSerde(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse_macro_input!(tokens as syn::DeriveInput);
 
     let tokens = match &ast.data {
@@ -17,15 +17,15 @@ pub fn deriveSerdelessDataTransferObject(tokens: proc_macro::TokenStream) -> pro
 
 fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
-    let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
+    let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
 
-    let dataTransferObjectBoundedWhereClause = getDataTransferObjectBoundedWhereClause(ast);
+    let structWhereClauseWithDataTransferObjectBounds = getDataTransferObjectBoundedWhereClause(ast);
     
     let structCloneImpl = deriveCloneForStruct(ast, data);
     let structDebugImpl = deriveDebugForStruct(ast, data);
 
     return quote! {
-        impl #implGenerics axiom::interfaces::DataTransferObject for #structIdent #typeGenerics #dataTransferObjectBoundedWhereClause {}
+        impl #structImplGenerics axiom::interfaces::DataTransferObject for #structIdent #structTypeGenerics #structWhereClauseWithDataTransferObjectBounds {}
 
         #structDebugImpl
         #structCloneImpl
@@ -34,15 +34,15 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
 
 fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
     let enumIdent = &ast.ident;
-    let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
+    let (enumImplGenerics, enumTypeGenerics, _) = ast.generics.split_for_impl();
 
-    let dataTransferObjectBoundedWhereClause = getDataTransferObjectBoundedWhereClause(ast);
+    let structWhereClauseWithDataTransferObjectBounds = getDataTransferObjectBoundedWhereClause(ast);
 
     let enumDebugImpl = deriveDebugForEnum(ast, data);
     let enumCloneImpl = deriveCloneForEnum(ast, data);
 
     return quote! {
-        impl #implGenerics axiom::interfaces::DataTransferObject for #enumIdent #typeGenerics #dataTransferObjectBoundedWhereClause {}
+        impl #enumImplGenerics axiom::interfaces::DataTransferObject for #enumIdent #enumTypeGenerics #structWhereClauseWithDataTransferObjectBounds {}
 
         #enumDebugImpl
         #enumCloneImpl

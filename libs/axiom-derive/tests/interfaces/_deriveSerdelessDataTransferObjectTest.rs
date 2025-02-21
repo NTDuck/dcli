@@ -1,7 +1,5 @@
-// use std::fmt::Debug;
-
 use axiom::interfaces::DataTransferObject;
-use axiom_derive::SerdelessDataTransferObject;
+use axiom_derive::DataTransferObjectWithoutSerde;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -18,7 +16,7 @@ pub mod axiom {
     }
 }
 
-#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 struct UnitStruct;
 
 #[test]
@@ -26,7 +24,7 @@ fn testUnitStruct() {
     verifyTraitBounds(UnitStruct);
 }
 
-#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 struct StructWithNoNamedFields {}
 
 #[test]
@@ -34,7 +32,7 @@ fn testStructWithNoNamedFields() {
     verifyTraitBounds(StructWithNoNamedFields {});
 }
 
-#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 struct StructWithNoUnnamedFields();
 
 #[test]
@@ -42,7 +40,7 @@ fn testStructWithNoUnnamedFields() {
     verifyTraitBounds(StructWithNoUnnamedFields());
 }
 
-#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 struct StructWithNamedFields {
     text: String,
     number: u64,
@@ -58,7 +56,7 @@ fn testStructWithNamedFields() {
     });
 }
 
-#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 struct StructWithUnnamedFields(String, u64, bool);
 
 #[test]
@@ -70,7 +68,7 @@ fn testStructWithUnnamedFields() {
     ));
 }
 
-#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 struct StructWithNamedFieldsAndBoundedGenerics<T, U> {
     pointer: Box<T>,
     vector: Vec<U>,
@@ -84,7 +82,7 @@ fn testStructWithNamedFieldsAndBoundedGenerics() {
     });
 }
 
-#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 struct StructWithUnnamedFieldsAndBoundedGenerics<T, U>(Box<T>, Vec<U>);
 
 #[test]
@@ -95,7 +93,7 @@ fn testStructWithUnnamedFieldsAndBoundedGenerics() {
     ));
 }
 
-#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 enum EnumWithOnlyUnitVariants {
     Quid,
     Pro,
@@ -109,7 +107,7 @@ fn testEnumWithOnlyUnitVariants() {
     verifyTraitBounds(EnumWithOnlyUnitVariants::Quo);
 }
 
-#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 enum EnumWithStructAndTupleVariants {
     Quid,
     Pro(String, u64, bool),
@@ -135,7 +133,7 @@ fn testEnumWithStructAndTupleVariants() {
     });
 }
 
-#[derive(SerdelessDataTransferObject, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 enum EnumWithStructAndTupleVariantsAndBoundedGenerics<T> {
     Quid,
     Pro(Vec<T>, u64, bool),
