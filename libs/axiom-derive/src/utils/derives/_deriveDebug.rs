@@ -12,7 +12,7 @@ pub fn deriveDebugForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> p
     };
 }
 
-pub fn deriveDebugForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
+fn deriveDebugForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
     let debugBoundedWhereClause = getDebugBoundedWhereClauseFromDeriveInput(ast);
@@ -30,7 +30,7 @@ pub fn deriveDebugForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNam
     };
 }
 
-pub fn deriveDebugForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
+fn deriveDebugForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
     let debugBoundedWhereClause = getDebugBoundedWhereClauseFromDeriveInput(ast);
@@ -48,7 +48,7 @@ pub fn deriveDebugForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnn
     };
 }
 
-pub fn deriveDebugForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+fn deriveDebugForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
     let debugBoundedWhereClause = getDebugBoundedWhereClauseFromDeriveInput(ast);
@@ -64,7 +64,34 @@ pub fn deriveDebugForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStr
     };
 }
 
-pub fn deriveDebugForStructVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
+pub fn deriveDebugForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
+    let variants = &data.variants;
+
+    let enumIdent = &ast.ident;
+    let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
+    let debugBoundedWhereClause = getDebugBoundedWhereClauseFromDeriveInput(ast);
+
+    let variantDebugImpls = variants
+        .iter()
+        .map(|variant| match &variant.fields {
+            syn::Fields::Named(fields) => deriveDebugForStructVariant(ast, variant, fields),
+            syn::Fields::Unnamed(fields) => deriveDebugForTupleVariant(ast, variant, fields),
+            syn::Fields::Unit => deriveDebugForUnitVariant(variant),
+        })
+        .collect::<Vec<_>>();
+
+    return quote! {
+        impl #implGenerics std::fmt::Debug for #enumIdent #typeGenerics #debugBoundedWhereClause {
+            fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                return match self {
+                    #( #variantDebugImpls, )*
+                };
+            }
+        }
+    }
+}
+
+fn deriveDebugForStructVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let enumIdent = &ast.ident;
     let variantIdent = &variant.ident;
     let fieldIdents = getFieldIdentsFromNamedFields(fields);
@@ -77,7 +104,7 @@ pub fn deriveDebugForStructVariant(ast: &syn::DeriveInput, variant: &syn::Varian
     };
 }
 
-pub fn deriveDebugForTupleVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
+fn deriveDebugForTupleVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let enumIdent = &ast.ident;
     let variantIdent = &variant.ident;
     let fieldIdents = getFieldsIdentsFromUnnamedFields(fields);
@@ -90,7 +117,7 @@ pub fn deriveDebugForTupleVariant(ast: &syn::DeriveInput, variant: &syn::Variant
     };
 }
 
-pub fn deriveDebugForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream {
+fn deriveDebugForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream {
     let variantIdent = &variant.ident;
 
     return quote! {
@@ -98,7 +125,7 @@ pub fn deriveDebugForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenSt
     };
 }
 
-pub fn getDebugBoundedWhereClauseFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+fn getDebugBoundedWhereClauseFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let genericIdents = getGenericIdentsFromDeriveInput(ast);
     let bounds = genericIdents
         .iter()
