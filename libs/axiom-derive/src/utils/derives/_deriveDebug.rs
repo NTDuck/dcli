@@ -14,12 +14,13 @@ pub fn deriveDebugForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> p
 
 fn deriveDebugForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
-    let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
-    let debugBoundedWhereClause = getDebugBoundedWhereClauseFromDeriveInput(ast);
+    let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
+    let structWhereClauseWithDebugBounds = getDebugBoundedWhereClauseFromDeriveInput(ast);
+
     let fieldIdents = getFieldIdentsFromNamedFields(fields);
 
     return quote! {
-        impl #implGenerics std::fmt::Debug for #structIdent #typeGenerics #debugBoundedWhereClause {
+        impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClauseWithDebugBounds {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return formatter
                     .debug_struct(stringify!(#structIdent))
@@ -32,12 +33,13 @@ fn deriveDebugForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) 
 
 fn deriveDebugForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
-    let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
-    let debugBoundedWhereClause = getDebugBoundedWhereClauseFromDeriveInput(ast);
+    let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
+    let structWhereClauseWithDebugBounds = getDebugBoundedWhereClauseFromDeriveInput(ast);
+
     let fieldIndices = getFieldIndicesFromUnnamedFields(fields);
 
     return quote! {
-        impl #implGenerics std::fmt::Debug for #structIdent #typeGenerics #debugBoundedWhereClause {
+        impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClauseWithDebugBounds {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return formatter
                     .debug_tuple(stringify!(#structIdent))
@@ -50,11 +52,11 @@ fn deriveDebugForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed
 
 fn deriveDebugForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
-    let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
-    let debugBoundedWhereClause = getDebugBoundedWhereClauseFromDeriveInput(ast);
+    let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
+    let structWhereClauseWithDebugBounds = getDebugBoundedWhereClauseFromDeriveInput(ast);
 
     return quote! {
-        impl #implGenerics std::fmt::Debug for #structIdent #typeGenerics #debugBoundedWhereClause {
+        impl #structImplGenerics std::fmt::Debug for #structIdent #structTypeGenerics #structWhereClauseWithDebugBounds {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return formatter
                     .debug_struct(stringify!(#structIdent))
@@ -68,8 +70,8 @@ pub fn deriveDebugForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_
     let variants = &data.variants;
 
     let enumIdent = &ast.ident;
-    let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
-    let debugBoundedWhereClause = getDebugBoundedWhereClauseFromDeriveInput(ast);
+    let (enumImplGenerics, enumTypeGenerics, _) = ast.generics.split_for_impl();
+    let enumWhereClauseWithDebugBounds = getDebugBoundedWhereClauseFromDeriveInput(ast);
 
     let variantDebugImpls = variants
         .iter()
@@ -81,7 +83,7 @@ pub fn deriveDebugForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_
         .collect::<Vec<_>>();
 
     return quote! {
-        impl #implGenerics std::fmt::Debug for #enumIdent #typeGenerics #debugBoundedWhereClause {
+        impl #enumImplGenerics std::fmt::Debug for #enumIdent #enumTypeGenerics #enumWhereClauseWithDebugBounds {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return match self {
                     #( #variantDebugImpls, )*
@@ -126,14 +128,14 @@ fn deriveDebugForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream
 }
 
 fn getDebugBoundedWhereClauseFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    let (_, _, whereClause) = ast.generics.split_for_impl();
+
     let genericIdents = getGenericIdentsFromDeriveInput(ast);
-    let bounds = genericIdents
+    let debugBounds = genericIdents
         .iter()
         .map(|ident| quote! {
             #ident: std::fmt::Debug
         });
-
-    let (_, _, whereClause) = ast.generics.split_for_impl();
     
-    return getBoundedWhereClauseFromBoundsAndWhereClause(bounds, whereClause);
+    return getWhereClauseWithTraitBoundsFromWhereClauseAndTraitBounds(whereClause, debugBounds);
 }

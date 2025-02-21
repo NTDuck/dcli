@@ -14,12 +14,13 @@ pub fn deriveCloneForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> p
 
 fn deriveCloneForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
-    let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
-    let cloneBoundedWhereClause = getCloneBoundedWhereClauseFromDeriveInput(ast);
+    let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
+    let structWhereClauseWithCloneBounds = getWhereClauseWithCloneBoundsFromDeriveInput(ast);
+
     let fieldIdents = getFieldIdentsFromNamedFields(fields);
 
     return quote! {
-        impl #implGenerics Clone for #structIdent #typeGenerics #cloneBoundedWhereClause {
+        impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClauseWithCloneBounds {
             fn clone(&self) -> Self {
                 return Self {
                     #( #fieldIdents: self.#fieldIdents.clone(), )*
@@ -31,12 +32,13 @@ fn deriveCloneForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) 
 
 fn deriveCloneForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
-    let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
-    let cloneBoundedWhereClause = getCloneBoundedWhereClauseFromDeriveInput(ast);
+    let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
+    let structWhereClauseWithCloneBounds = getWhereClauseWithCloneBoundsFromDeriveInput(ast);
+
     let fieldIndices = getFieldIndicesFromUnnamedFields(fields);
 
     return quote! {
-        impl #implGenerics Clone for #structIdent #typeGenerics #cloneBoundedWhereClause {
+        impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClauseWithCloneBounds {
             fn clone(&self) -> Self {
                 return Self(
                     #( self.#fieldIndices.clone(), )*
@@ -48,11 +50,11 @@ fn deriveCloneForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed
 
 fn deriveCloneForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
-    let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
-    let cloneBoundedWhereClause = getCloneBoundedWhereClauseFromDeriveInput(ast);
+    let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
+    let structWhereClauseWithCloneBounds = getWhereClauseWithCloneBoundsFromDeriveInput(ast);
 
     return quote! {
-        impl #implGenerics Clone for #structIdent #typeGenerics #cloneBoundedWhereClause {
+        impl #structImplGenerics Clone for #structIdent #structTypeGenerics #structWhereClauseWithCloneBounds {
             fn clone(&self) -> Self {
                 return Self;
             }
@@ -64,8 +66,8 @@ pub fn deriveCloneForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_
     let variants = &data.variants;
 
     let enumIdent = &ast.ident;
-    let (implGenerics, typeGenerics, _) = ast.generics.split_for_impl();
-    let cloneBoundedWhereClause = getCloneBoundedWhereClauseFromDeriveInput(ast);
+    let (enumImplGenerics, enumTypeGenerics, _) = ast.generics.split_for_impl();
+    let enumWhereClauseWithCloneBounds = getWhereClauseWithCloneBoundsFromDeriveInput(ast);
 
     let variantCloneImpls = variants
         .iter()
@@ -77,7 +79,7 @@ pub fn deriveCloneForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_
         .collect::<Vec<_>>();
 
     return quote! {
-        impl #implGenerics Clone for #enumIdent #typeGenerics #cloneBoundedWhereClause {
+        impl #enumImplGenerics Clone for #enumIdent #enumTypeGenerics #enumWhereClauseWithCloneBounds {
             fn clone(&self) -> Self {
                 return match self {
                     #( #variantCloneImpls, )*
@@ -87,7 +89,7 @@ pub fn deriveCloneForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_
     }
 }
 
-pub fn deriveCloneForStructVariant(variant: &syn::Variant, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
+fn deriveCloneForStructVariant(variant: &syn::Variant, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let variantIdent = &variant.ident;
     let fieldIdents = getFieldIdentsFromNamedFields(fields);
 
@@ -97,7 +99,7 @@ pub fn deriveCloneForStructVariant(variant: &syn::Variant, fields: &syn::FieldsN
     };
 }
 
-pub fn deriveCloneForTupleVariant(variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
+fn deriveCloneForTupleVariant(variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let variantIdent = &variant.ident;
     let fieldIdents = getFieldsIdentsFromUnnamedFields(fields);
 
@@ -107,7 +109,7 @@ pub fn deriveCloneForTupleVariant(variant: &syn::Variant, fields: &syn::FieldsUn
     };
 }
 
-pub fn deriveCloneForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream {
+fn deriveCloneForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream {
     let variantIdent = &variant.ident;
 
     return quote! {
@@ -115,15 +117,15 @@ pub fn deriveCloneForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenSt
     };
 }
 
-pub fn getCloneBoundedWhereClauseFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+fn getWhereClauseWithCloneBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    let (_, _, whereClause) = ast.generics.split_for_impl();
+
     let genericIdents = getGenericIdentsFromDeriveInput(ast);
-    let bounds = genericIdents
+    let cloneBounds = genericIdents
         .iter()
         .map(|ident| quote! {
             #ident: Clone
         });
-
-    let (_, _, whereClause) = ast.generics.split_for_impl();
     
-    return getBoundedWhereClauseFromBoundsAndWhereClause(bounds, whereClause);
+    return getWhereClauseWithTraitBoundsFromWhereClauseAndTraitBounds(whereClause, cloneBounds);
 }

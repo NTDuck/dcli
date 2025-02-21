@@ -50,14 +50,14 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
 }
 
 fn getDataTransferObjectBoundedWhereClause(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    let (_, _, whereClause) = ast.generics.split_for_impl();
+
     let genericIdents = getGenericIdentsFromDeriveInput(ast);
-    let bounds = genericIdents
+    let dataTransferObjectBounds = genericIdents
         .iter()
         .map(|ident| quote! {
             #ident: axiom::interfaces::DataTransferObject
         });
-
-    let (_, _, whereClause) = ast.generics.split_for_impl();
     
-    return getBoundedWhereClauseFromBoundsAndWhereClause(bounds, whereClause);
+    return getWhereClauseWithTraitBoundsFromWhereClauseAndTraitBounds(whereClause, dataTransferObjectBounds);
 }

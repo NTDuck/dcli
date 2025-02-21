@@ -1,4 +1,5 @@
-use quote::{format_ident, quote};
+use quote::format_ident;
+use quote::quote;
 
 pub fn getGenericIdentsFromDeriveInput(ast: &syn::DeriveInput) -> Vec<&syn::Ident> {
     return ast.generics.params
@@ -13,23 +14,27 @@ pub fn getGenericIdentsFromDeriveInput(ast: &syn::DeriveInput) -> Vec<&syn::Iden
         .collect();
 }
 
-pub fn getBoundedWhereClauseFromBoundsAndWhereClause(bounds: impl Iterator<Item = proc_macro2::TokenStream>, whereClause: Option<&syn::WhereClause>) -> proc_macro2::TokenStream {
+pub fn getWhereClauseWithTraitBoundsFromWhereClauseAndTraitBounds(
+    whereClause: Option<&syn::WhereClause>,
+    traitBounds: impl Iterator<Item = proc_macro2::TokenStream>
+) -> proc_macro2::TokenStream {
     if whereClause.is_some() {
         return quote! {
             #whereClause,
-            #( #bounds, )*
+            #( #traitBounds, )*
         };
     } else {
         return quote! {
-            where #( #bounds, )*
+            where
+                #( #traitBounds, )*
         };
     }
 }
 
-pub fn getFieldIdentsFromNamedFields(fields: &syn::FieldsNamed) -> Vec<&Option<syn::Ident>> {
+pub fn getFieldIdentsFromNamedFields(fields: &syn::FieldsNamed) -> Vec<syn::Ident> {
     return fields.named
         .iter()
-        .map(|field| &field.ident)
+        .filter_map(|field| field.ident.clone())
         .collect();
 }
 
