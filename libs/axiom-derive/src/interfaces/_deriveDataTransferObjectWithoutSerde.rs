@@ -19,10 +19,10 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
 
-    let structWhereClauseWithDataTransferObjectBounds = getDataTransferObjectBoundedWhereClause(ast);
+    let structWhereClauseWithDataTransferObjectBounds = getWhereClauseWithDataTransferObjectBoundsFromDeriveInput(ast);
     
-    let structCloneImpl = deriveCloneForStruct(ast, data);
     let structDebugImpl = deriveDebugForStruct(ast, data);
+    let structCloneImpl = deriveCloneForStruct(ast, data);
 
     return quote! {
         impl #structImplGenerics axiom::interfaces::DataTransferObject for #structIdent #structTypeGenerics #structWhereClauseWithDataTransferObjectBounds {}
@@ -36,20 +36,20 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
     let enumIdent = &ast.ident;
     let (enumImplGenerics, enumTypeGenerics, _) = ast.generics.split_for_impl();
 
-    let structWhereClauseWithDataTransferObjectBounds = getDataTransferObjectBoundedWhereClause(ast);
+    let enumWhereClauseWithDataTransferObjectBounds = getWhereClauseWithDataTransferObjectBoundsFromDeriveInput(ast);
 
     let enumDebugImpl = deriveDebugForEnum(ast, data);
     let enumCloneImpl = deriveCloneForEnum(ast, data);
 
     return quote! {
-        impl #enumImplGenerics axiom::interfaces::DataTransferObject for #enumIdent #enumTypeGenerics #structWhereClauseWithDataTransferObjectBounds {}
+        impl #enumImplGenerics axiom::interfaces::DataTransferObject for #enumIdent #enumTypeGenerics #enumWhereClauseWithDataTransferObjectBounds {}
 
         #enumDebugImpl
         #enumCloneImpl
     };
 }
 
-fn getDataTransferObjectBoundedWhereClause(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+fn getWhereClauseWithDataTransferObjectBoundsFromDeriveInput(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let (_, _, whereClause) = ast.generics.split_for_impl();
 
     let genericIdents = getGenericIdentsFromDeriveInput(ast);

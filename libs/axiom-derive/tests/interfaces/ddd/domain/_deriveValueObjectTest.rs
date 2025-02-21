@@ -68,11 +68,7 @@ fn testStructWithUnnamedFields() {
 }
 
 #[derive(ValueObject)]
-struct StructWithNamedFieldsAndBoundedGenerics<T, U>
-where
-    T: ValueObject,
-    U: ValueObject,
-{
+struct StructWithNamedFieldsAndBoundedGenerics<T, U> {
     pointer: Box<T>,
     vector: Vec<U>,
 }
@@ -81,25 +77,29 @@ where
 fn testStructWithNamedFieldsAndBoundedGenerics() {
     verifyTraitBounds(StructWithNamedFieldsAndBoundedGenerics {
         pointer: Box::new(UnitStruct),
-        vector: vec![UnitStruct],
+        vector: vec![UnitStruct, UnitStruct, UnitStruct],
     });
 }
 
 #[derive(ValueObject)]
-struct StructWithUnnamedFieldsAndBoundedGenerics<
-    T: ValueObject,
-    U: ValueObject
->(Box<T>, Vec<U>);
+struct StructWithUnnamedFieldsAndBoundedGenerics<T, U>(Box<T>, Vec<U>);
 
 #[test]
 fn testStructWithUnnamedFieldsAndBoundedGenerics() {
     verifyTraitBounds(StructWithUnnamedFieldsAndBoundedGenerics (
         Box::new(UnitStruct),
-        vec![UnitStruct],
+        vec![UnitStruct, UnitStruct, UnitStruct],
     ));
 }
 
-#[allow(dead_code)]
+#[derive(ValueObject)]
+enum EnumWithNoVariants {}
+
+#[test]
+fn testEnumWithNoVariants() {
+
+}
+
 #[derive(ValueObject)]
 enum EnumWithOnlyUnitVariants {
     Quid,
@@ -141,10 +141,7 @@ fn testEnumWithStructAndTupleVariants() {
 }
 
 #[derive(ValueObject)]
-enum EnumWithStructAndTupleVariantsAndBoundedGenerics<T>
-where
-    T: ValueObject,
-{
+enum EnumWithStructAndTupleVariantsAndBoundedGenerics<T> {
     Quid,
     Pro(Vec<T>, u64, bool),
     Quo {
@@ -158,20 +155,12 @@ where
 fn testEnumWithStructAndTupleVariantsAndBoundedGenerics() {
     verifyTraitBounds(EnumWithStructAndTupleVariantsAndBoundedGenerics::<UnitStruct>::Quid);
     verifyTraitBounds(EnumWithStructAndTupleVariantsAndBoundedGenerics::Pro(
-        vec![
-            EnumWithOnlyUnitVariants::Quid,
-            EnumWithOnlyUnitVariants::Pro,
-            EnumWithOnlyUnitVariants::Quo,
-        ],
+        vec![UnitStruct, UnitStruct, UnitStruct],
         42,
         false,
     ));
     verifyTraitBounds(EnumWithStructAndTupleVariantsAndBoundedGenerics::Quo {
-        vector: vec![
-            EnumWithOnlyUnitVariants::Quid,
-            EnumWithOnlyUnitVariants::Pro,
-            EnumWithOnlyUnitVariants::Quo,
-        ],
+        vector: vec![UnitStruct, UnitStruct, UnitStruct],
         number: 42,
         flag: false,
     });

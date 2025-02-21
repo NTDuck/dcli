@@ -76,16 +76,26 @@ pub fn derivePartialEqForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> p
         })
         .collect::<Vec<_>>();
 
-    return quote! {
-        impl #enumImplGenerics PartialEq for #enumIdent #enumTypeGenerics #enumWhereClauseWithPartialEqBounds {
-            fn eq(&self, other: &Self) -> bool {
-                return match (self, other) {
-                    #( #variantPartialEqImpls, )*
-                    _ => false,
-                };
+    if variants.is_empty() {
+        return quote! {
+            impl #enumImplGenerics PartialEq for #enumIdent #enumTypeGenerics #enumWhereClauseWithPartialEqBounds {
+                fn eq(&self, _: &Self) -> bool {
+                    match *self {}
+                }
             }
-        }
-    };
+        };
+    } else {
+        return quote! {
+            impl #enumImplGenerics PartialEq for #enumIdent #enumTypeGenerics #enumWhereClauseWithPartialEqBounds {
+                fn eq(&self, other: &Self) -> bool {
+                    return match (self, other) {
+                        #( #variantPartialEqImpls, )*
+                        _ => false,
+                    };
+                }
+            }
+        };
+    }
 }
 
 fn derivePartialEqForStructVariant(variant: &syn::Variant, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {

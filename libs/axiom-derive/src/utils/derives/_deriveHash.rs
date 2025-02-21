@@ -73,16 +73,26 @@ pub fn deriveHashForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_m
         })
         .collect::<Vec<_>>();
 
-    return quote! {
-        impl #enumImplGenerics std::hash::Hash for #enumIdent #enumTypeGenerics #enumWhereClauseWithHashBounds {
-            fn hash<Hasher: std::hash::Hasher>(&self, state: &mut Hasher) {
-                core::mem::discriminant(self).hash(state);
-
-                match self {
-                    #( #variantHashImpls, )*
+    if variants.is_empty() {
+        return quote! {
+            impl #enumImplGenerics std::hash::Hash for #enumIdent #enumTypeGenerics #enumWhereClauseWithHashBounds {
+                fn hash<Hasher: std::hash::Hasher>(&self, _: &mut Hasher) {
+                    match *self {}
                 }
             }
-        }
+        };
+    } else {
+        return quote! {
+            impl #enumImplGenerics std::hash::Hash for #enumIdent #enumTypeGenerics #enumWhereClauseWithHashBounds {
+                fn hash<Hasher: std::hash::Hasher>(&self, state: &mut Hasher) {
+                    core::mem::discriminant(self).hash(state);
+    
+                    match self {
+                        #( #variantHashImpls, )*
+                    }
+                }
+            }
+        };
     }
 }
 
