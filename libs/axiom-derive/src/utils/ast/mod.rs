@@ -51,3 +51,9 @@ pub fn getFieldIndicesFromUnnamedFields(fields: &syn::FieldsUnnamed) -> Vec<syn:
         .map(syn::Index::from)
         .collect();
 }
+
+pub fn convertIdentToCamelCase(ident: &syn::Ident) -> syn::Ident {
+    use heck::ToLowerCamelCase;
+
+    return format_ident!("{}", ident.to_string().to_lower_camel_case());
+}

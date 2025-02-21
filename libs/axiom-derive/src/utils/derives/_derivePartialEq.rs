@@ -152,22 +152,15 @@ fn generateWhereClauseWithPartialEqBoundsFromDeriveInput(ast: &syn::DeriveInput)
 fn getIdentsWithSelfPrefixed(idents: &Vec<syn::Ident>) -> Vec<syn::Ident> {
     return idents
         .iter()
-        .map(convertIdentToPascalCase)
         .map(|ident| format_ident!("self{}", ident))
+        .map(|ident| convertIdentToCamelCase(&ident))
         .collect();
 }
 
 fn getIdentsWithOtherPrefixed(idents: &Vec<syn::Ident>) -> Vec<syn::Ident> {
     return idents
         .iter()
-        .map(convertIdentToPascalCase)
         .map(|ident| format_ident!("other{}", ident))
+        .map(|ident| convertIdentToCamelCase(&ident))
         .collect();
-}
-
-fn convertIdentToPascalCase(ident: &syn::Ident) -> syn::Ident {
-    use heck::ToPascalCase;
-
-    let formattedIdent = ident.to_string().to_pascal_case();
-    return format_ident!("{}", formattedIdent);
 }

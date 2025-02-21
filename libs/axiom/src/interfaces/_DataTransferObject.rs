@@ -5,4 +5,4 @@ use serde::Serialize;
 
 pub trait DataTransferObject: Debug + Send + Sync + Clone + Serialize + for<'de> Deserialize<'de> {}
 
-pub use derive::deriveDataTransferObjectWithoutSerde;
+pub use derive::DataTransferObjectWithoutSerde;

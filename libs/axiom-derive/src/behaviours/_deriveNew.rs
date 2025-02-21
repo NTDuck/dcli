@@ -1,6 +1,9 @@
 use quote::format_ident;
 use quote::quote;
 
+use crate::utils::ast::convertIdentToCamelCase;
+use crate::utils::ast::getFieldIdentsFromNamedFields;
+
 pub fn deriveNew(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse_macro_input!(tokens as syn::DeriveInput);
 
@@ -26,16 +29,10 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
 fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
-    let methodIdent = format_ident!("{MethodName}");
+    let methodIdent = getMethodIdentForStruct();
 
-    let fieldIdents = fields.named
-        .iter()
-        .map(|field| &field.ident)
-        .collect::<Vec<_>>();
-    let fieldTypes = fields.named
-        .iter()
-        .map(|field| &field.ty)
-        .collect::<Vec<_>>();
+    let fieldIdents = getFieldIdentsFromNamedFields(fields);
+    let fieldTypes = getFieldTypesFromNamedFields(fields);
 
     return quote! {
         impl #structImplGenerics #structIdent #structTypeGenerics #structWhereClause {
@@ -49,15 +46,10 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
 fn deriveForUnnamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
-    let methodIdent = format_ident!("{MethodName}");
+    let methodIdent = getMethodIdentForStruct();
 
-    let fieldIdents = (0..fields.unnamed.len())
-        .map(|index| format_ident!("arg{index}"))
-        .collect::<Vec<_>>();
-    let fieldTypes = fields.unnamed
-        .iter()
-        .map(|field| &field.ty)
-        .collect::<Vec<_>>();
+    let fieldIdents = getFieldIdentsWithArgPrefixedFromUnnamedFields(fields);
+    let fieldTypes = getFieldTypesFromUnnamedFields(fields);
 
     return quote! {
         impl #structImplGenerics #structIdent #structTypeGenerics #structWhereClause {
@@ -71,7 +63,7 @@ fn deriveForUnnamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -
 fn deriveForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
-    let methodIdent = format_ident!("{MethodName}");
+    let methodIdent = getMethodIdentForStruct();
 
     return quote! {
         impl #structImplGenerics #structIdent #structTypeGenerics #structWhereClause {
@@ -108,17 +100,10 @@ fn deriveForEnum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::T
 
 fn deriveForNamedVariant(variant: &syn::Variant, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let variantIdent = &variant.ident;
-    let methodIdent = format_ident!("{}{}",
-        MethodName, convertIdentToUpperCamelCase(variantIdent));
+    let methodIdent = getMethodIdentForEnumFromVariant(variant);
 
-    let fieldIdents = fields.named
-        .iter()
-        .map(|field| &field.ident)
-        .collect::<Vec<_>>();
-    let fieldTypes = fields.named
-        .iter()
-        .map(|field| &field.ty)
-        .collect::<Vec<_>>();
+    let fieldIdents = getFieldIdentsFromNamedFields(fields);
+    let fieldTypes = getFieldTypesFromNamedFields(fields);
 
     return quote! {
         pub fn #methodIdent(#( #fieldIdents: #fieldTypes, )*) -> Self {
@@ -129,16 +114,10 @@ fn deriveForNamedVariant(variant: &syn::Variant, fields: &syn::FieldsNamed) -> p
 
 fn deriveForUnnamedVariant(variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let variantIdent = &variant.ident;
-    let methodIdent = format_ident!("{}{}",
-        MethodName, convertIdentToUpperCamelCase(variantIdent));
+    let methodIdent = getMethodIdentForEnumFromVariant(variant);
 
-    let fieldIdents = (0..fields.unnamed.len())
-        .map(|index| format_ident!("arg{index}"))
-        .collect::<Vec<_>>();
-    let fieldTypes = fields.unnamed
-        .iter()
-        .map(|field| &field.ty)
-        .collect::<Vec<_>>();
+    let fieldIdents = getFieldIdentsWithArgPrefixedFromUnnamedFields(fields);
+    let fieldTypes = getFieldTypesFromUnnamedFields(fields);
 
     return quote! {
         pub fn #methodIdent(#( #fieldIdents: #fieldTypes, )*) -> Self {
@@ -149,8 +128,7 @@ fn deriveForUnnamedVariant(variant: &syn::Variant, fields: &syn::FieldsUnnamed) 
 
 fn deriveForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream {
     let variantIdent = &variant.ident;
-    let methodIdent = format_ident!("{}{}",
-        MethodName, convertIdentToUpperCamelCase(variantIdent));
+    let methodIdent = getMethodIdentForEnumFromVariant(variant);
 
     return quote! {
         pub fn #methodIdent() -> Self {
@@ -159,13 +137,37 @@ fn deriveForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream {
     };
 }
 
-fn convertIdentToUpperCamelCase(ident: &syn::Ident) -> syn::Ident {
-    use heck::ToUpperCamelCase;
-
-    return syn::Ident::new(
-        ident.to_string().to_upper_camel_case().as_str(),
-        ident.span(),
-    );
+fn getMethodIdentForStruct() -> syn::Ident {
+    return format_ident!("{BaseMethodIdent}");
 }
 
-const MethodName: &str = "new";
+fn getFieldTypesFromNamedFields(fields: &syn::FieldsNamed) -> Vec<&syn::Type> {
+    return fields.named
+        .iter()
+        .map(|field| &field.ty)
+        .collect();
+}
+
+fn getFieldIdentsWithArgPrefixedFromUnnamedFields(fields: &syn::FieldsUnnamed) -> Vec<syn::Ident> {
+    return (0..fields.unnamed.len())
+        .map(|index| format_ident!("arg{index}"))
+        .collect::<Vec<_>>();
+}
+
+fn getFieldTypesFromUnnamedFields(fields: &syn::FieldsUnnamed) -> Vec<&syn::Type> {
+    return fields.unnamed
+        .iter()
+        .map(|field| &field.ty)
+        .collect();
+}
+
+fn getMethodIdentForEnumFromVariant(variant: &syn::Variant) -> syn::Ident {
+    let variantIdent = &variant.ident;
+
+    let unformattedMethodIdent = format_ident!("{BaseMethodIdent}{variantIdent}");
+    let formattedMethodIdent = convertIdentToCamelCase(&unformattedMethodIdent);
+
+    return formattedMethodIdent;
+}
+
+const BaseMethodIdent: &str = "new";
