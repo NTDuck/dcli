@@ -1,8 +1,7 @@
 use quote::format_ident;
 use quote::quote;
 
-use crate::utils::ast::convertIdentToCamelCase;
-use crate::utils::ast::getFieldIdentsFromNamedFields;
+use crate::utils::ast::*;
 
 pub fn deriveNew(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse_macro_input!(tokens as syn::DeriveInput);
@@ -20,13 +19,13 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
     let fields = &data.fields;
 
     return match fields {
-        syn::Fields::Named(fields) => deriveForNamedStruct(ast, fields),
-        syn::Fields::Unnamed(fields) => deriveForUnnamedStruct(ast, fields),
+        syn::Fields::Named(fields) => deriveForOrdinaryStruct(ast, fields),
+        syn::Fields::Unnamed(fields) => deriveForUnOrdinaryStruct(ast, fields),
         syn::Fields::Unit => deriveForUnitStruct(ast),
     };
 }
 
-fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
+fn deriveForOrdinaryStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
     let methodIdent = getMethodIdentForStruct();
@@ -43,7 +42,7 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
     };
 }
 
-fn deriveForUnnamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
+fn deriveForUnOrdinaryStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
     let methodIdent = getMethodIdentForStruct();

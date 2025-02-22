@@ -15,19 +15,19 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
     let fields = &data.fields;
 
     let syn::Fields::Unnamed(fields) = fields else {
-        panic!("Newtypes must be a single-field tuple struct")
+        panic!("Newtypes must be a single-fielded tuple struct")
     };
 
     if fields.unnamed.len() != 1 {
-        panic!("Newtypes must be a single-field tuple struct")
+        panic!("Newtypes must be a single-fielded tuple struct")
     };
 
     let field = fields.unnamed.first().unwrap();
 
-    return deriveForSingleFieldUnnamedStruct(ast, field);
+    return deriveForSingleFieldedOrdinaryStruct(ast, field);
 }
 
-fn deriveForSingleFieldUnnamedStruct(ast: &syn::DeriveInput, field: &syn::Field) -> proc_macro2::TokenStream {
+fn deriveForSingleFieldedOrdinaryStruct(ast: &syn::DeriveInput, field: &syn::Field) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
 
