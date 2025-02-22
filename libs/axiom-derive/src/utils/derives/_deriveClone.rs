@@ -6,13 +6,13 @@ pub fn deriveCloneForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> p
     let fields = &data.fields;
 
     return match fields {
-        syn::Fields::Named(fields) => deriveCloneForNamedStruct(ast, fields),
+        syn::Fields::Named(fields) => deriveCloneForOrdinaryStruct(ast, fields),
         syn::Fields::Unnamed(fields) => deriveCloneForTupleStruct(ast, fields),
         syn::Fields::Unit => deriveCloneForUnitStruct(ast),
     };
 }
 
-fn deriveCloneForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
+fn deriveCloneForOrdinaryStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
     let structWhereClauseWithCloneBounds = generateWhereClauseWithCloneBoundsFromDeriveInput(ast);
@@ -111,7 +111,7 @@ fn deriveCloneForStructVariant(variant: &syn::Variant, fields: &syn::FieldsNamed
 
 fn deriveCloneForTupleVariant(variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let variantIdent = &variant.ident;
-    let fieldIdents = getFieldsIdentsFromUnnamedFields(fields);
+    let fieldIdents = getFormattedFieldsIdentsFromUnnamedFields(fields);
 
     return quote! {
         Self::#variantIdent(#( #fieldIdents, )*) => 

@@ -1,4 +1,3 @@
-use quote::format_ident;
 use quote::quote;
 
 use crate::utils::ast::*;
@@ -7,13 +6,13 @@ pub fn deriveHashForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> pr
     let fields = &data.fields;
 
     return match fields {
-        syn::Fields::Named(fields) => deriveHashForNamedStruct(ast, fields),
+        syn::Fields::Named(fields) => deriveHashForOrdinaryStruct(ast, fields),
         syn::Fields::Unnamed(fields) => deriveHashForTupleStruct(ast, fields),
         syn::Fields::Unit => deriveHashForUnitStruct(ast),
     };
 }
 
-fn deriveHashForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
+fn deriveHashForOrdinaryStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
     let structWhereClauseWithHashBounds = generateWhereClauseWithHashBoundsFromDeriveInput(ast);
@@ -112,19 +111,13 @@ fn deriveHashForStructVariant(variant: &syn::Variant, fields: &syn::FieldsNamed)
 
 fn deriveHashForTupleVariant(variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let variantIdent = &variant.ident;
-    let fieldIdents = getFieldIdentsWithArgPrefixedFromUnnamedFields(fields);
+    let fieldIdents = getFormattedFieldsIdentsFromUnnamedFields(fields);
 
     return quote! {
         Self::#variantIdent(#( #fieldIdents, )*) => {
             #( #fieldIdents.hash(state); )*
         }
     };
-}
-
-fn getFieldIdentsWithArgPrefixedFromUnnamedFields(fields: &syn::FieldsUnnamed) -> Vec<syn::Ident> {
-    return (0..fields.unnamed.len())
-        .map(|index| format_ident!("arg{index}"))
-        .collect::<Vec<_>>();
 }
 
 fn deriveHashForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream {

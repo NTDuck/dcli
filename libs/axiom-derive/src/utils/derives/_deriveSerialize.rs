@@ -1,4 +1,3 @@
-use quote::format_ident;
 use quote::quote;
 
 use crate::utils::ast::*;
@@ -7,13 +6,13 @@ pub fn deriveSerializeForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) 
     let fields = &data.fields;
 
     return match fields {
-        syn::Fields::Named(fields) => deriveSerializeForNamedStruct(ast, fields),
+        syn::Fields::Named(fields) => deriveSerializeForOrdinaryStruct(ast, fields),
         syn::Fields::Unnamed(fields) => deriveSerializeForTupleStruct(ast, fields),
         syn::Fields::Unit => deriveSerializeForUnitStruct(ast),
     };
 }
 
-fn deriveSerializeForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
+fn deriveSerializeForOrdinaryStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
     let structWhereClauseWithSerializeBounds = generateWhereClauseWithSerializeBoundsFromDeriveInput(ast);
@@ -167,7 +166,7 @@ fn deriveSerializeForTupleVariant(ast: &syn::DeriveInput, variant: &syn::Variant
     let variantIdent = &variant.ident;
     let variantIndex = getVariantIndex(ast, variant).unwrap();
 
-    let fieldIdents = getFieldIdentsWithArgPrefixedFromUnnamedFields(fields);
+    let fieldIdents = getFormattedFieldsIdentsFromUnnamedFields(fields);
     let fieldCount = fields.unnamed.len();
 
     if fieldCount == 1 {
@@ -234,10 +233,4 @@ fn getVariantIndex(ast: &syn::DeriveInput, variant: &syn::Variant) -> Option<u32
     } else {
         return None;
     }
-}
-
-fn getFieldIdentsWithArgPrefixedFromUnnamedFields(fields: &syn::FieldsUnnamed) -> Vec<syn::Ident> {
-    return (0..fields.unnamed.len())
-        .map(|index| format_ident!("arg{index}"))
-        .collect::<Vec<_>>();
 }

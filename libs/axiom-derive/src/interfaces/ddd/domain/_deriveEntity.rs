@@ -17,12 +17,12 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
     let fields = &data.fields;
 
     return match fields {
-        syn::Fields::Named(fields) => deriveForNamedStruct(ast, fields),
+        syn::Fields::Named(fields) => deriveForOrdinaryStruct(ast, fields),
         _ => panic!(),
     };
 }
 
-fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
+fn deriveForOrdinaryStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
 
@@ -35,7 +35,7 @@ fn deriveForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> pr
 
     let fieldIdents = getFieldIdentsFromNamedFields(fields);
 
-    let identifierField = getIdentifierFieldForNamedStruct(fields)
+    let identifierField = getIdentifierFieldForOrdinaryStruct(fields)
         .expect(&format!(
             "Struct `{}` must have one field implementing \
             `axiom::interfaces::ddd::domain::Identifier` \
@@ -146,7 +146,7 @@ fn generateWhereClauseWithEqBoundsFromDeriveInput(ast: &syn::DeriveInput) -> pro
     );
 }
 
-fn getIdentifierFieldForNamedStruct(fields: &syn::FieldsNamed) -> Option<&syn::Field> {
+fn getIdentifierFieldForOrdinaryStruct(fields: &syn::FieldsNamed) -> Option<&syn::Field> {
     return fields.named.iter().find(|field| {
         field.attrs
             .iter()

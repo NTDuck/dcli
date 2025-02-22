@@ -6,13 +6,13 @@ pub fn deriveDebugForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> p
     let fields = &data.fields;
 
     return match fields {
-        syn::Fields::Named(fields) => deriveDebugForNamedStruct(ast, fields),
+        syn::Fields::Named(fields) => deriveDebugForOrdinaryStruct(ast, fields),
         syn::Fields::Unnamed(fields) => deriveDebugForTupleStruct(ast, fields),
         syn::Fields::Unit => deriveDebugForUnitStruct(ast),
     };
 }
 
-fn deriveDebugForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
+fn deriveDebugForOrdinaryStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
     let structWhereClauseWithDebugBounds = generateWhereClauseWithDebugBoundsFromDeriveInput(ast);
@@ -119,7 +119,7 @@ fn deriveDebugForStructVariant(ast: &syn::DeriveInput, variant: &syn::Variant, f
 fn deriveDebugForTupleVariant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let enumIdent = &ast.ident;
     let variantIdent = &variant.ident;
-    let fieldIdents = getFieldsIdentsFromUnnamedFields(fields);
+    let fieldIdents = getFormattedFieldsIdentsFromUnnamedFields(fields);
 
     return quote! {
         Self::#variantIdent(#( #fieldIdents, )*) => formatter

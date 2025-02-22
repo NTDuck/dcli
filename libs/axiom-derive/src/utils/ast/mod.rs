@@ -37,7 +37,7 @@ pub fn getFieldIdentsFromNamedFields(fields: &syn::FieldsNamed) -> Vec<syn::Iden
         .collect();
 }
 
-pub fn getFieldsIdentsFromUnnamedFields(fields: &syn::FieldsUnnamed) -> Vec<syn::Ident> {
+pub fn getFormattedFieldsIdentsFromUnnamedFields(fields: &syn::FieldsUnnamed) -> Vec<syn::Ident> {
     const Prefix: &str = "arg";
     const Suffix: &str = "";
 

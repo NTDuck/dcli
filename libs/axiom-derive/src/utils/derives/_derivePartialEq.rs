@@ -7,13 +7,13 @@ pub fn derivePartialEqForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) 
     let fields = &data.fields;
 
     return match fields {
-        syn::Fields::Named(fields) => derivePartialEqForNamedStruct(ast, fields),
+        syn::Fields::Named(fields) => derivePartialEqForOrdinaryStruct(ast, fields),
         syn::Fields::Unnamed(fields) => derivePartialEqForTupleStruct(ast, fields),
         syn::Fields::Unit => derivePartialEqForUnitStruct(ast),
     };
 }
 
-fn derivePartialEqForNamedStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
+fn derivePartialEqForOrdinaryStruct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, _) = ast.generics.split_for_impl();
     let structWhereClauseWithPartialEqBounds = generateWhereClauseWithPartialEqBoundsFromDeriveInput(ast);
@@ -118,7 +118,7 @@ fn derivePartialEqForStructVariant(variant: &syn::Variant, fields: &syn::FieldsN
 fn derivePartialEqForTupleVariant(variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let variantIdent = &variant.ident;
 
-    let fieldIdents = getFieldsIdentsFromUnnamedFields(fields);
+    let fieldIdents = getFormattedFieldsIdentsFromUnnamedFields(fields);
     let selfFieldIdents = getIdentsWithSelfPrefixed(&fieldIdents);
     let otherFieldIdents = getIdentsWithOtherPrefixed(&fieldIdents);
 
