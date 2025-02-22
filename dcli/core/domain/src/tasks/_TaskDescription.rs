@@ -1,6 +1,6 @@
 use axiom::behaviours::NewType;
 use axiom::interfaces::ddd;
-use axiom::interfaces::deriveDataTransferObjectWithoutSerde;
+use axiom::interfaces::DataTransferObjectWithoutSerde;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -63,7 +63,7 @@ impl TaskDescription {
     }
 }
 
-#[derive(deriveDataTransferObjectWithoutSerde, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub enum TaskDescriptionError {
     LengthUnderflow {
         actualLength: usize,
