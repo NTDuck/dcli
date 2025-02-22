@@ -7,3 +7,6 @@ class!(pub _derivePartialEq);
 class!(pub _deriveEq);
 
 class!(pub _deriveHash);
+
+class!(pub _deriveSerialize);
+class!(pub _deriveDeserialize);

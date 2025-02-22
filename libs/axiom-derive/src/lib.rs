@@ -24,6 +24,11 @@ pub fn deriveDataTransferObjectWithoutSerde(tokens: TokenStream) -> TokenStream 
     return crate::interfaces::deriveDataTransferObjectWithoutSerde(tokens);
 }
 
+#[proc_macro_derive(DataTransferObjectWithoutDeserialize)]
+pub fn deriveDataTransferObjectWithoutDeserialize(tokens: TokenStream) -> TokenStream {
+    return crate::interfaces::deriveDataTransferObjectWithoutDeserialize(tokens);
+}
+
 #[proc_macro_derive(Entity, attributes(axiom))]
 pub fn deriveEntity(tokens: TokenStream) -> TokenStream {
     return crate::interfaces::ddd::domain::deriveEntity(tokens);
