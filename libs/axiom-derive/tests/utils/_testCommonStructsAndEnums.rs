@@ -69,6 +69,16 @@ macro_rules! testCommonTupleStructs {
         }
 
         #[derive $derivedAttrs]
+        struct NewType(String);
+
+        #[test]
+        fn testNewType() {
+            $testFn(NewType(
+                "tomfoolery".to_owned(),
+            ));
+        }
+
+        #[derive $derivedAttrs]
         struct TupleStructWithGenerics<T, U>(
             Box<Box<Box<T>>>,
             Vec<U>,
@@ -85,6 +95,18 @@ macro_rules! testCommonTupleStructs {
                     TupleStructWithNoFields(),
                     TupleStructWithNoFields(),
                 ],
+            ));
+        }
+
+        #[derive $derivedAttrs]
+        struct NewTypeWithGenerics<T>(Box<Box<Box<T>>>);
+
+        #[test]
+        fn testNewTypeWithGenerics() {
+            $testFn(NewTypeWithGenerics(
+                Box::new(Box::new(Box::new(
+                    TupleStructWithNoFields(),
+                )))
             ));
         }
     };
@@ -122,13 +144,55 @@ macro_rules! testEmptyEnum {
 
 macro_rules! testCommonEnumsWithOnlyStructVariants {
     ($derivedAttrs:tt, $testFn:ident) => {
+        #[derive $derivedAttrs]
+        enum EnumWithOnlyStructVariants {
+            Quid {
+                text: String,
+            },
+            Pro {
+                number: u64,
+            },
+            Quo {
+                flag: bool,
+            },
+        }
 
+        #[test]
+        fn testEnumWithOnlyStructVariants() {
+            $testFn(EnumWithOnlyStructVariants::Quid {
+                text: "tomfoolery".to_owned(),
+            });
+            $testFn(EnumWithOnlyStructVariants::Pro {
+                number: 42,
+            });
+            $testFn(EnumWithOnlyStructVariants::Quo {
+                flag: false,
+            });
+        }
     };
 }
 
 macro_rules! testCommonEnumsWithOnlyTupleVariants {
     ($derivedAttrs:tt, $testFn:ident) => {
-        
+        #[derive $derivedAttrs]
+        enum EnumWithOnlyTupleVariants {
+            Quid(String),
+            Pro(u64),
+            Quo(bool),
+        }
+
+        #[test]
+        fn testEnumWithOnlyTupleVariants() {
+            $testFn(EnumWithOnlyTupleVariants::Quid(
+                "tomfoolery".to_owned(),
+            ));
+            $testFn(EnumWithOnlyTupleVariants::Pro(
+                42,
+            ));
+            $testFn(EnumWithOnlyTupleVariants::Quo(
+                false,
+            ));
+        }
     };
 }
 

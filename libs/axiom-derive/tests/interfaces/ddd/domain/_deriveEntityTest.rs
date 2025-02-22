@@ -2,30 +2,6 @@ use axiom::interfaces::ddd::domain::Entity;
 use axiom_derive::Entity;
 use axiom_derive::Identifier;
 
-// Allow `Entity` usage
-// without adding `axiom` as a dependency
-pub mod axiom {
-    pub mod interfaces {
-        pub mod ddd {
-            pub mod domain {
-                use std::fmt::Debug;
-                use std::hash::Hash;
-
-                pub trait Entity: ValueObject {
-                    type Id: Identifier;
-
-                    fn getId(&self) -> &Self::Id;
-                }
-
-                #[allow(dead_code)]
-                pub trait Identifier: ValueObject + Hash {}
-
-                pub trait ValueObject: Debug + Send + Sync + Clone + PartialEq + Eq {}
-            }
-        }
-    }
-}
-
 #[derive(Entity)]
 struct StructWithNamedFields {
     #[axiom(attributes(ddd::Identifier))]
@@ -73,5 +49,29 @@ fn testStructWithNamedFieldsAndBoundedGenerics() {
 
 #[derive(Identifier)]
 struct Uuid(u128);
+
+// Allow `Entity` usage
+// without adding `axiom` as a dependency
+pub mod axiom {
+    pub mod interfaces {
+        pub mod ddd {
+            pub mod domain {
+                use std::fmt::Debug;
+                use std::hash::Hash;
+
+                pub trait Entity: ValueObject {
+                    type Id: Identifier;
+
+                    fn getId(&self) -> &Self::Id;
+                }
+
+                #[allow(dead_code)]
+                pub trait Identifier: ValueObject + Hash {}
+
+                pub trait ValueObject: Debug + Send + Sync + Clone + PartialEq + Eq {}
+            }
+        }
+    }
+}
 
 fn verifyTraitBounds(_: impl Entity) {}
