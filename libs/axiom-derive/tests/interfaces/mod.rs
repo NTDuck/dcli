@@ -2,5 +2,6 @@ use layout::*;
 
 namespace!(ddd);
 
-class!(_deriveDataTransferObjectWithoutSerdeTest);
+class!(_deriveDataTransferObjectTest);
 class!(_deriveDataTransferObjectWithoutDeserializeTest);
+class!(_deriveDataTransferObjectWithoutSerdeTest);

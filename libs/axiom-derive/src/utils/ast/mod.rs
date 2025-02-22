@@ -52,6 +52,20 @@ pub fn getFieldIndicesFromUnnamedFields(fields: &syn::FieldsUnnamed) -> Vec<syn:
         .collect();
 }
 
+pub fn getFieldTypesFromNamedFields(fields: &syn::FieldsNamed) -> Vec<&syn::Type> {
+    return fields.named
+        .iter()
+        .map(|field| &field.ty)
+        .collect();
+}
+
+pub fn getFieldTypesFromUnnamedFields(fields: &syn::FieldsUnnamed) -> Vec<&syn::Type> {
+    return fields.unnamed
+        .iter()
+        .map(|field| &field.ty)
+        .collect();
+}
+
 pub fn convertIdentToCamelCase(ident: &syn::Ident) -> syn::Ident {
     use heck::ToLowerCamelCase;
 

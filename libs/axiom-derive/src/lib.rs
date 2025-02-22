@@ -19,14 +19,19 @@ pub fn deriveNewType(tokens: TokenStream) -> TokenStream {
     return crate::behaviours::deriveNewType(tokens);
 }
 
-#[proc_macro_derive(DataTransferObjectWithoutSerde)]
-pub fn deriveDataTransferObjectWithoutSerde(tokens: TokenStream) -> TokenStream {
-    return crate::interfaces::deriveDataTransferObjectWithoutSerde(tokens);
+#[proc_macro_derive(DataTransferObject)]
+pub fn deriveDataTransferObject(tokens: TokenStream) -> TokenStream {
+    return crate::interfaces::deriveDataTransferObject(tokens);
 }
 
 #[proc_macro_derive(DataTransferObjectWithoutDeserialize)]
 pub fn deriveDataTransferObjectWithoutDeserialize(tokens: TokenStream) -> TokenStream {
     return crate::interfaces::deriveDataTransferObjectWithoutDeserialize(tokens);
+}
+
+#[proc_macro_derive(DataTransferObjectWithoutSerde)]
+pub fn deriveDataTransferObjectWithoutSerde(tokens: TokenStream) -> TokenStream {
+    return crate::interfaces::deriveDataTransferObjectWithoutSerde(tokens);
 }
 
 #[proc_macro_derive(Entity, attributes(axiom))]

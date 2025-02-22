@@ -47,7 +47,7 @@ fn deriveForUnOrdinaryStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed
     let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
     let methodIdent = getMethodIdentForStruct();
 
-    let fieldIdents = getFieldIdentsWithArgPrefixedFromUnnamedFields(fields);
+    let fieldIdents = getFormattedFieldsIdentsFromUnnamedFields(fields);
     let fieldTypes = getFieldTypesFromUnnamedFields(fields);
 
     return quote! {
@@ -115,7 +115,7 @@ fn deriveForUnnamedVariant(variant: &syn::Variant, fields: &syn::FieldsUnnamed) 
     let variantIdent = &variant.ident;
     let methodIdent = getMethodIdentForEnumFromVariant(variant);
 
-    let fieldIdents = getFieldIdentsWithArgPrefixedFromUnnamedFields(fields);
+    let fieldIdents = getFormattedFieldsIdentsFromUnnamedFields(fields);
     let fieldTypes = getFieldTypesFromUnnamedFields(fields);
 
     return quote! {
@@ -138,26 +138,6 @@ fn deriveForUnitVariant(variant: &syn::Variant) -> proc_macro2::TokenStream {
 
 fn getMethodIdentForStruct() -> syn::Ident {
     return format_ident!("{BaseMethodIdent}");
-}
-
-fn getFieldTypesFromNamedFields(fields: &syn::FieldsNamed) -> Vec<&syn::Type> {
-    return fields.named
-        .iter()
-        .map(|field| &field.ty)
-        .collect();
-}
-
-fn getFieldIdentsWithArgPrefixedFromUnnamedFields(fields: &syn::FieldsUnnamed) -> Vec<syn::Ident> {
-    return (0..fields.unnamed.len())
-        .map(|index| format_ident!("arg{index}"))
-        .collect::<Vec<_>>();
-}
-
-fn getFieldTypesFromUnnamedFields(fields: &syn::FieldsUnnamed) -> Vec<&syn::Type> {
-    return fields.unnamed
-        .iter()
-        .map(|field| &field.ty)
-        .collect();
 }
 
 fn getMethodIdentForEnumFromVariant(variant: &syn::Variant) -> syn::Ident {
