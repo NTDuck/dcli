@@ -8,6 +8,14 @@ resolver = "2"
 [workspace.package]
 edition = "2021"
 
+[workspace.dependencies]
+# Cross-cutting concerns, centralized
+axiom = { path = "libs/axiom" }
+
+# Crates that we choose to marry
+# See: https://blessed.rs/crates
+serde = { version = "1.0", features = ["derive"] }
+
 [workspace.lints.rust]
 # See: https://doc.rust-lang.org/rustc/lints/listing/index.html
 non-snake-case = "allow"

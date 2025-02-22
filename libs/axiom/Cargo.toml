@@ -7,7 +7,7 @@ edition.workspace = true
 derive = { package = "axiom-derive", path = "../axiom-derive" }
 layout = { package = "axiom-layout", path = "../axiom-layout" }
 
-serde = "1.0"
+serde = { workspace = true }
 
 [lints]
 workspace = true

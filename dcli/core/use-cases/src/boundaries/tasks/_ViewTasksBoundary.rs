@@ -1,6 +1,6 @@
-use std::time::Instant;
+use std::time::SystemTime;
 
-use axiom::interfaces::deriveDataTransferObjectWithoutSerde;
+use axiom::interfaces::DataTransferObjectWithoutSerde;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -11,30 +11,30 @@ pub trait ViewTasksBoundary {
     fn apply(&self, request: ViewTasksRequestModel) -> Result<ViewTasksResponseModel, ViewTasksErrorModel>;
 }
 
-#[derive(deriveDataTransferObjectWithoutSerde, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct ViewTasksRequestModel {
     pub paginationRequest: PaginationRequest,
 }
 
-#[derive(deriveDataTransferObjectWithoutSerde, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct ViewTasksResponseModel {
-    pub paginationResponse: PaginationResponse<Task>,
+    pub paginationResponse: PaginationResponse<ViewTasksTask>,
 }
 
-#[derive(deriveDataTransferObjectWithoutSerde, Serialize, Deserialize)]
-pub struct Task {
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
+pub struct ViewTasksTask {
     pub id: u128,
     pub description: String,
-    pub status: TaskStatus,
-    pub createdAt: Instant,
+    pub status: ViewTasksTaskStatus,
+    pub createdAt: SystemTime,
 }
 
-#[derive(deriveDataTransferObjectWithoutSerde, Serialize, Deserialize)]
-pub enum TaskStatus {
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
+pub enum ViewTasksTaskStatus {
     Pending,
     InProgress,
     Completed,
 }
 
-#[derive(deriveDataTransferObjectWithoutSerde, Serialize, Deserialize)]
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct ViewTasksErrorModel;

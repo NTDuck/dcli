@@ -1,4 +1,5 @@
 use axiom::behaviours::New;
+use domain::utils::dataclasses::ids::Uuid;
 use domain::utils::dataclasses::time::Timestamp;
 use domain::Task;
 use domain::TaskDescription;
@@ -22,43 +23,46 @@ pub struct CreateTaskInteractor<Handle: PointerHandle> {
 
 impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> {
     fn apply(&self, request: CreateTaskRequestModel) -> Result<CreateTaskResponseModel, CreateTaskErrorModel> {
-        let CreateTaskRequestModel {
-            taskDescription,
-        } = request;
-
-        let taskDescription = match TaskDescription::try_from(taskDescription) {
-            Ok(taskDescription) => taskDescription,
-            Err(error) => match error {
-                TaskDescriptionError::LengthUnderflow {
-                    actualLength,
-                    minLengthRequired,
-                } => return Err(CreateTaskErrorModel::TaskDescriptionLengthUnderflow {
-                    actualLength,
-                    minLengthRequired,
-                }),
-                TaskDescriptionError::LengthOverflow {
-                    actualLength,
-                    maxLengthAllowed,
-                } => return Err(CreateTaskErrorModel::TaskDescriptionLengthOverflow {
-                    actualLength,
-                    maxLengthAllowed,
-                }),
-            }
-        };
-
+        let taskDescription = TaskDescription::try_from(request.taskDescription)
+            .map_err(TaskDescriptionError::from)?;
+        
         let uuid = self.uuidFactory.read()
             .generate();
-
-        let task = Task {
-            id: uuid,
-            description: taskDescription,
-            status: TaskStatus::Pending,
-            createdAt: Timestamp::now(),
-        };
+        let task = createTaskFromIdAndDescription(uuid, taskDescription);
 
         self.taskRepository.write()
             .save(task);
 
         return Ok(CreateTaskResponseModel);
     }
+}
+
+impl From<TaskDescriptionError> for CreateTaskErrorModel {
+    fn from(error: TaskDescriptionError) -> Self {
+        return match error {
+            TaskDescriptionError::LengthUnderflow {
+                actualLength,
+                minLengthRequired,
+            } => CreateTaskErrorModel::TaskDescriptionLengthUnderflow {
+                actualLength,
+                minLengthRequired,
+            },
+            TaskDescriptionError::LengthOverflow {
+                actualLength,
+                maxLengthAllowed,
+            } => CreateTaskErrorModel::TaskDescriptionLengthOverflow {
+                actualLength,
+                maxLengthAllowed,
+            },
+        };
+    }
+}
+
+fn createTaskFromIdAndDescription(id: Uuid, description: TaskDescription) -> Task {
+    return Task {
+        id,
+        description,
+        status: TaskStatus::Pending,
+        createdAt: Timestamp::now(),
+    };
 }

@@ -10,11 +10,10 @@ interactors = []
 gateways = []
 
 [dependencies]
-axiom = { path = "../../../libs/axiom" }
+axiom = { workspace = true }
+serde = { workspace = true }
 
 domain = { path = "../domain" }
-
-serde = { version = "1.0", features = ["derive"] }
 
 [lints]
 workspace = true
