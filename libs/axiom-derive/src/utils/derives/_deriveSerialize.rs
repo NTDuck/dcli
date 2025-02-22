@@ -45,20 +45,35 @@ fn deriveSerializeForTupleStruct(ast: &syn::DeriveInput, fields: &syn::FieldsUnn
     let fieldIndices = getFieldIndicesFromUnnamedFields(fields);
     let fieldCount = fieldIndices.len();
 
-    return quote! {
-        impl #structImplGenerics serde::Serialize for #structIdent #structTypeGenerics #structWhereClauseWithSerializeBounds {
-            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-            where
-                S: serde::Serializer,
-            {
-                use serde::ser::SerializeTupleStruct;
-
-                let mut state = serializer.serialize_tuple_struct(stringify!(#structIdent), #fieldCount)?;
-                #( state.serialize_field(&self.#fieldIndices)?; )*
-                return state.end();
+    if fieldCount == 1 {
+        return quote! {
+            impl #structImplGenerics serde::Serialize for #structIdent #structTypeGenerics #structWhereClauseWithSerializeBounds {
+                fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+                where
+                    S: serde::Serializer,
+                {
+                    use serde::ser::SerializeTupleStruct;
+    
+                    return serializer.serialize_newtype_struct(stringify!(#structIdent), &self.0);
+                }
             }
-        }
-    };
+        };
+    } else {
+        return quote! {
+            impl #structImplGenerics serde::Serialize for #structIdent #structTypeGenerics #structWhereClauseWithSerializeBounds {
+                fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+                where
+                    S: serde::Serializer,
+                {
+                    use serde::ser::SerializeTupleStruct;
+    
+                    let mut state = serializer.serialize_tuple_struct(stringify!(#structIdent), #fieldCount)?;
+                    #( state.serialize_field(&self.#fieldIndices)?; )*
+                    return state.end();
+                }
+            }
+        };
+    }
 }
 
 fn deriveSerializeForUnitStruct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
@@ -155,20 +170,35 @@ fn deriveSerializeForTupleVariant(ast: &syn::DeriveInput, variant: &syn::Variant
     let fieldIdents = getFieldIdentsWithArgPrefixedFromUnnamedFields(fields);
     let fieldCount = fields.unnamed.len();
 
-    return quote! {
-        Self::#variantIdent(#( #fieldIdents, )*) => {
-            use serde::ser::SerializeTupleVariant;
-            
-            let mut state = serializer.serialize_tuple_variant(
-                stringify!(#enumIdent),
-                #variantIndex,
-                stringify!(#variantIdent),
-                #fieldCount,
-            )?;
-            #( state.serialize_field(#fieldIdents)?; )*
-            return state.end();
-        }
-    };
+    if fieldCount == 1 {
+        return quote! {
+            Self::#variantIdent(arg) => {
+                use serde::ser::SerializeTupleVariant;
+                
+                return serializer.serialize_newtype_variant(
+                    stringify!(#enumIdent),
+                    #variantIndex,
+                    stringify!(#variantIdent),
+                    &arg,
+                );
+            }
+        };
+    } else {
+        return quote! {
+            Self::#variantIdent(#( #fieldIdents, )*) => {
+                use serde::ser::SerializeTupleVariant;
+                
+                let mut state = serializer.serialize_tuple_variant(
+                    stringify!(#enumIdent),
+                    #variantIndex,
+                    stringify!(#variantIdent),
+                    #fieldCount,
+                )?;
+                #( state.serialize_field(#fieldIdents)?; )*
+                return state.end();
+            }
+        };
+    }
 }
 
 fn deriveSerializeForUnitVariant(ast: &syn::DeriveInput, variant: &syn::Variant) -> proc_macro2::TokenStream {
