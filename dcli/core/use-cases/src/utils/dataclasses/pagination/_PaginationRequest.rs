@@ -7,3 +7,10 @@ pub struct PaginationRequest {
     pub pageNumber: usize,
     pub maxPageSize: usize,
 }
+
+pub const UnboundedPaginationRequest: PaginationRequest = PaginationRequest {
+    pageNumber: MinPageSize,
+    maxPageSize: usize::MAX,
+};
+
+pub const MinPageSize: usize = 1;

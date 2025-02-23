@@ -2,7 +2,7 @@ use axiom::interfaces::DataTransferObjectWithoutSerde;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::utils::dataclasses::pagination::PaginationProperties;
+use crate::utils::dataclasses::pagination::MinPageSize;
 use crate::utils::dataclasses::pagination::PaginationRequest;
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
@@ -15,8 +15,8 @@ impl From<&PaginationRequest> for PaginationRange {
     fn from(paginationRequest: &PaginationRequest) -> Self {
         return Self {
             offset: paginationRequest.pageNumber
-                .saturating_sub(PaginationProperties::MinPageSize)
-                * paginationRequest.maxPageSize,
+                .saturating_sub(MinPageSize)
+                .saturating_mul(paginationRequest.maxPageSize),
             limit: paginationRequest.maxPageSize,
         };
     }

@@ -1,34 +1,45 @@
 use axiom::behaviours::New;
-use domain::utils::dataclasses::ids::Uuid;
-use domain::utils::dataclasses::time::Timestamp;
-use domain::Task;
-use domain::TaskDescription;
-use domain::TaskDescriptionError;
-use domain::TaskStatus;
+use domain::tasks::Task;
+use domain::tasks::TaskDescription;
+use domain::tasks::TaskDescriptionError;
+use domain::tasks::TaskStatus;
 
 use crate::boundaries::tasks::CreateTaskBoundary;
 use crate::boundaries::tasks::CreateTaskErrorModel;
 use crate::boundaries::tasks::CreateTaskRequestModel;
 use crate::boundaries::tasks::CreateTaskResponseModel;
+use crate::gateways::factories::ids::MachineIdFactory;
+use crate::gateways::factories::ids::SnowflakeFactory;
+use crate::gateways::factories::time::TimestampFactory;
 use crate::gateways::pointers::PointerHandle;
 use crate::gateways::pointers::SharedPointer;
 use crate::gateways::repositories::tasks::TaskRepository;
-use crate::gateways::factories::ids::UuidFactory;
 
 #[derive(New)]
 pub struct CreateTaskInteractor<Handle: PointerHandle> {
     taskRepository: SharedPointer<Box<dyn TaskRepository>, Handle>,
-    uuidFactory: SharedPointer<Box<dyn UuidFactory>, Handle>,
+    snowflakeFactory: SharedPointer<Box<dyn SnowflakeFactory>, Handle>,
+    timestampFactory: SharedPointer<Box<dyn TimestampFactory>, Handle>,
+    machineIdFactory: SharedPointer<Box<dyn MachineIdFactory>, Handle>,
 }
 
 impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> {
     fn apply(&self, request: CreateTaskRequestModel) -> Result<CreateTaskResponseModel, CreateTaskErrorModel> {
         let taskDescription = TaskDescription::try_from(request.taskDescription)
-            .map_err(TaskDescriptionError::from)?;
+            .map_err(|error| self.mapTaskDescriptionErrorToErrorModel(error))?;
         
-        let uuid = self.uuidFactory.read()
-            .generate();
-        let task = createTaskFromIdAndDescription(uuid, taskDescription);
+        let timestamp = self.timestampFactory.read()
+            .currentTimestamp();
+        let machineId = self.machineIdFactory.read()
+            .getMachineId();
+        let snowflake = self.snowflakeFactory.read()
+            .newSnowflake(timestamp, machineId);
+
+        let task = Task {
+            id: snowflake,
+            description: taskDescription,
+            status: TaskStatus::Pending,
+        };
 
         self.taskRepository.write()
             .save(task);
@@ -37,8 +48,8 @@ impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> 
     }
 }
 
-impl From<TaskDescriptionError> for CreateTaskErrorModel {
-    fn from(error: TaskDescriptionError) -> Self {
+impl<Handle: PointerHandle> CreateTaskInteractor<Handle> {
+    fn mapTaskDescriptionErrorToErrorModel(&self, error: TaskDescriptionError) -> CreateTaskErrorModel {
         return match error {
             TaskDescriptionError::LengthUnderflow {
                 actualLength,
@@ -56,13 +67,4 @@ impl From<TaskDescriptionError> for CreateTaskErrorModel {
             },
         };
     }
-}
-
-fn createTaskFromIdAndDescription(id: Uuid, description: TaskDescription) -> Task {
-    return Task {
-        id,
-        description,
-        status: TaskStatus::Pending,
-        createdAt: Timestamp::now(),
-    };
 }

@@ -18,19 +18,19 @@ pub struct ViewTasksRequestModel {
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct ViewTasksResponseModel {
-    pub paginationResponse: PaginationResponse<ViewTasksTask>,
+    pub paginationResponse: PaginationResponse<ViewTasksTaskModel>,
 }
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
-pub struct ViewTasksTask {
-    pub id: u128,
+pub struct ViewTasksTaskModel {
+    pub id: u64,
     pub description: String,
-    pub status: ViewTasksTaskStatus,
+    pub status: ViewTasksTaskStatusModel,
     pub createdAt: SystemTime,
 }
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
-pub enum ViewTasksTaskStatus {
+pub enum ViewTasksTaskStatusModel {
     Pending,
     InProgress,
     Completed,

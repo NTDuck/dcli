@@ -1,15 +1,16 @@
 use std::ops::Deref;
 
 use axiom::behaviours::New;
-use domain::Task;
-use domain::TaskStatus;
+use domain::tasks::Task;
+use domain::tasks::TaskStatus;
 
 use crate::boundaries::tasks::ViewTasksBoundary;
 use crate::boundaries::tasks::ViewTasksErrorModel;
 use crate::boundaries::tasks::ViewTasksRequestModel;
 use crate::boundaries::tasks::ViewTasksResponseModel;
-use crate::boundaries::tasks::ViewTasksTask;
-use crate::boundaries::tasks::ViewTasksTaskStatus;
+use crate::boundaries::tasks::ViewTasksTaskModel;
+use crate::boundaries::tasks::ViewTasksTaskStatusModel;
+use crate::gateways::parsers::ids::SnowflakeParser;
 use crate::gateways::pointers::PointerHandle;
 use crate::gateways::pointers::SharedPointer;
 use crate::gateways::repositories::tasks::TaskRepository;
@@ -18,52 +19,52 @@ use crate::utils::dataclasses::pagination::PaginationResponse;
 #[derive(New)]
 pub struct ViewTasksInteractor<Handle: PointerHandle> {
     taskRepository: SharedPointer<Box<dyn TaskRepository>, Handle>,
+    snowflakeParser: SharedPointer<Box<dyn SnowflakeParser>, Handle>,
 }
 
 impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksInteractor<Handle> {
     fn apply(&self, request: ViewTasksRequestModel) -> Result<ViewTasksResponseModel, ViewTasksErrorModel> {
         let paginationResponse = self.taskRepository.read()
             .showOrderedByCreatedAtDesc(request.paginationRequest);
-        let paginationResponse = paginationResponse.into();
+        let responseModel = self.mapPaginationResponseToResponseModel(paginationResponse);
 
-        return Ok(ViewTasksResponseModel {
-            paginationResponse,
-        });
+        return Ok(responseModel);
     }
 }
 
-impl From<PaginationResponse<Task>> for PaginationResponse<ViewTasksTask> {
-    fn from(paginationResponse: PaginationResponse<Task>) -> Self {
-        return Self {
-            items: paginationResponse.items
-                .into_iter()
-                .map(ViewTasksTask::from)
-                .collect(),
-            pageSize: paginationResponse.pageSize,
-            maxPageSize: paginationResponse.maxPageSize,
-            pageNumber: paginationResponse.pageNumber,
-            maxPageNumber: paginationResponse.maxPageNumber,
+impl<Handle: PointerHandle> ViewTasksInteractor<Handle> {
+    fn mapPaginationResponseToResponseModel(&self, paginationResponse: PaginationResponse<Task>) -> ViewTasksResponseModel {
+        return ViewTasksResponseModel {
+            paginationResponse: PaginationResponse {
+                items: paginationResponse.items
+                    .into_iter()
+                    .map(|task| self.mapTaskToTaskModel(task))
+                    .collect(),
+
+                pageSize: paginationResponse.pageSize,
+                maxPageSize: paginationResponse.maxPageSize,
+                pageNumber: paginationResponse.pageNumber,
+                maxPageNumber: paginationResponse.maxPageNumber,
+            },
         };
     }
-}
 
-impl From<Task> for ViewTasksTask {
-    fn from(task: Task) -> Self {
-        return Self {
+    fn mapTaskToTaskModel(&self, task: Task) -> ViewTasksTaskModel {
+        return ViewTasksTaskModel {
             id: task.id.deref().clone(),
             description: task.description.deref().clone(),
-            status: task.status.into(),
-            createdAt: task.createdAt.deref().clone(),
+            status: self.mapTaskStatusToTaskStatusModel(task.status),
+            createdAt: self.snowflakeParser.read()
+                .getTimestampFromSnowflake(task.id)
+                .deref().clone(),
         };
     }
-}
 
-impl From<TaskStatus> for ViewTasksTaskStatus {
-    fn from(taskStatus: TaskStatus) -> Self {
+    fn mapTaskStatusToTaskStatusModel(&self, taskStatus: TaskStatus) -> ViewTasksTaskStatusModel {
         return match taskStatus {
-            TaskStatus::Pending => Self::Pending,
-            TaskStatus::InProgress => Self::InProgress,
-            TaskStatus::Completed => Self::Completed,
+            TaskStatus::Pending => ViewTasksTaskStatusModel::Pending,
+            TaskStatus::InProgress => ViewTasksTaskStatusModel::InProgress,
+            TaskStatus::Completed => ViewTasksTaskStatusModel::Completed,
         };
     }
 }
