@@ -6,8 +6,4 @@ use axiom::interfaces::ddd;
 #[derive(ddd::ValueObject, NewType, PartialOrd, Ord)]
 pub struct Timestamp(SystemTime);
 
-impl Timestamp {
-    pub fn now() -> Self {
-        return Self(SystemTime::now());
-    }
-}
+pub const UnixEpoch: Timestamp = Timestamp(std::time::UNIX_EPOCH);

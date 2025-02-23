@@ -10,7 +10,7 @@ impl UuidV4Factory {
 }
 
 impl UuidFactory for UuidV4Factory {
-    fn generate(&self) -> Uuid {
+    fn newUuid(&self) -> Uuid {
         let uuid = uuid::Uuid::new_v4();
         let uuid = uuid.as_u128();
         return Uuid::new(uuid);
