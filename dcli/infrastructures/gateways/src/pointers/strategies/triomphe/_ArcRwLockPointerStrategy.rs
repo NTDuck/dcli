@@ -3,7 +3,7 @@ use std::ops::DerefMut;
 use triomphe::Arc;
 use std::sync::RwLock;
 
-use crate::pointers::strategies::abc::PointerStrategy;
+use crate::pointers::handles::PointerStrategy;
 
 pub struct ArcRwLockSharedPointerStrategy;
 

@@ -1,4 +1,4 @@
-use domain::TaskId;
+use domain::utils::dataclasses::ids::Uuid;
 use use_cases::gateways::repositories::tasks::TaskRepository;
 
 use crate::repositories::inmemory::tasks::InMemoryTaskRepositoryTest::*;
@@ -39,6 +39,6 @@ fn GivenRepositoryContainingManyTasks_WhenCheckingIfContainsANotExistingOne_Expe
 }
 
 fn WhenCheckingIfContainsId(taskRepository: &impl TaskRepository, taskId: u128) -> bool {
-    let taskId = TaskId::from(taskId);
+    let taskId = Uuid::new(taskId);
     return taskRepository.contains(taskId);
 }

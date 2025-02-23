@@ -1,3 +1,3 @@
-use modules::*;
+use axiom::macros::layout::*;
 
-testSuite!(InMemoryTaskRepositoryTest);
+class!(InMemoryTaskRepositoryTest);

@@ -3,7 +3,8 @@ use std::ops::DerefMut;
 
 pub trait PointerStrategy: Sized {
     type Typed<T>;
-    type Untyped;   // = Self::Typed<()>;
+    /// `PointerStrategy::Untyped = PointerStrategy::Typed<()>`
+    type Untyped;
     
     fn intoTyped<T>(obj: T) -> Self::Typed<T>;
     

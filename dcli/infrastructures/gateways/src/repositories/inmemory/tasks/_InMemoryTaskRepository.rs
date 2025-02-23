@@ -1,5 +1,5 @@
+use domain::utils::dataclasses::ids::Uuid;
 use domain::Task;
-use domain::TaskId;
 use domain::TaskStatus;
 use indexmap::IndexMap;
 use use_cases::gateways::repositories::tasks::TaskRepository;
@@ -9,7 +9,7 @@ use use_cases::utils::dataclasses::pagination::PaginationRequest;
 use use_cases::utils::dataclasses::pagination::PaginationResponse;
 
 pub struct InMemoryTaskRepository {
-    tasksByIds: IndexMap<TaskId, Task>,
+    tasksByIds: IndexMap<Uuid, Task>,
 }
 
 impl InMemoryTaskRepository {
@@ -22,14 +22,14 @@ impl InMemoryTaskRepository {
 
 impl TaskRepository for InMemoryTaskRepository {
     fn save(&mut self, task: Task) {
-        self.tasksByIds.insert(task.id, task);
+        self.tasksByIds.insert(task.id, task.clone());
     }
 
-    fn remove(&mut self, taskId: TaskId) {
+    fn remove(&mut self, taskId: Uuid) {
         self.tasksByIds.shift_remove(&taskId);
     }
 
-    fn getById(&self, taskId: TaskId) -> Option<Task> {
+    fn getById(&self, taskId: Uuid) -> Option<Task> {
         return self.tasksByIds.get(&taskId).cloned();
     }
 
@@ -48,7 +48,7 @@ impl TaskRepository for InMemoryTaskRepository {
         return Self::paginate(filteredAndOrderedTasks, paginationRequest);
     }
 
-    fn contains(&self, taskId: TaskId) -> bool {
+    fn contains(&self, taskId: Uuid) -> bool {
         return self.tasksByIds.contains_key(&taskId);
     }
 

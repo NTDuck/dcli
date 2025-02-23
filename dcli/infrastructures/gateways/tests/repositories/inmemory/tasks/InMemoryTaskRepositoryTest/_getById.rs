@@ -1,5 +1,4 @@
-use domain::Task;
-use domain::TaskId;
+use domain::{utils::dataclasses::ids::Uuid, Task};
 use use_cases::gateways::repositories::tasks::TaskRepository;
 
 use crate::repositories::inmemory::tasks::InMemoryTaskRepositoryTest::*;
@@ -40,6 +39,6 @@ fn GivenRepositoryContainingManyTasks_WhenGettingANotExistingOne_ExpectNone() {
 }
 
 fn WhenGettingTaskById(taskRepository: &impl TaskRepository, taskId: u128) -> Option<Task> {
-    let taskId = TaskId::from(taskId);
+    let taskId = Uuid::new(taskId);
     return taskRepository.getById(taskId);
 }

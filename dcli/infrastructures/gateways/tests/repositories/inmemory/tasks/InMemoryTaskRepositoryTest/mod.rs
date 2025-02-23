@@ -1,7 +1,7 @@
-use modules::*;
+use axiom::macros::layout::*;
 
-testGroup!(_getById);
-testGroup!(_contains);
+class!(_getById);
+class!(_contains);
 
 class!(pub _PreConditions);
 class!(pub _PostConditions);

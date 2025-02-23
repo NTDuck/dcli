@@ -2,15 +2,15 @@ use std::mem::ManuallyDrop;
 use std::ops::Deref;
 use std::ops::DerefMut;
 
-use use_cases::gateways::pointers::handles::abc::PointerHandle;
+use use_cases::gateways::pointers::PointerHandle;
 
-use crate::pointers::strategies::abc::PointerStrategy;
+use crate::pointers::handles::PointerStrategy;
 
-pub struct StrategizedPointerHandle<Strategy: PointerStrategy> {
+pub struct PointerHandleWithStrategy<Strategy: PointerStrategy> {
     untyped: ManuallyDrop<Strategy::Untyped>,
 }
 
-unsafe impl<Strategy> PointerHandle for StrategizedPointerHandle<Strategy>
+unsafe impl<Strategy> PointerHandle for PointerHandleWithStrategy<Strategy>
 where
     Strategy: PointerStrategy,
 {
@@ -41,7 +41,7 @@ where
     }
 }
 
-impl<Strategy> StrategizedPointerHandle<Strategy>
+impl<Strategy> PointerHandleWithStrategy<Strategy>
 where
     Strategy: PointerStrategy,
 {

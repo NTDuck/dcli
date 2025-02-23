@@ -3,7 +3,7 @@ use std::ops::DerefMut;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-use crate::pointers::strategies::abc::PointerStrategy;
+use crate::pointers::handles::PointerStrategy;
 
 pub struct ArcMutexPointerStrategy;
 

@@ -1,3 +1,4 @@
-use modules::*;
+use axiom::macros::layout::*;
 
-class!(pub _StrategizedPointerHandle);
+class!(pub _PointerHandleWithStrategy);
+class!(pub _PointerStrategy);

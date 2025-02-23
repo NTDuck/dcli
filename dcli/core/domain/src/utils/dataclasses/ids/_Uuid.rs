@@ -2,5 +2,5 @@ use axiom::behaviours::New;
 use axiom::behaviours::NewType;
 use axiom::interfaces::ddd;
 
-#[derive(ddd::Identifier, New, NewType)]
+#[derive(ddd::Identifier, Copy, New, NewType)]
 pub struct Uuid(u128);
