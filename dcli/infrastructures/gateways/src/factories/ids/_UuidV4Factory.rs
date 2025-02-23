@@ -1,18 +1,12 @@
-use domain::utils::dataclasses::ids::Uuid;
+use axiom::behaviours::New;
+use domain::ids::Uuid;
 use use_cases::gateways::factories::ids::UuidFactory;
 
+#[derive(New)]
 pub struct UuidV4Factory;
-
-impl UuidV4Factory {
-    pub const fn new() -> Self {
-        return Self;
-    }
-}
 
 impl UuidFactory for UuidV4Factory {
     fn newUuid(&self) -> Uuid {
-        let uuid = uuid::Uuid::new_v4();
-        let uuid = uuid.as_u128();
-        return Uuid::new(uuid);
+        return Uuid::new(uuid::Uuid::new_v4().as_u128());
     }
 }

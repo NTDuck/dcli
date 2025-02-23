@@ -9,13 +9,14 @@ axiom = { workspace = true }
 domain = { path = "../../core/domain" }
 use-cases = { path = "../../core/use-cases", features = ["gateways"] }
 
-rayon = "1.10"
-rand = "0.9.0"
-triomphe = "0.1.14"
-uuid = { version = "1.12", features = [
-    "v4", "fast-rng", "macro-diagnostics",
-]}
+chrono = "0.4"
 indexmap = "2.7"
+pnet_datalink = "0.35"
+rand = "0.9"
+rayon = "1.10"
+triomphe = "0.1"
+uuid = { version = "1.12", features = ["v4", "fast-rng", "macro-diagnostics"] }
+sha2 = "0.10"
 
 [lib]
 test = false

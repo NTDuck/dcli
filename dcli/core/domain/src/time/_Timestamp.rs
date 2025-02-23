@@ -1,9 +1,11 @@
 use std::time::SystemTime;
+use std::time::UNIX_EPOCH;
 
+use axiom::behaviours::New;
 use axiom::behaviours::NewType;
 use axiom::interfaces::ddd;
 
-#[derive(ddd::ValueObject, NewType, PartialOrd, Ord)]
+#[derive(ddd::ValueObject, New, NewType, PartialOrd, Ord)]
 pub struct Timestamp(SystemTime);
 
-pub const UnixEpoch: Timestamp = Timestamp(std::time::UNIX_EPOCH);
+pub const Epoch: Timestamp = Timestamp(UNIX_EPOCH);
