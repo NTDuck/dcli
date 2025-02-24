@@ -1,9 +1,8 @@
 use std::time::Duration;
 
-use axiom::behaviours::NewType;
 use axiom::interfaces::ddd;
 
-#[derive(ddd::ValueObject, NewType)]
+#[derive(ddd::ValueObject)]
 #[derive(Copy, PartialOrd, Ord, Hash)]
 pub struct Interval(Duration);
 
