@@ -1,4 +1,5 @@
 use std::time::SystemTime;
+use std::time::UNIX_EPOCH;
 
 use axiom::behaviours::NewType;
 use axiom::interfaces::ddd;
@@ -53,3 +54,5 @@ impl Timestamp {
             .map(Self::fromSystemTime);
     }
 }
+
+pub const Epoch: Timestamp = Timestamp::fromSystemTime(UNIX_EPOCH);
