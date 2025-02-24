@@ -1,3 +1,4 @@
+use axiom::behaviours::NewType;
 use axiom::interfaces::ddd;
 
 use crate::time::Epoch;
@@ -7,7 +8,7 @@ use crate::time::Timestamp;
 /// ### See also:
 /// - [Twitter's announcement](https://blog.x.com/engineering/en_us/a/2010/announcing-snowflake)
 /// - [Comparison to UUID](https://softwaremind.com/blog/the-unique-features-of-snowflake-id-and-its-comparison-to-uuid/)
-#[derive(ddd::Identifier)]
+#[derive(ddd::Identifier, NewType)]
 #[derive(Copy, PartialOrd, Ord)]
 pub struct Snowflake(u64);
 

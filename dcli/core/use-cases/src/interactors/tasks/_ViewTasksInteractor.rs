@@ -10,7 +10,6 @@ use crate::boundaries::tasks::ViewTasksRequestModel;
 use crate::boundaries::tasks::ViewTasksResponseModel;
 use crate::boundaries::tasks::ViewTasksTaskModel;
 use crate::boundaries::tasks::ViewTasksTaskStatusModel;
-use crate::gateways::parsers::ids::SnowflakeParser;
 use crate::gateways::pointers::PointerHandle;
 use crate::gateways::pointers::SharedPointer;
 use crate::gateways::repositories::tasks::TaskRepository;
@@ -19,7 +18,6 @@ use crate::utils::dataclasses::pagination::PaginationResponse;
 #[derive(New)]
 pub struct ViewTasksInteractor<Handle: PointerHandle> {
     taskRepository: SharedPointer<Box<dyn TaskRepository>, Handle>,
-    snowflakeParser: SharedPointer<Box<dyn SnowflakeParser>, Handle>,
 }
 
 impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksInteractor<Handle> {
@@ -54,9 +52,7 @@ impl<Handle: PointerHandle> ViewTasksInteractor<Handle> {
             id: task.id.deref().clone(),
             description: task.description.deref().clone(),
             status: self.mapTaskStatusToTaskStatusModel(task.status),
-            createdAt: self.snowflakeParser.read()
-                .getTimestampFromSnowflake(task.id)
-                .deref().clone(),
+            createdAt: task.id.getTimestamp().asSystemTime(),
         };
     }
 
