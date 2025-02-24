@@ -24,10 +24,10 @@ fn deriveForStruct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro
 
     let field = fields.unnamed.first().unwrap();
 
-    return deriveForSingleFieldedOrdinaryStruct(ast, field);
+    return deriveForSingleFieldedTupleStruct(ast, field);
 }
 
-fn deriveForSingleFieldedOrdinaryStruct(ast: &syn::DeriveInput, field: &syn::Field) -> proc_macro2::TokenStream {
+fn deriveForSingleFieldedTupleStruct(ast: &syn::DeriveInput, field: &syn::Field) -> proc_macro2::TokenStream {
     let structIdent = &ast.ident;
     let (structImplGenerics, structTypeGenerics, structWhereClause) = ast.generics.split_for_impl();
 
