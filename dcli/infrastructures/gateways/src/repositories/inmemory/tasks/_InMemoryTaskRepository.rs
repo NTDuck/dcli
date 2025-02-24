@@ -33,14 +33,14 @@ impl TaskRepository for InMemoryTaskRepository {
         return self.tasksByIds.get(&taskId).cloned();
     }
 
-    fn showOrderedByCreatedAtDesc(&self, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
+    fn showChronologicallyOrdered(&self, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
         let orderedTasks = self.tasksByIds
             .values()
             .rev();
         return Self::paginate(orderedTasks, paginationRequest);
     }
 
-    fn showByStatusOrderedByCreatedAtDesc(&self, status: TaskStatus, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
+    fn showChronologicallyOrderedByStatus(&self, status: TaskStatus, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
         let filteredAndOrderedTasks = self.tasksByIds
             .values()
             .filter(|task| task.status == status)

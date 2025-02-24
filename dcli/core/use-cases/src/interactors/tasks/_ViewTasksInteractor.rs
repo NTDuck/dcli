@@ -23,7 +23,7 @@ pub struct ViewTasksInteractor<Handle: PointerHandle> {
 impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksInteractor<Handle> {
     fn apply(&self, request: ViewTasksRequestModel) -> Result<ViewTasksResponseModel, ViewTasksErrorModel> {
         let paginationResponse = self.taskRepository.read()
-            .showOrderedByCreatedAtDesc(request.paginationRequest);
+            .showChronologicallyOrdered(request.paginationRequest);
         let responseModel = self.mapPaginationResponseToResponseModel(paginationResponse);
 
         return Ok(responseModel);
@@ -49,7 +49,7 @@ impl<Handle: PointerHandle> ViewTasksInteractor<Handle> {
 
     fn mapTaskToTaskModel(&self, task: Task) -> ViewTasksTaskModel {
         return ViewTasksTaskModel {
-            id: task.id.deref().clone(),
+            id: *task.id.deref(),
             description: task.description.deref().clone(),
             status: self.mapTaskStatusToTaskStatusModel(task.status),
             createdAt: task.id.getTimestamp().asSystemTime(),
