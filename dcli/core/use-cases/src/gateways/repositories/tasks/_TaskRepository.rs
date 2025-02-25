@@ -11,8 +11,8 @@ pub trait TaskRepository {
 
     fn getById(&self, taskId: TaskId) -> Option<Task>;
 
-    fn showChronologicallyOrdered(&self, paginationRequest: PaginationRequest) -> PaginationResponse<Task>;
-    fn showChronologicallyOrderedByStatus(&self, status: TaskStatus, paginationRequest: PaginationRequest) -> PaginationResponse<Task>;
+    fn showReverseChronologicallyOrdered(&self, paginationRequest: PaginationRequest) -> PaginationResponse<Task>;
+    fn showReverseChronologicallyOrderedByStatus(&self, status: TaskStatus, paginationRequest: PaginationRequest) -> PaginationResponse<Task>;
 
     fn contains(&self, taskId: TaskId) -> bool {
         return self.getById(taskId).is_some();

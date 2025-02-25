@@ -23,7 +23,7 @@ pub struct ViewTasksInteractor<Handle: PointerHandle> {
 impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksInteractor<Handle> {
     fn apply(&self, request: ViewTasksRequestModel) -> Result<ViewTasksResponseModel, ViewTasksErrorModel> {
         let paginationResponse = self.taskRepository.read()
-            .showChronologicallyOrdered(request.paginationRequest);
+            .showReverseChronologicallyOrdered(request.paginationRequest);
         let responseModel = self.mapPaginationResponseToResponseModel(paginationResponse);
 
         return Ok(responseModel);

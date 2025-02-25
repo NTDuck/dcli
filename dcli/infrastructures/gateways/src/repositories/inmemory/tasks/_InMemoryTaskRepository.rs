@@ -1,54 +1,54 @@
-use domain::utils::dataclasses::ids::Uuid;
-use domain::Task;
-use domain::TaskStatus;
-use indexmap::IndexMap;
+use std::cmp::Reverse;
+use std::collections::BTreeMap;
+
+use domain::tasks::Task;
+use domain::tasks::TaskId;
+use domain::tasks::TaskStatus;
 use use_cases::gateways::repositories::tasks::TaskRepository;
-use use_cases::utils::dataclasses::pagination::PaginationProperties;
+use use_cases::utils::dataclasses::pagination::MinPageSize;
 use use_cases::utils::dataclasses::pagination::PaginationRange;
 use use_cases::utils::dataclasses::pagination::PaginationRequest;
 use use_cases::utils::dataclasses::pagination::PaginationResponse;
 
 pub struct InMemoryTaskRepository {
-    tasksByIds: IndexMap<Uuid, Task>,
+    tasksByIds: BTreeMap<TaskId, Task>,
 }
 
 impl InMemoryTaskRepository {
     pub fn new() -> Self {
         return Self {
-            tasksByIds: IndexMap::new(),
+            tasksByIds: BTreeMap::new(),
         };
     }
 }
 
 impl TaskRepository for InMemoryTaskRepository {
     fn save(&mut self, task: Task) {
-        self.tasksByIds.insert(task.id, task.clone());
+        self.tasksByIds.insert(Reverse(task.id), task);
     }
 
-    fn remove(&mut self, taskId: Uuid) {
-        self.tasksByIds.shift_remove(&taskId);
+    fn remove(&mut self, taskId: TaskId) {
+        self.tasksByIds.remove(&taskId);
     }
 
-    fn getById(&self, taskId: Uuid) -> Option<Task> {
+    fn getById(&self, taskId: TaskId) -> Option<Task> {
         return self.tasksByIds.get(&taskId).cloned();
     }
 
-    fn showChronologicallyOrdered(&self, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
-        let orderedTasks = self.tasksByIds
-            .values()
-            .rev();
-        return Self::paginate(orderedTasks, paginationRequest);
+    fn showReverseChronologicallyOrdered(&self, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
+        let reverseChronologicallyOrderedTasks = self.tasksByIds
+            .values();
+        return Self::computePaginationResponse(reverseChronologicallyOrderedTasks, paginationRequest);
     }
 
-    fn showChronologicallyOrderedByStatus(&self, status: TaskStatus, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
-        let filteredAndOrderedTasks = self.tasksByIds
+    fn showReverseChronologicallyOrderedByStatus(&self, status: TaskStatus, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
+        let reverseChronologicallyOrderedTasksByStatus = self.tasksByIds
             .values()
-            .filter(|task| task.status == status)
-            .rev();
-        return Self::paginate(filteredAndOrderedTasks, paginationRequest);
+            .filter(|task| task.status == status);
+        return Self::computePaginationResponse(reverseChronologicallyOrderedTasksByStatus, paginationRequest);
     }
 
-    fn contains(&self, taskId: Uuid) -> bool {
+    fn contains(&self, taskId: TaskId) -> bool {
         return self.tasksByIds.contains_key(&taskId);
     }
 
@@ -63,11 +63,10 @@ impl TaskRepository for InMemoryTaskRepository {
 }
 
 impl InMemoryTaskRepository {
-    fn paginate<'a>(unpaginatedTasks: impl Iterator<Item = &'a Task>, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
+    fn computePaginationResponse(unpaginatedTasks: impl Iterator<Item = Task>, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
         let paginationRange = PaginationRange::from(&paginationRequest);
 
-        let unpaginatedTasks: Vec<_> = unpaginatedTasks.collect();
-        let numberOfTasksBefore = unpaginatedTasks.len();
+        let unpaginatedTasksCount = unpaginatedTasks.len();
 
         let paginatedTasks: Vec<_> = unpaginatedTasks
             .into_iter()
@@ -75,20 +74,22 @@ impl InMemoryTaskRepository {
             .take(paginationRange.limit)
             .cloned()
             .collect();
-        let numberOfTasksAfter = paginatedTasks.len();
+        let paginatedTasksCount = paginatedTasks.len();
+
+        let maxPageNumber = Self::computeMaxPageNumber(unpaginatedTasksCount, paginationRequest.maxPageSize);
 
         return PaginationResponse {
             items: paginatedTasks,
-            pageSize: numberOfTasksAfter,
+            pageSize: paginatedTasksCount,
             maxPageSize: paginationRequest.maxPageSize,
             pageNumber: paginationRequest.pageNumber,
-            maxPageNumber: Self::calcMaxPageNumber(numberOfTasksBefore, paginationRequest.maxPageSize),
+            maxPageNumber,
         };
     }
 
-    fn calcMaxPageNumber(numberOfTasks: usize, maxPageSize: usize) -> usize {
+    fn computeMaxPageNumber(numberOfTasks: usize, maxPageSize: usize) -> usize {
         return match numberOfTasks {
-            0 => PaginationProperties::MinPageSize,
+            0 => MinPageSize,
             _ => numberOfTasks.div_ceil(maxPageSize),
         };
     }

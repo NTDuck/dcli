@@ -10,7 +10,6 @@ domain = { path = "../../core/domain" }
 use-cases = { path = "../../core/use-cases", features = ["gateways"] }
 
 chrono = "0.4"
-indexmap = "2.7"
 pnet_datalink = "0.35"
 rand = "0.9"
 rayon = "1.10"
