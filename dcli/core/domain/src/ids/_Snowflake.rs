@@ -15,8 +15,8 @@ pub struct Snowflake(u64);
 impl Snowflake {
     pub fn new(
         timestamp: Timestamp,
-        workerNumber: u16,
-        sequenceNumber: u16,
+        workerNumber: SnowflakeWorkerNumber,
+        sequenceNumber: SnowflakeSequenceNumber,
     ) -> Self {
         let encodedTimestamp = Self::encodeTimestamp(timestamp);
         let encodedWorkerNumber = Self::encodeWorkerNumber(workerNumber);
@@ -35,14 +35,14 @@ impl Snowflake {
             .expect("Timestamp overflow");
     }
 
-    pub fn getWorkerNumber(&self) -> u16 {
+    pub fn getWorkerNumber(&self) -> SnowflakeWorkerNumber {
         let encodedSnowflake = self.asEncodedSnowflake();
-        return ((encodedSnowflake >> WorkerNumberShift) & WorkerNumberBitmask) as u16;
+        return ((encodedSnowflake >> WorkerNumberShift) & WorkerNumberBitmask) as SnowflakeWorkerNumber;
     }
 
-    pub fn getSequenceNumber(&self) -> u16 {
+    pub fn getSequenceNumber(&self) -> SnowflakeSequenceNumber {
         let encodedSnowflake = self.asEncodedSnowflake();
-        return ((encodedSnowflake >> SequenceNumberShift) & SequenceNumberBitmask) as u16;
+        return ((encodedSnowflake >> SequenceNumberShift) & SequenceNumberBitmask) as SnowflakeSequenceNumber;
     }
 
     fn encodeTimestamp(timestamp: Timestamp) -> u64 {
@@ -53,12 +53,12 @@ impl Snowflake {
         return (milliseconds & TimestampBitmask) << TimestampShift;
     }
 
-    fn encodeWorkerNumber(workerNumber: u16) -> u64 {
+    fn encodeWorkerNumber(workerNumber: SnowflakeWorkerNumber) -> u64 {
         let workerNumber = workerNumber as u64;
         return (workerNumber & WorkerNumberBitmask) << WorkerNumberShift;
     }
 
-    fn encodeSequenceNumber(sequenceNumber: u16) -> u64 {
+    fn encodeSequenceNumber(sequenceNumber: SnowflakeSequenceNumber) -> u64 {
         let sequenceNumber = sequenceNumber as u64;
         return (sequenceNumber & SequenceNumberBitmask) << SequenceNumberShift;
     }
@@ -67,6 +67,9 @@ impl Snowflake {
         return self.0;
     }
 }
+
+pub use u16 as SnowflakeWorkerNumber;
+pub use u16 as SnowflakeSequenceNumber;
 
 const SnowflakeBits: usize = 64;
 const ReservedBits: usize = 1;
