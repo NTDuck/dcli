@@ -36,14 +36,12 @@ impl TaskRepository for InMemoryTaskRepository {
     }
 
     fn showReverseChronologicallyOrdered(&self, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
-        let reverseChronologicallyOrderedTasks = self.tasksByIds
-            .values();
+        let reverseChronologicallyOrderedTasks = self.tasksByIds.values();
         return Self::computePaginationResponse(reverseChronologicallyOrderedTasks, paginationRequest);
     }
 
     fn showReverseChronologicallyOrderedByStatus(&self, status: TaskStatus, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
-        let reverseChronologicallyOrderedTasksByStatus = self.tasksByIds
-            .values()
+        let reverseChronologicallyOrderedTasksByStatus = self.tasksByIds.values()
             .filter(|task| task.status == status);
         return Self::computePaginationResponse(reverseChronologicallyOrderedTasksByStatus, paginationRequest);
     }

@@ -1,3 +1,3 @@
 use axiom::macros::layout::*;
 
-class!(InMemoryTaskRepositoryTest);
+class!(_InMemoryTaskRepositoryTest);
