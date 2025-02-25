@@ -11,7 +11,7 @@ use use_cases::utils::dataclasses::pagination::PaginationRequest;
 use use_cases::utils::dataclasses::pagination::PaginationResponse;
 
 pub struct InMemoryTaskRepository {
-    tasksByIds: BTreeMap<TaskId, Task>,
+    tasksByIds: BTreeMap<Reverse<TaskId>, Task>,
 }
 
 impl InMemoryTaskRepository {
@@ -28,11 +28,11 @@ impl TaskRepository for InMemoryTaskRepository {
     }
 
     fn remove(&mut self, taskId: TaskId) {
-        self.tasksByIds.remove(&taskId);
+        self.tasksByIds.remove(&Reverse(taskId));
     }
 
     fn getById(&self, taskId: TaskId) -> Option<Task> {
-        return self.tasksByIds.get(&taskId).cloned();
+        return self.tasksByIds.get(&Reverse(taskId)).cloned();
     }
 
     fn showReverseChronologicallyOrdered(&self, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
@@ -49,7 +49,7 @@ impl TaskRepository for InMemoryTaskRepository {
     }
 
     fn contains(&self, taskId: TaskId) -> bool {
-        return self.tasksByIds.contains_key(&taskId);
+        return self.tasksByIds.contains_key(&Reverse(taskId));
     }
 
     fn clear(&mut self) {
@@ -63,10 +63,11 @@ impl TaskRepository for InMemoryTaskRepository {
 }
 
 impl InMemoryTaskRepository {
-    fn computePaginationResponse(unpaginatedTasks: impl Iterator<Item = Task>, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
+    fn computePaginationResponse<'repo>(unpaginatedTasks: impl Iterator<Item = &'repo Task>, paginationRequest: PaginationRequest) -> PaginationResponse<Task> {
         let paginationRange = PaginationRange::from(&paginationRequest);
 
-        let unpaginatedTasksCount = unpaginatedTasks.len();
+        let unpaginatedTasksCount = Self::computeIteratorSize(&unpaginatedTasks);
+        let maxPageNumber = Self::computeMaxPageNumber(unpaginatedTasksCount, paginationRequest.maxPageSize);
 
         let paginatedTasks: Vec<_> = unpaginatedTasks
             .into_iter()
@@ -76,8 +77,6 @@ impl InMemoryTaskRepository {
             .collect();
         let paginatedTasksCount = paginatedTasks.len();
 
-        let maxPageNumber = Self::computeMaxPageNumber(unpaginatedTasksCount, paginationRequest.maxPageSize);
-
         return PaginationResponse {
             items: paginatedTasks,
             pageSize: paginatedTasksCount,
@@ -85,6 +84,12 @@ impl InMemoryTaskRepository {
             pageNumber: paginationRequest.pageNumber,
             maxPageNumber,
         };
+    }
+
+    fn computeIteratorSize<T>(iterator: &impl Iterator<Item = T>) -> usize {
+        let (_, upperBound) = iterator.size_hint();
+        return upperBound
+            .expect("Iterator has no known upper bound");
     }
 
     fn computeMaxPageNumber(numberOfTasks: usize, maxPageSize: usize) -> usize {
