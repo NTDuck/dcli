@@ -1,4 +1,3 @@
 use axiom::macros::layout::*;
 
-class!(pub _SnowflakeSequenceNumberProvider);
-class!(pub _WorkerIdProvider);
+class!(pub _SnowflakeProvider);

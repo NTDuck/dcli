@@ -1,28 +1,21 @@
 use axiom::behaviours::New;
-use domain::ids::Snowflake;
-use domain::ids::SnowflakeWorkerNumber;
 use domain::tasks::Task;
 use domain::tasks::TaskDescription;
 use domain::tasks::TaskDescriptionError;
 use domain::tasks::TaskStatus;
-use domain::time::Timestamp;
 
 use crate::boundaries::tasks::CreateTaskBoundary;
 use crate::boundaries::tasks::CreateTaskErrorModel;
 use crate::boundaries::tasks::CreateTaskRequestModel;
 use crate::boundaries::tasks::CreateTaskResponseModel;
-use crate::gateways::encoders::ids::WorkerIdEncoder;
 use crate::gateways::pointers::PointerHandle;
 use crate::gateways::pointers::SharedPointer;
-use crate::gateways::providers::ids::SnowflakeSequenceNumberProvider;
-use crate::gateways::providers::ids::WorkerIdProvider;
+use crate::gateways::providers::ids::SnowflakeProvider;
 use crate::gateways::repositories::tasks::TaskRepository;
 
 #[derive(New)]
 pub struct CreateTaskInteractor<Handle: PointerHandle> {
-    workerIdEncoder: SharedPointer<Box<dyn WorkerIdEncoder>, Handle>,
-    sequenceNumberProvider: SharedPointer<Box<dyn SnowflakeSequenceNumberProvider>, Handle>,
-    workerIdProvider: SharedPointer<Box<dyn WorkerIdProvider>, Handle>,
+    snowflakeProvider: SharedPointer<Box<dyn SnowflakeProvider>, Handle>,
     taskRepository: SharedPointer<Box<dyn TaskRepository>, Handle>,
 }
 
@@ -31,12 +24,8 @@ impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> 
         let taskDescription = TaskDescription::try_from(request.taskDescription)
             .map_err(|error| self.mapTaskDescriptionErrorToErrorModel(error))?;
         
-        let currentTimestamp = Timestamp::current();
-        let workerNumber = self.getWorkerNumber();
-        let sequenceNumber = self.sequenceNumberProvider.read()
-            .getSequenceNumber();
-
-        let snowflake = Snowflake::new(currentTimestamp, workerNumber, sequenceNumber);
+        let snowflake = self.snowflakeProvider.read()
+            .newSnowflakeFromCurrentTimestamp();
 
         let task = Task {
             id: snowflake,
@@ -69,14 +58,5 @@ impl<Handle: PointerHandle> CreateTaskInteractor<Handle> {
                 maxLengthAllowed,
             },
         };
-    }
-
-    fn getWorkerNumber(&self) -> SnowflakeWorkerNumber {
-        let workerIdProvider = self.workerIdProvider.read();
-        let workerId = workerIdProvider
-            .getWorkerId();
-        let workerNumber = self.workerIdEncoder.read()
-            .encodeWorkerId(workerId);
-        return workerNumber;
     }
 }
