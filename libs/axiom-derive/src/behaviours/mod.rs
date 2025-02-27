@@ -1,4 +1,4 @@
 use layout::*;
 
-class!(pub _deriveNew);
-class!(pub _deriveNewType);
+class!(pub _derive_New);
+class!(pub _derive_NewType);

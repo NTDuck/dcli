@@ -1,5 +1,5 @@
 use layout::*;
 
-class!(pub _deriveEntity);
-class!(pub _deriveIdentifier);
-class!(pub _deriveValueObject);
+class!(pub _derive_Entity);
+class!(pub _derive_Identifier);
+class!(pub _derive_ValueObject);

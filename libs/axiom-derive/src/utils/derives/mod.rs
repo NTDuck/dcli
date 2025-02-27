@@ -1,11 +1,11 @@
 use layout::*;
 
-class!(pub _deriveDebug);
-class!(pub _deriveClone);
+class!(pub _derive_Debug);
+class!(pub _derive_Clone);
 
-class!(pub _derivePartialEq);
-class!(pub _deriveEq);
+class!(pub _derive_PartialEq);
+class!(pub _derive_Eq);
 
-class!(pub _deriveHash);
+class!(pub _derive_Hash);
 
-class!(pub _deriveSerialize);
+class!(pub _derive_Serialize);

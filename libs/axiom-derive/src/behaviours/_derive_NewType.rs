@@ -1,0 +1,51 @@
+use quote::quote;
+
+pub fn derive_NewType(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let ast = syn::parse_macro_input!(tokens as syn::DeriveInput);
+
+    let tokens = match &ast.data {
+        syn::Data::Struct(data) => derive_for_struct(&ast, data),
+        _ => panic!(),
+    };
+
+    return proc_macro::TokenStream::from(tokens);
+}
+
+fn derive_for_struct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
+    let fields = &data.fields;
+
+    let syn::Fields::Unnamed(fields) = fields else {
+        panic!("Newtypes must be a single-fielded tuple struct")
+    };
+
+    if fields.unnamed.len() != 1 {
+        panic!("Newtypes must be a single-fielded tuple struct")
+    };
+
+    let field = fields.unnamed.first().unwrap();
+
+    return derive_for_single_fielded_tuple_struct(ast, field);
+}
+
+fn derive_for_single_fielded_tuple_struct(ast: &syn::DeriveInput, field: &syn::Field) -> proc_macro2::TokenStream {
+    let struct_ident = &ast.ident;
+    let (struct_impl_generics, struct_type_generics, struct_where_clause) = ast.generics.split_for_impl();
+
+    let field_type = &field.ty;
+
+    return quote! {
+        impl #struct_impl_generics std::ops::Deref for #struct_ident #struct_type_generics #struct_where_clause {
+            type Target = #field_type;
+
+            fn deref(&self) -> &Self::Target {
+                return &self.0;
+            }
+        }
+
+        impl #struct_impl_generics std::ops::DerefMut for #struct_ident #struct_type_generics #struct_where_clause {
+            fn deref_mut(&mut self) -> &mut Self::Target {
+                return &mut self.0;
+            }
+        }
+    }
+}
