@@ -11,12 +11,6 @@ impl Interval {
         return Self(duration);
     }
 
-    pub const fn asDuration(&self) -> Duration {
-        return self.0;
-    }
-}
-
-impl Interval {
     pub const fn fromSeconds(seconds: u64) -> Self {
         let duration = Duration::from_secs(seconds);
         return Self::fromDuration(duration);
@@ -35,6 +29,10 @@ impl Interval {
     pub const fn fromNanoseconds(nanoseconds: u64) -> Self {
         let duration = Duration::from_nanos(nanoseconds);
         return Self::fromDuration(duration);
+    }
+
+    pub const fn asDuration(&self) -> Duration {
+        return self.0;
     }
 
     pub const fn asSeconds(&self) -> u64 {

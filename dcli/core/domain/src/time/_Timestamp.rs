@@ -10,7 +10,7 @@ use crate::time::Interval;
 pub struct Timestamp(SystemTime);
 
 impl Timestamp {
-    pub(in crate::time) const fn fromSystemTime(systemTime: SystemTime) -> Self {
+    pub const fn fromSystemTime(systemTime: SystemTime) -> Self {
         return Self(systemTime);
     }
 
@@ -20,12 +20,7 @@ impl Timestamp {
 }
 
 impl Timestamp {
-    pub fn current() -> Self {
-        let currentSystemTime = SystemTime::now();
-        return Self::fromSystemTime(currentSystemTime);
-    }
-
-    pub fn intervalSince(&self, previous: Self) -> Option<Interval> {
+    pub fn computeIntervalSince(&self, previous: Self) -> Option<Interval> {
         let systemTime = self.asSystemTime();
         let previousSystemTime = previous.asSystemTime();
         

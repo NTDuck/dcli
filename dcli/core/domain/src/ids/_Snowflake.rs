@@ -46,7 +46,7 @@ impl Snowflake {
     }
 
     fn encodeTimestamp(timestamp: Timestamp) -> u64 {
-        let interval = timestamp.intervalSince(Epoch)
+        let interval = timestamp.computeIntervalSince(Epoch)
             .expect("Timestamp earlier than Epoch");
         let milliseconds = interval.asMilliseconds() as u64;
         
@@ -68,8 +68,8 @@ impl Snowflake {
     }
 }
 
-pub use u16 as SnowflakeWorkerNumber;
-pub use u16 as SnowflakeSequenceNumber;
+pub type SnowflakeWorkerNumber = u16;
+pub type SnowflakeSequenceNumber = u16;
 
 const SnowflakeBits: usize = 64;
 const ReservedBits: usize = 1;

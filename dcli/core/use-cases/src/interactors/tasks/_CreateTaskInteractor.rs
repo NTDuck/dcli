@@ -11,10 +11,12 @@ use crate::boundaries::tasks::CreateTaskResponseModel;
 use crate::gateways::pointers::PointerHandle;
 use crate::gateways::pointers::SharedPointer;
 use crate::gateways::providers::ids::SnowflakeProvider;
+use crate::gateways::providers::time::TimestampProvider;
 use crate::gateways::repositories::tasks::TaskRepository;
 
 #[derive(New)]
 pub struct CreateTaskInteractor<Handle: PointerHandle> {
+    timestampProvider: SharedPointer<Box<dyn TimestampProvider>, Handle>,
     snowflakeProvider: SharedPointer<Box<dyn SnowflakeProvider>, Handle>,
     taskRepository: SharedPointer<Box<dyn TaskRepository>, Handle>,
 }
@@ -24,8 +26,10 @@ impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> 
         let taskDescription = TaskDescription::try_from(request.taskDescription)
             .map_err(|error| self.mapTaskDescriptionErrorToErrorModel(error))?;
         
+        let currentTimestamp = self.timestampProvider.read()
+            .getCurrentTimestamp();
         let snowflake = self.snowflakeProvider.read()
-            .newSnowflakeFromCurrentTimestamp();
+            .newSnowflakeFromTimestamp(currentTimestamp);
 
         let task = Task {
             id: snowflake,
