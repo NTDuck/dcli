@@ -11,10 +11,10 @@ impl TryFrom<String> for TaskDescription {
     type Error = TaskDescriptionError;
     
     fn try_from(description: String) -> Result<Self, Self::Error> {
-        let description = Self::removeTrailingAndLeadingWhitespaces(&description);
+        let description = Self::remove_trailing_and_leading_whitespaces(&description);
 
-        Self::ensureNoLengthUnderflow(description)?;
-        Self::ensureNoLengthOverflow(description)?;
+        Self::ensure_no_length_underflow(description)?;
+        Self::ensure_no_length_overflow(description)?;
 
         let description = description.to_string();
         return Ok(TaskDescription(description));
@@ -22,26 +22,26 @@ impl TryFrom<String> for TaskDescription {
 }
 
 impl TaskDescription {
-    fn removeTrailingAndLeadingWhitespaces(description: &str) -> &str {
+    fn remove_trailing_and_leading_whitespaces(description: &str) -> &str {
         return description.trim();
     }
 
-    fn ensureNoLengthUnderflow(description: &str) -> Result<(), TaskDescriptionError> {
-        if description.len() < MinLengthRequired {
+    fn ensure_no_length_underflow(description: &str) -> Result<(), TaskDescriptionError> {
+        if description.len() < MIN_LENGTH_REQUIRED {
             return Err(TaskDescriptionError::LengthUnderflow {
-                actualLength: description.len(),
-                minLengthRequired: MinLengthRequired,
+                actual_length: description.len(),
+                min_length_required: MIN_LENGTH_REQUIRED,
             });
         }
 
         return Ok(());
     }
 
-    fn ensureNoLengthOverflow(description: &str) -> Result<(), TaskDescriptionError> {
-        if description.len() > MaxLengthAllowed {
+    fn ensure_no_length_overflow(description: &str) -> Result<(), TaskDescriptionError> {
+        if description.len() > MAX_LENGTH_ALLOWED {
             return Err(TaskDescriptionError::LengthOverflow {
-                actualLength: description.len(),
-                maxLengthAllowed: MaxLengthAllowed,
+                actual_length: description.len(),
+                max_length_allowed: MAX_LENGTH_ALLOWED,
             });
         }
 
@@ -49,17 +49,17 @@ impl TaskDescription {
     }
 }
 
-const MinLengthRequired: usize = 1;
-const MaxLengthAllowed: usize = 1024;
+const MIN_LENGTH_REQUIRED: usize = 1;
+const MAX_LENGTH_ALLOWED: usize = 1024;
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub enum TaskDescriptionError {
     LengthUnderflow {
-        actualLength: usize,
-        minLengthRequired: usize,
+        actual_length: usize,
+        min_length_required: usize,
     },
     LengthOverflow {
-        actualLength: usize,
-        maxLengthAllowed: usize,
+        actual_length: usize,
+        max_length_allowed: usize,
     },
 }

@@ -2,7 +2,7 @@ use domain::tasks::Task;
 use domain::tasks::TaskDescription;
 use domain::tasks::TaskId;
 use domain::tasks::TaskStatus;
-use domain::time::Epoch;
+use domain::time::EPOCH;
 use domain::time::Interval;
 use gateways::repositories::inmemory::tasks::InMemoryTaskRepository;
 use use_cases::gateways::repositories::tasks::TaskRepository;
@@ -11,95 +11,95 @@ use use_cases::gateways::repositories::tasks::TaskRepository;
 fn GivenEmptyRepository_WhenSaveTask_ThenContainsTask() {
     let mut repository = InMemoryTaskRepository::new();
 
-    repository.save(newTaskWithId(42));
+    repository.save(new_task_with_id(42));
     
-    assert!(repository.contains(newTaskId(42)));
+    assert!(repository.contains(new_task_id(42)));
 }
 
 #[test]
 fn GivenRepositoryWithTask_WhenRemoveTask_ThenDoesNotContainTask() {
     let mut repository = InMemoryTaskRepository::new();
-    repository.save(newTaskWithId(42));
+    repository.save(new_task_with_id(42));
 
-    repository.remove(newTaskId(42));
+    repository.remove(new_task_id(42));
 
-    assert!(!repository.contains(newTaskId(42)));
+    assert!(!repository.contains(new_task_id(42)));
 }
 
 #[test]
 fn GivenRepositoryWithTask_WhenGetById_ThenReturnsCorrectTask() {
     let mut repository = InMemoryTaskRepository::new();
-    repository.save(newTaskWithId(42));
+    repository.save(new_task_with_id(42));
 
-    let retrievedTask = repository.getById(newTaskId(42));
+    let retrievedTask = repository.get_by_id(new_task_id(42));
 
     assert!(retrievedTask.is_some());
-    assert_eq!(retrievedTask.unwrap(), newTaskWithId(42));
+    assert_eq!(retrievedTask.unwrap(), new_task_with_id(42));
 }
 
 #[test]
 fn GivenEmptyRepository_WhenGetById_ThenReturnsNone() {
     let repository = InMemoryTaskRepository::new();
 
-    let retrievedTask = repository.getById(newTaskId(42));
+    let retrieved_task = repository.get_by_id(new_task_id(42));
 
-    assert!(retrievedTask.is_none());
+    assert!(retrieved_task.is_none());
 }
 
 #[test]
 fn GivenRepositoryWithMultipleTasks_WhenClear_ThenRepositoryIsEmpty() {
     let mut repository = InMemoryTaskRepository::new();
-    repository.save(newTaskWithId(42));
-    repository.save(newTaskWithId(43));
+    repository.save(new_task_with_id(42));
+    repository.save(new_task_with_id(43));
 
     repository.clear();
 
-    assert!(!repository.contains(newTaskId(42)));
-    assert!(!repository.contains(newTaskId(43)));
+    assert!(!repository.contains(new_task_id(42)));
+    assert!(!repository.contains(new_task_id(43)));
 }
 
 #[test]
 fn GivenRepositoryWithDifferentStatuses_WhenClearByStatus_ThenRemovesOnlyMatchingStatus() {
     let mut repository = InMemoryTaskRepository::new();
-    repository.save(newTaskWithIdAndStatus(42, TaskStatus::Pending));
-    repository.save(newTaskWithIdAndStatus(43, TaskStatus::Pending));
-    repository.save(newTaskWithIdAndStatus(123, TaskStatus::InProgress));
-    repository.save(newTaskWithIdAndStatus(124, TaskStatus::InProgress));
-    repository.save(newTaskWithIdAndStatus(125, TaskStatus::InProgress));
-    repository.save(newTaskWithIdAndStatus(1234, TaskStatus::Completed));
-    repository.save(newTaskWithIdAndStatus(1235, TaskStatus::Completed));
-    repository.save(newTaskWithIdAndStatus(1236, TaskStatus::Completed));
-    repository.save(newTaskWithIdAndStatus(1237, TaskStatus::Completed));
+    repository.save(new_task_with_id_and_status(42, TaskStatus::Pending));
+    repository.save(new_task_with_id_and_status(43, TaskStatus::Pending));
+    repository.save(new_task_with_id_and_status(123, TaskStatus::InProgress));
+    repository.save(new_task_with_id_and_status(124, TaskStatus::InProgress));
+    repository.save(new_task_with_id_and_status(125, TaskStatus::InProgress));
+    repository.save(new_task_with_id_and_status(1234, TaskStatus::Completed));
+    repository.save(new_task_with_id_and_status(1235, TaskStatus::Completed));
+    repository.save(new_task_with_id_and_status(1236, TaskStatus::Completed));
+    repository.save(new_task_with_id_and_status(1237, TaskStatus::Completed));
     
-    repository.clearByStatus(TaskStatus::Completed);
+    repository.clear_by_status(TaskStatus::Completed);
 
-    assert!(repository.contains(newTaskId(42)));
-    assert!(repository.contains(newTaskId(43)));
-    assert!(repository.contains(newTaskId(123)));
-    assert!(repository.contains(newTaskId(124)));
-    assert!(repository.contains(newTaskId(125)));
-    assert!(!repository.contains(newTaskId(1234)));
-    assert!(!repository.contains(newTaskId(1235)));
-    assert!(!repository.contains(newTaskId(1236)));
-    assert!(!repository.contains(newTaskId(1237)));
+    assert!(repository.contains(new_task_id(42)));
+    assert!(repository.contains(new_task_id(43)));
+    assert!(repository.contains(new_task_id(123)));
+    assert!(repository.contains(new_task_id(124)));
+    assert!(repository.contains(new_task_id(125)));
+    assert!(!repository.contains(new_task_id(1234)));
+    assert!(!repository.contains(new_task_id(1235)));
+    assert!(!repository.contains(new_task_id(1236)));
+    assert!(!repository.contains(new_task_id(1237)));
 }
 
-fn newTaskWithId(value: u64) -> Task {
-    return newTaskWithIdAndStatus(value, TaskStatus::Pending);
+fn new_task_with_id(id: u64) -> Task {
+    return new_task_with_id_and_status(id, TaskStatus::Pending);
 }
 
-fn newTaskWithIdAndStatus(value: u64, status: TaskStatus) -> Task {
+fn new_task_with_id_and_status(id: u64, status: TaskStatus) -> Task {
     return Task {
-        id: newTaskId(value),
+        id: new_task_id(id),
         description: TaskDescription::try_from("tomfoolery".to_owned())
             .expect("Invalid description length"),
         status,
     };
 }
 
-fn newTaskId(value: u64) -> TaskId {
+fn new_task_id(id: u64) -> TaskId {
     return TaskId::new(
-        Epoch.checkedAdd(Interval::fromSeconds(value))
+        EPOCH.checked_add(Interval::from_secs(id))
             .expect("Timestamp earlier than Epoch"),
         Default::default(), Default::default(),
     );

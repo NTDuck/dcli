@@ -22,27 +22,27 @@ pub struct ViewTasksInteractor<Handle: PointerHandle> {
 
 impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksInteractor<Handle> {
     fn apply(&self, request: ViewTasksRequestModel) -> Result<ViewTasksResponseModel, ViewTasksErrorModel> {
-        let paginationResponse = self.taskRepository.read()
-            .showReverseChronologicallyOrdered(request.paginationRequest);
-        let responseModel = self.mapPaginationResponseToResponseModel(paginationResponse);
+        let pagination_response = self.taskRepository.as_ref()
+            .show_reverse_chronologically_ordered(request.pagination_request);
+        let response_model = self.map_pagination_response_to_response_model(pagination_response);
 
-        return Ok(responseModel);
+        return Ok(response_model);
     }
 }
 
 impl<Handle: PointerHandle> ViewTasksInteractor<Handle> {
-    fn mapPaginationResponseToResponseModel(&self, paginationResponse: PaginationResponse<Task>) -> ViewTasksResponseModel {
+    fn map_pagination_response_to_response_model(&self, pagination_response: PaginationResponse<Task>) -> ViewTasksResponseModel {
         return ViewTasksResponseModel {
-            paginationResponse: PaginationResponse {
-                items: paginationResponse.items
+            pagination_response: PaginationResponse {
+                items: pagination_response.items
                     .into_iter()
                     .map(|task| self.mapTaskToTaskModel(task))
                     .collect(),
 
-                pageSize: paginationResponse.pageSize,
-                maxPageSize: paginationResponse.maxPageSize,
-                pageNumber: paginationResponse.pageNumber,
-                maxPageNumber: paginationResponse.maxPageNumber,
+                page_size: pagination_response.page_size,
+                max_page_size: pagination_response.max_page_size,
+                page_number: pagination_response.page_number,
+                max_page_number: pagination_response.max_page_number,
             },
         };
     }
@@ -52,12 +52,12 @@ impl<Handle: PointerHandle> ViewTasksInteractor<Handle> {
             id: *task.id.deref(),
             description: task.description.deref().clone(),
             status: self.mapTaskStatusToTaskStatusModel(task.status),
-            createdAt: task.id.getTimestamp().asSystemTime(),
+            created_at: task.id.get_timestamp().as_system_time(),
         };
     }
 
-    fn mapTaskStatusToTaskStatusModel(&self, taskStatus: TaskStatus) -> ViewTasksTaskStatusModel {
-        return match taskStatus {
+    fn mapTaskStatusToTaskStatusModel(&self, task_status: TaskStatus) -> ViewTasksTaskStatusModel {
+        return match task_status {
             TaskStatus::Pending => ViewTasksTaskStatusModel::Pending,
             TaskStatus::InProgress => ViewTasksTaskStatusModel::InProgress,
             TaskStatus::Completed => ViewTasksTaskStatusModel::Completed,

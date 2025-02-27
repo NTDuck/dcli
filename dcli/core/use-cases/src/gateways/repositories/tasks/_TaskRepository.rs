@@ -7,17 +7,17 @@ use crate::utils::dataclasses::pagination::PaginationResponse;
 
 pub trait TaskRepository {
     fn save(&mut self, task: Task);
-    fn remove(&mut self, taskId: TaskId);
+    fn remove(&mut self, task_id: TaskId);
 
-    fn getById(&self, taskId: TaskId) -> Option<Task>;
+    fn get_by_id(&self, task_id: TaskId) -> Option<Task>;
 
-    fn showReverseChronologicallyOrdered(&self, paginationRequest: PaginationRequest) -> PaginationResponse<Task>;
-    fn showReverseChronologicallyOrderedByStatus(&self, status: TaskStatus, paginationRequest: PaginationRequest) -> PaginationResponse<Task>;
+    fn show_reverse_chronologically_ordered(&self, pagination_request: PaginationRequest) -> PaginationResponse<Task>;
+    fn show_reverse_chronologically_ordered_by_status(&self, status: TaskStatus, pagination_request: PaginationRequest) -> PaginationResponse<Task>;
 
-    fn contains(&self, taskId: TaskId) -> bool {
-        return self.getById(taskId).is_some();
+    fn contains(&self, task_id: TaskId) -> bool {
+        return self.get_by_id(task_id).is_some();
     }
 
     fn clear(&mut self);
-    fn clearByStatus(&mut self, status: TaskStatus);
+    fn clear_by_status(&mut self, status: TaskStatus);
 }

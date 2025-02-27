@@ -1,5 +1,5 @@
 use domain::time::Timestamp;
 
 pub trait TimestampProvider {
-    fn getCurrentTimestamp(&self) -> Timestamp;
+    fn get_current_timestamp(&self) -> Timestamp;
 }

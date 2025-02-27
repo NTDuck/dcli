@@ -1,7 +1,7 @@
 use axiom::behaviours::NewType;
 use axiom::interfaces::ddd;
 
-use crate::time::Epoch;
+use crate::time::EPOCH;
 use crate::time::Interval;
 use crate::time::Timestamp;
 
@@ -15,55 +15,55 @@ pub struct Snowflake(u64);
 impl Snowflake {
     pub fn new(
         timestamp: Timestamp,
-        workerNumber: SnowflakeWorkerNumber,
-        sequenceNumber: SnowflakeSequenceNumber,
+        worker_number: SnowflakeWorkerNumber,
+        sequence_number: SnowflakeSequenceNumber,
     ) -> Self {
-        let encodedTimestamp = Self::encodeTimestamp(timestamp);
-        let encodedWorkerNumber = Self::encodeWorkerNumber(workerNumber);
-        let encodedSequenceNumber = Self::encodeSequenceNumber(sequenceNumber);
+        let encoded_timestamp = Self::encode_timestamp(timestamp);
+        let encoded_worker_number = Self::encode_worker_number(worker_number);
+        let encoded_sequence_number = Self::encode_sequence_number(sequence_number);
 
-        return Self(encodedTimestamp | encodedWorkerNumber | encodedSequenceNumber);
+        return Self(encoded_timestamp | encoded_worker_number | encoded_sequence_number);
     }
 
-    pub fn getTimestamp(&self) -> Timestamp {
-        let encodedSnowflake = self.asEncodedSnowflake();
-        let encodedMilliseconds = (encodedSnowflake >> TimestampShift) & TimestampBitmask;
-        let encodedInterval = Interval::fromMilliseconds(encodedMilliseconds);
+    pub fn get_timestamp(&self) -> Timestamp {
+        let inner = self.as_inner();
+        let encoded_millis = (inner >> TIMESTAMP_SHIFT) & TIMESTAMP_BITMASK;
+        let encoded_interval = Interval::from_millis(encoded_millis);
         
-        return Epoch
-            .checkedAdd(encodedInterval)
+        return EPOCH
+            .checked_add(encoded_interval)
             .expect("Timestamp overflow");
     }
 
-    pub fn getWorkerNumber(&self) -> SnowflakeWorkerNumber {
-        let encodedSnowflake = self.asEncodedSnowflake();
-        return ((encodedSnowflake >> WorkerNumberShift) & WorkerNumberBitmask) as SnowflakeWorkerNumber;
+    pub fn get_worker_number(&self) -> SnowflakeWorkerNumber {
+        let inner = self.as_inner();
+        return ((inner >> WORKER_NUMBER_SHIFT) & WORKER_NUMBER_BITMASK) as SnowflakeWorkerNumber;
     }
 
-    pub fn getSequenceNumber(&self) -> SnowflakeSequenceNumber {
-        let encodedSnowflake = self.asEncodedSnowflake();
-        return ((encodedSnowflake >> SequenceNumberShift) & SequenceNumberBitmask) as SnowflakeSequenceNumber;
+    pub fn get_sequence_number(&self) -> SnowflakeSequenceNumber {
+        let inner = self.as_inner();
+        return ((inner >> SEQUENCE_NUMBER_SHIFT) & SEQUENCE_NUMBER_BITMASK) as SnowflakeSequenceNumber;
     }
 
-    fn encodeTimestamp(timestamp: Timestamp) -> u64 {
-        let interval = timestamp.computeIntervalSince(Epoch)
+    fn encode_timestamp(timestamp: Timestamp) -> u64 {
+        let interval = timestamp.computer_interval_since(EPOCH)
             .expect("Timestamp earlier than Epoch");
-        let milliseconds = interval.asMilliseconds() as u64;
+        let millis = interval.as_millis() as u64;
         
-        return (milliseconds & TimestampBitmask) << TimestampShift;
+        return (millis & TIMESTAMP_BITMASK) << TIMESTAMP_SHIFT;
     }
 
-    fn encodeWorkerNumber(workerNumber: SnowflakeWorkerNumber) -> u64 {
-        let workerNumber = workerNumber as u64;
-        return (workerNumber & WorkerNumberBitmask) << WorkerNumberShift;
+    fn encode_worker_number(worker_number: SnowflakeWorkerNumber) -> u64 {
+        let worker_number = worker_number as u64;
+        return (worker_number & WORKER_NUMBER_BITMASK) << WORKER_NUMBER_SHIFT;
     }
 
-    fn encodeSequenceNumber(sequenceNumber: SnowflakeSequenceNumber) -> u64 {
+    fn encode_sequence_number(sequenceNumber: SnowflakeSequenceNumber) -> u64 {
         let sequenceNumber = sequenceNumber as u64;
-        return (sequenceNumber & SequenceNumberBitmask) << SequenceNumberShift;
+        return (sequenceNumber & SEQUENCE_NUMBER_BITMASK) << SEQUENCE_NUMBER_SHIFT;
     }
 
-    fn asEncodedSnowflake(&self) -> u64 {
+    fn as_inner(&self) -> u64 {
         return self.0;
     }
 }
@@ -71,16 +71,16 @@ impl Snowflake {
 pub type SnowflakeWorkerNumber = u16;
 pub type SnowflakeSequenceNumber = u16;
 
-const SnowflakeBits: usize = 64;
-const ReservedBits: usize = 1;
-const TimestampBits: usize = 41;
-const WorkerNumberBits: usize = 10;
-const SequenceNumberBits: usize = 12;
+const SNOWFLAKE_BITS: usize = 64;
+const RESERVED_BITS: usize = 1;
+const TIMESTAMP_BITS: usize = 41;
+const WORKER_NUMBER_BITS: usize = 10;
+const SEQUENCE_NUMBER_BITS: usize = 12;
 
-const TimestampBitmask: u64 = 0x1ffffffffff;
-const WorkerNumberBitmask: u64 = 0x3ff;
-const SequenceNumberBitmask: u64 = 0x0fff;
+const TIMESTAMP_BITMASK: u64 = 0x1ffffffffff;
+const WORKER_NUMBER_BITMASK: u64 = 0x3ff;
+const SEQUENCE_NUMBER_BITMASK: u64 = 0x0fff;
 
-const TimestampShift: usize = SnowflakeBits - ReservedBits - TimestampBits;
-const WorkerNumberShift: usize = TimestampShift - WorkerNumberBits;
-const SequenceNumberShift: usize = WorkerNumberShift - SequenceNumberBits;
+const TIMESTAMP_SHIFT: usize = SNOWFLAKE_BITS - RESERVED_BITS - TIMESTAMP_BITS;
+const WORKER_NUMBER_SHIFT: usize = TIMESTAMP_SHIFT - WORKER_NUMBER_BITS;
+const SEQUENCE_NUMBER_SHIFT: usize = WORKER_NUMBER_SHIFT - SEQUENCE_NUMBER_BITS;

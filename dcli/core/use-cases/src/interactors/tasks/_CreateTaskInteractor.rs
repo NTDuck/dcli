@@ -16,28 +16,28 @@ use crate::gateways::repositories::tasks::TaskRepository;
 
 #[derive(New)]
 pub struct CreateTaskInteractor<Handle: PointerHandle> {
-    timestampProvider: SharedPointer<Box<dyn TimestampProvider>, Handle>,
-    snowflakeProvider: SharedPointer<Box<dyn SnowflakeProvider>, Handle>,
-    taskRepository: SharedPointer<Box<dyn TaskRepository>, Handle>,
+    timestamp_provider: SharedPointer<Box<dyn TimestampProvider>, Handle>,
+    snowflake_provider: SharedPointer<Box<dyn SnowflakeProvider>, Handle>,
+    task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
 }
 
 impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> {
     fn apply(&self, request: CreateTaskRequestModel) -> Result<CreateTaskResponseModel, CreateTaskErrorModel> {
-        let taskDescription = TaskDescription::try_from(request.taskDescription)
-            .map_err(|error| self.mapTaskDescriptionErrorToErrorModel(error))?;
+        let task_description = TaskDescription::try_from(request.task_description)
+            .map_err(|error| self.map_task_description_error_to_error_model(error))?;
         
-        let currentTimestamp = self.timestampProvider.read()
-            .getCurrentTimestamp();
-        let snowflake = self.snowflakeProvider.read()
-            .newSnowflakeFromTimestamp(currentTimestamp);
+        let current_timestamp = self.timestamp_provider.as_ref()
+            .get_current_timestamp();
+        let task_id = self.snowflake_provider.as_ref()
+            .new_snowflake_from_timestamp(current_timestamp);
 
         let task = Task {
-            id: snowflake,
-            description: taskDescription,
+            id: task_id,
+            description: task_description,
             status: TaskStatus::Pending,
         };
 
-        self.taskRepository.write()
+        self.task_repository.as_mut()
             .save(task);
 
         return Ok(CreateTaskResponseModel);
@@ -45,21 +45,21 @@ impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> 
 }
 
 impl<Handle: PointerHandle> CreateTaskInteractor<Handle> {
-    fn mapTaskDescriptionErrorToErrorModel(&self, error: TaskDescriptionError) -> CreateTaskErrorModel {
+    fn map_task_description_error_to_error_model(&self, error: TaskDescriptionError) -> CreateTaskErrorModel {
         return match error {
             TaskDescriptionError::LengthUnderflow {
-                actualLength,
-                minLengthRequired,
+                actual_length,
+                min_length_required,
             } => CreateTaskErrorModel::TaskDescriptionLengthUnderflow {
-                actualLength,
-                minLengthRequired,
+                actual_length,
+                min_length_required,
             },
             TaskDescriptionError::LengthOverflow {
-                actualLength,
-                maxLengthAllowed,
+                actual_length,
+                max_length_allowed,
             } => CreateTaskErrorModel::TaskDescriptionLengthOverflow {
-                actualLength,
-                maxLengthAllowed,
+                actual_length,
+                max_length_allowed,
             },
         };
     }

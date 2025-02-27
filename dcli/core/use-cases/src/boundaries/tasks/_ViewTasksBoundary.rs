@@ -13,12 +13,12 @@ pub trait ViewTasksBoundary {
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct ViewTasksRequestModel {
-    pub paginationRequest: PaginationRequest,
+    pub pagination_request: PaginationRequest,
 }
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct ViewTasksResponseModel {
-    pub paginationResponse: PaginationResponse<ViewTasksTaskModel>,
+    pub pagination_response: PaginationResponse<ViewTasksTaskModel>,
 }
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
@@ -26,7 +26,7 @@ pub struct ViewTasksTaskModel {
     pub id: u64,
     pub description: String,
     pub status: ViewTasksTaskStatusModel,
-    pub createdAt: SystemTime,
+    pub created_at: SystemTime,
 }
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]

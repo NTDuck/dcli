@@ -15,22 +15,22 @@ where
     Strategy: PointerStrategy,
 {
     fn new<T>(obj: T) -> Self {
-        let typed = Strategy::intoTyped(obj);
-        let untyped = Strategy::intoUntyped(typed);
+        let typed = Strategy::into_typed(obj);
+        let untyped = Strategy::into_untyped(typed);
         return Self::newFromUntyped(untyped);
     }
     
-    fn read<'br, T: 'br>(&'br self) -> impl Deref<Target = T> + 'br {
-        return Strategy::read(self.asTypedRef());
+    fn as_ref<'br, T: 'br>(&'br self) -> impl Deref<Target = T> + 'br {
+        return Strategy::as_ref(self.asTypedRef());
     }
     
-    fn write<'br, T: 'br>(&'br self) -> impl DerefMut<Target = T> + 'br {
-        return Strategy::write(self.asTypedRef());
+    fn as_mut<'br, T: 'br>(&'br self) -> impl DerefMut<Target = T> + 'br {
+        return Strategy::as_mut(self.asTypedRef());
     }
 
-    unsafe fn shallowClone<T>(&self) -> Self {
-        let typed = Strategy::shallowClone::<T>(self.asTypedRef());
-        let untyped = Strategy::intoUntyped(typed);
+    unsafe fn shallow_clone<T>(&self) -> Self {
+        let typed = Strategy::shallow_clone::<T>(self.asTypedRef());
+        let untyped = Strategy::into_untyped(typed);
         return Self::newFromUntyped(untyped);
     }
 

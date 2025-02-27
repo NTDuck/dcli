@@ -7,85 +7,85 @@ use axiom::interfaces::ddd;
 pub struct Interval(Duration);
 
 impl Interval {
-    pub(in crate::time) const fn fromDuration(duration: Duration) -> Self {
+    pub(in crate::time) const fn from_duration(duration: Duration) -> Self {
         return Self(duration);
     }
 
-    pub const fn fromSeconds(seconds: u64) -> Self {
+    pub const fn from_secs(seconds: u64) -> Self {
         let duration = Duration::from_secs(seconds);
-        return Self::fromDuration(duration);
+        return Self::from_duration(duration);
     }
 
-    pub const fn fromMilliseconds(milliseconds: u64) -> Self {
+    pub const fn from_millis(milliseconds: u64) -> Self {
         let duration = Duration::from_millis(milliseconds);
-        return Self::fromDuration(duration);
+        return Self::from_duration(duration);
     }
 
-    pub const fn fromMicroseconds(microseconds: u64) -> Self {
+    pub const fn from_micros(microseconds: u64) -> Self {
         let duration = Duration::from_micros(microseconds);
-        return Self::fromDuration(duration);
+        return Self::from_duration(duration);
     }
 
-    pub const fn fromNanoseconds(nanoseconds: u64) -> Self {
+    pub const fn from_nanos(nanoseconds: u64) -> Self {
         let duration = Duration::from_nanos(nanoseconds);
-        return Self::fromDuration(duration);
+        return Self::from_duration(duration);
     }
 
-    pub const fn asDuration(&self) -> Duration {
+    pub const fn as_duration(&self) -> Duration {
         return self.0;
     }
 
-    pub const fn asSeconds(&self) -> u64 {
-        let duration = self.asDuration();
+    pub const fn as_secs(&self) -> u64 {
+        let duration = self.as_duration();
         return duration.as_secs();
     }
 
-    pub const fn asMilliseconds(&self) -> u128 {
-        let duration = self.asDuration();
+    pub const fn as_millis(&self) -> u128 {
+        let duration = self.as_duration();
         return duration.as_millis();
     }
 
-    pub const fn asMicroseconds(&self) -> u128 {
-        let duration = self.asDuration();
+    pub const fn as_micros(&self) -> u128 {
+        let duration = self.as_duration();
         return duration.as_micros();
     }
 
-    pub const fn asNanoseconds(&self) -> u128 {
-        let duration = self.asDuration();
+    pub const fn as_nanos(&self) -> u128 {
+        let duration = self.as_duration();
         return duration.as_nanos();
     }
 
-    pub fn checkedAdd(self, other: Self) -> Option<Self> {
-        let duration = self.asDuration();
-        let otherDuration = other.asDuration();
+    pub fn checked_add(self, other: Self) -> Option<Self> {
+        let duration = self.as_duration();
+        let other_duration = other.as_duration();
 
         return duration
-            .checked_add(otherDuration)
-            .map(Self::fromDuration);
+            .checked_add(other_duration)
+            .map(Self::from_duration);
     }
 
-    pub fn checkedSub(self, other: Self) -> Option<Self> {
-        let duration = self.asDuration();
-        let otherDuration = other.asDuration();
+    pub fn checked_sub(self, other: Self) -> Option<Self> {
+        let duration = self.as_duration();
+        let other_duration = other.as_duration();
 
         return duration
-            .checked_sub(otherDuration)
-            .map(Self::fromDuration);
+            .checked_sub(other_duration)
+            .map(Self::from_duration);
     }
 
-    pub fn checkedMul(self, multiplier: u32) -> Option<Self> {
-        let duration = self.asDuration();
+    pub fn checked_mul(self, multiplier: u32) -> Option<Self> {
+        let duration = self.as_duration();
 
         return duration
             .checked_mul(multiplier)
-            .map(Self::fromDuration);
+            .map(Self::from_duration);
     }
 
-    pub fn checkedDiv(self, divisor: u32) -> Option<Self> {
-        let duration = self.asDuration();
+    pub fn checked_div(self, divisor: u32) -> Option<Self> {
+        let duration = self.as_duration();
 
         return duration
             .checked_div(divisor)
-            .map(Self::fromDuration);
+            .map(Self::from_duration);
     }
 }

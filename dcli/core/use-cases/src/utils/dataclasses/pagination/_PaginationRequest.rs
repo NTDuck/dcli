@@ -4,13 +4,13 @@ use serde::Serialize;
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct PaginationRequest {
-    pub pageNumber: usize,
-    pub maxPageSize: usize,
+    pub page_number: usize,
+    pub max_page_size: usize,
 }
 
-pub const UnboundedPaginationRequest: PaginationRequest = PaginationRequest {
-    pageNumber: MinPageSize,
-    maxPageSize: usize::MAX,
+pub const UNBOUNDED_PAGINATION_REQUEST: PaginationRequest = PaginationRequest {
+    page_number: MIN_PAGE_SIZE,
+    max_page_size: usize::MAX,
 };
 
-pub const MinPageSize: usize = 1;
+pub const MIN_PAGE_SIZE: usize = 1;

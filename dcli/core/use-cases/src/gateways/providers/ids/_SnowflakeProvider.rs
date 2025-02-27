@@ -4,13 +4,13 @@ use domain::ids::SnowflakeSequenceNumber;
 use domain::time::Timestamp;
 
 pub trait SnowflakeProvider {
-    fn newSnowflakeFromTimestamp(&self, timestamp: Timestamp) -> Snowflake {
-        let workerNumber = self.getWorkerNumber();
-        let sequenceNumber = self.getSequenceNumber();
+    fn new_snowflake_from_timestamp(&self, timestamp: Timestamp) -> Snowflake {
+        let workerNumber = self.get_worker_number();
+        let sequenceNumber = self.get_sequence_number();
 
         return Snowflake::new(timestamp, workerNumber, sequenceNumber);
     }
 
-    fn getWorkerNumber(&self) -> SnowflakeWorkerNumber;
-    fn getSequenceNumber(&self) -> SnowflakeSequenceNumber;
+    fn get_worker_number(&self) -> SnowflakeWorkerNumber;
+    fn get_sequence_number(&self) -> SnowflakeSequenceNumber;
 }

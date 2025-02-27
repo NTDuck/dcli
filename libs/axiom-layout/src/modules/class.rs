@@ -13,7 +13,6 @@
 macro_rules! class {
     ($visibility:vis $module:ident) => {
         #[allow(non_snake_case)]
-        #[allow(non_upper_case_globals)]
         mod $module;
 
         $visibility use self::$module::*;

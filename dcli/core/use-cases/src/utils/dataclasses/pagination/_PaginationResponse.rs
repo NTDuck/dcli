@@ -6,8 +6,8 @@ use serde::Serialize;
 pub struct PaginationResponse<T> {
     pub items: Vec<T>,
     
-    pub pageSize: usize,
-    pub maxPageSize: usize,
-    pub pageNumber: usize,
-    pub maxPageNumber: usize,
+    pub page_size: usize,
+    pub max_page_size: usize,
+    pub page_number: usize,
+    pub max_page_number: usize,
 }

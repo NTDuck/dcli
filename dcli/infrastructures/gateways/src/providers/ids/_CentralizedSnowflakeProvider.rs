@@ -8,13 +8,13 @@ use use_cases::gateways::providers::ids::SnowflakeProvider;
 
 #[derive(New)]
 pub struct CentralizedSnowflakeProvider {
-    workerNumber: SnowflakeWorkerNumber,
-    sequenceNumber: AtomicU16,
+    worker_number: SnowflakeWorkerNumber,
+    sequence_number: AtomicU16,
 }
 
 impl CentralizedSnowflakeProvider {
-    fn computeAndAssignNextSequenceNumber(&self) -> SnowflakeSequenceNumber {
-        return self.sequenceNumber.fetch_update(
+    fn compute_and_assign_next_sequence_number(&self) -> SnowflakeSequenceNumber {
+        return self.sequence_number.fetch_update(
             Ordering::Relaxed,
             Ordering::Relaxed,
             |sequenceNumber| Some((sequenceNumber) + 1 & 0xfff))
@@ -23,11 +23,11 @@ impl CentralizedSnowflakeProvider {
 }
 
 impl SnowflakeProvider for CentralizedSnowflakeProvider {
-    fn getWorkerNumber(&self) -> SnowflakeWorkerNumber {
-        return self.workerNumber;
+    fn get_worker_number(&self) -> SnowflakeWorkerNumber {
+        return self.worker_number;
     }
 
-    fn getSequenceNumber(&self) -> SnowflakeSequenceNumber {
-        return self.computeAndAssignNextSequenceNumber();
+    fn get_sequence_number(&self) -> SnowflakeSequenceNumber {
+        return self.compute_and_assign_next_sequence_number();
     }
 }

@@ -1,5 +1,5 @@
 use domain::ids::Uuid;
 
 pub trait UuidFactory {
-    fn newUuid(&self) -> Uuid;
+    fn new_uuid(&self) -> Uuid;
 }

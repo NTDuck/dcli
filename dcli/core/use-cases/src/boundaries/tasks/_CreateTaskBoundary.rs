@@ -8,7 +8,7 @@ pub trait CreateTaskBoundary {
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct CreateTaskRequestModel {
-    pub taskDescription: String,
+    pub task_description: String,
 }
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
@@ -17,11 +17,11 @@ pub struct CreateTaskResponseModel;
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub enum CreateTaskErrorModel {
     TaskDescriptionLengthUnderflow {
-        actualLength: usize,
-        minLengthRequired: usize,
+        actual_length: usize,
+        min_length_required: usize,
     },
     TaskDescriptionLengthOverflow {
-        actualLength: usize,
-        maxLengthAllowed: usize,
+        actual_length: usize,
+        max_length_allowed: usize,
     },
 }
