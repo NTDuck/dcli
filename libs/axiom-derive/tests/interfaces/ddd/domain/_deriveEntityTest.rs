@@ -62,7 +62,7 @@ pub mod axiom {
                 pub trait Entity: ValueObject {
                     type Id: Identifier;
 
-                    fn getId(&self) -> &Self::Id;
+                    fn get_id(&self) -> &Self::Id;
                 }
 
                 #[allow(dead_code)]
