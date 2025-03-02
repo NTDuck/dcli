@@ -153,7 +153,7 @@ fn get_idents_with_self_prefixed(idents: &Vec<syn::Ident>) -> Vec<syn::Ident> {
     return idents
         .iter()
         .map(|ident| format_ident!("self{}", ident))
-        .map(|ident| convert_ident_to_camel_case(&ident))
+        .map(|ident| convert_ident_to_snake_case(&ident))
         .collect();
 }
 
@@ -161,6 +161,6 @@ fn get_idents_with_other_prefixed(idents: &Vec<syn::Ident>) -> Vec<syn::Ident> {
     return idents
         .iter()
         .map(|ident| format_ident!("other{}", ident))
-        .map(|ident| convert_ident_to_camel_case(&ident))
+        .map(|ident| convert_ident_to_snake_case(&ident))
         .collect();
 }

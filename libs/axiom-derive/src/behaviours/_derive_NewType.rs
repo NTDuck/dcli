@@ -1,3 +1,4 @@
+use quote::format_ident;
 use quote::quote;
 
 pub fn derive_NewType(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -32,8 +33,15 @@ fn derive_for_single_fielded_tuple_struct(ast: &syn::DeriveInput, field: &syn::F
     let (struct_impl_generics, struct_type_generics, struct_where_clause) = ast.generics.split_for_impl();
 
     let field_type = &field.ty;
+    let inner_method_name = generate_inner_method_ident_from_field(field);
 
     return quote! {
+        impl #struct_impl_generics #struct_ident #struct_type_generics #struct_where_clause {
+            pub fn #inner_method_name(&self) -> &#field_type {
+                return &self.0;
+            }
+        }
+
         impl #struct_impl_generics std::ops::Deref for #struct_ident #struct_type_generics #struct_where_clause {
             type Target = #field_type;
 
@@ -48,4 +56,23 @@ fn derive_for_single_fielded_tuple_struct(ast: &syn::DeriveInput, field: &syn::F
             }
         }
     }
+}
+
+fn generate_inner_method_ident_from_field(field: &syn::Field) -> syn::Ident {
+    use heck::ToSnakeCase;
+    use quote::ToTokens;
+    
+    let formatted_field_type_ident = field.ty
+        .clone()
+        .into_token_stream()
+        .to_string()
+        .split('<')
+        .next()
+        .unwrap()
+        .split("::")
+        .last()
+        .unwrap()
+        .to_snake_case();
+
+    return format_ident!("as_{formatted_field_type_ident}");
 }

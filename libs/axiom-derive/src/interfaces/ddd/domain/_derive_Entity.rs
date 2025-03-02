@@ -200,5 +200,3 @@ const ACCEPTED_ATTRIBUTES: [&str; 3] = [
     "ddd::Identifier",
     "ddd::domain::Identifier",
 ];
-
-const SEGMENT_SEPARATOR: &str = "::";

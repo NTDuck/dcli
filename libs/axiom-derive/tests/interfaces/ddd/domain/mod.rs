@@ -1,5 +1,5 @@
 use layout::*;
 
-class!(_deriveEntityTest);
-class!(_deriveIdentifierTest);
-class!(_deriveValueObjectTest);
+class!(_derive_Entity_test);
+class!(_derive_Identifier_test);
+class!(_derive_ValueObject_test);

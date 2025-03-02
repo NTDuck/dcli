@@ -227,7 +227,7 @@ enum EnumWithOnlyStructVariants {
 #[test]
 fn testEnumWithOnlyStructVariants() {
     verifyTraitBounds(
-        EnumWithOnlyStructVariants::newQuid(
+        EnumWithOnlyStructVariants::new_quid(
             "tomfoolery".to_owned(),
         ),
         EnumWithOnlyStructVariants::Quid {
@@ -235,7 +235,7 @@ fn testEnumWithOnlyStructVariants() {
         },
     );
     verifyTraitBounds(
-        EnumWithOnlyStructVariants::newPro(
+        EnumWithOnlyStructVariants::new_pro(
             42,
         ),
         EnumWithOnlyStructVariants::Pro {
@@ -243,7 +243,7 @@ fn testEnumWithOnlyStructVariants() {
         },
     );
     verifyTraitBounds(
-        EnumWithOnlyStructVariants::newQuo(
+        EnumWithOnlyStructVariants::new_quo(
             false,
         ),
         EnumWithOnlyStructVariants::Quo {
@@ -262,15 +262,15 @@ enum EnumWithOnlyTupleVariants {
 #[test]
 fn testEnumWithOnlyTupleVariants() {
     verifyTraitBounds(
-        EnumWithOnlyTupleVariants::newQuid("tomfoolery".to_owned()),
+        EnumWithOnlyTupleVariants::new_quid("tomfoolery".to_owned()),
         EnumWithOnlyTupleVariants::Quid("tomfoolery".to_owned()),
     );
     verifyTraitBounds(
-        EnumWithOnlyTupleVariants::newPro(42),
+        EnumWithOnlyTupleVariants::new_pro(42),
         EnumWithOnlyTupleVariants::Pro(42),
     );
     verifyTraitBounds(
-        EnumWithOnlyTupleVariants::newQuo(false),
+        EnumWithOnlyTupleVariants::new_quo(false),
         EnumWithOnlyTupleVariants::Quo(false),
     );
 }
@@ -289,7 +289,7 @@ enum EnumWithMixedVariants {
 #[test]
 fn testEnumWithMixedVariants() {
     verifyTraitBounds(
-        EnumWithMixedVariants::newQuid(
+        EnumWithMixedVariants::new_quid(
             "tomfoolery".to_owned(),
             42,
             false,
@@ -301,7 +301,7 @@ fn testEnumWithMixedVariants() {
         },
     );
     verifyTraitBounds(
-        EnumWithMixedVariants::newPro(
+        EnumWithMixedVariants::new_pro(
             "tomfoolery".to_owned(), 
             42, 
             false,
@@ -313,7 +313,7 @@ fn testEnumWithMixedVariants() {
         ),
     );
     verifyTraitBounds(
-        EnumWithMixedVariants::newQuo(), EnumWithMixedVariants::Quo,
+        EnumWithMixedVariants::new_quo(), EnumWithMixedVariants::Quo,
     );
 }
 

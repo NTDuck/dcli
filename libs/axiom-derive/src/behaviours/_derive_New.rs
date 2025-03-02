@@ -144,7 +144,7 @@ fn get_method_ident_for_enum_from_variant(variant: &syn::Variant) -> syn::Ident 
     let variant_ident = &variant.ident;
 
     let unformatted_method_ident = format_ident!("{BASE_METHOD_IDENT}{variant_ident}");
-    let formatted_method_ident = convert_ident_to_camel_case(&unformatted_method_ident);
+    let formatted_method_ident = convert_ident_to_snake_case(&unformatted_method_ident);
 
     return formatted_method_ident;
 }

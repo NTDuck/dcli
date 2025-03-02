@@ -22,6 +22,10 @@ impl TryFrom<String> for TaskDescription {
 }
 
 impl TaskDescription {
+    pub fn as_string(self) -> String {
+        return self.0;
+    }
+
     fn remove_trailing_and_leading_whitespaces(description: &str) -> &str {
         return description.trim();
     }

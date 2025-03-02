@@ -66,8 +66,10 @@ pub fn get_field_types_from_unnamed_fields(fields: &syn::FieldsUnnamed) -> Vec<&
         .collect();
 }
 
-pub fn convert_ident_to_camel_case(ident: &syn::Ident) -> syn::Ident {
-    use heck::ToLowerCamelCase;
+pub fn convert_ident_to_snake_case(ident: &syn::Ident) -> syn::Ident {
+    use heck::ToSnakeCase;
 
-    return format_ident!("{}", ident.to_string().to_lower_camel_case());
+    return format_ident!("{}", ident.to_string().to_snake_case());
 }
+
+pub const SEGMENT_SEPARATOR: &str = "::";
