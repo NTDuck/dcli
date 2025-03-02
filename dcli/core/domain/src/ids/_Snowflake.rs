@@ -24,19 +24,16 @@ impl Snowflake {
     }
 
     pub fn get_timestamp(&self) -> Timestamp {
-        let inner = self.as_inner();
-        let encoded_millis = (inner >> TIMESTAMP_SHIFT) & TIMESTAMP_BITMASK;
+        let encoded_millis = (self.as_u64() >> TIMESTAMP_SHIFT) & TIMESTAMP_BITMASK;
         return Timestamp::from_millis_since_epoch(encoded_millis as i64);
     }
 
     pub fn get_worker_number(&self) -> SnowflakeWorkerNumber {
-        let inner = self.as_inner();
-        return ((inner >> WORKER_NUMBER_SHIFT) & WORKER_NUMBER_BITMASK) as SnowflakeWorkerNumber;
+        return ((self.as_u64() >> WORKER_NUMBER_SHIFT) & WORKER_NUMBER_BITMASK) as SnowflakeWorkerNumber;
     }
 
     pub fn get_sequence_number(&self) -> SnowflakeSequenceNumber {
-        let inner = self.as_inner();
-        return ((inner >> SEQUENCE_NUMBER_SHIFT) & SEQUENCE_NUMBER_BITMASK) as SnowflakeSequenceNumber;
+        return ((self.as_u64() >> SEQUENCE_NUMBER_SHIFT) & SEQUENCE_NUMBER_BITMASK) as SnowflakeSequenceNumber;
     }
 
     fn encode_timestamp(timestamp: Timestamp) -> u64 {
@@ -52,10 +49,6 @@ impl Snowflake {
     fn encode_sequence_number(sequence_number: SnowflakeSequenceNumber) -> u64 {
         let sequenceNumber = sequence_number as u64;
         return (sequenceNumber & SEQUENCE_NUMBER_BITMASK) << SEQUENCE_NUMBER_SHIFT;
-    }
-
-    fn as_inner(&self) -> u64 {
-        return self.0;
     }
 }
 

@@ -24,12 +24,10 @@ pub struct CreateTaskInteractor<Handle: PointerHandle> {
 impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> {
     fn apply(&self, request: CreateTaskRequestModel) -> Result<CreateTaskResponseModel, CreateTaskErrorModel> {
         let task_description = TaskDescription::try_from(request.task_description)
-            .map_err(|error| self.map_task_description_error_to_error_model(error))?;
+            .map_err(CreateTaskErrorModel::from)?;
         
-        let current_timestamp = self.timestamp_provider.as_ref()
-            .get_current_timestamp();
-        let task_id = self.snowflake_provider.as_ref()
-            .new_snowflake_from_timestamp(current_timestamp);
+        let current_timestamp = self.timestamp_provider.as_ref().get_current_timestamp();
+        let task_id = self.snowflake_provider.as_ref().new_snowflake_from_timestamp(current_timestamp);
 
         let task = Task {
             id: task_id,
@@ -37,15 +35,14 @@ impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> 
             status: TaskStatus::Pending,
         };
 
-        self.task_repository.as_mut()
-            .save(task);
+        self.task_repository.as_mut().save(task);
 
         return Ok(CreateTaskResponseModel);
     }
 }
 
-impl<Handle: PointerHandle> CreateTaskInteractor<Handle> {
-    fn map_task_description_error_to_error_model(&self, error: TaskDescriptionError) -> CreateTaskErrorModel {
+impl From<TaskDescriptionError> for CreateTaskErrorModel {
+    fn from(error: TaskDescriptionError) -> Self {
         return match error {
             TaskDescriptionError::LengthUnderflow {
                 actual_length,
@@ -64,3 +61,4 @@ impl<Handle: PointerHandle> CreateTaskInteractor<Handle> {
         };
     }
 }
+

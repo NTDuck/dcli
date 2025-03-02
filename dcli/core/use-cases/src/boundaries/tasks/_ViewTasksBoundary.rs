@@ -2,6 +2,7 @@ use axiom::interfaces::DataTransferObjectWithoutSerde;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::boundaries::tasks::common::TaskModel;
 use crate::utils::dataclasses::pagination::PaginationRequest;
 use crate::utils::dataclasses::pagination::PaginationResponse;
 
@@ -16,22 +17,7 @@ pub struct ViewTasksRequestModel {
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct ViewTasksResponseModel {
-    pub pagination_response: PaginationResponse<ViewTasksTaskModel>,
-}
-
-#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
-pub struct ViewTasksTaskModel {
-    pub id: u64,
-    pub description: String,
-    pub status: ViewTasksTaskStatusModel,
-    pub created_at: String,
-}
-
-#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
-pub enum ViewTasksTaskStatusModel {
-    Pending,
-    InProgress,
-    Completed,
+    pub pagination_response: PaginationResponse<TaskModel>,
 }
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
