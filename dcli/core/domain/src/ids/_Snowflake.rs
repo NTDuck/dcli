@@ -1,8 +1,6 @@
 use axiom::behaviours::NewType;
 use axiom::interfaces::ddd;
 
-use crate::time::EPOCH;
-use crate::time::Interval;
 use crate::time::Timestamp;
 
 /// ### See also:
@@ -28,11 +26,7 @@ impl Snowflake {
     pub fn get_timestamp(&self) -> Timestamp {
         let inner = self.as_inner();
         let encoded_millis = (inner >> TIMESTAMP_SHIFT) & TIMESTAMP_BITMASK;
-        let encoded_interval = Interval::from_millis(encoded_millis);
-        
-        return EPOCH
-            .checked_add(encoded_interval)
-            .expect("Timestamp overflow");
+        return Timestamp::from_millis_since_epoch(encoded_millis as i64);
     }
 
     pub fn get_worker_number(&self) -> SnowflakeWorkerNumber {
@@ -46,10 +40,7 @@ impl Snowflake {
     }
 
     fn encode_timestamp(timestamp: Timestamp) -> u64 {
-        let interval = timestamp.computer_interval_since(EPOCH)
-            .expect("Timestamp earlier than Epoch");
-        let millis = interval.as_millis() as u64;
-        
+        let millis = timestamp.as_millis_since_epoch() as u64;
         return (millis & TIMESTAMP_BITMASK) << TIMESTAMP_SHIFT;
     }
 
@@ -58,8 +49,8 @@ impl Snowflake {
         return (worker_number & WORKER_NUMBER_BITMASK) << WORKER_NUMBER_SHIFT;
     }
 
-    fn encode_sequence_number(sequenceNumber: SnowflakeSequenceNumber) -> u64 {
-        let sequenceNumber = sequenceNumber as u64;
+    fn encode_sequence_number(sequence_number: SnowflakeSequenceNumber) -> u64 {
+        let sequenceNumber = sequence_number as u64;
         return (sequenceNumber & SEQUENCE_NUMBER_BITMASK) << SEQUENCE_NUMBER_SHIFT;
     }
 

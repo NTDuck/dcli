@@ -2,8 +2,7 @@ use domain::tasks::Task;
 use domain::tasks::TaskDescription;
 use domain::tasks::TaskId;
 use domain::tasks::TaskStatus;
-use domain::time::EPOCH;
-use domain::time::Interval;
+use domain::time::Timestamp;
 use gateways::repositories::inmemory::tasks::InMemoryTaskRepository;
 use use_cases::gateways::repositories::tasks::TaskRepository;
 
@@ -99,8 +98,7 @@ fn new_task_with_id_and_status(id: u64, status: TaskStatus) -> Task {
 
 fn new_task_id(id: u64) -> TaskId {
     return TaskId::new(
-        EPOCH.checked_add(Interval::from_secs(id))
-            .expect("Timestamp earlier than Epoch"),
+        Timestamp::from_millis_since_epoch(id as i64),
         Default::default(), Default::default(),
     );
 }

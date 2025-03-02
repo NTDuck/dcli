@@ -26,7 +26,7 @@ pub struct ViewTasksTaskModel {
     pub id: u64,
     pub description: String,
     pub status: ViewTasksTaskStatusModel,
-    pub created_at: SystemTime,
+    pub created_at: String,
 }
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]

@@ -1,91 +1,48 @@
-use std::time::Duration;
+use std::ops::Add;
+use std::ops::Neg;
+use std::ops::Sub;
 
 use axiom::interfaces::ddd;
 
 #[derive(ddd::ValueObject)]
 #[derive(Copy, PartialOrd, Ord, Hash)]
-pub struct Interval(Duration);
+pub struct Interval(i64);
 
 impl Interval {
-    pub(in crate::time) const fn from_duration(duration: Duration) -> Self {
-        return Self(duration);
+    pub const fn from_millis(millis: i64) -> Self {
+        return Self(millis);
     }
 
-    pub const fn from_secs(seconds: u64) -> Self {
-        let duration = Duration::from_secs(seconds);
-        return Self::from_duration(duration);
-    }
-
-    pub const fn from_millis(milliseconds: u64) -> Self {
-        let duration = Duration::from_millis(milliseconds);
-        return Self::from_duration(duration);
-    }
-
-    pub const fn from_micros(microseconds: u64) -> Self {
-        let duration = Duration::from_micros(microseconds);
-        return Self::from_duration(duration);
-    }
-
-    pub const fn from_nanos(nanoseconds: u64) -> Self {
-        let duration = Duration::from_nanos(nanoseconds);
-        return Self::from_duration(duration);
-    }
-
-    pub const fn as_duration(&self) -> Duration {
+    pub const fn as_millis(&self) -> i64 {
         return self.0;
     }
+}
 
-    pub const fn as_secs(&self) -> u64 {
-        let duration = self.as_duration();
-        return duration.as_secs();
+impl Neg for Interval {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        let millis = self.as_millis().neg();
+        return Self::from_millis(millis);
     }
+}
 
-    pub const fn as_millis(&self) -> u128 {
-        let duration = self.as_duration();
-        return duration.as_millis();
+impl Add for Interval {
+    type Output = Self;
+
+    fn add(self, interval: Interval) -> Self::Output {
+        let millis = self.as_millis()
+            .saturating_add(interval.as_millis());
+        return Self::from_millis(millis);
     }
+}
 
-    pub const fn as_micros(&self) -> u128 {
-        let duration = self.as_duration();
-        return duration.as_micros();
-    }
+impl Sub for Interval {
+    type Output = Self;
 
-    pub const fn as_nanos(&self) -> u128 {
-        let duration = self.as_duration();
-        return duration.as_nanos();
-    }
-
-    pub fn checked_add(self, other: Self) -> Option<Self> {
-        let duration = self.as_duration();
-        let other_duration = other.as_duration();
-
-        return duration
-            .checked_add(other_duration)
-            .map(Self::from_duration);
-    }
-
-    pub fn checked_sub(self, other: Self) -> Option<Self> {
-        let duration = self.as_duration();
-        let other_duration = other.as_duration();
-
-        return duration
-            .checked_sub(other_duration)
-            .map(Self::from_duration);
-    }
-
-    pub fn checked_mul(self, multiplier: u32) -> Option<Self> {
-        let duration = self.as_duration();
-
-        return duration
-            .checked_mul(multiplier)
-            .map(Self::from_duration);
-    }
-
-    pub fn checked_div(self, divisor: u32) -> Option<Self> {
-        let duration = self.as_duration();
-
-        return duration
-            .checked_div(divisor)
-            .map(Self::from_duration);
+    fn sub(self, interval: Interval) -> Self::Output {
+        let millis = self.as_millis()
+            .saturating_sub(interval.as_millis());
+        return Self::from_millis(millis);
     }
 }

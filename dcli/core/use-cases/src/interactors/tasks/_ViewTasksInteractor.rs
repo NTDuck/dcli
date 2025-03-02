@@ -10,6 +10,7 @@ use crate::boundaries::tasks::ViewTasksRequestModel;
 use crate::boundaries::tasks::ViewTasksResponseModel;
 use crate::boundaries::tasks::ViewTasksTaskModel;
 use crate::boundaries::tasks::ViewTasksTaskStatusModel;
+use crate::gateways::formatters::time::TimestampFormatter;
 use crate::gateways::pointers::PointerHandle;
 use crate::gateways::pointers::SharedPointer;
 use crate::gateways::repositories::tasks::TaskRepository;
@@ -17,12 +18,13 @@ use crate::utils::dataclasses::pagination::PaginationResponse;
 
 #[derive(New)]
 pub struct ViewTasksInteractor<Handle: PointerHandle> {
-    taskRepository: SharedPointer<Box<dyn TaskRepository>, Handle>,
+    timestamp_formatter: SharedPointer<Box<dyn TimestampFormatter>, Handle>,
+    task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
 }
 
 impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksInteractor<Handle> {
     fn apply(&self, request: ViewTasksRequestModel) -> Result<ViewTasksResponseModel, ViewTasksErrorModel> {
-        let pagination_response = self.taskRepository.as_ref()
+        let pagination_response = self.task_repository.as_ref()
             .show_reverse_chronologically_ordered(request.pagination_request);
         let response_model = self.map_pagination_response_to_response_model(pagination_response);
 
@@ -36,7 +38,7 @@ impl<Handle: PointerHandle> ViewTasksInteractor<Handle> {
             pagination_response: PaginationResponse {
                 items: pagination_response.items
                     .into_iter()
-                    .map(|task| self.mapTaskToTaskModel(task))
+                    .map(|task| self.map_task_to_model(task))
                     .collect(),
 
                 page_size: pagination_response.page_size,
@@ -47,16 +49,17 @@ impl<Handle: PointerHandle> ViewTasksInteractor<Handle> {
         };
     }
 
-    fn mapTaskToTaskModel(&self, task: Task) -> ViewTasksTaskModel {
+    fn map_task_to_model(&self, task: Task) -> ViewTasksTaskModel {
         return ViewTasksTaskModel {
             id: *task.id.deref(),
             description: task.description.deref().clone(),
-            status: self.mapTaskStatusToTaskStatusModel(task.status),
-            created_at: task.id.get_timestamp().as_system_time(),
+            status: self.map_task_status_to_model(task.status),
+            created_at: self.timestamp_formatter.as_ref()
+                .format(task.id.get_timestamp()),
         };
     }
 
-    fn mapTaskStatusToTaskStatusModel(&self, task_status: TaskStatus) -> ViewTasksTaskStatusModel {
+    fn map_task_status_to_model(&self, task_status: TaskStatus) -> ViewTasksTaskStatusModel {
         return match task_status {
             TaskStatus::Pending => ViewTasksTaskStatusModel::Pending,
             TaskStatus::InProgress => ViewTasksTaskStatusModel::InProgress,

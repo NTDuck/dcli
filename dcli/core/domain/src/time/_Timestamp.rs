@@ -1,5 +1,5 @@
-use std::time::SystemTime;
-use std::time::UNIX_EPOCH;
+use std::ops::Add;
+use std::ops::Sub;
 
 use axiom::interfaces::ddd;
 
@@ -7,46 +7,46 @@ use crate::time::Interval;
 
 #[derive(ddd::ValueObject)]
 #[derive(Copy, PartialOrd, Ord, Hash)]
-pub struct Timestamp(SystemTime);
+pub struct Timestamp(i64);
 
 impl Timestamp {
-    pub const fn from_system_time(systemTime: SystemTime) -> Self {
-        return Self(systemTime);
+    pub const fn from_millis_since_epoch(millis: i64) -> Self {
+        return Self(millis);
     }
 
-    pub const fn as_system_time(&self) -> SystemTime {
+    pub const fn as_millis_since_epoch(&self) -> i64 {
         return self.0;
     }
+
+    pub const EPOCH: Self = Self::from_millis_since_epoch(0);
 }
 
-impl Timestamp {
-    pub fn computer_interval_since(&self, previous: Self) -> Option<Interval> {
-        let system_time = self.as_system_time();
-        let previous_system_time = previous.as_system_time();
-        
-        return system_time
-            .duration_since(previous_system_time)
-            .ok()
-            .map(Interval::from_duration);
-    }
+impl Add<Interval> for Timestamp {
+    type Output = Self;
 
-    pub fn checked_add(self, interval: Interval) -> Option<Self> {
-        let system_time = self.as_system_time();
-        let duration = interval.as_duration();
-        
-        return system_time
-            .checked_add(duration)
-            .map(Self::from_system_time);
-    }
-
-    pub fn checked_sub(self, interval: Interval) -> Option<Self> {
-        let system_time = self.as_system_time();
-        let duration = interval.as_duration();
-        
-        return system_time
-            .checked_sub(duration)
-            .map(Self::from_system_time);
+    fn add(self, interval: Interval) -> Self::Output {
+        let millis_since_epoch = self.as_millis_since_epoch()
+            .saturating_add(interval.as_millis());
+        return Self::from_millis_since_epoch(millis_since_epoch);
     }
 }
 
-pub const EPOCH: Timestamp = Timestamp::from_system_time(UNIX_EPOCH);
+impl Sub<Interval> for Timestamp {
+    type Output = Self;
+
+    fn sub(self, interval: Interval) -> Self::Output {
+        let millis_since_epoch = self.as_millis_since_epoch()
+            .saturating_sub(interval.as_millis());
+        return Self::from_millis_since_epoch(millis_since_epoch);
+    }
+}
+
+impl Sub<Self> for Timestamp {
+    type Output = Interval;
+
+    fn sub(self, other: Self) -> Self::Output {
+        let millis = self.as_millis_since_epoch()
+            .saturating_sub(other.as_millis_since_epoch());
+        return Interval::from_millis(millis);
+    }
+}
