@@ -13,7 +13,7 @@ use crate::gateways::pointers::PointerHandle;
 use crate::gateways::pointers::SharedPointer;
 use crate::gateways::repositories::tasks::TaskRepository;
 use crate::utils::dataclasses::pagination::PaginationResponse;
-use crate::utils::interfaces::FromUsing;
+use crate::utils::interfaces::DeferredNewFrom;
 
 #[derive(New)]
 pub struct ViewTasksInteractor<Handle: PointerHandle> {
@@ -24,23 +24,23 @@ pub struct ViewTasksInteractor<Handle: PointerHandle> {
 impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksInteractor<Handle> {
     fn apply(&self, request: ViewTasksRequestModel) -> Result<ViewTasksResponseModel, ViewTasksErrorModel> {
         let pagination_response = self.task_repository.as_ref().show_reverse_chronologically_ordered(request.pagination_request);
-        let response_model = ViewTasksResponseModel::fromm(pagination_response)
+        let response_model = ViewTasksResponseModel::new_from(pagination_response)
             .using(self.timestamp_formatter.as_ref());
 
         return Ok(response_model);
     }
 }
 
-impl<Formatter> FromUsing<PaginationResponse<Task>, Formatter> for ViewTasksResponseModel
+impl<TimestampFormatterRef> DeferredNewFrom<PaginationResponse<Task>, TimestampFormatterRef> for ViewTasksResponseModel
 where
-    Formatter: Deref<Target = Box<dyn TimestampFormatter>>,
+    TimestampFormatterRef: Deref<Target = Box<dyn TimestampFormatter>>,
 {
-    fn from_using(pagination_response: PaginationResponse<Task>, timestamp_formatter: Formatter) -> Self {
+    fn new(pagination_response: PaginationResponse<Task>, timestamp_formatter: TimestampFormatterRef) -> Self {
         return Self {
             pagination_response: PaginationResponse {
                 items: pagination_response.items
                     .into_iter()
-                    .map(|task| TaskModel::fromm(task)
+                    .map(|task| TaskModel::new_from(task)
                         .using(timestamp_formatter.deref()))
                     .collect(),
                 page_size: pagination_response.page_size,

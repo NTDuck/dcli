@@ -1,29 +1,32 @@
 use std::marker::PhantomData;
 
-pub trait FromUsing<F, U> {
-    fn from_using(from: F, using: U) -> Self;
+pub trait DeferredNewFrom<F, U>: Sized {
+    fn new(from: F, using: U) -> Self;
 
-    fn fromm(from: F) -> Using<Self, F, U>
-    where
-        Self: Sized,
-    {
-        return Using {
+    fn new_from(from: F) -> Deferred<Self, F, U> {
+        return Deferred::from(from);
+    }
+}
+
+pub struct Deferred<T, F, U> {
+    from: F,
+    _marker: PhantomData<(T, U)>,
+}
+
+impl<T, F, U> From<F> for Deferred<T, F, U> {
+    fn from(from: F) -> Self {
+        return Self {
             from,
             _marker: PhantomData,
         };
     }
 }
 
-pub struct Using<T, F, U> {
-    from: F,
-    _marker: PhantomData<(T, U)>,
-}
-
-impl<T, F, U> Using<T, F, U>
+impl<T, F, U> Deferred<T, F, U>
 where
-    T: FromUsing<F, U>,
+    T: DeferredNewFrom<F, U>,
 {
     pub fn using(self, using: U) -> T {
-        return T::from_using(self.from, using);
+        return T::new(self.from, using);
     }
 }
