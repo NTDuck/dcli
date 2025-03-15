@@ -1,7 +1,7 @@
 [workspace]
 members = [
     "dcli/*/*",
-    "libs/*",
+    "libs/*", 'dcli\configurations\web',
 ]
 resolver = "2"
 
