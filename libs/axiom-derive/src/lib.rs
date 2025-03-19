@@ -1,44 +1,40 @@
-#![allow(nonstandard_style)]
-
-use layout::*;
-
-namespace!(behaviours);
-namespace!(interfaces);
-namespace!(utils);
+mod behaviours;
+mod interfaces;
+mod utils;
 
 use proc_macro::TokenStream;
 
 #[proc_macro_derive(New)]
-pub fn derive_New(tokens: TokenStream) -> TokenStream {
-    return crate::behaviours::derive_New(tokens);
+pub fn derive_new(tokens: TokenStream) -> TokenStream {
+    return crate::behaviours::derive_new(tokens);
 }
 
 #[proc_macro_derive(NewType)]
-pub fn derive_NewType(tokens: TokenStream) -> TokenStream {
-    return crate::behaviours::derive_NewType(tokens);
+pub fn derive_newtype(tokens: TokenStream) -> TokenStream {
+    return crate::behaviours::derive_newtype(tokens);
 }
 
 #[proc_macro_derive(DataTransferObjectWithoutDeserialize)]
-pub fn deriveDataTransferObjectWithoutDeserialize(tokens: TokenStream) -> TokenStream {
-    return crate::interfaces::derive_DataTransferObjectWithoutDeserialize(tokens);
+pub fn derive_data_transfer_object_without_deserialize(tokens: TokenStream) -> TokenStream {
+    return crate::interfaces::derive_data_transfer_object_without_deserialize(tokens);
 }
 
 #[proc_macro_derive(DataTransferObjectWithoutSerde)]
-pub fn deriveDataTransferObjectWithoutSerde(tokens: TokenStream) -> TokenStream {
-    return crate::interfaces::derive_DataTransferObjectWithoutSerde(tokens);
+pub fn derive_data_transfer_object_without_serde(tokens: TokenStream) -> TokenStream {
+    return crate::interfaces::derive_data_transfer_object_without_serde(tokens);
 }
 
 #[proc_macro_derive(Entity, attributes(axiom))]
-pub fn deriveEntity(tokens: TokenStream) -> TokenStream {
-    return crate::interfaces::ddd::domain::derive_Entity(tokens);
+pub fn derive_entity(tokens: TokenStream) -> TokenStream {
+    return crate::interfaces::ddd::domain::derive_entity(tokens);
 }
 
 #[proc_macro_derive(Identifier)]
-pub fn deriveIdentifier(tokens: TokenStream) -> TokenStream {
-    return crate::interfaces::ddd::domain::derive_Identifier(tokens);
+pub fn derive_identifier(tokens: TokenStream) -> TokenStream {
+    return crate::interfaces::ddd::domain::derive_identifier(tokens);
 }
 
 #[proc_macro_derive(ValueObject)]
-pub fn deriveValueObject(tokens: TokenStream) -> TokenStream {
-    return crate::interfaces::ddd::domain::derive_ValueObject(tokens);
+pub fn derive_value_object(tokens: TokenStream) -> TokenStream {
+    return crate::interfaces::ddd::domain::derive_value_object(tokens);
 }

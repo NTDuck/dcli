@@ -129,8 +129,8 @@ fn derive_clone_for_unit_variant(variant: &syn::Variant) -> proc_macro2::TokenSt
 
 fn generate_where_clause_with_clone_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |T| quote! {
-            #T: Clone
+        |trait_ident| quote! {
+            #trait_ident: Clone
         },
         ast,
     );

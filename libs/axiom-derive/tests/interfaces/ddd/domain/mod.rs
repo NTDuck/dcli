@@ -1,5 +1,3 @@
-use layout::*;
-
-class!(_derive_Entity_test);
-class!(_derive_Identifier_test);
-class!(_derive_ValueObject_test);
+mod derive_entity_test;
+mod derive_identifier_test;
+mod derive_value_object_test;

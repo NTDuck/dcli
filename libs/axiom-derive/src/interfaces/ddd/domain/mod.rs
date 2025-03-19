@@ -1,5 +1,7 @@
-use layout::*;
+mod derive_entity;
+mod derive_identifier;
+mod derive_value_object;
 
-class!(pub _derive_Entity);
-class!(pub _derive_Identifier);
-class!(pub _derive_ValueObject);
+pub use self::derive_entity::*;
+pub use self::derive_identifier::*;
+pub use self::derive_value_object::*;

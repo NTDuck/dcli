@@ -1,6 +1,7 @@
-use layout::*;
+pub mod ddd;
 
-namespace!(pub ddd);
+mod derive_data_transfer_object_without_deserialize;
+mod derive_data_transfer_object_without_serde;
 
-class!(pub _derive_DataTransferObjectWithoutDeserialize);
-class!(pub _derive_DataTransferObjectWithoutSerde);
+pub use self::derive_data_transfer_object_without_deserialize::*;
+pub use self::derive_data_transfer_object_without_serde::*;

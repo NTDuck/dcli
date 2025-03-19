@@ -1,3 +1,1 @@
-use layout::*;
-
-namespace!(domain);
+mod domain;

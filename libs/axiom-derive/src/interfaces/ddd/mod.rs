@@ -1,3 +1,3 @@
-use layout::*;
+pub mod domain;
 
-namespace!(pub domain);
+pub use self::domain::*;

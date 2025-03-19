@@ -1,11 +1,13 @@
-use layout::*;
+mod derive_clone;
+mod derive_debug;
+mod derive_eq;
+mod derive_hash;
+mod derive_partial_eq;
+mod derive_serialize;
 
-class!(pub _derive_Debug);
-class!(pub _derive_Clone);
-
-class!(pub _derive_PartialEq);
-class!(pub _derive_Eq);
-
-class!(pub _derive_Hash);
-
-class!(pub _derive_Serialize);
+pub use self::derive_clone::*;
+pub use self::derive_debug::*;
+pub use self::derive_eq::*;
+pub use self::derive_hash::*;
+pub use self::derive_partial_eq::*;
+pub use self::derive_serialize::*;

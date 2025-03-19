@@ -1,6 +1,4 @@
-use layout::*;
+mod ddd;
 
-namespace!(ddd);
-
-class!(_derive_DataTransferObjectWithoutDeserialize_test);
-class!(_derive_DataTransferObjectWithoutSerde_test);
+mod derive_data_transfer_object_without_deserialize_test;
+mod derive_data_transfer_object_without_serde_test;

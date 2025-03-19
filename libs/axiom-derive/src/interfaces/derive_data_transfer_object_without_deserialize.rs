@@ -3,7 +3,7 @@ use quote::quote;
 use crate::utils::ast::*;
 use crate::utils::derives::*;
 
-pub fn derive_DataTransferObjectWithoutDeserialize(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn derive_data_transfer_object_without_deserialize(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse_macro_input!(tokens as syn::DeriveInput);
 
     let tokens = match &ast.data {

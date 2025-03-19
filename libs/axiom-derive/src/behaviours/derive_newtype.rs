@@ -3,7 +3,7 @@ use quote::quote;
 
 use crate::utils::ast::*;
 
-pub fn derive_NewType(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn derive_newtype(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse_macro_input!(tokens as syn::DeriveInput);
 
     let tokens = match &ast.data {

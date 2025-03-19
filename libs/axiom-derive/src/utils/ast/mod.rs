@@ -38,12 +38,13 @@ pub fn get_field_idents_from_named_fields(fields: &syn::FieldsNamed) -> Vec<syn:
 }
 
 pub fn get_formatted_field_idents_from_unnamed_fields(fields: &syn::FieldsUnnamed) -> Vec<syn::Ident> {
-    const PREFIX: &str = "arg";
-    const SUFFIX: &str = "";
-
     return (0..fields.unnamed.len())
-        .map(|index| format_ident!("{PREFIX}{index}{SUFFIX}"))
+        .map(format_field_index)
         .collect();
+
+    fn format_field_index(field_index: usize) -> syn::Ident {
+        format_ident!("arg{field_index}")
+    }
 }
 
 pub fn get_field_indices_from_unnamed_fields(fields: &syn::FieldsUnnamed) -> Vec<syn::Index> {

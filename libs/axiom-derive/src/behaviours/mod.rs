@@ -1,4 +1,5 @@
-use layout::*;
+mod derive_new;
+mod derive_newtype;
 
-class!(pub _derive_New);
-class!(pub _derive_NewType);
+pub use self::derive_new::*;
+pub use self::derive_newtype::*;

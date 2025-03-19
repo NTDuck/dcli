@@ -1,5 +1,3 @@
-use layout::*;
-
-namespace!(behaviours);
-namespace!(interfaces);
-namespace!(utils);
+mod behaviours;
+mod interfaces;
+mod utils;
