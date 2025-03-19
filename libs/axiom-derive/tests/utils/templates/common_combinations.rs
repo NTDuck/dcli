@@ -1,6 +1,6 @@
-macro_rules! test_common_ordinary_structs {
-    ($derived_attrs:tt, $test_fn:ident) => {
-        #[derive $derived_attrs]
+macro_rules! __test_common_ordinary_structs {
+    ($derive_clause:tt, $test_fn:ident) => {
+        #$derive_clause
         struct OrdinaryStructWithNoFields {}
 
         #[test]
@@ -8,7 +8,7 @@ macro_rules! test_common_ordinary_structs {
             $test_fn(OrdinaryStructWithNoFields {});
         }
 
-        #[derive $derived_attrs]
+        #$derive_clause
         struct OrdinaryStructWithThreeFields {
             text: String,
             number: u64,
@@ -24,7 +24,7 @@ macro_rules! test_common_ordinary_structs {
             });
         }
 
-        #[derive $derived_attrs]
+        #$derive_clause
         struct OrdinaryStructWithGenerics<T, U> {
             pointer: Box<Box<Box<T>>>,
             vector: Vec<U>,
@@ -46,9 +46,9 @@ macro_rules! test_common_ordinary_structs {
     };
 }
 
-macro_rules! test_common_tuple_structs {
-    ($derived_attrs:tt, $test_fn:ident) => {
-        #[derive $derived_attrs]
+macro_rules! __test_common_tuple_structs {
+    ($derive_clause:tt, $test_fn:ident) => {
+        #$derive_clause
         struct TupleStructWithNoFields();
 
         #[test]
@@ -56,7 +56,7 @@ macro_rules! test_common_tuple_structs {
             $test_fn(TupleStructWithNoFields());
         }
 
-        #[derive $derived_attrs]
+        #$derive_clause
         struct TupleStructWithThreeFields(String, u64, bool);
 
         #[test]
@@ -68,7 +68,7 @@ macro_rules! test_common_tuple_structs {
             ));
         }
 
-        #[derive $derived_attrs]
+        #$derive_clause
         struct NewType(String);
 
         #[test]
@@ -78,7 +78,7 @@ macro_rules! test_common_tuple_structs {
             ));
         }
 
-        #[derive $derived_attrs]
+        #$derive_clause
         struct TupleStructWithGenerics<T, U>(
             Box<Box<Box<T>>>,
             Vec<U>,
@@ -98,7 +98,7 @@ macro_rules! test_common_tuple_structs {
             ));
         }
 
-        #[derive $derived_attrs]
+        #$derive_clause
         struct NewTypeWithGenerics<T>(Box<Box<Box<T>>>);
 
         #[test]
@@ -112,9 +112,9 @@ macro_rules! test_common_tuple_structs {
     };
 }
 
-macro_rules! test_common_unit_structs {
-    ($derived_attrs:tt, $test_fn:ident) => {
-        #[derive $derived_attrs]
+macro_rules! __test_common_unit_structs {
+    ($derive_clause:tt, $test_fn:ident) => {
+        #$derive_clause
         struct UnitStruct;
 
         #[test]
@@ -124,27 +124,27 @@ macro_rules! test_common_unit_structs {
     };
 }
 
-macro_rules! test_common_structs {
-    ($derived_attrs:tt, $test_fn:ident) => {
-        test_common_ordinary_structs!($derived_attrs, $test_fn);
-        test_common_tuple_structs!($derived_attrs, $test_fn);
-        test_common_unit_structs!($derived_attrs, $test_fn);
+macro_rules! __test_common_structs {
+    ($derive_clause:tt, $test_fn:ident) => {
+        crate::utils::templates::common_combinations::__test_common_ordinary_structs!($derive_clause, $test_fn);
+        crate::utils::templates::common_combinations::__test_common_tuple_structs!($derive_clause, $test_fn);
+        crate::utils::templates::common_combinations::__test_common_unit_structs!($derive_clause, $test_fn);
     };
 }
 
-macro_rules! test_empty_enum {
-    ($derived_attrs:tt) => {
+macro_rules! __test_empty_enum {
+    ($derive_clause:tt) => {
+        #[allow(dead_code)]
         // Skip tests, as there is no way to
         // instantiate an `EmptyEnum`
-        #[allow(dead_code)]
-        #[derive $derived_attrs]
+        #$derive_clause
         enum EmptyEnum {}
     };
 }
 
-macro_rules! test_common_enums_with_only_struct_variants {
-    ($derived_attrs:tt, $test_fn:ident) => {
-        #[derive $derived_attrs]
+macro_rules! __test_common_enums_with_only_struct_variants {
+    ($derive_clause:tt, $test_fn:ident) => {
+        #$derive_clause
         enum EnumWithOnlyStructVariants {
             Quid {
                 text: String,
@@ -172,9 +172,9 @@ macro_rules! test_common_enums_with_only_struct_variants {
     };
 }
 
-macro_rules! test_common_enums_with_only_tuple_variants {
-    ($derived_attrs:tt, $test_fn:ident) => {
-        #[derive $derived_attrs]
+macro_rules! __test_common_enums_with_only_tuple_variants {
+    ($derive_clause:tt, $test_fn:ident) => {
+        #$derive_clause
         enum EnumWithOnlyTupleVariants {
             Quid(String),
             Pro(u64),
@@ -196,9 +196,9 @@ macro_rules! test_common_enums_with_only_tuple_variants {
     };
 }
 
-macro_rules! test_common_enums_with_only_unit_variants {
-    ($derived_attrs:tt, $test_fn:ident) => {
-        #[derive $derived_attrs]
+macro_rules! __test_common_enums_with_only_unit_variants {
+    ($derive_clause:tt, $test_fn:ident) => {
+        #$derive_clause
         enum EnumWithOnlyUnitVariants {
             Quid,
             Pro,
@@ -214,9 +214,9 @@ macro_rules! test_common_enums_with_only_unit_variants {
     };
 }
 
-macro_rules! test_common_enums_with_mixed_variants {
-    ($derived_attrs:tt, $test_fn:ident) => {
-        #[derive $derived_attrs]
+macro_rules! __test_common_enums_with_mixed_variants {
+    ($derive_clause:tt, $test_fn:ident) => {
+        #$derive_clause
         enum EnumWithMixedVariants {
             Quid {
                 text: String,
@@ -242,7 +242,7 @@ macro_rules! test_common_enums_with_mixed_variants {
             $test_fn(EnumWithMixedVariants::Quo);
         }
 
-        #[derive $derived_attrs]
+        #$derive_clause
         enum EnumWithMixedVariantsAndGenerics<T, U> {
             Quid {
                 pointer: Box<Box<Box<T>>>,
@@ -285,34 +285,37 @@ macro_rules! test_common_enums_with_mixed_variants {
     };
 }
 
-macro_rules! test_common_enums {
-    ($derived_attrs:tt, $test_fn:ident) => {
-        test_empty_enum!($derived_attrs);
-        test_common_enums_with_only_struct_variants!($derived_attrs, $test_fn);
-        test_common_enums_with_only_tuple_variants!($derived_attrs, $test_fn);
-        test_common_enums_with_only_unit_variants!($derived_attrs, $test_fn);
-        test_common_enums_with_mixed_variants!($derived_attrs, $test_fn);
+macro_rules! __test_common_enums {
+    ($derive_clause:tt, $test_fn:ident) => {
+        crate::utils::templates::common_combinations::__test_empty_enum!($derive_clause);
+        crate::utils::templates::common_combinations::__test_common_enums_with_only_struct_variants!($derive_clause, $test_fn);
+        crate::utils::templates::common_combinations::__test_common_enums_with_only_tuple_variants!($derive_clause, $test_fn);
+        crate::utils::templates::common_combinations::__test_common_enums_with_only_unit_variants!($derive_clause, $test_fn);
+        crate::utils::templates::common_combinations::__test_common_enums_with_mixed_variants!($derive_clause, $test_fn);
     };
 }
 
 macro_rules! test_common_combinations {
-    ($derived_attrs:tt, $test_fn:ident) => {
-        test_common_structs!($derived_attrs, $test_fn);
-        test_common_enums!($derived_attrs, $test_fn);
+    (
+        derives = #$derive_clause:tt,
+        test_fn = $test_fn:ident,
+    ) => {
+        crate::utils::templates::common_combinations::__test_common_structs!($derive_clause, $test_fn);
+        crate::utils::templates::common_combinations::__test_common_enums!($derive_clause, $test_fn);
     };
 }
 
 pub(crate) use test_common_combinations;
 
-pub(crate) use test_common_structs;
-pub(crate) use test_common_enums;
+pub(crate) use __test_common_structs;
+pub(crate) use __test_common_enums;
 
-pub(crate) use test_common_ordinary_structs;
-pub(crate) use test_common_tuple_structs;
-pub(crate) use test_common_unit_structs;
+pub(crate) use __test_common_ordinary_structs;
+pub(crate) use __test_common_tuple_structs;
+pub(crate) use __test_common_unit_structs;
 
-pub(crate) use test_empty_enum;
-pub(crate) use test_common_enums_with_only_struct_variants;
-pub(crate) use test_common_enums_with_only_tuple_variants;
-pub(crate) use test_common_enums_with_only_unit_variants;
-pub(crate) use test_common_enums_with_mixed_variants;
+pub(crate) use __test_empty_enum;
+pub(crate) use __test_common_enums_with_only_struct_variants;
+pub(crate) use __test_common_enums_with_only_tuple_variants;
+pub(crate) use __test_common_enums_with_only_unit_variants;
+pub(crate) use __test_common_enums_with_mixed_variants;

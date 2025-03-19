@@ -1,12 +1,12 @@
 use axiom::interfaces::ddd::domain::ValueObject;
 use axiom_derive::ValueObject;
 
-use crate::utils::templates::common_combinations::*;
+use crate::utils::templates::common_combinations::test_common_combinations;
 
-test_common_combinations!{
-    (ValueObject),
-    verify_trait_bounds
-}
+test_common_combinations!(
+    derives = #[derive(ValueObject)],
+    test_fn = verify_trait_bounds,
+);
 
 // Allow `ValueObject` usage
 // without adding `axiom` as a dependency

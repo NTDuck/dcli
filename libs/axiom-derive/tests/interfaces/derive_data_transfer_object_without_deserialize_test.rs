@@ -2,12 +2,12 @@ use axiom::interfaces::DataTransferObject;
 use axiom_derive::DataTransferObjectWithoutDeserialize;
 use serde::Deserialize;
 
-use crate::utils::templates::common_combinations::*;
+use crate::utils::templates::common_combinations::test_common_combinations;
 
-test_common_combinations!{
-    (DataTransferObjectWithoutDeserialize, Deserialize),
-    verify_trait_bounds
-}
+test_common_combinations!(
+    derives = #[derive(DataTransferObjectWithoutDeserialize, Deserialize)],
+    test_fn = verify_trait_bounds,
+);
 
 // Allow `DataTransferObject` usage
 // without adding `axiom` as a dependency

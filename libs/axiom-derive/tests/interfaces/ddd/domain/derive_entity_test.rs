@@ -25,7 +25,7 @@ fn test_struct_with_named_fields() {
 // which is unprecedented
 #[derive(Entity)]
 struct StructWithNamedFieldsAndBoundedGenerics<T: Entity, U: Entity> {
-    #[axiom(attributes(ddd::Identifier))]
+    #[axiom(attributes(ddd::domain::Identifier))]
     id: Uuid,
     pointer: Box<T>,
     vector: Vec<U>,

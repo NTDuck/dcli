@@ -1,12 +1,12 @@
 use axiom::interfaces::ddd::domain::Identifier;
 use axiom_derive::Identifier;
 
-use crate::utils::templates::common_combinations::*;
+use crate::utils::templates::common_combinations::test_common_combinations;
 
-test_common_combinations!{
-    (Identifier),
-    verify_trait_bounds
-}
+test_common_combinations!(
+    derives = #[derive(Identifier)],
+    test_fn = verify_trait_bounds,
+);
 
 // Allow `Identifier` usage
 // without adding `axiom` as a dependency
