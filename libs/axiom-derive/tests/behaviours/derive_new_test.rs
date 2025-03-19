@@ -6,8 +6,8 @@ use axiom_derive::New;
 struct OrdinaryStructWithNoFields {}
 
 #[test]
-fn testOrdinaryStructWithNoFields() {
-    verifyTraitBounds(
+fn test_ordinary_struct_with_no_fields() {
+    verify_trait_bounds(
         OrdinaryStructWithNoFields::new(),
         OrdinaryStructWithNoFields {},
     );
@@ -21,8 +21,8 @@ struct OrdinaryStructWithThreeFields {
 }
 
 #[test]
-fn testOrdinaryStructWithThreeFields() {
-    verifyTraitBounds(
+fn test_ordinary_struct_with_three_fields() {
+    verify_trait_bounds(
         OrdinaryStructWithThreeFields::new("tomfoolery".to_owned(), 42, false),
         OrdinaryStructWithThreeFields {
             text: "tomfoolery".to_owned(),
@@ -39,8 +39,8 @@ struct OrdinaryStructWithGenerics<T, U> {
 }
 
 #[test]
-fn testOrdinaryStructWithGenerics() {
-    verifyTraitBounds(
+fn test_ordinary_struct_with_generics() {
+    verify_trait_bounds(
         OrdinaryStructWithGenerics::new(
             Box::new(Box::new(Box::new(OrdinaryStructWithNoFields::new()))),
             vec![
@@ -68,14 +68,14 @@ struct OrdinaryStructWithLifetimes<'a, 'b, 'c> {
 }
 
 #[test]
-fn testOrdinaryStructWithLifetimes() {
+fn test_ordinary_struct_with_lifetimes() {
     let (text, number, flag) = (
         "tomfoolery".to_owned(),
         42,
         false,
     );
 
-    verifyTraitBounds(
+    verify_trait_bounds(
         OrdinaryStructWithLifetimes::new(
             &text,
             &number,
@@ -93,8 +93,8 @@ fn testOrdinaryStructWithLifetimes() {
 struct TupleStructWithNoFields();
 
 #[test]
-fn testTupleStructWithNoFields() {
-    verifyTraitBounds(
+fn test_tuple_struct_with_no_fields() {
+    verify_trait_bounds(
         TupleStructWithNoFields::new(),
         TupleStructWithNoFields(),
     );
@@ -104,8 +104,8 @@ fn testTupleStructWithNoFields() {
 struct TupleStructWithThreeFields(String, u64, bool);
 
 #[test]
-fn testTupleStructWithThreeFields() {
-    verifyTraitBounds(
+fn test_tuple_struct_with_three_fields() {
+    verify_trait_bounds(
         TupleStructWithThreeFields::new("tomfoolery".to_owned(), 42, false),
         TupleStructWithThreeFields("tomfoolery".to_owned(), 42, false),
     );
@@ -115,8 +115,8 @@ fn testTupleStructWithThreeFields() {
 struct NewType(String);
 
 #[test]
-fn testNewType() {
-    verifyTraitBounds(
+fn test_new_type() {
+    verify_trait_bounds(
         NewType::new("tomfoolery".to_owned()),
         NewType("tomfoolery".to_owned()),
     );
@@ -129,8 +129,8 @@ struct TupleStructWithGenerics<T, U>(
 );
 
 #[test]
-fn testTupleStructWithGenerics() {
-    verifyTraitBounds(
+fn test_tuple_struct_with_generics() {
+    verify_trait_bounds(
         TupleStructWithGenerics::new(
             Box::new(Box::new(Box::new(
                 TupleStructWithNoFields::new(),
@@ -158,8 +158,8 @@ fn testTupleStructWithGenerics() {
 struct NewTypeWithGenerics<T>(Box<Box<Box<T>>>);
 
 #[test]
-fn testNewTypeWithGenerics() {
-    verifyTraitBounds(
+fn test_new_type_with_generics() {
+    verify_trait_bounds(
         NewTypeWithGenerics::new(
             Box::new(Box::new(Box::new(
                 TupleStructWithNoFields(),
@@ -181,14 +181,14 @@ struct TupleStructWithLifetimes<'a, 'b, 'c>(
 );
 
 #[test]
-fn testTupleStructWithLifetimes() {
+fn test_tuple_struct_with_lifetimes() {
     let (text, number, flag) = (
         "tomfoolery".to_owned(),
         42,
         false,
     );
 
-    verifyTraitBounds(
+    verify_trait_bounds(
         TupleStructWithLifetimes::new(
             &text,
             &number,
@@ -205,8 +205,8 @@ fn testTupleStructWithLifetimes() {
 struct EnumWithOnlyUnitVariants;
 
 #[test]
-fn testEnumWithOnlyUnitVariants() {
-    verifyTraitBounds(
+fn test_enum_with_only_unit_variants() {
+    verify_trait_bounds(
         EnumWithOnlyUnitVariants::new(), EnumWithOnlyUnitVariants,
     );
 }
@@ -225,8 +225,8 @@ enum EnumWithOnlyStructVariants {
 }
 
 #[test]
-fn testEnumWithOnlyStructVariants() {
-    verifyTraitBounds(
+fn test_enum_with_only_struct_variants() {
+    verify_trait_bounds(
         EnumWithOnlyStructVariants::new_quid(
             "tomfoolery".to_owned(),
         ),
@@ -234,7 +234,7 @@ fn testEnumWithOnlyStructVariants() {
             text: "tomfoolery".to_owned(),
         },
     );
-    verifyTraitBounds(
+    verify_trait_bounds(
         EnumWithOnlyStructVariants::new_pro(
             42,
         ),
@@ -242,7 +242,7 @@ fn testEnumWithOnlyStructVariants() {
             number: 42,
         },
     );
-    verifyTraitBounds(
+    verify_trait_bounds(
         EnumWithOnlyStructVariants::new_quo(
             false,
         ),
@@ -260,16 +260,16 @@ enum EnumWithOnlyTupleVariants {
 }
 
 #[test]
-fn testEnumWithOnlyTupleVariants() {
-    verifyTraitBounds(
+fn test_enum_with_only_tuple_variants() {
+    verify_trait_bounds(
         EnumWithOnlyTupleVariants::new_quid("tomfoolery".to_owned()),
         EnumWithOnlyTupleVariants::Quid("tomfoolery".to_owned()),
     );
-    verifyTraitBounds(
+    verify_trait_bounds(
         EnumWithOnlyTupleVariants::new_pro(42),
         EnumWithOnlyTupleVariants::Pro(42),
     );
-    verifyTraitBounds(
+    verify_trait_bounds(
         EnumWithOnlyTupleVariants::new_quo(false),
         EnumWithOnlyTupleVariants::Quo(false),
     );
@@ -287,8 +287,8 @@ enum EnumWithMixedVariants {
 }
 
 #[test]
-fn testEnumWithMixedVariants() {
-    verifyTraitBounds(
+fn test_enum_with_mixed_variants() {
+    verify_trait_bounds(
         EnumWithMixedVariants::new_quid(
             "tomfoolery".to_owned(),
             42,
@@ -300,7 +300,7 @@ fn testEnumWithMixedVariants() {
             flag: false,
         },
     );
-    verifyTraitBounds(
+    verify_trait_bounds(
         EnumWithMixedVariants::new_pro(
             "tomfoolery".to_owned(), 
             42, 
@@ -312,12 +312,12 @@ fn testEnumWithMixedVariants() {
             false,
         ),
     );
-    verifyTraitBounds(
+    verify_trait_bounds(
         EnumWithMixedVariants::new_quo(), EnumWithMixedVariants::Quo,
     );
 }
 
 
-fn verifyTraitBounds<T: Debug + PartialEq>(factoryConstructed: T, manuallyConstructed: T) {
-    assert_eq!(factoryConstructed, manuallyConstructed);
+fn verify_trait_bounds<T: Debug + PartialEq>(factory_constructed: T, manually_constructed: T) {
+    assert_eq!(factory_constructed, manually_constructed);
 }
