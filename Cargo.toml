@@ -22,8 +22,6 @@ serde = { version = "1.0", features = ["derive"] }
 [workspace.lints.clippy]
 # See: https://rust-lang.github.io/rust-clippy/master/index.html
 derived_hash_with_manual_eq = "allow"
-needless_return = "allow"
-needless_return_with_question_mark = "allow"
 new_without_default = "allow"
 missing_safety_doc = "allow"
 useless_conversion = "allow"

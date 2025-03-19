@@ -5,7 +5,6 @@ edition.workspace = true
 
 [dependencies]
 derive = { package = "axiom-derive", path = "../axiom-derive" }
-layout = { package = "axiom-layout", path = "../axiom-layout" }
 
 serde = { workspace = true }
 

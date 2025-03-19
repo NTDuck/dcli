@@ -1,5 +1,2 @@
-use layout::*;
-
-namespace!(pub behaviours);
-namespace!(pub interfaces);
-namespace!(pub macros);
+pub mod behaviours;
+pub mod interfaces;

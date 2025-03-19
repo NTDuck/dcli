@@ -1,4 +1,5 @@
-use layout::*;
+mod new;
+mod newtype;
 
-class!(pub _New);
-class!(pub _NewType);
+pub use self::new::*;
+pub use self::newtype::*;

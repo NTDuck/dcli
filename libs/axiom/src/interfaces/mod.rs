@@ -1,5 +1,5 @@
-use layout::*;
+pub mod ddd;
 
-namespace!(pub ddd);
+mod data_transfer_object;
 
-class!(pub _DataTransferObject);
+pub use self::data_transfer_object::*;

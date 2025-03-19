@@ -1,5 +1,7 @@
-use layout::*;
+mod entity;
+mod identifier;
+mod value_object;
 
-class!(pub _Entity);
-class!(pub _Identifier);
-class!(pub _ValueObject);
+pub use self::entity::*;
+pub use self::identifier::*;
+pub use self::value_object::*;
