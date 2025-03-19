@@ -53,10 +53,10 @@ fn derive_for_ordinary_struct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed)
 
     return quote! {
         impl #struct_impl_generics axiom::interfaces::ddd::domain::Entity for #struct_ident #struct_type_generics #struct_where_clause_with_entity_bounds {
-            type Id = #identifier_field_type;
+            type Identifier = #identifier_field_type;
 
             #[inline(always)]
-            fn get_id(&self) -> &Self::Id {
+            fn get_id(&self) -> &Self::Identifier {
                 return &self.#identifier_field_ident;
             }
         }
@@ -94,8 +94,8 @@ fn derive_for_ordinary_struct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed)
 
 fn generate_where_clause_with_entity_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |T| quote! {
-            #T: axiom::interfaces::ddd::domain::Entity
+        |type_ident| quote! {
+            #type_ident: axiom::interfaces::ddd::domain::Entity
         },
         ast,
     );
@@ -103,8 +103,8 @@ fn generate_where_clause_with_entity_bounds_from_derive_input(ast: &syn::DeriveI
 
 fn generate_where_clause_with_value_object_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |T| quote! {
-            #T: axiom::interfaces::ddd::domain::ValueObject
+        |type_ident| quote! {
+            #type_ident: axiom::interfaces::ddd::domain::ValueObject
         },
         ast,
     );
@@ -112,8 +112,8 @@ fn generate_where_clause_with_value_object_bounds_from_derive_input(ast: &syn::D
 
 fn generate_where_clause_with_debug_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |T| quote! {
-            #T: std::fmt::Debug
+        |type_ident| quote! {
+            #type_ident: std::fmt::Debug
         },
         ast,
     );
@@ -121,8 +121,8 @@ fn generate_where_clause_with_debug_bounds_from_derive_input(ast: &syn::DeriveIn
 
 fn generate_where_clause_with_clone_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |T| quote! {
-            #T: Clone
+        |type_ident| quote! {
+            #type_ident: Clone
         },
         ast,
     );
@@ -130,8 +130,8 @@ fn generate_where_clause_with_clone_bounds_from_derive_input(ast: &syn::DeriveIn
 
 fn generate_where_clause_with_partial_eq_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |T| quote! {
-            #T: PartialEq
+        |type_ident| quote! {
+            #type_ident: PartialEq
         },
         ast,
     );
@@ -139,8 +139,8 @@ fn generate_where_clause_with_partial_eq_bounds_from_derive_input(ast: &syn::Der
 
 fn generate_where_clause_with_eq_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |T| quote! {
-            #T: Eq
+        |type_ident| quote! {
+            #type_ident: Eq
         },
         ast,
     );

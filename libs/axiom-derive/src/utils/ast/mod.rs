@@ -37,7 +37,7 @@ pub fn get_field_idents_from_named_fields(fields: &syn::FieldsNamed) -> Vec<syn:
         .collect();
 }
 
-pub fn get_formatted_field_idents_from_unnamed_fields(fields: &syn::FieldsUnnamed) -> Vec<syn::Ident> {
+pub fn get_field_idents_from_unnamed_fields(fields: &syn::FieldsUnnamed) -> Vec<syn::Ident> {
     return (0..fields.unnamed.len())
         .map(format_field_index)
         .collect();

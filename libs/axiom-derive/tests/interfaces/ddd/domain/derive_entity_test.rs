@@ -12,8 +12,8 @@ struct StructWithNamedFields {
 }
 
 #[test]
-fn testStructWithNamedFields() {
-    verifyTraitBounds(StructWithNamedFields {
+fn test_struct_with_named_fields() {
+    verify_trait_bounds(StructWithNamedFields {
         id: Uuid(42),
         text: "tomfoolery".to_owned(),
         number: 42,
@@ -32,18 +32,18 @@ struct StructWithNamedFieldsAndBoundedGenerics<T: Entity, U: Entity> {
 }
 
 #[test]
-fn testStructWithNamedFieldsAndBoundedGenerics() {
-    let structWithNamedFields = StructWithNamedFields {
+fn test_struct_with_named_fields_and_bounded_generics() {
+    let struct_with_named_fields = StructWithNamedFields {
         id: Uuid(42),
         text: "tomfoolery".to_owned(),
         number: 42,
         flag: false,
     };
 
-    verifyTraitBounds(StructWithNamedFieldsAndBoundedGenerics {
+    verify_trait_bounds(StructWithNamedFieldsAndBoundedGenerics {
         id: Uuid(42),
-        pointer: Box::new(structWithNamedFields.clone()),
-        vector: vec![structWithNamedFields.clone()],
+        pointer: Box::new(struct_with_named_fields.clone()),
+        vector: vec![struct_with_named_fields.clone()],
     });
 }
 
@@ -60,9 +60,9 @@ pub mod axiom {
                 use std::hash::Hash;
 
                 pub trait Entity: ValueObject {
-                    type Id: Identifier;
+                    type Identifier: Identifier;
 
-                    fn get_id(&self) -> &Self::Id;
+                    fn get_id(&self) -> &Self::Identifier;
                 }
 
                 #[allow(dead_code)]
@@ -74,4 +74,4 @@ pub mod axiom {
     }
 }
 
-fn verifyTraitBounds(_: impl Entity) {}
+fn verify_trait_bounds(_: impl Entity) {}

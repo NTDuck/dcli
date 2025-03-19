@@ -111,7 +111,7 @@ fn derive_hash_for_struct_variant(variant: &syn::Variant, fields: &syn::FieldsNa
 
 fn derive_hash_for_tuple_variant(variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let variant_ident = &variant.ident;
-    let field_idents = get_formatted_field_idents_from_unnamed_fields(fields);
+    let field_idents = get_field_idents_from_unnamed_fields(fields);
 
     return quote! {
         Self::#variant_ident(#( #field_idents, )*) => {
@@ -130,8 +130,8 @@ fn derive_hash_for_unit_variant(variant: &syn::Variant) -> proc_macro2::TokenStr
 
 fn generate_where_clause_with_hash_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |T| quote! {
-            #T: std::hash::Hash
+        |type_ident| quote! {
+            #type_ident: std::hash::Hash
         },
         ast,
     );

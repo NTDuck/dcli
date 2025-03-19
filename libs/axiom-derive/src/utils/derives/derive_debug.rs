@@ -119,7 +119,7 @@ fn derive_debug_for_struct_variant(ast: &syn::DeriveInput, variant: &syn::Varian
 fn derive_debug_for_tuple_variant(ast: &syn::DeriveInput, variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let enum_ident = &ast.ident;
     let variant_ident = &variant.ident;
-    let field_idents = get_formatted_field_idents_from_unnamed_fields(fields);
+    let field_idents = get_field_idents_from_unnamed_fields(fields);
 
     return quote! {
         Self::#variant_ident(#( #field_idents, )*) => formatter
@@ -139,8 +139,8 @@ fn derive_debug_for_unit_variant(variant: &syn::Variant) -> proc_macro2::TokenSt
 
 fn generate_where_clause_with_debug_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |T| quote! {
-            #T: std::fmt::Debug
+        |type_ident| quote! {
+            #type_ident: std::fmt::Debug
         },
         ast,
     );

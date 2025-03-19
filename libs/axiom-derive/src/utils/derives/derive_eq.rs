@@ -15,8 +15,8 @@ pub fn derive_eq(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
 
 fn generate_where_clause_with_eq_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |T| quote! {
-            #T: Eq
+        |type_ident| quote! {
+            #type_ident: Eq
         },
         ast,
     );

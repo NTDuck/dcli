@@ -1,11 +1,11 @@
 use axiom::interfaces::ddd::domain::Identifier;
 use axiom_derive::Identifier;
 
-use crate::utils::*;
+use crate::utils::templates::common_combinations::*;
 
-testCommonStructsAndEnums!{
+test_common_combinations!{
     (Identifier),
-    verifyTraitBounds
+    verify_trait_bounds
 }
 
 // Allow `Identifier` usage
@@ -25,4 +25,4 @@ pub mod axiom {
     }
 }
 
-fn verifyTraitBounds(_: impl Identifier) {}
+fn verify_trait_bounds(_: impl Identifier) {}

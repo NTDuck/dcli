@@ -47,7 +47,7 @@ fn derive_for_tuple_struct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) 
     let (struct_impl_generics, struct_type_generics, struct_where_clause) = ast.generics.split_for_impl();
     let method_ident = get_method_ident_for_struct();
 
-    let field_idents = get_formatted_field_idents_from_unnamed_fields(fields);
+    let field_idents = get_field_idents_from_unnamed_fields(fields);
     let field_types = get_field_types_from_unnamed_fields(fields);
 
     return quote! {
@@ -115,12 +115,12 @@ fn derive_for_tuple_variant(variant: &syn::Variant, fields: &syn::FieldsUnnamed)
     let variant_ident = &variant.ident;
     let method_ident = get_method_ident_for_enum_from_variant(variant);
 
-    let fieldIdents = get_formatted_field_idents_from_unnamed_fields(fields);
+    let field_idents = get_field_idents_from_unnamed_fields(fields);
     let field_types = get_field_types_from_unnamed_fields(fields);
 
     return quote! {
-        pub fn #method_ident(#( #fieldIdents: #field_types, )*) -> Self {
-            return Self::#variant_ident( #( #fieldIdents, )* );
+        pub fn #method_ident(#( #field_idents: #field_types, )*) -> Self {
+            return Self::#variant_ident( #( #field_idents, )* );
         }
     };
 }

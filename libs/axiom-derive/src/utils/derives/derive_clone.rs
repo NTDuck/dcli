@@ -111,7 +111,7 @@ fn derive_clone_for_struct_variant(variant: &syn::Variant, fields: &syn::FieldsN
 
 fn derive_clone_for_tuple_variant(variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let variant_ident = &variant.ident;
-    let field_idents = get_formatted_field_idents_from_unnamed_fields(fields);
+    let field_idents = get_field_idents_from_unnamed_fields(fields);
 
     return quote! {
         Self::#variant_ident(#( #field_idents, )*) => 
@@ -129,8 +129,8 @@ fn derive_clone_for_unit_variant(variant: &syn::Variant) -> proc_macro2::TokenSt
 
 fn generate_where_clause_with_clone_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |trait_ident| quote! {
-            #trait_ident: Clone
+        |type_ident| quote! {
+            #type_ident: Clone
         },
         ast,
     );

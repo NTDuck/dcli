@@ -1,11 +1,11 @@
 use axiom::interfaces::ddd::domain::ValueObject;
 use axiom_derive::ValueObject;
 
-use crate::utils::*;
+use crate::utils::templates::common_combinations::*;
 
-testCommonStructsAndEnums!{
+test_common_combinations!{
     (ValueObject),
-    verifyTraitBounds
+    verify_trait_bounds
 }
 
 // Allow `ValueObject` usage
@@ -22,4 +22,4 @@ pub mod axiom {
     }
 }
 
-fn verifyTraitBounds(_: impl ValueObject) {}
+fn verify_trait_bounds(_: impl ValueObject) {}

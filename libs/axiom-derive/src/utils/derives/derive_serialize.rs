@@ -166,7 +166,7 @@ fn derive_serialize_for_tuple_variant(ast: &syn::DeriveInput, variant: &syn::Var
     let variant_ident = &variant.ident;
     let variant_index = get_variant_index(ast, variant).unwrap();
 
-    let field_idents = get_formatted_field_idents_from_unnamed_fields(fields);
+    let field_idents = get_field_idents_from_unnamed_fields(fields);
     let field_count = fields.unnamed.len();
 
     if field_count == 1 {
@@ -217,8 +217,8 @@ fn derive_serialize_for_unit_variant(ast: &syn::DeriveInput, variant: &syn::Vari
 
 fn generate_where_clause_with_serialize_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |T| quote! {
-            #T: serde::Serialize
+        |type_ident| quote! {
+            #type_ident: serde::Serialize
         },
         ast,
     );

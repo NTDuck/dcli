@@ -59,8 +59,8 @@ fn derive_for_enum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2:
 
 fn generate_where_clause_with_value_object_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |T| quote! {
-            #T: axiom::interfaces::ddd::domain::ValueObject
+        |type_ident| quote! {
+            #type_ident: axiom::interfaces::ddd::domain::ValueObject
         },
         ast,
     );

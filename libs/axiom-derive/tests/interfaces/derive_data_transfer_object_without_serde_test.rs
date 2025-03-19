@@ -3,11 +3,11 @@ use axiom_derive::DataTransferObjectWithoutSerde;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::utils::*;
+use crate::utils::templates::common_combinations::*;
 
-testCommonStructsAndEnums!{
+test_common_combinations!{
     (DataTransferObjectWithoutSerde, Serialize, Deserialize),
-    verifyTraitBounds
+    verify_trait_bounds
 }
 
 // Allow `DataTransferObject` usage
@@ -23,4 +23,4 @@ pub mod axiom {
     }
 }
 
-fn verifyTraitBounds(_: impl DataTransferObject) {}
+fn verify_trait_bounds(_: impl DataTransferObject) {}
