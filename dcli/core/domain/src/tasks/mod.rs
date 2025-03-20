@@ -1,5 +1,7 @@
-use axiom::macros::layout::*;
+mod task_description;
+mod task_status;
+mod task;
 
-class!(pub _Task);
-class!(pub _TaskDescription);
-class!(pub _TaskStatus);
+pub use self::task_description::*;
+pub use self::task_status::*;
+pub use self::task::*;

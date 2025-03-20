@@ -1,4 +1,5 @@
-use axiom::macros::layout::*;
+mod snowflake;
+mod uuid;
 
-class!(pub _Snowflake);
-class!(pub _Uuid);
+pub use self::snowflake::*;
+pub use self::uuid::*;

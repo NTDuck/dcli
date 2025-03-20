@@ -1,6 +1,3 @@
-use axiom::macros::layout::*;
-
-namespace!(pub tasks);
-
-namespace!(pub ids);
-namespace!(pub time);
+pub mod ids;
+pub mod tasks;
+pub mod time;

@@ -47,8 +47,8 @@ impl Snowflake {
     }
 
     fn encode_sequence_number(sequence_number: SnowflakeSequenceNumber) -> u64 {
-        let sequenceNumber = sequence_number as u64;
-        return (sequenceNumber & SEQUENCE_NUMBER_BITMASK) << SEQUENCE_NUMBER_SHIFT;
+        let sequence_number = sequence_number as u64;
+        return (sequence_number & SEQUENCE_NUMBER_BITMASK) << SEQUENCE_NUMBER_SHIFT;
     }
 }
 

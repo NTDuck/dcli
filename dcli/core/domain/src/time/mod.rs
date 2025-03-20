@@ -1,4 +1,5 @@
-use axiom::macros::layout::*;
+mod interval;
+mod timestamp;
 
-class!(pub _Interval);
-class!(pub _Timestamp);
+pub use self::interval::*;
+pub use self::timestamp::*;
