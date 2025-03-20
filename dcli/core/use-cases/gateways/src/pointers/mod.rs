@@ -1,4 +1,3 @@
-use axiom::macros::layout::*;
+mod pointer_handle;
 
-class!(pub _SharedPointer);
-class!(pub _PointerHandle);
+pub use self::pointer_handle::*;

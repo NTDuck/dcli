@@ -1,3 +1,3 @@
-use axiom::macros::layout::*;
+mod timestamp_formatter;
 
-class!(pub _TimestampFormatter);
+pub use self::timestamp_formatter::*;

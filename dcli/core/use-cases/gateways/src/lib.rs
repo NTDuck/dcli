@@ -1,8 +1,5 @@
-use axiom::macros::layout::*;
-
-namespace!(pub factories);
-namespace!(pub formatters);
-namespace!(pub providers);
-namespace!(pub repositories);
-
-namespace!(pub pointers);
+pub mod factories;
+pub mod formatters;
+pub mod pointers;
+pub mod providers;
+pub mod repositories;

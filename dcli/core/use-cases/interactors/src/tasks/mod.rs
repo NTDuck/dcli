@@ -1,6 +1,5 @@
-use axiom::macros::layout::*;
+mod create_task_interactor;
+mod view_tasks_interactor;
 
-namespace!(pub common);
-
-class!(pub _CreateTaskInteractor);
-class!(pub _ViewTasksInteractor);
+pub use self::create_task_interactor::*;
+pub use self::view_tasks_interactor::*;

@@ -1,3 +1,1 @@
-use axiom::macros::layout::*;
-
-namespace!(pub tasks);
+pub mod tasks;

@@ -1,3 +1,3 @@
-use axiom::macros::layout::*;
+mod task_repository;
 
-class!(pub _TaskRepository);
+pub use self::task_repository::*;

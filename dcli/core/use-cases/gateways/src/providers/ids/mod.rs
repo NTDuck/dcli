@@ -1,3 +1,3 @@
-use axiom::macros::layout::*;
+mod snowflake_provider;
 
-class!(pub _SnowflakeProvider);
+pub use self::snowflake_provider::*;

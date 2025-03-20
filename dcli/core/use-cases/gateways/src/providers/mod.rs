@@ -1,4 +1,2 @@
-use axiom::macros::layout::*;
-
-namespace!(pub ids);
-namespace!(pub time);
+pub mod ids;
+pub mod time;

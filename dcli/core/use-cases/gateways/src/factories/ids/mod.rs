@@ -1,3 +1,3 @@
-use axiom::macros::layout::*;
+mod uuid_factory;
 
-class!(pub _UuidFactory);
+pub use self::uuid_factory::*;

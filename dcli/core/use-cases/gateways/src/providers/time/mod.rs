@@ -1,3 +1,3 @@
-use axiom::macros::layout::*;
+mod timestamp_provider;
 
-class!(pub _TimestampProvider);
+pub use self::timestamp_provider::*;
