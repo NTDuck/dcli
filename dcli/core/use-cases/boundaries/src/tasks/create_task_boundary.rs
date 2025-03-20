@@ -2,8 +2,12 @@ use axiom::interfaces::DataTransferObjectWithoutSerde;
 use serde::Deserialize;
 use serde::Serialize;
 
-pub trait CreateTaskBoundary {
-    fn apply(&self, request: CreateTaskRequestModel) -> Result<CreateTaskResponseModel, CreateTaskErrorModel>;
+pub trait CreateTaskInputBoundary {
+    fn accept(&self, request: CreateTaskRequestModel);
+}
+
+pub trait CreateTaskOutputBoundary {
+    fn accept(&self, response: CreateTaskResponseModel);
 }
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
@@ -11,11 +15,13 @@ pub struct CreateTaskRequestModel {
     pub task_description: String,
 }
 
-#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
-pub struct CreateTaskResponseModel;
+pub type CreateTaskResponseModel = Result<CreateTaskOkResponseModel, CreateTaskErrResponseModel>;
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
-pub enum CreateTaskErrorModel {
+pub struct CreateTaskOkResponseModel;
+
+#[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
+pub enum CreateTaskErrResponseModel {
     TaskDescriptionLengthUnderflow {
         actual_length: usize,
         min_length_required: usize,

@@ -1,5 +1,5 @@
 [package]
-name = "gateways"
+name = "services"
 version = "0.1.0"
 edition.workspace = true
 
@@ -7,7 +7,6 @@ edition.workspace = true
 axiom = { workspace = true }
 
 domain = { path = "../../core/domain" }
-use-cases = { path = "../../core/use-cases", features = ["gateways"] }
 
 chrono = "0.4"
 pnet_datalink = "0.35"
