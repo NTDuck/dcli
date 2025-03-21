@@ -1,14 +1,14 @@
-use std::ops::Deref;
-
 use axiom::behaviours::New;
 use boundaries::tasks::CreateTaskErrResponseModel;
 use boundaries::tasks::CreateTaskInputBoundary;
 use boundaries::tasks::CreateTaskOkResponseModel;
 use boundaries::tasks::CreateTaskOutputBoundary;
+use boundaries::tasks::CreateTaskRequestModel;
 use boundaries::tasks::CreateTaskResponseModel;
 use domain::tasks::Task;
 use domain::tasks::TaskDescription;
 use domain::tasks::TaskDescriptionError;
+use domain::tasks::TaskId;
 use domain::tasks::TaskStatus;
 use gateways::pointers::PointerHandle;
 use gateways::providers::ids::SnowflakeProvider;
@@ -17,7 +17,6 @@ use gateways::repositories::tasks::TaskRepository;
 
 use crate::utils::pointers::SharedPointer;
 
-#[derive(New)]
 pub struct CreateTaskInteractor<Handle: PointerHandle> {
     output_boundary: SharedPointer<Box<dyn CreateTaskOutputBoundary>, Handle>,
     
@@ -25,40 +24,54 @@ pub struct CreateTaskInteractor<Handle: PointerHandle> {
     snowflake_provider: SharedPointer<Box<dyn SnowflakeProvider>, Handle>,
     task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
 
-    task_assembler: TaskAssembler<Handle>,
     response_model_assembler: CreateTaskResponseModelAssembler,
 }
 
+impl<Handle: PointerHandle> CreateTaskInteractor<Handle> {
+    pub fn new(
+        output_boundary: SharedPointer<Box<dyn CreateTaskOutputBoundary>, Handle>,
+        timestamp_provider: SharedPointer<Box<dyn TimestampProvider>, Handle>,
+        snowflake_provider: SharedPointer<Box<dyn SnowflakeProvider>, Handle>,
+        task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
+    ) -> Self {
+        return Self {
+            output_boundary,
+            timestamp_provider,
+            snowflake_provider,
+            task_repository,
+            response_model_assembler: CreateTaskResponseModelAssembler::new(),
+        };
+    }
+}
+
 impl<Handle: PointerHandle> CreateTaskInputBoundary for CreateTaskInteractor<Handle> {
-    fn accept(&self, request: boundaries::tasks::CreateTaskRequestModel) {
-        let task_description = TaskDescription::try_from(request.task_description)
-            .map_err(|err| self.response_model_assembler.assemble_from_task_description_error(err));
+    fn accept(&self, request: CreateTaskRequestModel) {
+        let task_description = match TaskDescription::try_from(request.task_description) {
+            Ok(task_description) => task_description,
+            Err(task_description_error) => {
+                let response_model = self.response_model_assembler.assemble_from_task_description_error(task_description_error);
+                self.output_boundary.as_ref().accept(response_model);
+                return;
+            },
+        };
 
-        let task = self.task_assembler.assemble(task_description);
-
-        self.task_repository.as_mut().save(task);
-
-        self.output_boundary.as_ref().accept(Ok(CreateTaskOkResponseModel));
-    }    
-}
-
-#[derive(New)]
-struct TaskAssembler<Handle: PointerHandle> {
-    timestamp_provider: SharedPointer<Box<dyn TimestampProvider>, Handle>,
-    snowflake_provider: SharedPointer<Box<dyn SnowflakeProvider>, Handle>,
-}
-
-impl<Handle: PointerHandle> TaskAssembler<Handle> {
-    pub fn assemble(&self, task_description: TaskDescription) -> Task {
         let current_timestamp = self.timestamp_provider.as_ref().get_current_timestamp();
-        let snowflake = self.snowflake_provider.as_ref().new_snowflake_from_timestamp(current_timestamp);
 
-        return Task {
-            id: snowflake,
+        let snowflake_worker_number = self.snowflake_provider.as_ref().get_worker_number();
+        let snowflake_sequence_number = self.snowflake_provider.as_ref().get_sequence_number();
+        
+        let task_id = TaskId::new(current_timestamp, snowflake_worker_number, snowflake_sequence_number);
+        let task = Task {
+            id: task_id,
             description: task_description,
             status: TaskStatus::Pending,
         };
-    }
+
+        self.task_repository.as_mut().save(task);
+
+        let response_model = Ok(CreateTaskOkResponseModel);
+        self.output_boundary.as_ref().accept(response_model);
+    }    
 }
 
 #[derive(New)]

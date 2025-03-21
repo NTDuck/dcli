@@ -1,2 +1,4 @@
 pub mod tasks;
-pub(crate) mod utils;
+mod utils;
+
+pub use utils::pointers::SharedPointer;
