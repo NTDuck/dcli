@@ -1,4 +1,4 @@
-use boundaries::tasks::models::TaskModel;
+use boundaries::utils::dataclasses::tasks::TaskModel;
 use domain::tasks::Task;
 use gateways::formatters::time::TimestampFormatter;
 use gateways::pointers::PointerHandle;

@@ -2,9 +2,9 @@ use axiom::interfaces::DataTransferObjectWithoutSerde;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::tasks::models::TaskModel;
 use crate::utils::dataclasses::pagination::PaginationRequest;
 use crate::utils::dataclasses::pagination::PaginationResponse;
+use crate::utils::dataclasses::tasks::TaskModel;
 
 pub trait ViewTasksInputBoundary {
     fn accept(&self, request: ViewTasksRequestModel);

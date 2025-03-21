@@ -1,5 +1,5 @@
 use axiom::behaviours::New;
-use boundaries::tasks::models::TaskStatusModel;
+use boundaries::utils::dataclasses::tasks::TaskStatusModel;
 use domain::tasks::TaskStatus;
 
 #[derive(New)]

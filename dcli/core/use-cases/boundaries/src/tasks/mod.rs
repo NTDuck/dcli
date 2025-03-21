@@ -1,5 +1,3 @@
-pub mod models;
-
 mod create_task_boundary;
 mod view_tasks_boundary;
 
