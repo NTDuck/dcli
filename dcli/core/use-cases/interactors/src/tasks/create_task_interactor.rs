@@ -1,53 +1,59 @@
 use std::ops::Deref;
 
 use axiom::behaviours::New;
+use boundaries::tasks::CreateTaskErrResponseModel;
+use boundaries::tasks::CreateTaskInputBoundary;
+use boundaries::tasks::CreateTaskOkResponseModel;
+use boundaries::tasks::CreateTaskOutputBoundary;
+use boundaries::tasks::CreateTaskResponseModel;
 use domain::tasks::Task;
 use domain::tasks::TaskDescription;
 use domain::tasks::TaskDescriptionError;
 use domain::tasks::TaskStatus;
+use gateways::pointers::PointerHandle;
+use gateways::providers::ids::SnowflakeProvider;
+use gateways::providers::time::TimestampProvider;
+use gateways::repositories::tasks::TaskRepository;
 
-use crate::boundaries::tasks::CreateTaskBoundary;
-use crate::boundaries::tasks::CreateTaskErrorModel;
-use crate::boundaries::tasks::CreateTaskRequestModel;
-use crate::boundaries::tasks::CreateTaskResponseModel;
-use crate::gateways::pointers::PointerHandle;
-use crate::gateways::pointers::SharedPointer;
-use crate::gateways::providers::ids::SnowflakeProvider;
-use crate::gateways::providers::time::TimestampProvider;
-use crate::gateways::repositories::tasks::TaskRepository;
-use crate::utils::interfaces::DeferredNewFrom;
+use crate::utils::pointers::SharedPointer;
 
 #[derive(New)]
 pub struct CreateTaskInteractor<Handle: PointerHandle> {
+    output_boundary: SharedPointer<Box<dyn CreateTaskOutputBoundary>, Handle>,
+    
     timestamp_provider: SharedPointer<Box<dyn TimestampProvider>, Handle>,
     snowflake_provider: SharedPointer<Box<dyn SnowflakeProvider>, Handle>,
     task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
+
+    task_assembler: TaskAssembler<Handle>,
+    response_model_assembler: CreateTaskResponseModelAssembler,
 }
 
-impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskInteractor<Handle> {
-    fn apply(&self, request: CreateTaskRequestModel) -> Result<CreateTaskResponseModel, CreateTaskErrorModel> {
+impl<Handle: PointerHandle> CreateTaskInputBoundary for CreateTaskInteractor<Handle> {
+    fn accept(&self, request: boundaries::tasks::CreateTaskRequestModel) {
         let task_description = TaskDescription::try_from(request.task_description)
-            .map_err(CreateTaskErrorModel::from)?;
-        
-        let task = Task::new_from(task_description)
-            .using((self.timestamp_provider.as_ref(), self.snowflake_provider.as_ref()));
+            .map_err(|err| self.response_model_assembler.assemble_from_task_description_error(err));
+
+        let task = self.task_assembler.assemble(task_description);
 
         self.task_repository.as_mut().save(task);
 
-        return Ok(CreateTaskResponseModel);
-    }
+        self.output_boundary.as_ref().accept(Ok(CreateTaskOkResponseModel));
+    }    
 }
 
-impl<TimestampProviderRef, SnowflakeProviderRef> DeferredNewFrom<TaskDescription, (TimestampProviderRef, SnowflakeProviderRef)> for Task
-where
-    TimestampProviderRef: Deref<Target = Box<dyn TimestampProvider>>,
-    SnowflakeProviderRef: Deref<Target = Box<dyn SnowflakeProvider>>,
-{
-    fn new(task_description: TaskDescription, (timestamp_provider, snowflake_provider): (TimestampProviderRef, SnowflakeProviderRef)) -> Self {
-        let current_timestamp = timestamp_provider.get_current_timestamp();
-        let snowflake = snowflake_provider.new_snowflake_from_timestamp(current_timestamp);
+#[derive(New)]
+struct TaskAssembler<Handle: PointerHandle> {
+    timestamp_provider: SharedPointer<Box<dyn TimestampProvider>, Handle>,
+    snowflake_provider: SharedPointer<Box<dyn SnowflakeProvider>, Handle>,
+}
 
-        return Self {
+impl<Handle: PointerHandle> TaskAssembler<Handle> {
+    pub fn assemble(&self, task_description: TaskDescription) -> Task {
+        let current_timestamp = self.timestamp_provider.as_ref().get_current_timestamp();
+        let snowflake = self.snowflake_provider.as_ref().new_snowflake_from_timestamp(current_timestamp);
+
+        return Task {
             id: snowflake,
             description: task_description,
             status: TaskStatus::Pending,
@@ -55,24 +61,26 @@ where
     }
 }
 
-impl From<TaskDescriptionError> for CreateTaskErrorModel {
-    fn from(error: TaskDescriptionError) -> Self {
-        return match error {
+#[derive(New)]
+struct CreateTaskResponseModelAssembler;
+
+impl CreateTaskResponseModelAssembler {
+    pub fn assemble_from_task_description_error(&self, task_description_error: TaskDescriptionError) -> CreateTaskResponseModel {
+        return match task_description_error {
             TaskDescriptionError::LengthUnderflow {
                 actual_length,
                 min_length_required,
-            } => CreateTaskErrorModel::TaskDescriptionLengthUnderflow {
+            } => Err(CreateTaskErrResponseModel::TaskDescriptionLengthUnderflow {
                 actual_length,
                 min_length_required,
-            },
+            }),
             TaskDescriptionError::LengthOverflow {
                 actual_length,
                 max_length_allowed,
-            } => CreateTaskErrorModel::TaskDescriptionLengthOverflow {
+            } => Err(CreateTaskErrResponseModel::TaskDescriptionLengthOverflow {
                 actual_length,
                 max_length_allowed,
-            },
+            }),
         };
     }
 }
-

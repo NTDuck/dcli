@@ -3,7 +3,7 @@ use std::mem::ManuallyDrop;
 use std::ops::Deref;
 use std::ops::DerefMut;
 
-use crate::gateways::pointers::PointerHandle;
+use gateways::pointers::PointerHandle;
 
 /// Inspired by [archery](https://github.com/orium/archery).
 /// 

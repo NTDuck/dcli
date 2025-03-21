@@ -5,10 +5,10 @@ use domain::time::Timestamp;
 
 pub trait SnowflakeProvider {
     fn new_snowflake_from_timestamp(&self, timestamp: Timestamp) -> Snowflake {
-        let workerNumber = self.get_worker_number();
-        let sequenceNumber = self.get_sequence_number();
+        let worker_number = self.get_worker_number();
+        let sequence_number = self.get_sequence_number();
 
-        return Snowflake::new(timestamp, workerNumber, sequenceNumber);
+        return Snowflake::new(timestamp, worker_number, sequence_number);
     }
 
     fn get_worker_number(&self) -> SnowflakeWorkerNumber;

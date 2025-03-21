@@ -8,6 +8,7 @@ axiom = { workspace = true }
 serde = { workspace = true }
 
 domain = { path = "../../../core/domain" }
+boundaries = { path = "../boundaries" }
 
 [lints]
 workspace = true
