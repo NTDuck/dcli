@@ -7,8 +7,8 @@ use domain::tasks::TaskStatus;
 use gateways::repositories::tasks::TaskRepository;
 use models::pagination::PaginationRequest;
 use models::pagination::PaginationResponse;
+use models::pagination::MIN_PAGE_SIZE;
 
-use crate::utils::configurations::pagination::MIN_PAGE_SIZE;
 use crate::utils::dataclasses::pagination::PaginationRange;
 
 pub struct InMemoryTaskRepository {
