@@ -1,4 +1,2 @@
-use axiom::macros::layout::*;
-
-namespace!(pub handles);
-namespace!(pub strategies);
+pub mod handles;
+pub mod strategies;

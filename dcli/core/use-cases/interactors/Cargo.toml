@@ -10,6 +10,7 @@ serde = { workspace = true }
 domain = { path = "../../domain" }
 boundaries = { path = "../boundaries" }
 gateways = { path = "../gateways" }
+models = { path = "../models" }
 
 [lints]
 workspace = true

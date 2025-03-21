@@ -1,6 +1,6 @@
 use axiom::behaviours::New;
-use boundaries::utils::dataclasses::tasks::TaskStatusModel;
 use domain::tasks::TaskStatus;
+use models::tasks::TaskStatusModel;
 
 #[derive(New)]
 pub struct TaskStatusModelAssembler;

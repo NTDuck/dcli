@@ -1,8 +1,8 @@
-use boundaries::utils::dataclasses::pagination::PaginationRequest;
-use boundaries::utils::dataclasses::pagination::PaginationResponse;
 use domain::tasks::Task;
 use domain::tasks::TaskId;
 use domain::tasks::TaskStatus;
+use models::pagination::PaginationRequest;
+use models::pagination::PaginationResponse;
 
 pub trait TaskRepository {
     fn save(&mut self, task: Task);

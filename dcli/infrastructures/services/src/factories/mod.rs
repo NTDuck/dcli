@@ -1,3 +1,1 @@
-use axiom::macros::layout::*;
-
-namespace!(pub ids);
+pub mod ids;

@@ -4,6 +4,7 @@ members = [
     "dcli/core/use-cases/boundaries",
     "dcli/core/use-cases/gateways",
     "dcli/core/use-cases/interactors",
+    "dcli/core/use-cases/models",
     "dcli/infrastructures/adapters",
     "dcli/infrastructures/services",
     "dcli/configurations/*",

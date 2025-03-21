@@ -7,5 +7,7 @@ edition.workspace = true
 axiom = { workspace = true }
 serde = { workspace = true }
 
+models = { path = "../models" }
+
 [lints]
 workspace = true

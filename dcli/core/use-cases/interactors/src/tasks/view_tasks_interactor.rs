@@ -3,11 +3,11 @@ use boundaries::tasks::ViewTasksOkResponseModel;
 use boundaries::tasks::ViewTasksOutputBoundary;
 use boundaries::tasks::ViewTasksRequestModel;
 use boundaries::tasks::ViewTasksResponseModel;
-use boundaries::utils::dataclasses::pagination::PaginationResponse;
 use domain::tasks::Task;
 use gateways::formatters::time::TimestampFormatter;
 use gateways::pointers::PointerHandle;
 use gateways::repositories::tasks::TaskRepository;
+use models::pagination::PaginationResponse;
 
 use crate::utils::assemblers::tasks::TaskModelAssembler;
 use crate::utils::pointers::SharedPointer;

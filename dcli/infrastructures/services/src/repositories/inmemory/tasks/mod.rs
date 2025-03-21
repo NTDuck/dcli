@@ -1,3 +1,3 @@
-use axiom::macros::layout::*;
+mod inmemory_task_repository;
 
-class!(pub _InMemoryTaskRepository);
+pub use self::inmemory_task_repository::*;

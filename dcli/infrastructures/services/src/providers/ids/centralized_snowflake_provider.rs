@@ -4,7 +4,7 @@ use std::sync::atomic::Ordering;
 use axiom::behaviours::New;
 use domain::ids::SnowflakeWorkerNumber;
 use domain::ids::SnowflakeSequenceNumber;
-use use_cases::gateways::providers::ids::SnowflakeProvider;
+use gateways::providers::ids::SnowflakeProvider;
 
 #[derive(New)]
 pub struct CentralizedSnowflakeProvider {
@@ -17,7 +17,7 @@ impl CentralizedSnowflakeProvider {
         return self.sequence_number.fetch_update(
             Ordering::Relaxed,
             Ordering::Relaxed,
-            |sequenceNumber| Some((sequenceNumber) + 1 & 0xfff))
+            |sequence_number| Some((sequence_number) + 1 & 0xfff))
         .unwrap();
     }
 }

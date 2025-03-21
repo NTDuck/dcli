@@ -5,8 +5,11 @@ edition.workspace = true
 
 [dependencies]
 axiom = { workspace = true }
+serde = { workspace = true }
 
 domain = { path = "../../core/domain" }
+gateways = { path = "../../core/use-cases/gateways" }
+models = { path = "../../core/use-cases/models" }
 
 chrono = "0.4"
 pnet_datalink = "0.35"

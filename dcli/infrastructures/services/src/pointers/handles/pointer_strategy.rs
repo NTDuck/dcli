@@ -21,7 +21,7 @@ pub trait PointerStrategy: Sized {
     fn as_ref<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl Deref<Target = T> + 'br;
     fn as_mut<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl DerefMut<Target = T> + 'br;
 
-    fn checkBinaryCompatibility<T>() {
+    fn check_binary_compatibility<T>() {
         std::hint::black_box(Self::into_untyped::<T>);
     }
 }

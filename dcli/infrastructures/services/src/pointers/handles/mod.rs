@@ -1,4 +1,5 @@
-use axiom::macros::layout::*;
+mod pointer_handle_with_strategy;
+mod pointer_strategy;
 
-class!(pub _PointerHandleWithStrategy);
-class!(pub _PointerStrategy);
+pub use self::pointer_handle_with_strategy::*;
+pub use self::pointer_strategy::*;

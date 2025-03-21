@@ -1,14 +1,11 @@
 [package]
-name = "gateways"
+name = "models"
 version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
 axiom = { workspace = true }
 serde = { workspace = true }
-
-domain = { path = "../../../core/domain" }
-models = { path = "../models" }
 
 [lints]
 workspace = true

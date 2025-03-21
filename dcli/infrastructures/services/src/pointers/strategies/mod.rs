@@ -1,4 +1,2 @@
-use axiom::macros::layout::*;
-
-namespace!(pub builtin);
-namespace!(pub triomphe);
+pub mod builtin;
+pub mod triomphe;

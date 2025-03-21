@@ -1,4 +1,5 @@
-use axiom::macros::layout::*;
+mod arc_mutex_pointer_strategy;
+mod arc_rwlock_pointer_strategy;
 
-class!(pub _ArcMutexPointerStrategy);
-class!(pub _ArcRwLockPointerStrategy);
+pub use self::arc_mutex_pointer_strategy::*;
+pub use self::arc_rwlock_pointer_strategy::*;

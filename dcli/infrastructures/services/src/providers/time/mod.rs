@@ -1,3 +1,3 @@
-use axiom::macros::layout::*;
+mod centralized_unix_timestamp_provider;
 
-class!(pub _CentralizedSystemTimestampProvider);
+pub use self::centralized_unix_timestamp_provider::*;

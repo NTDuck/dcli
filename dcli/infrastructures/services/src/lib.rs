@@ -1,7 +1,6 @@
-use axiom::macros::layout::*;
+pub mod factories;
+pub mod pointers;
+pub mod providers;
+pub mod repositories;
 
-namespace!(pub factories);
-namespace!(pub providers);
-namespace!(pub repositories);
-
-namespace!(pub pointers);
+mod utils;
