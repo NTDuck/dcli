@@ -1,0 +1,10 @@
+[package]
+name = "triomphe-infrastructures"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+triomphe = "0.1"
+
+[lints]
+workspace = true

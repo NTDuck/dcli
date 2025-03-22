@@ -1,5 +1,6 @@
 use axiom::interfaces::ddd;
 
+use crate::ids::Snowflake;
 use crate::tasks::TaskDescription;
 use crate::tasks::TaskStatus;
 
@@ -11,4 +12,4 @@ pub struct Task {
     pub status: TaskStatus,
 }
 
-pub use crate::ids::Snowflake as TaskId;
+pub type TaskId = Snowflake;
