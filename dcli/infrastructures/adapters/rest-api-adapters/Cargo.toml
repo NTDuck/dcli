@@ -4,6 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
+axiom = { workspace = true }
+
 boundaries = { path = "../../../core/use-cases/boundaries" }
 gateways = { path = "../../../core/use-cases/gateways" }
 models = { path = "../../../core/use-cases/models" }

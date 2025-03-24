@@ -9,6 +9,10 @@ gateways = { path = "../../core/use-cases/gateways" }
 interactors = { path = "../../core/use-cases/interactors" }
 models = { path = "../../core/use-cases/models" }
 
+rest-api-adapters = { path = "../../infrastructures/adapters/rest-api-adapters" }
+chrono-gateways-impl = { path = "../../infrastructures/gateways-impl/chrono-gateways-impl" }
+std-gateways-impl = { path = "../../infrastructures/gateways-impl/std-gateways-impl" }
+
 axum = "0.8"
 tokio = { version = "1.44", features = ["macros", "rt-multi-thread"] }
 

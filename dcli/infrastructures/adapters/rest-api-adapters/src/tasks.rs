@@ -1,3 +1,4 @@
+use axiom::behaviours::New;
 use axum::Json;
 use boundaries::tasks::CreateTaskBoundary;
 use boundaries::tasks::CreateTaskRequestModel;
@@ -8,6 +9,7 @@ use boundaries::tasks::ViewTasksResponseModel;
 use gateways::pointers::PointerHandle;
 use gateways::pointers::SharedPointer;
 
+#[derive(New)]
 pub struct TaskController<Handle: PointerHandle> {
     create_task_boundary: SharedPointer<Box<dyn CreateTaskBoundary>, Handle>,
     view_tasks_boundary: SharedPointer<Box<dyn ViewTasksBoundary>, Handle>,
