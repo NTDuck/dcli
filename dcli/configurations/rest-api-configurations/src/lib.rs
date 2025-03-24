@@ -42,6 +42,7 @@ async fn main() {
 
     let task_controller = TaskController::new(create_task_interactor.clone(), view_tasks_interactor.clone());
 
+    // Now go back to segregated boundaries...
     let router = Router::new()
         .route("/tasks", post(|request| task_controller.create_task(request)))
         .route("/tasks/view", post(|request| task_controller.view_tasks(request)));
