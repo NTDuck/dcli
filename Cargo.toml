@@ -6,7 +6,7 @@ members = [
     "dcli/core/use-cases/interactors",
     "dcli/core/use-cases/models",
     "dcli/infrastructures/adapters/*",
-    "dcli/infrastructures/services/*",
+    "dcli/infrastructures/gateways-impl/*",
     "dcli/configurations/*",
     "libs/*",
 ]
