@@ -1,18 +1,16 @@
 use axum::Json;
-use boundaries::tasks::CreateTaskInputBoundary;
-use boundaries::tasks::CreateTaskOutputBoundary;
+use boundaries::tasks::CreateTaskBoundary;
 use boundaries::tasks::CreateTaskRequestModel;
 use boundaries::tasks::CreateTaskResponseModel;
-use boundaries::tasks::ViewTasksInputBoundary;
-use boundaries::tasks::ViewTasksOutputBoundary;
+use boundaries::tasks::ViewTasksBoundary;
 use boundaries::tasks::ViewTasksRequestModel;
 use boundaries::tasks::ViewTasksResponseModel;
 use gateways::pointers::PointerHandle;
 use gateways::pointers::SharedPointer;
 
 pub struct TaskRouter<Handle: PointerHandle> {
-    create_task_boundary: SharedPointer<Box<dyn CreateTaskInputBoundary>, Handle>,
-    view_tasks_boundary: SharedPointer<Box<dyn ViewTasksInputBoundary>, Handle>,
+    create_task_boundary: SharedPointer<Box<dyn CreateTaskBoundary>, Handle>,
+    view_tasks_boundary: SharedPointer<Box<dyn ViewTasksBoundary>, Handle>,
 
     cached_create_task_response_model: SharedPointer<Option<CreateTaskResponseModel>, Handle>,
     cached_view_tasks_response_model: SharedPointer<Option<ViewTasksResponseModel>, Handle>,
@@ -20,8 +18,8 @@ pub struct TaskRouter<Handle: PointerHandle> {
 
 impl<Handle: PointerHandle> TaskRouter<Handle> {
     pub fn new(
-        create_task_boundary: SharedPointer<Box<dyn CreateTaskInputBoundary>, Handle>,
-        view_tasks_boundary: SharedPointer<Box<dyn ViewTasksInputBoundary>, Handle>,  
+        create_task_boundary: SharedPointer<Box<dyn CreateTaskBoundary>, Handle>,
+        view_tasks_boundary: SharedPointer<Box<dyn ViewTasksBoundary>, Handle>,  
     ) -> Self {
         return Self {
             create_task_boundary: create_task_boundary.clone(),
@@ -33,11 +31,13 @@ impl<Handle: PointerHandle> TaskRouter<Handle> {
     }
 
     pub async fn create_task_post(&self, Json(request): Json<CreateTaskRequestModel>) {
-        self.create_task_boundary.as_ref().accept(request);
+        *self.cached_create_task_response_model.as_mut() =
+            Some(self.create_task_boundary.as_ref().apply(request));
     }
     
     pub async fn view_tasks_post(&self, Json(request): Json<ViewTasksRequestModel>) {
-        self.view_tasks_boundary.as_ref().accept(request);
+        *self.cached_view_tasks_response_model.as_mut() =
+            Some(self.view_tasks_boundary.as_ref().apply(request));
     }
 
     pub async fn create_task_get(&self) -> Json<CreateTaskResponseModel> {
@@ -56,17 +56,5 @@ impl<Handle: PointerHandle> TaskRouter<Handle> {
             Some(response) => Json(response),
             None => panic!(),
         }
-    }
-}
-
-impl<Handle: PointerHandle> CreateTaskOutputBoundary for TaskRouter<Handle> {
-    fn accept(&self, response: CreateTaskResponseModel) {
-        *self.cached_create_task_response_model.as_mut() = Some(response);
-    }
-}
-
-impl<Handle: PointerHandle> ViewTasksOutputBoundary for TaskRouter<Handle> {
-    fn accept(&self, response: ViewTasksResponseModel) {
-        *self.cached_view_tasks_response_model.as_mut() = Some(response);
     }
 }

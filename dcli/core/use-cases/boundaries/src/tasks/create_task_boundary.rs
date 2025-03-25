@@ -2,14 +2,6 @@ use axiom::interfaces::DataTransferObjectWithoutSerde;
 use serde::Deserialize;
 use serde::Serialize;
 
-pub trait CreateTaskInputBoundary {
-    fn accept(&self, request: CreateTaskRequestModel);
-}
-
-pub trait CreateTaskOutputBoundary {
-    fn accept(&self, response: CreateTaskResponseModel);
-}
-
 pub trait CreateTaskBoundary {
     fn apply(&self, request: CreateTaskRequestModel) -> CreateTaskResponseModel;
 }

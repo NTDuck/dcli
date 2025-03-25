@@ -1,1 +1,3 @@
-pub mod task_router;
+mod task_router;
+
+pub use self::task_router::*;
