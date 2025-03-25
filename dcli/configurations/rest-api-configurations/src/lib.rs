@@ -12,7 +12,7 @@ use gateways::providers::time::TimestampProvider;
 use gateways::repositories::tasks::TaskRepository;
 use interactors::tasks::CreateTaskInteractor;
 use interactors::tasks::ViewTasksInteractor;
-use rest_api_adapters::tasks::TaskController;
+use rest_api_adapters::task_router::TaskRouter;
 use std_gateways_impl::pointers::handles::PointerHandleWithStrategy;
 use std_gateways_impl::pointers::strategies::ArcRwLockSharedPointerStrategy;
 use std_gateways_impl::providers::ids::CentralizedSnowflakeProvider;
@@ -40,12 +40,12 @@ async fn main() {
     let view_tasks_interactor: Pointer<Box<dyn ViewTasksBoundary>> =
         Pointer::new(Box::new(ViewTasksInteractor::new(timestamp_formatter.clone(), task_repository.clone())));
 
-    let task_controller = TaskController::new(create_task_interactor.clone(), view_tasks_interactor.clone());
+    let task_controller = TaskRouter::new(create_task_interactor.clone(), view_tasks_interactor.clone());
 
     // Now go back to segregated boundaries...
     let router = Router::new()
-        .route("/tasks", post(|request| task_controller.create_task(request)))
-        .route("/tasks/view", post(|request| task_controller.view_tasks(request)));
+        .route("/tasks", post(|request| task_controller.create_task_get(request)))
+        .route("/tasks/view", post(|request| task_controller.view_tasks_get(request)));
     
     let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
     axum::serve(listener, router).await.unwrap();

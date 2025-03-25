@@ -1,7 +1,9 @@
 use axiom::behaviours::New;
 use boundaries::tasks::CreateTaskBoundary;
 use boundaries::tasks::CreateTaskErrResponseModel;
+use boundaries::tasks::CreateTaskInputBoundary;
 use boundaries::tasks::CreateTaskOkResponseModel;
+use boundaries::tasks::CreateTaskOutputBoundary;
 use boundaries::tasks::CreateTaskRequestModel;
 use boundaries::tasks::CreateTaskResponseModel;
 use domain::ids::Snowflake;
@@ -16,6 +18,8 @@ use gateways::providers::time::TimestampProvider;
 use gateways::repositories::tasks::TaskRepository;
 
 pub struct CreateTaskInteractor<Handle: PointerHandle> {
+    output_boundary: SharedPointer<Box<dyn CreateTaskOutputBoundary>, Handle>,
+
     timestamp_provider: SharedPointer<Box<dyn TimestampProvider>, Handle>,
     snowflake_provider: SharedPointer<Box<dyn SnowflakeProvider>, Handle>,
     task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
@@ -25,16 +29,25 @@ pub struct CreateTaskInteractor<Handle: PointerHandle> {
 
 impl<Handle: PointerHandle> CreateTaskInteractor<Handle> {
     pub fn new(
+        output_boundary: SharedPointer<Box<dyn CreateTaskOutputBoundary>, Handle>,
         timestamp_provider: SharedPointer<Box<dyn TimestampProvider>, Handle>,
         snowflake_provider: SharedPointer<Box<dyn SnowflakeProvider>, Handle>,
         task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
     ) -> Self {
         return Self {
-            timestamp_provider,
-            snowflake_provider,
-            task_repository,
+            output_boundary: output_boundary.clone(),
+            timestamp_provider: timestamp_provider.clone(),
+            snowflake_provider: snowflake_provider.clone(),
+            task_repository: task_repository.clone(),
             response_model_assembler: CreateTaskResponseModelAssembler::new(),
         };
+    }
+}
+
+impl<Handle: PointerHandle> CreateTaskInputBoundary for CreateTaskInteractor<Handle> {
+    fn accept(&self, request: CreateTaskRequestModel) {
+        let response = self.apply(request);
+        self.output_boundary.as_ref().accept(response);
     }
 }
 

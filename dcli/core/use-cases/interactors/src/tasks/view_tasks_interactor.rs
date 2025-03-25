@@ -1,5 +1,7 @@
 use boundaries::tasks::ViewTasksBoundary;
+use boundaries::tasks::ViewTasksInputBoundary;
 use boundaries::tasks::ViewTasksOkResponseModel;
+use boundaries::tasks::ViewTasksOutputBoundary;
 use boundaries::tasks::ViewTasksRequestModel;
 use boundaries::tasks::ViewTasksResponseModel;
 use domain::tasks::Task;
@@ -12,6 +14,8 @@ use models::pagination::PaginationResponse;
 use crate::utils::assemblers::tasks::TaskModelAssembler;
 
 pub struct ViewTasksInteractor<Handle: PointerHandle> {
+    output_boundary: SharedPointer<Box<dyn ViewTasksOutputBoundary>, Handle>,
+
     task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
 
     response_model_assembler: ViewTasksResponseModelAssembler<Handle>,
@@ -19,13 +23,22 @@ pub struct ViewTasksInteractor<Handle: PointerHandle> {
 
 impl<Handle: PointerHandle> ViewTasksInteractor<Handle> {
     pub fn new(
+        output_boundary: SharedPointer<Box<dyn ViewTasksOutputBoundary>, Handle>,
         timestamp_formatter: SharedPointer<Box<dyn TimestampFormatter>, Handle>,
         task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
     ) -> Self {
         return Self {
+            output_boundary: output_boundary.clone(),
             task_repository: task_repository.clone(),
             response_model_assembler: ViewTasksResponseModelAssembler::new(timestamp_formatter.clone()),
         };
+    }
+}
+
+impl<Handle: PointerHandle> ViewTasksInputBoundary for ViewTasksInteractor<Handle> {
+    fn accept(&self, request: ViewTasksRequestModel) {
+        let response = self.apply(request);
+        self.output_boundary.as_ref().accept(response);
     }
 }
 
