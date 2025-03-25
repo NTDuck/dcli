@@ -15,6 +15,7 @@ std-gateways-impl = { path = "../../infrastructures/gateways-impl/std-gateways-i
 
 axum = "0.8"
 tokio = { version = "1.44", features = ["macros", "rt-multi-thread"] }
+tower-service = "0.3"
 
 [lints]
 workspace = true

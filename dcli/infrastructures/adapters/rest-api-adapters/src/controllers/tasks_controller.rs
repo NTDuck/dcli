@@ -8,7 +8,7 @@ use boundaries::tasks::ViewTasksResponseModel;
 use gateways::pointers::PointerHandle;
 use gateways::pointers::SharedPointer;
 
-pub struct TaskRouter<Handle: PointerHandle> {
+pub struct TasksController<Handle: PointerHandle> {
     create_task_boundary: SharedPointer<Box<dyn CreateTaskBoundary>, Handle>,
     view_tasks_boundary: SharedPointer<Box<dyn ViewTasksBoundary>, Handle>,
 
@@ -16,7 +16,7 @@ pub struct TaskRouter<Handle: PointerHandle> {
     cached_view_tasks_response_model: SharedPointer<Option<ViewTasksResponseModel>, Handle>,
 }
 
-impl<Handle: PointerHandle> TaskRouter<Handle> {
+impl<Handle: PointerHandle> TasksController<Handle> {
     pub fn new(
         create_task_boundary: SharedPointer<Box<dyn CreateTaskBoundary>, Handle>,
         view_tasks_boundary: SharedPointer<Box<dyn ViewTasksBoundary>, Handle>,  

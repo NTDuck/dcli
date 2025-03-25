@@ -1,5 +1,6 @@
 use std::sync::atomic::AtomicU16;
 
+use axum::routing::get;
 use axum::routing::post;
 use axum::Router;
 use boundaries::tasks::CreateTaskBoundary;
@@ -12,7 +13,7 @@ use gateways::providers::time::TimestampProvider;
 use gateways::repositories::tasks::TaskRepository;
 use interactors::tasks::CreateTaskInteractor;
 use interactors::tasks::ViewTasksInteractor;
-use rest_api_adapters::TaskRouter;
+use rest_api_adapters::controllers::TasksController;
 use std_gateways_impl::pointers::handles::PointerHandleWithStrategy;
 use std_gateways_impl::pointers::strategies::ArcRwLockSharedPointerStrategy;
 use std_gateways_impl::providers::ids::CentralizedSnowflakeProvider;
@@ -40,13 +41,40 @@ async fn main() {
     let view_tasks_interactor: Pointer<Box<dyn ViewTasksBoundary>> =
         Pointer::new(Box::new(ViewTasksInteractor::new(timestamp_formatter.clone(), task_repository.clone())));
 
-    let task_router = TaskRouter::new(create_task_interactor.clone(), view_tasks_interactor.clone());
+    let tasks_controller: Pointer<TasksController<_>> =
+        Pointer::new(TasksController::new(create_task_interactor.clone(), view_tasks_interactor.clone()));
+    let tasks_router = Router::new()
+        .route("/", post({
+            move |request| async move {
+                tasks_controller.as_ref().create_task_post(request).await
+            }
+        }))
+        .route("/", get({
+            move || async move {
+                tasks_controller.as_ref().create_task_get().await
+            }
+        }))
+        .route("/", post({
+            move |request| async move {
+                tasks_controller.as_ref().view_tasks_post(request).await
+            }
+        }))
+        .route("/", get({
+            move || async move {
+                tasks_controller.as_ref().view_tasks_get().await
+            }
+        }));
 
-    // Now go back to segregated boundaries...
     let router = Router::new()
-        .route("/tasks", post(|request| task_router.create_task_post(request)))
-        .route("/tasks/view", post(|request| task_router.view_tasks_post(request)));
-    
+        .nest("/tasks", tasks_router);
     let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
+    
     axum::serve(listener, router).await.unwrap();
 }
+
+// .route("/tasks", post({
+//     let router = task_router.clone();
+//     move |request| async move {
+//         router.as_ref().create_task_post(request).await
+//     }
+// }))
