@@ -1,5 +1,5 @@
 use domain::ids::Uuid;
 
-pub trait UuidFactory {
+pub trait UuidFactory: Send + Sync {
     fn create(&self) -> Uuid;
 }

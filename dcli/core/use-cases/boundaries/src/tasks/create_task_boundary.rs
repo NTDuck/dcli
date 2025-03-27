@@ -2,7 +2,7 @@ use axiom::interfaces::DataTransferObjectWithoutSerde;
 use serde::Deserialize;
 use serde::Serialize;
 
-pub trait CreateTaskBoundary {
+pub trait CreateTaskBoundary: Send + Sync {
     fn apply(&self, request: CreateTaskRequestModel) -> CreateTaskResponseModel;
 }
 

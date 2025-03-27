@@ -71,10 +71,3 @@ async fn main() {
     
     axum::serve(listener, router).await.unwrap();
 }
-
-// .route("/tasks", post({
-//     let router = task_router.clone();
-//     move |request| async move {
-//         router.as_ref().create_task_post(request).await
-//     }
-// }))

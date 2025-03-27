@@ -5,7 +5,7 @@ use models::tasks::TaskModel;
 use serde::Deserialize;
 use serde::Serialize;
 
-pub trait ViewTasksBoundary {
+pub trait ViewTasksBoundary: Send + Sync {
     fn apply(&self, request: ViewTasksRequestModel) -> ViewTasksResponseModel;
 }
 
