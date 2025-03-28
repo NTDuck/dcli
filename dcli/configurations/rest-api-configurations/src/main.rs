@@ -55,6 +55,7 @@ async fn main() {
         .with_state(tasks_state);
 
     let router = Router::new()
+        .route("/", get(|| async { "dcli" }))
         .nest("/tasks", tasks_router);
     let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
     
