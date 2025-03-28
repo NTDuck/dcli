@@ -47,16 +47,16 @@ async fn main() {
 
     let tasks_state: Pointer<TasksState<_>> =
         Pointer::new(TasksState::new(create_task_interactor.clone(), view_tasks_interactor.clone()));
+        
     let tasks_router = Router::new()
-        .route("/create", post(create_task_post))
-        .route("/view", post(view_tasks_post))
-        .route("/create", get(create_task_get))
-        .route("/view", get(view_tasks_get))
+        .route("/create", post(create_task_post).get(create_task_get))
+        .route("/view", post(view_tasks_post).get(view_tasks_get))
         .with_state(tasks_state);
 
     let router = Router::new()
         .route("/", get(|| async { "dcli" }))
         .nest("/tasks", tasks_router);
+    
     let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
     
     axum::serve(listener, router).await.unwrap();
