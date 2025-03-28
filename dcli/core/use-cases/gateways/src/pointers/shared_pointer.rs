@@ -10,8 +10,8 @@ use crate::pointers::PointerHandle;
 /// See: [Higher Kinded Types in Rust](https://joshlf.com/post/2018/10/18/rust-higher-kinded-types-already/)
 pub struct SharedPointer<T, Handle: PointerHandle> {
     handle: ManuallyDrop<Handle>,
-    // Prevent `Send` and `Sync` auto implementation
-    _marker: PhantomData<(T, *mut ())>,
+    _phantom_t: PhantomData<T>,
+    _phantom_no_send_sync: PhantomData<*mut ()>,
 }
 
 unsafe impl<T, Handle> Send for SharedPointer<T, Handle>
@@ -51,7 +51,8 @@ where
     fn new_from_handle(handle: Handle) -> Self {
         return Self {
             handle: ManuallyDrop::new(handle),
-            _marker: PhantomData,
+            _phantom_t: PhantomData,
+            _phantom_no_send_sync: PhantomData,
         };
     }
 }

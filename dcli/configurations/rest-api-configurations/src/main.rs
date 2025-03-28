@@ -13,7 +13,11 @@ use gateways::providers::time::TimestampProvider;
 use gateways::repositories::tasks::TaskRepository;
 use interactors::tasks::CreateTaskInteractor;
 use interactors::tasks::ViewTasksInteractor;
-use rest_api_adapters::controllers::TasksController;
+use rest_api_adapters::handlers::create_task_get;
+use rest_api_adapters::handlers::create_task_post;
+use rest_api_adapters::handlers::view_tasks_get;
+use rest_api_adapters::handlers::view_tasks_post;
+use rest_api_adapters::states::TasksState;
 use std_gateways_impl::pointers::handles::PointerHandleWithStrategy;
 use std_gateways_impl::pointers::strategies::ArcRwLockSharedPointerStrategy;
 use std_gateways_impl::providers::ids::CentralizedSnowflakeProvider;
@@ -41,29 +45,14 @@ async fn main() {
     let view_tasks_interactor: Pointer<Box<dyn ViewTasksBoundary>> =
         Pointer::new(Box::new(ViewTasksInteractor::new(timestamp_formatter.clone(), task_repository.clone())));
 
-    let tasks_controller: Pointer<TasksController<_>> =
-        Pointer::new(TasksController::new(create_task_interactor.clone(), view_tasks_interactor.clone()));
+    let tasks_state: Pointer<TasksState<_>> =
+        Pointer::new(TasksState::new(create_task_interactor.clone(), view_tasks_interactor.clone()));
     let tasks_router = Router::new()
-        .route("/", post({
-            move |request| async move {
-                tasks_controller.clone().as_ref().create_task_post(request).await
-            }
-        }))
-        .route("/", get({
-            move || async move {
-                tasks_controller.as_ref().create_task_get().await
-            }
-        }))
-        .route("/", post({
-            move |request| async move {
-                tasks_controller.as_ref().view_tasks_post(request).await
-            }
-        }))
-        .route("/", get({
-            move || async move {
-                tasks_controller.as_ref().view_tasks_get().await
-            }
-        }));
+        .route("/create", post(create_task_post))
+        .route("/view", post(view_tasks_post))
+        .route("/create", get(create_task_get))
+        .route("/view", get(view_tasks_get))
+        .with_state(tasks_state);
 
     let router = Router::new()
         .nest("/tasks", tasks_router);
