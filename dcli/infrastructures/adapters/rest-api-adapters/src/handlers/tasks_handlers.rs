@@ -1,4 +1,5 @@
 use axum::extract::State;
+use axum::http::StatusCode;
 use axum::Json;
 use boundaries::tasks::CreateTaskRequestModel;
 use boundaries::tasks::CreateTaskResponseModel;
@@ -27,22 +28,22 @@ pub async fn view_tasks_post<Handle: PointerHandle>(
 
 pub async fn create_task_get<Handle: PointerHandle>(
     State(state): State<SharedPointer<TasksState<Handle>, Handle>>,
-) -> Json<CreateTaskResponseModel> {
+) -> Result<Json<CreateTaskResponseModel>, StatusCode> {
     let cached_response = state.as_ref().cached_create_task_response_model.as_mut().take();
 
     match cached_response {
-        Some(response) => Json(response),
-        None => panic!(),
+        Some(response) => Ok(Json(response)),
+        None => Err(StatusCode::NOT_FOUND),
     }
 }
 
 pub async fn view_tasks_get<Handle: PointerHandle>(
     State(state): State<SharedPointer<TasksState<Handle>, Handle>>,
-) -> Json<ViewTasksResponseModel> {
+) -> Result<Json<ViewTasksResponseModel>, StatusCode> {
     let cached_response = state.as_ref().cached_view_tasks_response_model.as_mut().take();
 
     match cached_response {
-        Some(response) => Json(response),
-        None => panic!(),
+        Some(response) => Ok(Json(response)),
+        None => Err(StatusCode::NOT_FOUND),
     }
 }
