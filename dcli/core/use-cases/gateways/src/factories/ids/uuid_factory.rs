@@ -1,5 +1,7 @@
 use domain::ids::Uuid;
 
-pub trait UuidFactory: Send + Sync {
+use crate::utils::interfaces::Gateway;
+
+pub trait UuidFactory: Gateway {
     fn create(&self) -> Uuid;
 }

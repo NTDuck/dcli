@@ -4,7 +4,9 @@ use domain::tasks::TaskStatus;
 use models::pagination::PaginationRequest;
 use models::pagination::PaginationResponse;
 
-pub trait TaskRepository: Send + Sync {
+use crate::utils::interfaces::Gateway;
+
+pub trait TaskRepository: Gateway {
     fn save(&mut self, task: Task);
     fn remove(&mut self, task_id: TaskId);
 

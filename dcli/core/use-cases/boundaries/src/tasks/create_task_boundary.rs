@@ -2,7 +2,9 @@ use axiom::interfaces::DataTransferObjectWithoutSerde;
 use serde::Deserialize;
 use serde::Serialize;
 
-pub trait CreateTaskBoundary: Send + Sync {
+use crate::utils::interfaces::Boundary;
+
+pub trait CreateTaskBoundary: Boundary {
     fn apply(&self, request: CreateTaskRequestModel) -> CreateTaskResponseModel;
 }
 

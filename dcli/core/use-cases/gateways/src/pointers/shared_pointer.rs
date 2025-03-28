@@ -16,14 +16,14 @@ pub struct SharedPointer<T, Handle: PointerHandle> {
 
 unsafe impl<T, Handle> Send for SharedPointer<T, Handle>
 where
-    T: Sync + Send,
-    Handle: PointerHandle + Send
+    T: Send + Sync,
+    Handle: PointerHandle,
 {}
 
 unsafe impl<T, Handle> Sync for SharedPointer<T, Handle>
 where
-    T: Sync + Send,
-    Handle: PointerHandle + Sync
+    T: Send + Sync,
+    Handle: PointerHandle,
 {}
 
 impl<T, Handle> Unpin for SharedPointer<T, Handle>

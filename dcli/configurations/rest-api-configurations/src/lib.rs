@@ -46,7 +46,7 @@ async fn main() {
     let tasks_router = Router::new()
         .route("/", post({
             move |request| async move {
-                tasks_controller.as_ref().create_task_post(request).await
+                tasks_controller.clone().as_ref().create_task_post(request).await
             }
         }))
         .route("/", get({

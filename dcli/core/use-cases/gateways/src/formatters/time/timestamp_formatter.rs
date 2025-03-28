@@ -1,5 +1,7 @@
 use domain::time::Timestamp;
 
-pub trait TimestampFormatter: Send + Sync {
+use crate::utils::interfaces::Gateway;
+
+pub trait TimestampFormatter: Gateway {
     fn format(&self, timestamp: Timestamp) -> String;
 }
