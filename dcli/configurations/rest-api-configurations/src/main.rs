@@ -60,7 +60,7 @@ async fn main() {
         .layer(ServiceBuilder::new()
             .layer(TraceLayer::new_for_http())
             .layer(CorsLayer::new()))
-        .nest("/tasks", tasks_router);
+        .nest("/task", tasks_router);
     
     let listener = TcpListener::bind("127.0.0.1:4444").await.unwrap();
     println!("Running on {}://{} ...", "http", listener.local_addr().unwrap());

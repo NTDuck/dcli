@@ -1,6 +1,7 @@
 use clap::builder::Styles;
 use clap::Arg;
 use clap::Command;
+use models::pagination::MIN_PAGE_NUMBER;
 use models::tasks::TaskStatusModel;
 use rest_api_adapters::models::tasks::CreateTaskErrViewModel;
 use rest_api_adapters::models::tasks::CreateTaskRequestObject;
@@ -30,12 +31,14 @@ fn main() {
     match command.get_matches().subcommand() {
         Some(("task", matches)) => match matches.subcommand() {
             Some(("create", matches)) => {
-                let task_description = matches.get_one::<String>("task-description").unwrap();
+                let task_description = matches.get_one::<String>("task-description")
+                    .expect("Error: Missing required argument `task-description`");
 
                 let request = CreateTaskRequestObject {
                     task_description: task_description.to_owned(),
                 };
                 let query = serde_qs::to_string(&request).unwrap();
+                println!("url is {}", format!("{}/task/create?{}", ROOT_URI, query));
                 let response = agent.get(format!("{}/task/create?{}", ROOT_URI, query))
                     .call().unwrap()
                     .body_mut()
@@ -60,7 +63,9 @@ fn main() {
                 }
             },
             Some(("view", matches)) => {
-                let page_number = matches.get_one::<usize>("page-number").unwrap().clone();
+                let page_number = matches.get_one::<usize>("page-number")
+                    .cloned()
+                    .unwrap_or(MIN_PAGE_NUMBER);
                 
                 let request = ViewTasksRequestObject {
                     page_number,
@@ -83,7 +88,8 @@ fn main() {
                                     TaskStatusModel::InProgress => "in-progress",
                                     TaskStatusModel::Completed => "completed",
                                 };
-                                println!("- [{}] {} ({}) ({})", task.id, task.description, task.created_at, task_status);
+                                println!("- [{}] ({}) ({})", task.id, task.created_at, task_status);
+                                println!("   {}", task.description);
                             });
                     },
                     Err(_) => {},

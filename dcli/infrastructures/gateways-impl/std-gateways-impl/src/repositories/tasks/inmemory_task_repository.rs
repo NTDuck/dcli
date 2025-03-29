@@ -7,7 +7,7 @@ use domain::tasks::TaskStatus;
 use gateways::repositories::tasks::TaskRepository;
 use models::pagination::PaginationRequest;
 use models::pagination::PaginationResponse;
-use models::pagination::MIN_PAGE_SIZE;
+use models::pagination::MIN_PAGE_NUMBER;
 
 use crate::utils::dataclasses::pagination::PaginationRange;
 
@@ -93,7 +93,7 @@ impl InMemoryTaskRepository {
 
     fn compute_max_page_number(number_of_tasks: usize, max_page_size: usize) -> usize {
         return match number_of_tasks {
-            0 => MIN_PAGE_SIZE,
+            0 => MIN_PAGE_NUMBER,
             _ => number_of_tasks.div_ceil(max_page_size),
         };
     }
