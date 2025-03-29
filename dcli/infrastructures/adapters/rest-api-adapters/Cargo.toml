@@ -5,6 +5,7 @@ edition.workspace = true
 
 [dependencies]
 axiom = { workspace = true }
+serde = { workspace = true }
 
 boundaries = { path = "../../../core/use-cases/boundaries" }
 gateways = { path = "../../../core/use-cases/gateways" }

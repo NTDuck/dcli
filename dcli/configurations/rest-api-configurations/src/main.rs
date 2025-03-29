@@ -1,7 +1,6 @@
 use std::sync::atomic::AtomicU16;
 
 use axum::routing::get;
-use axum::routing::post;
 use axum::Router;
 use boundaries::tasks::CreateTaskBoundary;
 use boundaries::tasks::ViewTasksBoundary;
@@ -13,10 +12,8 @@ use gateways::providers::time::TimestampProvider;
 use gateways::repositories::tasks::TaskRepository;
 use interactors::tasks::CreateTaskInteractor;
 use interactors::tasks::ViewTasksInteractor;
-use rest_api_adapters::handlers::create_task_get;
-use rest_api_adapters::handlers::create_task_post;
-use rest_api_adapters::handlers::view_tasks_get;
-use rest_api_adapters::handlers::view_tasks_post;
+use rest_api_adapters::handlers::tasks::create_task;
+use rest_api_adapters::handlers::tasks::view_tasks;
 use rest_api_adapters::states::TasksState;
 use std_gateways_impl::pointers::handles::PointerHandleWithStrategy;
 use std_gateways_impl::pointers::strategies::ArcRwLockSharedPointerStrategy;
@@ -24,6 +21,9 @@ use std_gateways_impl::providers::ids::CentralizedSnowflakeProvider;
 use std_gateways_impl::providers::time::CentralizedSystemTimestampProvider;
 use std_gateways_impl::repositories::tasks::InMemoryTaskRepository;
 use tokio::net::TcpListener;
+use tower::ServiceBuilder;
+use tower_http::cors::CorsLayer;
+use tower_http::trace::TraceLayer;
 
 #[tokio::main]
 async fn main() {
@@ -49,15 +49,21 @@ async fn main() {
         Pointer::new(TasksState::new(create_task_interactor.clone(), view_tasks_interactor.clone()));
         
     let tasks_router = Router::new()
-        .route("/create", post(create_task_post).get(create_task_get))
-        .route("/view", post(view_tasks_post).get(view_tasks_get))
+        .route("/create", get(create_task))
+        .route("/view", get(view_tasks))
         .with_state(tasks_state);
 
     let router = Router::new()
         .route("/", get(|| async { "dcli" }))
+        .layer(ServiceBuilder::new()
+            .layer(TraceLayer::new_for_http())
+            .layer(CorsLayer::new()))
         .nest("/tasks", tasks_router);
     
-    let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
+    let listener = TcpListener::bind(ADDRESS).await.unwrap();
     
+    println!("Running on http://{}", ADDRESS);
     axum::serve(listener, router).await.unwrap();
+
+    const ADDRESS: &str = "127.0.0.1:4444";
 }
