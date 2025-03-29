@@ -7,7 +7,6 @@ edition.workspace = true
 boundaries = { path = "../../core/use-cases/boundaries" }
 gateways = { path = "../../core/use-cases/gateways" }
 interactors = { path = "../../core/use-cases/interactors" }
-models = { path = "../../core/use-cases/models" }
 
 rest-api-adapters = { path = "../../infrastructures/adapters/rest-api-adapters" }
 chrono-gateways-impl = { path = "../../infrastructures/gateways-impl/chrono-gateways-impl" }

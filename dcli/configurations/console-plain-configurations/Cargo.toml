@@ -6,7 +6,12 @@ edition.workspace = true
 [dependencies]
 serde = { workspace = true }
 
+models = { path = "../../core/use-cases/models" }
+
+rest-api-adapters = { path = "../../infrastructures/adapters/rest-api-adapters" }
+
 clap = "4.5"
+serde_qs = "0.14"
 ureq = { version = "3.0", features = ["json"] }
 
 [lints]
