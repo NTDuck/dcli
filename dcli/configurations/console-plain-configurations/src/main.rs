@@ -1,4 +1,5 @@
 use clap::builder::Styles;
+use clap::value_parser;
 use clap::Arg;
 use clap::Command;
 use models::pagination::MIN_PAGE_NUMBER;
@@ -22,11 +23,13 @@ fn main() {
             .subcommand(Command::new("create")
                 .arg(Arg::new("task-description")
                     .long("task-description")
-                    .short('d')))
+                    .short('d')
+                    .value_parser(value_parser!(String))))
             .subcommand(Command::new("view")
                 .arg(Arg::new("page-number")
                     .long("page-number")
-                    .short('p'))));
+                    .short('p')
+                    .value_parser(value_parser!(usize)))));
 
     match command.get_matches().subcommand() {
         Some(("task", matches)) => match matches.subcommand() {
