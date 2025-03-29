@@ -46,7 +46,10 @@ async fn main() {
         Pointer::new(Box::new(ViewTasksInteractor::new(timestamp_formatter.clone(), task_repository.clone())));
 
     let tasks_state: Pointer<TasksState<_>> =
-        Pointer::new(TasksState::new(create_task_interactor.clone(), view_tasks_interactor.clone()));
+        Pointer::new(TasksState {
+            create_task_boundary: create_task_interactor.clone(),
+            view_tasks_boundary: view_tasks_interactor.clone(),
+        });
         
     let tasks_router = Router::new()
         .route("/create", get(create_task))
@@ -54,16 +57,13 @@ async fn main() {
         .with_state(tasks_state);
 
     let router = Router::new()
-        .route("/", get(|| async { "dcli" }))
         .layer(ServiceBuilder::new()
             .layer(TraceLayer::new_for_http())
             .layer(CorsLayer::new()))
         .nest("/tasks", tasks_router);
     
-    let listener = TcpListener::bind(ADDRESS).await.unwrap();
+    let listener = TcpListener::bind("127.0.0.1:4444").await.unwrap();
+    println!("Running on {}://{} ...", "http", listener.local_addr().unwrap());
     
-    println!("Running on http://{}", ADDRESS);
     axum::serve(listener, router).await.unwrap();
-
-    const ADDRESS: &str = "127.0.0.1:4444";
 }

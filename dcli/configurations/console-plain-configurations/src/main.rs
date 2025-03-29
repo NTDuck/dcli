@@ -21,8 +21,6 @@ fn main() {
                     .long("page-number")
                     .short('p'))));
 
-    println!("dcli :3");
-
     match command.get_matches().subcommand() {
         Some(("task", matches)) => match matches.subcommand() {
             Some(("create", matches)) => {
