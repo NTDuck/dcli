@@ -1,5 +1,5 @@
 [package]
-name = "console-plain-client-adapters"
+name = "console-plain-adapters"
 version = "0.1.0"
 edition.workspace = true
 

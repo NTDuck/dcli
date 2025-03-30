@@ -1,6 +1,7 @@
 use std::sync::atomic::AtomicU16;
 
 use axum::routing::get;
+use axum::routing::post;
 use axum::Router;
 use boundaries::tasks::CreateTaskBoundary;
 use boundaries::tasks::ViewTasksBoundary;
@@ -12,9 +13,9 @@ use gateways::providers::time::TimestampProvider;
 use gateways::repositories::tasks::TaskRepository;
 use interactors::tasks::CreateTaskInteractor;
 use interactors::tasks::ViewTasksInteractor;
-use rest_api_server_adapters::handlers::tasks::create_task;
-use rest_api_server_adapters::handlers::tasks::view_tasks;
-use rest_api_server_adapters::states::TasksState;
+use rest_api_adapters::server::handlers::tasks::create_task;
+use rest_api_adapters::server::handlers::tasks::view_tasks;
+use rest_api_adapters::server::states::TasksState;
 use std_gateways_impl::pointers::handles::PointerHandleWithStrategy;
 use std_gateways_impl::pointers::strategies::ArcRwLockSharedPointerStrategy;
 use std_gateways_impl::providers::ids::CentralizedSnowflakeProvider;
@@ -52,7 +53,7 @@ async fn main() {
         });
         
     let tasks_router = Router::new()
-        .route("/create", get(create_task))
+        .route("/create", post(create_task))
         .route("/view", get(view_tasks))
         .with_state(tasks_state);
 

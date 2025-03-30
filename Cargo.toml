@@ -5,9 +5,9 @@ members = [
     "dcli/core/use-cases/gateways",
     "dcli/core/use-cases/interactors",
     "dcli/core/use-cases/models",
-    "dcli/infrastructures/adapters/*/*",
+    "dcli/infrastructures/adapters/*",
     "dcli/infrastructures/gateways-impl/*",
-    "dcli/configurations/*/*",
+    "dcli/configurations/*",
     "libs/*",
 ]
 resolver = "2"
