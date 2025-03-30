@@ -1,3 +1,3 @@
 [alias]
-run-rest-api = "run -p rest-api-configurations"
-run-console = "run -p console-plain-configurations"
+run-server-rest-api = "run -p rest-api-server-configurations"
+run-client-console = "run -p console-plain-client-configurations"
