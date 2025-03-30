@@ -20,6 +20,6 @@ ureq = { version = "3.0", features = ["json"] }
 workspace = true
 
 [features]
-default = ["client", "server"]
+default = []
 client = []
 server = []

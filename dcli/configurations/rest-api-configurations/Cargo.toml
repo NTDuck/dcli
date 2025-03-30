@@ -8,7 +8,7 @@ boundaries = { path = "../../core/use-cases/boundaries" }
 gateways = { path = "../../core/use-cases/gateways" }
 interactors = { path = "../../core/use-cases/interactors" }
 
-rest-api-adapters = { path = "../../infrastructures/adapters/rest-api-adapters" }
+rest-api-adapters = { path = "../../infrastructures/adapters/rest-api-adapters", features = ["server"] }
 chrono-gateways-impl = { path = "../../infrastructures/gateways-impl/chrono-gateways-impl" }
 std-gateways-impl = { path = "../../infrastructures/gateways-impl/std-gateways-impl" }
 

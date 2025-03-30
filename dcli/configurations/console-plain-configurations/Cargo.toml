@@ -8,11 +8,9 @@ serde = { workspace = true }
 
 models = { path = "../../core/use-cases/models" }
 
-rest-api-adapters = { path = "../../infrastructures/adapters/rest-api-adapters" }
+rest-api-adapters = { path = "../../infrastructures/adapters/rest-api-adapters", features = ["client"] }
 
 clap = "4.5"
-serde_qs = "0.14"
-ureq = { version = "3.0", features = ["json"] }
 
 [lints]
 workspace = true

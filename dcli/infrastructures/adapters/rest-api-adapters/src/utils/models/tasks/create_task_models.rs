@@ -11,6 +11,14 @@ pub struct CreateTaskRequestObject {
     pub task_description: String,
 }
 
+impl From<CreateTaskRequestModel> for CreateTaskRequestObject {
+    fn from(response: CreateTaskRequestModel) -> Self {
+        return Self {
+            task_description: response.task_description,
+        };
+    }
+}
+
 impl Into<CreateTaskRequestModel> for CreateTaskRequestObject {
     fn into(self) -> CreateTaskRequestModel {
         return CreateTaskRequestModel {
@@ -57,6 +65,12 @@ impl From<CreateTaskOkResponseModel> for CreateTaskOkViewModel {
     }
 }
 
+impl Into<CreateTaskOkResponseModel> for CreateTaskOkViewModel {
+    fn into(self) -> CreateTaskOkResponseModel {
+        return CreateTaskOkResponseModel;
+    }
+}
+
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub enum CreateTaskErrViewModel {
     TaskDescriptionLengthUnderflow {
@@ -83,6 +97,27 @@ impl From<CreateTaskErrResponseModel> for CreateTaskErrViewModel {
                 actual_length,
                 max_length_allowed,
             } => Self::TaskDescriptionLengthOverflow {
+                actual_length,
+                max_length_allowed,
+            },
+        }
+    }
+}
+
+impl Into<CreateTaskErrResponseModel> for CreateTaskErrViewModel {
+    fn into(self) -> CreateTaskErrResponseModel {
+        match self {
+            Self::TaskDescriptionLengthUnderflow {
+                actual_length,
+                min_length_required,
+            } => CreateTaskErrResponseModel::TaskDescriptionLengthUnderflow {
+                actual_length,
+                min_length_required,
+            },
+            Self::TaskDescriptionLengthOverflow {
+                actual_length,
+                max_length_allowed,
+            } => CreateTaskErrResponseModel::TaskDescriptionLengthOverflow {
                 actual_length,
                 max_length_allowed,
             },

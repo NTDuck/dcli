@@ -4,11 +4,6 @@ use clap::Arg;
 use clap::Command;
 use models::pagination::MIN_PAGE_NUMBER;
 use models::tasks::TaskStatusModel;
-use rest_api_adapters::models::tasks::CreateTaskErrViewModel;
-use rest_api_adapters::models::tasks::CreateTaskRequestObject;
-use rest_api_adapters::models::tasks::CreateTaskViewModel;
-use rest_api_adapters::models::tasks::ViewTasksRequestObject;
-use rest_api_adapters::models::tasks::ViewTasksViewModel;
 use ureq::Agent;
 
 fn main() {

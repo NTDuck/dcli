@@ -1,3 +1,4 @@
+use axum::http::Uri;
 use boundaries::tasks::ViewTasksBoundary;
 use boundaries::tasks::ViewTasksRequestModel;
 use boundaries::tasks::ViewTasksResponseModel;
@@ -5,21 +6,15 @@ use gateways::pointers::PointerHandle;
 use gateways::pointers::SharedPointer;
 use ureq::Agent;
 
-use crate::utils::dataclasses::Endpoints;
-
 pub struct ViewTasksRemoteInteractor<Handle: PointerHandle> {
     agent: SharedPointer<Agent, Handle>,
-    endpoints: SharedPointer<Endpoints, Handle>,
+    uri: Uri,
 }
 
 impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksRemoteInteractor<Handle> {
     fn apply(&self, request: ViewTasksRequestModel) -> ViewTasksResponseModel {
-        let queries = serde_qs::to_string(&request).unwrap();
-        let uri = format!("{}://{}:{}/{}/{}?{}",
-            self.endpoints.as_ref().scheme, self.endpoints.as_ref().domain, self.endpoints.as_ref().port,
-            self.endpoints.as_ref().task_router_path, self.endpoints.as_ref().view_tasks_handler_path,
-            queries,
-        );
+        let query = serde_qs::to_string(&request).unwrap();
+        let uri = format!("{}?{}", self.uri.clone(), query);
 
         let response = self.agent.as_ref()
             .get(uri)
