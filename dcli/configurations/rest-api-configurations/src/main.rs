@@ -1,53 +1,51 @@
-use std::sync::atomic::AtomicU16;
-
 use axum::routing::get;
 use axum::routing::post;
 use axum::Router;
-use boundaries::tasks::CreateTaskBoundary;
-use boundaries::tasks::ViewTasksBoundary;
-use chrono_gateways_impl::formatters::Rfc2822TimestampFormatter;
-use gateways::formatters::time::TimestampFormatter;
-use gateways::pointers::SharedPointer;
-use gateways::providers::ids::SnowflakeProvider;
-use gateways::providers::time::TimestampProvider;
-use gateways::repositories::tasks::TaskRepository;
-use interactors::tasks::CreateTaskInteractor;
-use interactors::tasks::ViewTasksInteractor;
+use gateways_impl::formatters::Rfc2822TimestampFormatter;
+use gateways_impl::pointers::handles::PointerHandleWithStrategy;
+use gateways_impl::pointers::strategies::triomphe::ArcRwLockSharedPointerStrategy;
+use gateways_impl::providers::ids::CentralizedSnowflakeProvider;
+use gateways_impl::providers::time::CentralizedSystemTimestampProvider;
+use gateways_impl::repositories::tasks::InMemoryTaskRepository;
 use rest_api_adapters::server::handlers::tasks::create_task;
 use rest_api_adapters::server::handlers::tasks::view_tasks;
 use rest_api_adapters::server::states::TasksState;
-use std_gateways_impl::pointers::handles::PointerHandleWithStrategy;
-use std_gateways_impl::pointers::strategies::ArcRwLockSharedPointerStrategy;
-use std_gateways_impl::providers::ids::CentralizedSnowflakeProvider;
-use std_gateways_impl::providers::time::CentralizedSystemTimestampProvider;
-use std_gateways_impl::repositories::tasks::InMemoryTaskRepository;
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
 use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
+use use_cases::boundaries::tasks::CreateTaskBoundary;
+use use_cases::boundaries::tasks::ViewTasksBoundary;
+use use_cases::gateways::formatters::time::TimestampFormatter;
+use use_cases::gateways::pointers::SharedPointer as SharedPointer_;
+use use_cases::gateways::providers::ids::SnowflakeProvider;
+use use_cases::gateways::providers::time::TimestampProvider;
+use use_cases::gateways::repositories::tasks::TaskRepository;
+use use_cases::interactors::tasks::CreateTaskInteractor;
+use use_cases::interactors::tasks::ViewTasksInteractor;
 
 #[tokio::main]
 async fn main() {
-    type Pointer<T> = SharedPointer<T, PointerHandle>;
+    type SharedPointer<T> = SharedPointer_<T, PointerHandle>;
     type PointerHandle = PointerHandleWithStrategy<PointerStrategy>;
     type PointerStrategy = ArcRwLockSharedPointerStrategy;
 
-    let timestamp_formatter: Pointer<Box<dyn TimestampFormatter>> =
-        Pointer::new(Box::new(Rfc2822TimestampFormatter::new()));
-    let timestamp_provider: Pointer<Box<dyn TimestampProvider>> =
-        Pointer::new(Box::new(CentralizedSystemTimestampProvider::new()));
-    let snowflake_provider: Pointer<Box<dyn SnowflakeProvider>> =
-        Pointer::new(Box::new(CentralizedSnowflakeProvider::new(1, AtomicU16::new(0))));
-    let task_repository: Pointer<Box<dyn TaskRepository>> =
-        Pointer::new(Box::new(InMemoryTaskRepository::new()));
+    let timestamp_formatter: SharedPointer<Box<dyn TimestampFormatter>> =
+        SharedPointer::new(Box::new(Rfc2822TimestampFormatter::new()));
+    let timestamp_provider: SharedPointer<Box<dyn TimestampProvider>> =
+        SharedPointer::new(Box::new(CentralizedSystemTimestampProvider::new()));
+    let snowflake_provider: SharedPointer<Box<dyn SnowflakeProvider>> =
+        SharedPointer::new(Box::new(CentralizedSnowflakeProvider::default()));
+    let task_repository: SharedPointer<Box<dyn TaskRepository>> =
+        SharedPointer::new(Box::new(InMemoryTaskRepository::new()));
 
-    let create_task_interactor: Pointer<Box<dyn CreateTaskBoundary>> =
-        Pointer::new(Box::new(CreateTaskInteractor::new(timestamp_provider.clone(), snowflake_provider.clone(), task_repository.clone())));
-    let view_tasks_interactor: Pointer<Box<dyn ViewTasksBoundary>> =
-        Pointer::new(Box::new(ViewTasksInteractor::new(timestamp_formatter.clone(), task_repository.clone())));
+    let create_task_interactor: SharedPointer<Box<dyn CreateTaskBoundary>> =
+        SharedPointer::new(Box::new(CreateTaskInteractor::new(timestamp_provider.clone(), snowflake_provider.clone(), task_repository.clone())));
+    let view_tasks_interactor: SharedPointer<Box<dyn ViewTasksBoundary>> =
+        SharedPointer::new(Box::new(ViewTasksInteractor::new(timestamp_formatter.clone(), task_repository.clone())));
 
-    let tasks_state: Pointer<TasksState<_>> =
-        Pointer::new(TasksState {
+    let tasks_state: SharedPointer<TasksState<_>> =
+        SharedPointer::new(TasksState {
             create_task_boundary: create_task_interactor.clone(),
             view_tasks_boundary: view_tasks_interactor.clone(),
         });

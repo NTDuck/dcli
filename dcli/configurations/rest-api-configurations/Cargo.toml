@@ -4,9 +4,9 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
-use-cases = { path = "../../core/use-cases" }
+use-cases = { path = "../../core/use-cases", features = ["boundaries", "gateways", "interactors"] }
 rest-api-adapters = { path = "../../infrastructures/adapters/rest-api-adapters", features = ["server"] }
-gateways-impl = { path = "../../infrastructures/gateways-impl" }
+gateways-impl = { path = "../../infrastructures/gateways-impl", features = ["chrono", "triomphe"] }
 
 axum = "0.8"
 tokio = { version = "1.44", features = ["macros", "rt-multi-thread"] }
