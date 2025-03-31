@@ -1,6 +1,6 @@
-pub trait UseCaseGateway: Send + Sync;
+pub trait Gateway: Send + Sync {}
 
-impl<T> UseCaseGateway for T
+impl<T> Gateway for T
 where
     T: Send + Sync,
 {}

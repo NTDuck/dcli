@@ -1,10 +1,10 @@
 use domain::tasks::Task;
-use gateways::formatters::time::TimestampFormatter;
-use gateways::pointers::PointerHandle;
-use gateways::pointers::SharedPointer;
-use models::tasks::TaskModel;
+use crate::gateways::formatters::time::TimestampFormatter;
+use crate::gateways::pointers::PointerHandle;
+use crate::gateways::pointers::SharedPointer;
 
 use crate::utils::assemblers::tasks::TaskStatusModelAssembler;
+use crate::utils::dataclasses::tasks::TaskModel;
 
 pub struct TaskModelAssembler<Handle: PointerHandle> {
     timestamp_formatter: SharedPointer<Box<dyn TimestampFormatter>, Handle>,

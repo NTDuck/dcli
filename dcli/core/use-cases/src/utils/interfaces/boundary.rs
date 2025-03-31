@@ -1,6 +1,6 @@
-pub trait UseCaseBoundary: Send + Sync;
+pub trait Boundary: Send + Sync {}
 
-impl<T> UseCaseBoundary for T
+impl<T> Boundary for T
 where
     T: Send + Sync,
 {}

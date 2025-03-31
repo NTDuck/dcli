@@ -2,7 +2,7 @@ use axiom::interfaces::DataTransferObjectWithoutSerde;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::tasks::TaskStatusModel;
+use crate::utils::dataclasses::tasks::TaskStatusModel;
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct TaskModel {

@@ -13,7 +13,7 @@ domain = { path = "../domain" }
 default = ["boundaries", "gateways", "interactors"]
 boundaries = []
 gateways = []
-interactors = []
+interactors = ["boundaries", "gateways"]
 
 [lints]
 workspace = true

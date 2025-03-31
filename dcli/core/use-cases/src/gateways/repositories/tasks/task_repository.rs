@@ -1,9 +1,9 @@
 use domain::tasks::Task;
 use domain::tasks::TaskId;
 use domain::tasks::TaskStatus;
-use models::pagination::PaginationRequest;
-use models::pagination::PaginationResponse;
 
+use crate::utils::dataclasses::pagination::PaginationRequest;
+use crate::utils::dataclasses::pagination::PaginationResponse;
 use crate::utils::interfaces::Gateway;
 
 pub trait TaskRepository: Gateway {

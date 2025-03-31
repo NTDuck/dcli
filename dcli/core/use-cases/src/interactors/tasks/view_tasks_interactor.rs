@@ -1,15 +1,15 @@
-use boundaries::tasks::ViewTasksBoundary;
-use boundaries::tasks::ViewTasksOkResponseModel;
-use boundaries::tasks::ViewTasksRequestModel;
-use boundaries::tasks::ViewTasksResponseModel;
 use domain::tasks::Task;
-use gateways::formatters::time::TimestampFormatter;
-use gateways::pointers::PointerHandle;
-use gateways::pointers::SharedPointer;
-use gateways::repositories::tasks::TaskRepository;
-use models::pagination::PaginationResponse;
 
+use crate::boundaries::tasks::ViewTasksBoundary;
+use crate::boundaries::tasks::ViewTasksOkResponseModel;
+use crate::boundaries::tasks::ViewTasksRequestModel;
+use crate::boundaries::tasks::ViewTasksResponseModel;
+use crate::gateways::formatters::time::TimestampFormatter;
+use crate::gateways::pointers::PointerHandle;
+use crate::gateways::pointers::SharedPointer;
+use crate::gateways::repositories::tasks::TaskRepository;
 use crate::utils::assemblers::tasks::TaskModelAssembler;
+use crate::utils::dataclasses::pagination::PaginationResponse;
 
 pub struct ViewTasksInteractor<Handle: PointerHandle> {
     task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
