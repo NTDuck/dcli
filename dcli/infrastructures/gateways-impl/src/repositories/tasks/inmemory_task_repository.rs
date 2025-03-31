@@ -4,10 +4,10 @@ use std::collections::BTreeMap;
 use domain::tasks::Task;
 use domain::tasks::TaskId;
 use domain::tasks::TaskStatus;
-use gateways::repositories::tasks::TaskRepository;
-use models::pagination::PaginationRequest;
-use models::pagination::PaginationResponse;
-use models::pagination::MIN_PAGE_NUMBER;
+use use_cases::dataclasses::pagination::PaginationRequest;
+use use_cases::dataclasses::pagination::PaginationResponse;
+use use_cases::dataclasses::pagination::MIN_PAGE_NUMBER;
+use use_cases::gateways::repositories::tasks::TaskRepository;
 
 use crate::utils::dataclasses::pagination::PaginationRange;
 

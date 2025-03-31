@@ -1,8 +1,8 @@
 use axiom::interfaces::DataTransferObjectWithoutSerde;
-use models::pagination::PaginationRequest;
-use models::pagination::MIN_PAGE_NUMBER;
 use serde::Deserialize;
 use serde::Serialize;
+use use_cases::dataclasses::pagination::PaginationRequest;
+use use_cases::dataclasses::pagination::MIN_PAGE_NUMBER;
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct PaginationRange {

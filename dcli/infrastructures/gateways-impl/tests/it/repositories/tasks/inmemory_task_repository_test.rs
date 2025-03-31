@@ -3,9 +3,8 @@ use domain::tasks::TaskDescription;
 use domain::tasks::TaskId;
 use domain::tasks::TaskStatus;
 use domain::time::Timestamp;
-use gateways::repositories::tasks::TaskRepository;
-
-use std_gateways_impl::repositories::tasks::InMemoryTaskRepository;
+use gateways_impl::repositories::tasks::InMemoryTaskRepository;
+use use_cases::gateways::repositories::tasks::TaskRepository;
 
 #[test]
 fn given_empty_repository_when_save_task_then_contains_task() {

@@ -10,10 +10,13 @@ serde = { workspace = true }
 domain = { path = "../domain" }
 
 [features]
-default = ["boundaries", "gateways", "interactors"]
 boundaries = []
 gateways = []
 interactors = ["boundaries", "gateways"]
+
+[lib]
+test = false
+doctest = false
 
 [lints]
 workspace = true

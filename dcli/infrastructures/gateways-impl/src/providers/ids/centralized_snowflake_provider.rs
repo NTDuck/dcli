@@ -4,9 +4,9 @@ use std::sync::atomic::Ordering;
 use axiom::behaviours::New;
 use domain::ids::SnowflakeWorkerNumber;
 use domain::ids::SnowflakeSequenceNumber;
-use gateways::providers::ids::SnowflakeProvider;
+use use_cases::gateways::providers::ids::SnowflakeProvider;
 
-#[derive(New)]
+#[derive(New, Default)]
 pub struct CentralizedSnowflakeProvider {
     worker_number: SnowflakeWorkerNumber,
     sequence_number: AtomicU16,

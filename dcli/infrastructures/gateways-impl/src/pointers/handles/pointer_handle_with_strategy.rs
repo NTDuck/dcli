@@ -2,7 +2,7 @@ use std::mem::ManuallyDrop;
 use std::ops::Deref;
 use std::ops::DerefMut;
 
-use gateways::pointers::PointerHandle;
+use use_cases::gateways::pointers::PointerHandle;
 
 use crate::pointers::handles::PointerStrategy;
 

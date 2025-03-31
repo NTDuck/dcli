@@ -1,7 +1,7 @@
 use axiom::behaviours::New;
 use chrono::{TimeZone, Utc};
 use domain::time::Timestamp;
-use gateways::formatters::time::TimestampFormatter;
+use use_cases::gateways::formatters::time::TimestampFormatter;
 
 #[derive(New)]
 pub struct Rfc2822TimestampFormatter;

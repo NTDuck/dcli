@@ -1,6 +1,6 @@
 use axiom::behaviours::New;
 use domain::ids::Uuid;
-use gateways::factories::ids::UuidFactory;
+use use_cases::gateways::factories::ids::UuidFactory;
 
 #[derive(New)]
 pub struct UuidV4Factory;

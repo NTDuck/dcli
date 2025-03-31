@@ -3,7 +3,7 @@ use std::time::UNIX_EPOCH;
 
 use axiom::behaviours::New;
 use domain::time::Timestamp;
-use gateways::providers::time::TimestampProvider;
+use use_cases::gateways::providers::time::TimestampProvider;
 
 #[derive(New)]
 pub struct CentralizedSystemTimestampProvider;

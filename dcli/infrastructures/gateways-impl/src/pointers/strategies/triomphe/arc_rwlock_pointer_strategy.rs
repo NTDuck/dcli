@@ -1,7 +1,8 @@
 use std::ops::Deref;
 use std::ops::DerefMut;
-use triomphe::Arc;
 use std::sync::RwLock;
+
+use triomphe::Arc;
 
 use crate::pointers::handles::PointerStrategy;
 
