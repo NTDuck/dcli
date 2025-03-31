@@ -1,12 +1,12 @@
 use axum::http::Uri;
-use boundaries::tasks::CreateTaskBoundary;
-use boundaries::tasks::CreateTaskRequestModel;
-use boundaries::tasks::CreateTaskResponseModel;
-use gateways::pointers::PointerHandle;
-use gateways::pointers::SharedPointer;
 use ureq::Agent;
+use use_cases::boundaries::tasks::CreateTaskBoundary;
+use use_cases::boundaries::tasks::CreateTaskRequestModel;
+use use_cases::boundaries::tasks::CreateTaskResponseModel;
+use use_cases::gateways::pointers::PointerHandle;
+use use_cases::gateways::pointers::SharedPointer;
 
-use crate::utils::models::tasks::CreateTaskRequestObject;
+use crate::utils::dataclasses::tasks::CreateTaskRequestObject;
 
 pub struct CreateTaskRemoteInteractor<Handle: PointerHandle> {
     agent: SharedPointer<Agent, Handle>,
@@ -23,7 +23,7 @@ impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskRemoteInteractor<Ha
             .into_body()
             .read_json().unwrap();
 
-        let response = 
+        // let response = todo!();
 
         return response;
     }

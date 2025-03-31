@@ -1,10 +1,10 @@
 use axiom::interfaces::DataTransferObjectWithoutSerde;
-use boundaries::tasks::CreateTaskErrResponseModel;
-use boundaries::tasks::CreateTaskOkResponseModel;
-use boundaries::tasks::CreateTaskRequestModel;
-use boundaries::tasks::CreateTaskResponseModel;
 use serde::Deserialize;
 use serde::Serialize;
+use use_cases::boundaries::tasks::CreateTaskErrResponseModel;
+use use_cases::boundaries::tasks::CreateTaskOkResponseModel;
+use use_cases::boundaries::tasks::CreateTaskRequestModel;
+use use_cases::boundaries::tasks::CreateTaskResponseModel;
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct CreateTaskRequestObject {

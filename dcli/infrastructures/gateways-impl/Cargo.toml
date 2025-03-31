@@ -15,7 +15,6 @@ triomphe = { version = "0.1", optional = true }
 uuid = { version = "1.12", features = ["v4", "fast-rng", "macro-diagnostics"], optional = true }
 
 [features]
-default = ["chrono", "triomphe", "uuid"]
 chrono = ["dep:chrono"]
 triomphe = ["dep:triomphe"]
 uuid = ["dep:uuid"]

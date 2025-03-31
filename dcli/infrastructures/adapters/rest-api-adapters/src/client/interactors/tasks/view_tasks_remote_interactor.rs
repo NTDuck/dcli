@@ -1,10 +1,10 @@
 use axum::http::Uri;
-use boundaries::tasks::ViewTasksBoundary;
-use boundaries::tasks::ViewTasksRequestModel;
-use boundaries::tasks::ViewTasksResponseModel;
-use gateways::pointers::PointerHandle;
-use gateways::pointers::SharedPointer;
 use ureq::Agent;
+use use_cases::boundaries::tasks::ViewTasksBoundary;
+use use_cases::boundaries::tasks::ViewTasksRequestModel;
+use use_cases::boundaries::tasks::ViewTasksResponseModel;
+use use_cases::gateways::pointers::PointerHandle;
+use use_cases::gateways::pointers::SharedPointer;
 
 pub struct ViewTasksRemoteInteractor<Handle: PointerHandle> {
     agent: SharedPointer<Agent, Handle>,

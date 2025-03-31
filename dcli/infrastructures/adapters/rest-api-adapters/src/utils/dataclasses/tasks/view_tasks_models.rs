@@ -1,12 +1,12 @@
 use axiom::interfaces::DataTransferObjectWithoutSerde;
-use boundaries::tasks::ViewTasksErrResponseModel;
-use boundaries::tasks::ViewTasksOkResponseModel;
-use boundaries::tasks::ViewTasksRequestModel;
-use boundaries::tasks::ViewTasksResponseModel;
-use models::pagination::PaginationRequest;
-use models::tasks::TaskModel;
 use serde::Deserialize;
 use serde::Serialize;
+use use_cases::boundaries::tasks::ViewTasksErrResponseModel;
+use use_cases::boundaries::tasks::ViewTasksOkResponseModel;
+use use_cases::boundaries::tasks::ViewTasksRequestModel;
+use use_cases::boundaries::tasks::ViewTasksResponseModel;
+use use_cases::dataclasses::pagination::PaginationRequest;
+use use_cases::dataclasses::tasks::TaskModel;
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct ViewTasksRequestObject {
