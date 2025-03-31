@@ -1,0 +1,27 @@
+[package]
+name = "gateways-impl"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+axiom = { workspace = true }
+
+domain = { path = "../../core/domain" }
+use-cases = { path = "../../core/use-cases" }
+
+chrono = { version = "0.4", optional = true }
+triomphe = { version = "0.1", optional = true }
+uuid = { version = "1.12", features = ["v4", "fast-rng", "macro-diagnostics"], optional = true }
+
+[features]
+default = ["chrono", "triomphe", "uuid"]
+chrono = ["dep:chrono"]
+triomphe = ["dep:triomphe"]
+uuid = ["dep:uuid"]
+
+[lib]
+test = false
+doctest = false
+
+[lints]
+workspace = true

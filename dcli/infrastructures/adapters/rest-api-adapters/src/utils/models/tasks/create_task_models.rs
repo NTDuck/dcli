@@ -11,6 +11,7 @@ pub struct CreateTaskRequestObject {
     pub task_description: String,
 }
 
+#[cfg(feature = "client")]
 impl From<CreateTaskRequestModel> for CreateTaskRequestObject {
     fn from(response: CreateTaskRequestModel) -> Self {
         return Self {
@@ -19,6 +20,7 @@ impl From<CreateTaskRequestModel> for CreateTaskRequestObject {
     }
 }
 
+#[cfg(feature = "server")]
 impl Into<CreateTaskRequestModel> for CreateTaskRequestObject {
     fn into(self) -> CreateTaskRequestModel {
         return CreateTaskRequestModel {

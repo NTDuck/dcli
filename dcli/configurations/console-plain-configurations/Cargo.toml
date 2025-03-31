@@ -6,8 +6,7 @@ edition.workspace = true
 [dependencies]
 serde = { workspace = true }
 
-models = { path = "../../core/use-cases/models" }
-
+use-cases = { path = "../../core/use-cases" }
 rest-api-adapters = { path = "../../infrastructures/adapters/rest-api-adapters", features = ["client"] }
 
 clap = "4.5"

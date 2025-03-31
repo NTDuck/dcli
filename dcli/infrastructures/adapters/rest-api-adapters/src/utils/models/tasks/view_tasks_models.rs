@@ -14,6 +14,19 @@ pub struct ViewTasksRequestObject {
     pub max_page_size: usize,
 }
 
+#[cfg(feature = "client")]
+impl From<ViewTasksRequestModel> for ViewTasksRequestObject {
+    fn from(request: ViewTasksRequestModel) -> Self {
+        let pagination_request = request.pagination_request;
+        
+        return Self {
+            page_number: pagination_request.page_number,
+            max_page_size: pagination_request.max_page_size,
+        };
+    }
+}
+
+#[cfg(feature = "server")]
 impl Into<ViewTasksRequestModel> for ViewTasksRequestObject {
     fn into(self) -> ViewTasksRequestModel {
         return ViewTasksRequestModel {

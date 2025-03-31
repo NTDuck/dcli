@@ -7,9 +7,7 @@ edition.workspace = true
 axiom = { workspace = true }
 serde = { workspace = true }
 
-boundaries = { path = "../../../core/use-cases/boundaries" }
-gateways = { path = "../../../core/use-cases/gateways" }
-models = { path = "../../../core/use-cases/models" }
+use-cases = { path = "../../../core/use-cases" }
 
 axum = "0.8"
 # paste = "1.0"

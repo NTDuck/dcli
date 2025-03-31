@@ -1,12 +1,9 @@
 [workspace]
 members = [
     "dcli/core/domain",
-    "dcli/core/use-cases/boundaries",
-    "dcli/core/use-cases/gateways",
-    "dcli/core/use-cases/interactors",
-    "dcli/core/use-cases/models",
+    "dcli/core/use-cases/",
     "dcli/infrastructures/adapters/*",
-    "dcli/infrastructures/gateways-impl/*",
+    "dcli/infrastructures/gateways-impl",
     "dcli/configurations/*",
     "libs/*",
 ]
