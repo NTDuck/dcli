@@ -105,7 +105,7 @@ fn main() {
                 };
                 let response = view_tasks_interactor.as_ref().apply(request);
 
-                match response.into() {
+                match response {
                     Ok(response) => {
                         let pagination_response = response.pagination_response;
                         println!(
