@@ -30,12 +30,12 @@ impl<Handle: PointerHandle> CreateTaskInteractor<Handle> {
         snowflake_provider: SharedPointer<Box<dyn SnowflakeProvider>, Handle>,
         task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
     ) -> Self {
-        return Self {
+        Self {
             timestamp_provider: timestamp_provider.clone(),
             snowflake_provider: snowflake_provider.clone(),
             task_repository: task_repository.clone(),
             response_model_assembler: CreateTaskResponseModelAssembler::new(),
-        };
+        }
     }
 }
 
@@ -76,7 +76,7 @@ impl<Handle: PointerHandle> CreateTaskBoundary
         self.task_repository.as_mut().save(task);
 
         let response_model = Ok(CreateTaskOkResponseModel);
-        return response_model;
+        response_model
     }
 }
 
@@ -88,7 +88,7 @@ impl CreateTaskResponseModelAssembler {
         &self,
         task_description_error: TaskDescriptionError,
     ) -> CreateTaskErrResponseModel {
-        return match task_description_error {
+        match task_description_error {
             TaskDescriptionError::LengthUnderflow {
                 actual_length,
                 min_length_required,
@@ -103,6 +103,6 @@ impl CreateTaskResponseModelAssembler {
                 actual_length,
                 max_length_allowed,
             },
-        };
+        }
     }
 }

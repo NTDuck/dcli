@@ -19,25 +19,25 @@ pub struct ViewTasksRequestObject {
 
 #[cfg(feature = "client")]
 impl From<ViewTasksRequestModel> for ViewTasksRequestObject {
-    fn from(request: ViewTasksRequestModel) -> Self {
-        let pagination_request = request.pagination_request;
+    fn from(model: ViewTasksRequestModel) -> Self {
+        let pagination_request = model.pagination_request;
 
-        return Self {
+        Self {
             page_number: pagination_request.page_number,
             max_page_size: pagination_request.max_page_size,
-        };
+        }
     }
 }
 
 #[cfg(feature = "server")]
-impl Into<ViewTasksRequestModel> for ViewTasksRequestObject {
-    fn into(self) -> ViewTasksRequestModel {
-        return ViewTasksRequestModel {
+impl From<ViewTasksRequestObject> for ViewTasksRequestModel {
+    fn from(model: ViewTasksRequestObject) -> Self {
+        ViewTasksRequestModel {
             pagination_request: PaginationRequest {
-                page_number: self.page_number,
-                max_page_size: self.max_page_size,
+                page_number: model.page_number,
+                max_page_size: model.max_page_size,
             },
-        };
+        }
     }
 }
 
@@ -50,24 +50,24 @@ pub enum ViewTasksViewModel {
 
 #[cfg(feature = "server")]
 impl From<ViewTasksResponseModel> for ViewTasksViewModel {
-    fn from(response: ViewTasksResponseModel) -> Self {
-        let response = response
+    fn from(model: ViewTasksResponseModel) -> Self {
+        let model = model
             .map(ViewTasksOkViewModel::from)
             .map_err(ViewTasksErrViewModel::from);
 
-        match response {
-            Ok(response) => Self::Ok(response),
-            Err(response) => Self::Err(response),
+        match model {
+            Ok(model) => Self::Ok(model),
+            Err(model) => Self::Err(model),
         }
     }
 }
 
 #[cfg(feature = "client")]
-impl Into<ViewTasksResponseModel> for ViewTasksViewModel {
-    fn into(self) -> ViewTasksResponseModel {
-        match self {
-            Self::Ok(response) => Ok(response.into()),
-            Self::Err(response) => Err(response.into()),
+impl From<ViewTasksViewModel> for ViewTasksResponseModel {
+    fn from(model: ViewTasksViewModel) -> Self {
+        match model {
+            ViewTasksViewModel::Ok(model) => Ok(model.into()),
+            ViewTasksViewModel::Err(model) => Err(model.into()),
         }
     }
 }
@@ -84,33 +84,33 @@ pub struct ViewTasksOkViewModel {
 
 #[cfg(feature = "server")]
 impl From<ViewTasksOkResponseModel> for ViewTasksOkViewModel {
-    fn from(response: ViewTasksOkResponseModel) -> Self {
-        let pagination_response = response.pagination_response;
+    fn from(model: ViewTasksOkResponseModel) -> Self {
+        let pagination_response = model.pagination_response;
 
-        return Self {
+        Self {
             tasks: pagination_response.items,
 
             page_size: pagination_response.page_size,
             max_page_size: pagination_response.max_page_size,
             page_number: pagination_response.page_number,
             max_page_number: pagination_response.max_page_number,
-        };
+        }
     }
 }
 
 #[cfg(feature = "client")]
-impl Into<ViewTasksOkResponseModel> for ViewTasksOkViewModel {
-    fn into(self) -> ViewTasksOkResponseModel {
-        return ViewTasksOkResponseModel {
+impl From<ViewTasksOkViewModel> for ViewTasksOkResponseModel {
+    fn from(model: ViewTasksOkViewModel) -> Self {
+        ViewTasksOkResponseModel {
             pagination_response: PaginationResponse {
-                items: self.tasks,
+                items: model.tasks,
 
-                page_size: self.page_size,
-                max_page_size: self.max_page_size,
-                page_number: self.page_number,
-                max_page_number: self.max_page_number,
+                page_size: model.page_size,
+                max_page_size: model.max_page_size,
+                page_number: model.page_number,
+                max_page_number: model.max_page_number,
             },
-        };
+        }
     }
 }
 
@@ -120,13 +120,13 @@ pub struct ViewTasksErrViewModel;
 #[cfg(feature = "server")]
 impl From<ViewTasksErrResponseModel> for ViewTasksErrViewModel {
     fn from(_: ViewTasksErrResponseModel) -> Self {
-        return Self;
+        Self
     }
 }
 
 #[cfg(feature = "client")]
-impl Into<ViewTasksErrResponseModel> for ViewTasksErrViewModel {
-    fn into(self) -> ViewTasksErrResponseModel {
-        return ViewTasksErrResponseModel;
+impl From<ViewTasksErrViewModel> for ViewTasksErrResponseModel {
+    fn from(_: ViewTasksErrViewModel) -> Self {
+        ViewTasksErrResponseModel
     }
 }

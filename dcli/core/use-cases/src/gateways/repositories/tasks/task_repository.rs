@@ -23,7 +23,7 @@ pub trait TaskRepository: Gateway {
     ) -> PaginationResponse<Task>;
 
     fn contains(&self, task_id: TaskId) -> bool {
-        return self.get_by_id(task_id).is_some();
+        self.get_by_id(task_id).is_some()
     }
 
     fn clear(&mut self);

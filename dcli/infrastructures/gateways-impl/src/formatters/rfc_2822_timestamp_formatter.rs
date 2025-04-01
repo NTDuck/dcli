@@ -14,6 +14,6 @@ impl TimestampFormatter for Rfc2822TimestampFormatter {
             .timestamp_millis_opt(millis)
             .single()
             .expect("Invalid timestamp");
-        return datetime.to_rfc2822();
+        datetime.to_rfc2822()
     }
 }

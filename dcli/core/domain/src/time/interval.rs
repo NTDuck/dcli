@@ -10,11 +10,11 @@ pub struct Interval(i64);
 
 impl Interval {
     pub const fn from_millis(millis: i64) -> Self {
-        return Self(millis);
+        Self(millis)
     }
 
     pub const fn as_millis(&self) -> i64 {
-        return self.0;
+        self.0
     }
 }
 
@@ -23,7 +23,7 @@ impl Neg for Interval {
 
     fn neg(self) -> Self::Output {
         let millis = self.as_millis().neg();
-        return Self::from_millis(millis);
+        Self::from_millis(millis)
     }
 }
 
@@ -32,7 +32,7 @@ impl Add for Interval {
 
     fn add(self, interval: Interval) -> Self::Output {
         let millis = self.as_millis().saturating_add(interval.as_millis());
-        return Self::from_millis(millis);
+        Self::from_millis(millis)
     }
 }
 
@@ -41,6 +41,6 @@ impl Sub for Interval {
 
     fn sub(self, interval: Interval) -> Self::Output {
         let millis = self.as_millis().saturating_sub(interval.as_millis());
-        return Self::from_millis(millis);
+        Self::from_millis(millis)
     }
 }

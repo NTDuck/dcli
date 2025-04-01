@@ -31,8 +31,5 @@ missing_safety_doc = "allow"
 let_and_return = "allow"
 useless_conversion = "allow"
 
-needless_return = "allow"
-from_over_into = "allow"
-
 [workspace.metadata.rust-analyzer]
 # See: https://rust-analyzer.github.io/book/diagnostics.html

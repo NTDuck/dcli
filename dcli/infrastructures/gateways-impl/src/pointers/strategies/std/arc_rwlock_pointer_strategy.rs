@@ -12,28 +12,28 @@ impl PointerStrategy for ArcRwLockSharedPointerStrategy {
     type Untyped = Self::Typed<()>;
 
     fn into_typed<T>(obj: T) -> Self::Typed<T> {
-        return Arc::new(RwLock::new(obj));
+        Arc::new(RwLock::new(obj))
     }
 
     fn into_untyped<T>(typed: Self::Typed<T>) -> Self::Untyped {
-        return unsafe {
+        unsafe {
             std::mem::transmute::<Self::Typed<T>, Self::Untyped>(typed)
-        };
+        }
     }
 
     fn shallow_clone<T>(typed: &Self::Typed<T>) -> Self::Typed<T> {
-        return Arc::clone(typed);
+        Arc::clone(typed)
     }
 
     fn as_ref<'br, T: 'br>(
         typed: &'br Self::Typed<T>,
     ) -> impl Deref<Target = T> + 'br {
-        return typed.read().unwrap();
+        typed.read().unwrap()
     }
 
     fn as_mut<'br, T: 'br>(
         typed: &'br Self::Typed<T>,
     ) -> impl DerefMut<Target = T> + 'br {
-        return typed.write().unwrap();
+        typed.write().unwrap()
     }
 }

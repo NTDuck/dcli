@@ -22,5 +22,5 @@ pub async fn create_task<Handle: PointerHandle>(
         CreateTaskViewModel::Err(_) => StatusCode::BAD_REQUEST,
     };
 
-    return (status_code, Json(response));
+    (status_code, Json(response))
 }

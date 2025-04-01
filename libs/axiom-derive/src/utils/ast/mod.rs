@@ -12,9 +12,9 @@ pub fn generate_where_clause_with_trait_bounds_from_derive_input(
         .iter()
         .filter_map(|param| {
             if let syn::GenericParam::Type(ty) = param {
-                return Some(&ty.ident);
+                Some(&ty.ident)
             } else {
-                return None;
+                None
             }
         })
         .map(trait_bounds);
@@ -35,11 +35,11 @@ pub fn generate_where_clause_with_trait_bounds_from_derive_input(
 pub fn get_field_idents_from_named_fields(
     fields: &syn::FieldsNamed,
 ) -> Vec<syn::Ident> {
-    return fields
+    fields
         .named
         .iter()
         .filter_map(|field| field.ident.clone())
-        .collect();
+        .collect()
 }
 
 pub fn get_field_idents_from_unnamed_fields(
@@ -55,25 +55,25 @@ pub fn get_field_idents_from_unnamed_fields(
 pub fn get_field_indices_from_unnamed_fields(
     fields: &syn::FieldsUnnamed,
 ) -> Vec<syn::Index> {
-    return (0..fields.unnamed.len()).map(syn::Index::from).collect();
+    (0..fields.unnamed.len()).map(syn::Index::from).collect()
 }
 
 pub fn get_field_types_from_named_fields(
     fields: &syn::FieldsNamed,
 ) -> Vec<&syn::Type> {
-    return fields.named.iter().map(|field| &field.ty).collect();
+    fields.named.iter().map(|field| &field.ty).collect()
 }
 
 pub fn get_field_types_from_unnamed_fields(
     fields: &syn::FieldsUnnamed,
 ) -> Vec<&syn::Type> {
-    return fields.unnamed.iter().map(|field| &field.ty).collect();
+    fields.unnamed.iter().map(|field| &field.ty).collect()
 }
 
 pub fn convert_ident_to_snake_case(ident: &syn::Ident) -> syn::Ident {
     use heck::ToSnakeCase;
 
-    return format_ident!("{}", ident.to_string().to_snake_case());
+    format_ident!("{}", ident.to_string().to_snake_case())
 }
 
 pub const SEGMENT_SEPARATOR: &str = "::";

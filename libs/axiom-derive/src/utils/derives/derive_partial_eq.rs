@@ -9,13 +9,14 @@ pub fn derive_partial_eq_for_struct(
 ) -> proc_macro2::TokenStream {
     let fields = &data.fields;
 
-    return match fields {
+    match fields {
         syn::Fields::Named(fields) =>
             derive_partial_eq_for_ordinary_struct(ast, fields),
         syn::Fields::Unnamed(fields) =>
             derive_partial_eq_for_tuple_struct(ast, fields),
-        syn::Fields::Unit => derive_partial_eq_for_unit_struct(ast),
-    };
+        syn::Fields::Unit =>
+            derive_partial_eq_for_unit_struct(ast),
+    }
 }
 
 fn derive_partial_eq_for_ordinary_struct(
@@ -30,14 +31,14 @@ fn derive_partial_eq_for_ordinary_struct(
 
     let field_idents = get_field_idents_from_named_fields(fields);
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics PartialEq for #struct_ident #struct_type_generics
         #struct_where_clause_with_partial_eq_bounds {
             fn eq(&self, other: &Self) -> bool {
                 return #( self.#field_idents == other.#field_idents && )* true;
             }
         }
-    };
+    }
 }
 
 fn derive_partial_eq_for_tuple_struct(
@@ -52,13 +53,13 @@ fn derive_partial_eq_for_tuple_struct(
 
     let field_indices = get_field_indices_from_unnamed_fields(fields);
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics PartialEq for #struct_ident #struct_type_generics #struct_where_clause_with_partial_eq_bounds {
             fn eq(&self, other: &Self) -> bool {
                 return #( self.#field_indices == other.#field_indices && )* true;
             }
         }
-    };
+    }
 }
 
 fn derive_partial_eq_for_unit_struct(
@@ -70,13 +71,13 @@ fn derive_partial_eq_for_unit_struct(
     let struct_where_clause_with_partial_eq_bounds =
         generate_where_clause_with_partial_eq_bounds_from_derive_input(ast);
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics PartialEq for #struct_ident #struct_type_generics #struct_where_clause_with_partial_eq_bounds {
             fn eq(&self, other: &Self) -> bool {
                 return true;
             }
         }
-    };
+    }
 }
 
 pub fn derive_partial_eq_for_enum(
@@ -98,20 +99,21 @@ pub fn derive_partial_eq_for_enum(
                 derive_partial_eq_for_struct_variant(variant, fields),
             syn::Fields::Unnamed(fields) =>
                 derive_partial_eq_for_tuple_variant(variant, fields),
-            syn::Fields::Unit => derive_partial_eq_for_unit_variant(variant),
+            syn::Fields::Unit =>
+                derive_partial_eq_for_unit_variant(variant),
         })
         .collect::<Vec<_>>();
 
     if variants.is_empty() {
-        return quote! {
+        quote! {
             impl #enum_impl_generics PartialEq for #enum_ident #enum_type_generics #enum_where_clause_with_partial_eq_bounds {
                 fn eq(&self, _: &Self) -> bool {
                     match *self {}
                 }
             }
-        };
+        }
     } else {
-        return quote! {
+        quote! {
             impl #enum_impl_generics PartialEq for #enum_ident #enum_type_generics #enum_where_clause_with_partial_eq_bounds {
                 fn eq(&self, other: &Self) -> bool {
                     return match (self, other) {
@@ -120,7 +122,7 @@ pub fn derive_partial_eq_for_enum(
                     };
                 }
             }
-        };
+        }
     }
 }
 
@@ -134,14 +136,14 @@ fn derive_partial_eq_for_struct_variant(
     let selffield_idents = get_idents_with_self_prefixed(&field_idents);
     let otherfield_idents = get_idents_with_other_prefixed(&field_idents);
 
-    return quote! {
+    quote! {
         (
             Self::#variant_ident { #( #field_idents: #selffield_idents, )* },
             Self::#variant_ident { #( #field_idents: #otherfield_idents, )* },
         ) => {
             return #( #selffield_idents == #otherfield_idents && )* true;
         }
-    };
+    }
 }
 
 fn derive_partial_eq_for_tuple_variant(
@@ -154,14 +156,14 @@ fn derive_partial_eq_for_tuple_variant(
     let selffield_idents = get_idents_with_self_prefixed(&field_idents);
     let otherfield_idents = get_idents_with_other_prefixed(&field_idents);
 
-    return quote! {
+    quote! {
         (
             Self::#variant_ident(#( #selffield_idents, )*),
             Self::#variant_ident(#( #otherfield_idents, )*)
         ) => {
             return #( #selffield_idents == #otherfield_idents && )* true;
         }
-    };
+    }
 }
 
 fn derive_partial_eq_for_unit_variant(
@@ -169,36 +171,36 @@ fn derive_partial_eq_for_unit_variant(
 ) -> proc_macro2::TokenStream {
     let variant_ident = &variant.ident;
 
-    return quote! {
+    quote! {
         (Self::#variant_ident, Self::#variant_ident) => true
-    };
+    }
 }
 
 fn generate_where_clause_with_partial_eq_bounds_from_derive_input(
     ast: &syn::DeriveInput,
 ) -> proc_macro2::TokenStream {
-    return generate_where_clause_with_trait_bounds_from_derive_input(
+    generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {
                 #type_ident: PartialEq
             }
         },
         ast,
-    );
+    )
 }
 
 fn get_idents_with_self_prefixed(idents: &[syn::Ident]) -> Vec<syn::Ident> {
-    return idents
+    idents
         .iter()
         .map(|ident| format_ident!("self{}", ident))
         .map(|ident| convert_ident_to_snake_case(&ident))
-        .collect();
+        .collect()
 }
 
 fn get_idents_with_other_prefixed(idents: &[syn::Ident]) -> Vec<syn::Ident> {
-    return idents
+    idents
         .iter()
         .map(|ident| format_ident!("other{}", ident))
         .map(|ident| convert_ident_to_snake_case(&ident))
-        .collect();
+        .collect()
 }

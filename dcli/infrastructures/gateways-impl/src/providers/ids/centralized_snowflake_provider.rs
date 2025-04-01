@@ -16,23 +16,23 @@ impl CentralizedSnowflakeProvider {
     fn compute_and_assign_next_sequence_number(
         &self,
     ) -> SnowflakeSequenceNumber {
-        return self
+        self
             .sequence_number
             .fetch_update(
                 Ordering::Relaxed,
                 Ordering::Relaxed,
                 |sequence_number| Some((sequence_number + 1) & 0xfff),
             )
-            .unwrap();
+            .unwrap()
     }
 }
 
 impl SnowflakeProvider for CentralizedSnowflakeProvider {
     fn get_worker_number(&self) -> SnowflakeWorkerNumber {
-        return self.worker_number;
+        self.worker_number
     }
 
     fn get_sequence_number(&self) -> SnowflakeSequenceNumber {
-        return self.compute_and_assign_next_sequence_number();
+        self.compute_and_assign_next_sequence_number()
     }
 }

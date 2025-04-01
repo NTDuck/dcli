@@ -17,21 +17,21 @@ where
     fn new<T>(obj: T) -> Self {
         let typed = Strategy::into_typed(obj);
         let untyped = Strategy::into_untyped(typed);
-        return Self::new_from_untyped(untyped);
+        Self::new_from_untyped(untyped)
     }
 
     fn as_ref<'br, T: 'br>(&'br self) -> impl Deref<Target = T> + 'br {
-        return Strategy::as_ref(self.as_typed_ref());
+        Strategy::as_ref(self.as_typed_ref())
     }
 
     fn as_mut<'br, T: 'br>(&'br self) -> impl DerefMut<Target = T> + 'br {
-        return Strategy::as_mut(self.as_typed_ref());
+        Strategy::as_mut(self.as_typed_ref())
     }
 
     unsafe fn shallow_clone<T>(&self) -> Self {
         let typed = Strategy::shallow_clone::<T>(self.as_typed_ref());
         let untyped = Strategy::into_untyped(typed);
-        return Self::new_from_untyped(untyped);
+        Self::new_from_untyped(untyped)
     }
 
     unsafe fn drop<T>(&mut self) {
@@ -46,9 +46,9 @@ where
     Strategy: PointerStrategy,
 {
     fn new_from_untyped(untyped: Strategy::Untyped) -> Self {
-        return Self {
+        Self {
             untyped: ManuallyDrop::new(untyped),
-        };
+        }
     }
 
     fn as_typed_ref<T>(&self) -> &Strategy::Typed<T> {
@@ -58,7 +58,7 @@ where
 
         Strategy::check_binary_compatibility::<T>();
 
-        return unsafe { &*raw_const_pointer };
+        unsafe { &*raw_const_pointer }
     }
 
     fn as_typed_mut<T>(&mut self) -> &mut Strategy::Typed<T> {
@@ -68,6 +68,6 @@ where
 
         Strategy::check_binary_compatibility::<T>();
 
-        return unsafe { &mut *raw_mut_pointer };
+        unsafe { &mut *raw_mut_pointer }
     }
 }

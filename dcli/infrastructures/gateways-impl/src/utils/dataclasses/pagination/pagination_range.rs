@@ -12,12 +12,12 @@ pub struct PaginationRange {
 
 impl From<&PaginationRequest> for PaginationRange {
     fn from(pagination_request: &PaginationRequest) -> Self {
-        return Self {
+        Self {
             offset: pagination_request
                 .page_number
                 .saturating_sub(MIN_PAGE_NUMBER)
                 .saturating_mul(pagination_request.max_page_size),
             limit: pagination_request.max_page_size,
-        };
+        }
     }
 }

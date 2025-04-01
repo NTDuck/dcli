@@ -85,22 +85,22 @@ fn given_repository_with_different_statuses_when_clear_by_status_then_removes_on
 }
 
 fn new_task_with_id(id: u64) -> Task {
-    return new_task_with_id_and_status(id, TaskStatus::Pending);
+    new_task_with_id_and_status(id, TaskStatus::Pending)
 }
 
 fn new_task_with_id_and_status(id: u64, status: TaskStatus) -> Task {
-    return Task {
+    Task {
         id: new_task_id(id),
         description: TaskDescription::try_from("tomfoolery".to_owned())
             .expect("Invalid description length"),
         status,
-    };
+    }
 }
 
 fn new_task_id(id: u64) -> TaskId {
-    return TaskId::new(
+    TaskId::new(
         Timestamp::from_millis_since_epoch(id as i64),
         Default::default(),
         Default::default(),
-    );
+    )
 }

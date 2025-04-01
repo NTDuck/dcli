@@ -8,13 +8,14 @@ pub fn derive_hash_for_struct(
 ) -> proc_macro2::TokenStream {
     let fields = &data.fields;
 
-    return match fields {
+    match fields {
         syn::Fields::Named(fields) =>
             derive_hash_for_ordinary_struct(ast, fields),
         syn::Fields::Unnamed(fields) =>
             derive_hash_for_tuple_struct(ast, fields),
-        syn::Fields::Unit => derive_hash_for_unit_struct(ast),
-    };
+        syn::Fields::Unit =>
+            derive_hash_for_unit_struct(ast),
+    }
 }
 
 fn derive_hash_for_ordinary_struct(
@@ -29,13 +30,13 @@ fn derive_hash_for_ordinary_struct(
 
     let field_idents = get_field_idents_from_named_fields(fields);
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics std::hash::Hash for #struct_ident #struct_type_generics #struct_where_clause_with_hash_bounds {
             fn hash<Hasher: std::hash::Hasher>(&self, state: &mut Hasher) {
                 #( self.#field_idents.hash(state); )*
             }
         }
-    };
+    }
 }
 
 fn derive_hash_for_tuple_struct(
@@ -50,13 +51,13 @@ fn derive_hash_for_tuple_struct(
 
     let field_indices = get_field_indices_from_unnamed_fields(fields);
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics std::hash::Hash for #struct_ident #struct_type_generics #struct_where_clause_with_hash_bounds {
             fn hash<Hasher: std::hash::Hasher>(&self, state: &mut Hasher) {
                 #( self.#field_indices.hash(state); )*
             }
         }
-    };
+    }
 }
 
 fn derive_hash_for_unit_struct(
@@ -68,11 +69,11 @@ fn derive_hash_for_unit_struct(
     let struct_where_clause_with_hash_bounds =
         generate_where_clause_with_hash_bounds_from_derive_input(ast);
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics std::hash::Hash for #struct_ident #struct_type_generics #struct_where_clause_with_hash_bounds {
             fn hash<Hasher: std::hash::Hasher>(&self, state: &mut Hasher) {}
         }
-    };
+    }
 }
 
 pub fn derive_hash_for_enum(
@@ -94,20 +95,21 @@ pub fn derive_hash_for_enum(
                 derive_hash_for_struct_variant(variant, fields),
             syn::Fields::Unnamed(fields) =>
                 derive_hash_for_tuple_variant(variant, fields),
-            syn::Fields::Unit => derive_hash_for_unit_variant(variant),
+            syn::Fields::Unit =>
+                derive_hash_for_unit_variant(variant),
         })
         .collect::<Vec<_>>();
 
     if variants.is_empty() {
-        return quote! {
+        quote! {
             impl #enum_impl_generics std::hash::Hash for #enum_ident #enum_type_generics #enum_where_clause_with_hash_bounds {
                 fn hash<Hasher: std::hash::Hasher>(&self, _: &mut Hasher) {
                     match *self {}
                 }
             }
-        };
+        }
     } else {
-        return quote! {
+        quote! {
             impl #enum_impl_generics std::hash::Hash for #enum_ident #enum_type_generics #enum_where_clause_with_hash_bounds {
                 fn hash<Hasher: std::hash::Hasher>(&self, state: &mut Hasher) {
                     core::mem::discriminant(self).hash(state);
@@ -117,7 +119,7 @@ pub fn derive_hash_for_enum(
                     }
                 }
             }
-        };
+        }
     }
 }
 
@@ -129,11 +131,11 @@ fn derive_hash_for_struct_variant(
     let field_idents =
         fields.named.iter().map(|field| &field.ident).collect::<Vec<_>>();
 
-    return quote! {
+    quote! {
         Self::#variant_ident { #( #field_idents, )* } => {
             #( #field_idents.hash(state); )*
         }
-    };
+    }
 }
 
 fn derive_hash_for_tuple_variant(
@@ -143,11 +145,11 @@ fn derive_hash_for_tuple_variant(
     let variant_ident = &variant.ident;
     let field_idents = get_field_idents_from_unnamed_fields(fields);
 
-    return quote! {
+    quote! {
         Self::#variant_ident(#( #field_idents, )*) => {
             #( #field_idents.hash(state); )*
         }
-    };
+    }
 }
 
 fn derive_hash_for_unit_variant(
@@ -155,20 +157,20 @@ fn derive_hash_for_unit_variant(
 ) -> proc_macro2::TokenStream {
     let variant_ident = &variant.ident;
 
-    return quote! {
+    quote! {
         Self::#variant_ident => {}
-    };
+    }
 }
 
 fn generate_where_clause_with_hash_bounds_from_derive_input(
     ast: &syn::DeriveInput,
 ) -> proc_macro2::TokenStream {
-    return generate_where_clause_with_trait_bounds_from_derive_input(
+    generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {
                 #type_ident: std::hash::Hash
             }
         },
         ast,
-    );
+    )
 }

@@ -36,23 +36,23 @@ where
 {
     pub fn new(obj: T) -> Self {
         let handle = Handle::new(obj);
-        return Self::new_from_handle(handle);
+        Self::new_from_handle(handle)
     }
 
     pub fn as_ref(&self) -> impl Deref<Target = T> + '_ {
-        return self.handle.as_ref();
+        self.handle.as_ref()
     }
 
     pub fn as_mut(&self) -> impl DerefMut<Target = T> + '_ {
-        return self.handle.as_mut();
+        self.handle.as_mut()
     }
 
     fn new_from_handle(handle: Handle) -> Self {
-        return Self {
+        Self {
             handle: ManuallyDrop::new(handle),
             _phantom_t: PhantomData,
             _phantom_no_send_sync: PhantomData,
-        };
+        }
     }
 }
 
@@ -62,7 +62,7 @@ where
 {
     fn clone(&self) -> Self {
         let handle = unsafe { self.handle.shallow_clone::<T>() };
-        return Self::new_from_handle(handle);
+        Self::new_from_handle(handle)
     }
 }
 

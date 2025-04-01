@@ -36,6 +36,6 @@ impl<Handle: PointerHandle> CreateTaskBoundary
 
         let response = response.into();
 
-        return response;
+        response
     }
 }

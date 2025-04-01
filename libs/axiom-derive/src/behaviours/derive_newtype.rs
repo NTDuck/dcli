@@ -13,7 +13,7 @@ pub fn derive_newtype(
         _ => panic!(),
     };
 
-    return proc_macro::TokenStream::from(tokens);
+    proc_macro::TokenStream::from(tokens)
 }
 
 fn derive_for_struct(
@@ -32,7 +32,7 @@ fn derive_for_struct(
 
     let field = fields.unnamed.first().unwrap();
 
-    return derive_for_single_fielded_tuple_struct(ast, field);
+    derive_for_single_fielded_tuple_struct(ast, field)
 }
 
 fn derive_for_single_fielded_tuple_struct(
@@ -48,7 +48,7 @@ fn derive_for_single_fielded_tuple_struct(
     let as_method_ident = format_ident!("as_{field_type_ident}");
     let to_method_ident = format_ident!("to_{field_type_ident}");
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics #struct_ident #struct_type_generics #struct_where_clause {
             pub fn #as_method_ident(&self) -> &#field_type {
                 return &self.0;
@@ -72,7 +72,7 @@ fn derive_for_single_fielded_tuple_struct(
                 return &mut self.0;
             }
         }
-    };
+    }
 }
 
 fn get_field_type_ident_from_field(field: &syn::Field) -> syn::Ident {
@@ -92,5 +92,5 @@ fn get_field_type_ident_from_field(field: &syn::Field) -> syn::Ident {
         .unwrap()
         .to_snake_case();
 
-    return format_ident!("{}", field_type_ident);
+    format_ident!("{}", field_type_ident)
 }

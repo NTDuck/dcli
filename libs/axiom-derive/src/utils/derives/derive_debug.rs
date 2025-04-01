@@ -8,13 +8,14 @@ pub fn derive_debug_for_struct(
 ) -> proc_macro2::TokenStream {
     let fields = &data.fields;
 
-    return match fields {
+    match fields {
         syn::Fields::Named(fields) =>
             derive_debug_for_ordinary_struct(ast, fields),
         syn::Fields::Unnamed(fields) =>
             derive_debug_for_tuple_struct(ast, fields),
-        syn::Fields::Unit => derive_debug_for_unit_struct(ast),
-    };
+        syn::Fields::Unit =>
+            derive_debug_for_unit_struct(ast),
+    }
 }
 
 fn derive_debug_for_ordinary_struct(
@@ -29,7 +30,7 @@ fn derive_debug_for_ordinary_struct(
 
     let field_idents = get_field_idents_from_named_fields(fields);
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics std::fmt::Debug for #struct_ident #struct_type_generics #struct_where_clause_with_debug_bounds {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return formatter
@@ -38,7 +39,7 @@ fn derive_debug_for_ordinary_struct(
                     .finish();
             }
         }
-    };
+    }
 }
 
 fn derive_debug_for_tuple_struct(
@@ -53,7 +54,7 @@ fn derive_debug_for_tuple_struct(
 
     let field_indices = get_field_indices_from_unnamed_fields(fields);
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics std::fmt::Debug for #struct_ident #struct_type_generics #struct_where_clause_with_debug_bounds {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return formatter
@@ -62,7 +63,7 @@ fn derive_debug_for_tuple_struct(
                     .finish();
             }
         }
-    };
+    }
 }
 
 fn derive_debug_for_unit_struct(
@@ -74,7 +75,7 @@ fn derive_debug_for_unit_struct(
     let struct_where_clause_with_debug_bounds =
         generate_where_clause_with_debug_bounds_from_derive_input(ast);
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics std::fmt::Debug for #struct_ident #struct_type_generics #struct_where_clause_with_debug_bounds {
             fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return formatter
@@ -82,7 +83,7 @@ fn derive_debug_for_unit_struct(
                     .finish();
             }
         }
-    };
+    }
 }
 
 pub fn derive_debug_for_enum(
@@ -104,20 +105,21 @@ pub fn derive_debug_for_enum(
                 derive_debug_for_struct_variant(ast, variant, fields),
             syn::Fields::Unnamed(fields) =>
                 derive_debug_for_tuple_variant(ast, variant, fields),
-            syn::Fields::Unit => derive_debug_for_unit_variant(variant),
+            syn::Fields::Unit =>
+                derive_debug_for_unit_variant(variant),
         })
         .collect::<Vec<_>>();
 
     if variants.is_empty() {
-        return quote! {
+        quote! {
             impl #enum_impl_generics std::fmt::Debug for #enum_ident #enum_type_generics #enum_where_clause_with_debug_bounds {
                 fn fmt(&self, _: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                     match *self {}
                 }
             }
-        };
+        }
     } else {
-        return quote! {
+        quote! {
             impl #enum_impl_generics std::fmt::Debug for #enum_ident #enum_type_generics #enum_where_clause_with_debug_bounds {
                 fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                     return match self {
@@ -125,7 +127,7 @@ pub fn derive_debug_for_enum(
                     };
                 }
             }
-        };
+        }
     }
 }
 
@@ -138,12 +140,12 @@ fn derive_debug_for_struct_variant(
     let variant_ident = &variant.ident;
     let field_idents = get_field_idents_from_named_fields(fields);
 
-    return quote! {
+    quote! {
         Self::#variant_ident { #( #field_idents, )* } => formatter
             .debug_struct(stringify!(#enum_ident))
             #( .field(stringify!(#field_idents), #field_idents) )*
             .finish()
-    };
+    }
 }
 
 fn derive_debug_for_tuple_variant(
@@ -155,12 +157,12 @@ fn derive_debug_for_tuple_variant(
     let variant_ident = &variant.ident;
     let field_idents = get_field_idents_from_unnamed_fields(fields);
 
-    return quote! {
+    quote! {
         Self::#variant_ident(#( #field_idents, )*) => formatter
             .debug_tuple(stringify!(#enum_ident))
             #( .field(#field_idents) )*
             .finish()
-    };
+    }
 }
 
 fn derive_debug_for_unit_variant(
@@ -168,20 +170,20 @@ fn derive_debug_for_unit_variant(
 ) -> proc_macro2::TokenStream {
     let variant_ident = &variant.ident;
 
-    return quote! {
+    quote! {
         Self::#variant_ident => write!(formatter, stringify!(#variant_ident))
-    };
+    }
 }
 
 fn generate_where_clause_with_debug_bounds_from_derive_input(
     ast: &syn::DeriveInput,
 ) -> proc_macro2::TokenStream {
-    return generate_where_clause_with_trait_bounds_from_derive_input(
+    generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {
                 #type_ident: std::fmt::Debug
             }
         },
         ast,
-    );
+    )
 }

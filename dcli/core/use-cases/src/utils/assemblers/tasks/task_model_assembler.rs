@@ -15,10 +15,10 @@ impl<Handle: PointerHandle> TaskModelAssembler<Handle> {
     pub fn new(
         timestamp_formatter: SharedPointer<Box<dyn TimestampFormatter>, Handle>,
     ) -> Self {
-        return Self {
+        Self {
             timestamp_formatter,
             task_status_model_assembler: TaskStatusModelAssembler,
-        };
+        }
     }
 
     pub fn assemble(&self, task: Task) -> TaskModel {

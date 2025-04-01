@@ -13,19 +13,19 @@ pub struct CreateTaskRequestObject {
 
 #[cfg(feature = "client")]
 impl From<CreateTaskRequestModel> for CreateTaskRequestObject {
-    fn from(response: CreateTaskRequestModel) -> Self {
-        return Self {
-            task_description: response.task_description,
-        };
+    fn from(model: CreateTaskRequestModel) -> Self {
+        Self {
+            task_description: model.task_description,
+        }
     }
 }
 
 #[cfg(feature = "server")]
-impl Into<CreateTaskRequestModel> for CreateTaskRequestObject {
-    fn into(self) -> CreateTaskRequestModel {
-        return CreateTaskRequestModel {
-            task_description: self.task_description,
-        };
+impl From<CreateTaskRequestObject> for CreateTaskRequestModel {
+    fn from(model: CreateTaskRequestObject) -> Self {
+        CreateTaskRequestModel {
+            task_description: model.task_description,
+        }
     }
 }
 
@@ -38,24 +38,24 @@ pub enum CreateTaskViewModel {
 
 #[cfg(feature = "server")]
 impl From<CreateTaskResponseModel> for CreateTaskViewModel {
-    fn from(response: CreateTaskResponseModel) -> Self {
-        let response = response
+    fn from(model: CreateTaskResponseModel) -> Self {
+        let model = model
             .map(CreateTaskOkViewModel::from)
             .map_err(CreateTaskErrViewModel::from);
 
-        match response {
-            Ok(response) => Self::Ok(response),
-            Err(response) => Self::Err(response),
+        match model {
+            Ok(model) => Self::Ok(model),
+            Err(model) => Self::Err(model),
         }
     }
 }
 
 #[cfg(feature = "client")]
-impl Into<CreateTaskResponseModel> for CreateTaskViewModel {
-    fn into(self) -> CreateTaskResponseModel {
-        match self {
-            Self::Ok(response) => Ok(response.into()),
-            Self::Err(response) => Err(response.into()),
+impl From<CreateTaskViewModel> for CreateTaskResponseModel {
+    fn from(model: CreateTaskViewModel) -> Self {
+        match model {
+            CreateTaskViewModel::Ok(model) => Ok(model.into()),
+            CreateTaskViewModel::Err(model) => Err(model.into()),
         }
     }
 }
@@ -66,14 +66,14 @@ pub struct CreateTaskOkViewModel;
 #[cfg(feature = "server")]
 impl From<CreateTaskOkResponseModel> for CreateTaskOkViewModel {
     fn from(_: CreateTaskOkResponseModel) -> Self {
-        return Self;
+        Self
     }
 }
 
 #[cfg(feature = "client")]
-impl Into<CreateTaskOkResponseModel> for CreateTaskOkViewModel {
-    fn into(self) -> CreateTaskOkResponseModel {
-        return CreateTaskOkResponseModel;
+impl From<CreateTaskOkViewModel> for CreateTaskOkResponseModel {
+    fn from(_: CreateTaskOkViewModel) -> Self {
+        CreateTaskOkResponseModel
     }
 }
 
@@ -92,8 +92,8 @@ pub enum CreateTaskErrViewModel {
 
 #[cfg(feature = "server")]
 impl From<CreateTaskErrResponseModel> for CreateTaskErrViewModel {
-    fn from(response: CreateTaskErrResponseModel) -> Self {
-        match response {
+    fn from(model: CreateTaskErrResponseModel) -> Self {
+        match model {
             CreateTaskErrResponseModel::TaskDescriptionLengthUnderflow {
                 actual_length,
                 min_length_required,
@@ -113,17 +113,17 @@ impl From<CreateTaskErrResponseModel> for CreateTaskErrViewModel {
 }
 
 #[cfg(feature = "client")]
-impl Into<CreateTaskErrResponseModel> for CreateTaskErrViewModel {
-    fn into(self) -> CreateTaskErrResponseModel {
-        match self {
-            Self::TaskDescriptionLengthUnderflow {
+impl From<CreateTaskErrViewModel> for CreateTaskErrResponseModel {
+    fn from(model: CreateTaskErrViewModel) -> Self {
+        match model {
+            CreateTaskErrViewModel::TaskDescriptionLengthUnderflow {
                 actual_length,
                 min_length_required,
             } => CreateTaskErrResponseModel::TaskDescriptionLengthUnderflow {
                 actual_length,
                 min_length_required,
             },
-            Self::TaskDescriptionLengthOverflow {
+            CreateTaskErrViewModel::TaskDescriptionLengthOverflow {
                 actual_length,
                 max_length_allowed,
             } => CreateTaskErrResponseModel::TaskDescriptionLengthOverflow {

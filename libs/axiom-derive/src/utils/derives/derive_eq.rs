@@ -9,20 +9,20 @@ pub fn derive_eq(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let where_clause_with_eq_bounds =
         generate_where_clause_with_eq_bounds_from_derive_input(ast);
 
-    return quote! {
+    quote! {
         impl #impl_generics Eq for #ident #type_generics #where_clause_with_eq_bounds {}
-    };
+    }
 }
 
 fn generate_where_clause_with_eq_bounds_from_derive_input(
     ast: &syn::DeriveInput,
 ) -> proc_macro2::TokenStream {
-    return generate_where_clause_with_trait_bounds_from_derive_input(
+    generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {
                 #type_ident: Eq
             }
         },
         ast,
-    );
+    )
 }

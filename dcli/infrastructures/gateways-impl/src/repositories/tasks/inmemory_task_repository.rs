@@ -17,9 +17,9 @@ pub struct InMemoryTaskRepository {
 
 impl InMemoryTaskRepository {
     pub fn new() -> Self {
-        return Self {
+        Self {
             tasks_by_ids: BTreeMap::new(),
-        };
+        }
     }
 }
 
@@ -33,7 +33,7 @@ impl TaskRepository for InMemoryTaskRepository {
     }
 
     fn get_by_id(&self, task_id: TaskId) -> Option<Task> {
-        return self.tasks_by_ids.get(&Reverse(task_id)).cloned();
+        self.tasks_by_ids.get(&Reverse(task_id)).cloned()
     }
 
     fn show_reverse_chronologically_ordered(
@@ -41,10 +41,10 @@ impl TaskRepository for InMemoryTaskRepository {
         pagination_request: PaginationRequest,
     ) -> PaginationResponse<Task> {
         let reverse_chronologically_ordered_tasks = self.tasks_by_ids.values();
-        return Self::compute_pagination_response(
+        Self::compute_pagination_response(
             reverse_chronologically_ordered_tasks,
             pagination_request,
-        );
+        )
     }
 
     fn show_reverse_chronologically_ordered_by_status(
@@ -54,14 +54,14 @@ impl TaskRepository for InMemoryTaskRepository {
     ) -> PaginationResponse<Task> {
         let reverse_chronologically_ordered_tasks_by_status =
             self.tasks_by_ids.values().filter(|task| task.status == status);
-        return Self::compute_pagination_response(
+        Self::compute_pagination_response(
             reverse_chronologically_ordered_tasks_by_status,
             pagination_request,
-        );
+        )
     }
 
     fn contains(&self, task_id: TaskId) -> bool {
-        return self.tasks_by_ids.contains_key(&Reverse(task_id));
+        self.tasks_by_ids.contains_key(&Reverse(task_id))
     }
 
     fn clear(&mut self) {
@@ -95,27 +95,27 @@ impl InMemoryTaskRepository {
             .collect();
         let paginated_tasks_count = paginated_tasks.len();
 
-        return PaginationResponse {
+        PaginationResponse {
             items: paginated_tasks,
             page_size: paginated_tasks_count,
             max_page_size: pagination_request.max_page_size,
             page_number: pagination_request.page_number,
             max_page_number,
-        };
+        }
     }
 
     fn compute_iterator_size<T>(iterator: &impl Iterator<Item = T>) -> usize {
         let (_, upper_bound) = iterator.size_hint();
-        return upper_bound.expect("Iterator has no known upper bound");
+        upper_bound.expect("Iterator has no known upper bound")
     }
 
     fn compute_max_page_number(
         number_of_tasks: usize,
         max_page_size: usize,
     ) -> usize {
-        return match number_of_tasks {
+        match number_of_tasks {
             0 => MIN_PAGE_NUMBER,
             _ => number_of_tasks.div_ceil(max_page_size),
-        };
+        }
     }
 }

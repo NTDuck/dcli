@@ -22,12 +22,12 @@ impl<Handle: PointerHandle> ViewTasksInteractor<Handle> {
         timestamp_formatter: SharedPointer<Box<dyn TimestampFormatter>, Handle>,
         task_repository: SharedPointer<Box<dyn TaskRepository>, Handle>,
     ) -> Self {
-        return Self {
+        Self {
             task_repository: task_repository.clone(),
             response_model_assembler: ViewTasksResponseModelAssembler::new(
                 timestamp_formatter.clone(),
             ),
-        };
+        }
     }
 }
 
@@ -40,7 +40,7 @@ impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksInteractor<Handle> {
         let response_model =
             self.response_model_assembler.assemble(pagination_response);
 
-        return response_model;
+        response_model
     }
 }
 
@@ -52,18 +52,18 @@ impl<Handle: PointerHandle> ViewTasksResponseModelAssembler<Handle> {
     pub fn new(
         timestamp_formatter: SharedPointer<Box<dyn TimestampFormatter>, Handle>,
     ) -> Self {
-        return Self {
+        Self {
             task_model_assembler: TaskModelAssembler::new(
                 timestamp_formatter.clone(),
             ),
-        };
+        }
     }
 
     pub fn assemble(
         &self,
         pagination_response: PaginationResponse<Task>,
     ) -> ViewTasksResponseModel {
-        return Ok(ViewTasksOkResponseModel {
+        Ok(ViewTasksOkResponseModel {
             pagination_response: PaginationResponse {
                 items: pagination_response
                     .items
@@ -75,6 +75,6 @@ impl<Handle: PointerHandle> ViewTasksResponseModelAssembler<Handle> {
                 page_number: pagination_response.page_number,
                 max_page_number: pagination_response.max_page_number,
             },
-        });
+        })
     }
 }

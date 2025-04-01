@@ -23,5 +23,5 @@ pub async fn view_tasks<Handle: PointerHandle>(
         ViewTasksViewModel::Err(_) => StatusCode::BAD_REQUEST,
     };
 
-    return (status_code, Json(response));
+    (status_code, Json(response))
 }

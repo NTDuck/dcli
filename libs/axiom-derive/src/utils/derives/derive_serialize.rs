@@ -8,13 +8,14 @@ pub fn derive_serialize_for_struct(
 ) -> proc_macro2::TokenStream {
     let fields = &data.fields;
 
-    return match fields {
+    match fields {
         syn::Fields::Named(fields) =>
             derive_serialize_for_ordinary_struct(ast, fields),
         syn::Fields::Unnamed(fields) =>
             derive_serialize_for_tuple_struct(ast, fields),
-        syn::Fields::Unit => derive_serialize_for_unit_struct(ast),
-    };
+        syn::Fields::Unit =>
+            derive_serialize_for_unit_struct(ast),
+    }
 }
 
 fn derive_serialize_for_ordinary_struct(
@@ -30,7 +31,7 @@ fn derive_serialize_for_ordinary_struct(
     let field_idents = get_field_idents_from_named_fields(fields);
     let field_count = fields.named.len();
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics serde::Serialize for #struct_ident #struct_type_generics #struct_where_clause_with_serialize_bounds {
             fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
             where
@@ -43,7 +44,7 @@ fn derive_serialize_for_ordinary_struct(
                 return state.end();
             }
         }
-    };
+    }
 }
 
 fn derive_serialize_for_tuple_struct(
@@ -60,7 +61,7 @@ fn derive_serialize_for_tuple_struct(
     let field_count = field_indices.len();
 
     if field_count == 1 {
-        return quote! {
+        quote! {
             impl #struct_impl_generics serde::Serialize for #struct_ident #struct_type_generics #struct_where_clause_with_serialize_bounds {
                 fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
                 where
@@ -71,9 +72,9 @@ fn derive_serialize_for_tuple_struct(
                     return serializer.serialize_newtype_struct(stringify!(#struct_ident), &self.0);
                 }
             }
-        };
+        }
     } else {
-        return quote! {
+        quote! {
             impl #struct_impl_generics serde::Serialize for #struct_ident #struct_type_generics #struct_where_clause_with_serialize_bounds {
                 fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
                 where
@@ -86,7 +87,7 @@ fn derive_serialize_for_tuple_struct(
                     return state.end();
                 }
             }
-        };
+        }
     }
 }
 
@@ -99,7 +100,7 @@ fn derive_serialize_for_unit_struct(
     let struct_where_clause_with_serialize_bounds =
         generate_where_clause_with_serialize_bounds_from_derive_input(ast);
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics serde::Serialize for #struct_ident #struct_type_generics #struct_where_clause_with_serialize_bounds {
             fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
             where
@@ -108,7 +109,7 @@ fn derive_serialize_for_unit_struct(
                 return serializer.serialize_unit_struct(stringify!(#struct_ident));
             }
         }
-    };
+    }
 }
 
 pub fn derive_serialize_for_enum(
@@ -136,7 +137,7 @@ pub fn derive_serialize_for_enum(
         .collect::<Vec<_>>();
 
     if variants.is_empty() {
-        return quote! {
+        quote! {
             impl #enum_impl_generics serde::Serialize for #enum_ident #enum_type_generics #enum_where_clause_with_serialize_bounds {
                 fn serialize<S>(&self, _: S) -> Result<S::Ok, S::Error>
                 where
@@ -145,9 +146,9 @@ pub fn derive_serialize_for_enum(
                     match *self {}
                 }
             }
-        };
+        }
     } else {
-        return quote! {
+        quote! {
             impl #enum_impl_generics serde::Serialize for #enum_ident #enum_type_generics #enum_where_clause_with_serialize_bounds {
                 fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
                 where
@@ -158,7 +159,7 @@ pub fn derive_serialize_for_enum(
                     }
                 }
             }
-        };
+        }
     }
 }
 
@@ -175,7 +176,7 @@ fn derive_serialize_for_struct_variant(
     let field_idents = get_field_idents_from_named_fields(fields);
     let field_count = fields.named.len();
 
-    return quote! {
+    quote! {
         Self::#variant_ident { #( #field_idents, )* } => {
             use serde::ser::SerializeStructVariant;
 
@@ -188,7 +189,7 @@ fn derive_serialize_for_struct_variant(
             #( state.serialize_field(stringify!(#field_idents), #field_idents)?; )*
             return state.end();
         }
-    };
+    }
 }
 
 fn derive_serialize_for_tuple_variant(
@@ -205,7 +206,7 @@ fn derive_serialize_for_tuple_variant(
     let field_count = fields.unnamed.len();
 
     if field_count == 1 {
-        return quote! {
+        quote! {
             Self::#variant_ident(arg) => {
                 use serde::ser::SerializeTupleVariant;
 
@@ -216,9 +217,9 @@ fn derive_serialize_for_tuple_variant(
                     &arg,
                 );
             }
-        };
+        }
     } else {
-        return quote! {
+        quote! {
             Self::#variant_ident(#( #field_idents, )*) => {
                 use serde::ser::SerializeTupleVariant;
 
@@ -231,7 +232,7 @@ fn derive_serialize_for_tuple_variant(
                 #( state.serialize_field(#field_idents)?; )*
                 return state.end();
             }
-        };
+        }
     }
 }
 
@@ -244,26 +245,26 @@ fn derive_serialize_for_unit_variant(
     let variant_ident = &variant.ident;
     let variant_index = get_variant_index(ast, variant).unwrap();
 
-    return quote! {
+    quote! {
         Self::#variant_ident => serializer.serialize_unit_variant(
             stringify!(#enum_ident),
             #variant_index,
             stringify!(#variant_ident),
         )
-    };
+    }
 }
 
 fn generate_where_clause_with_serialize_bounds_from_derive_input(
     ast: &syn::DeriveInput,
 ) -> proc_macro2::TokenStream {
-    return generate_where_clause_with_trait_bounds_from_derive_input(
+    generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {
                 #type_ident: serde::Serialize
             }
         },
         ast,
-    );
+    )
 }
 
 fn get_variant_index(
@@ -271,12 +272,12 @@ fn get_variant_index(
     variant: &syn::Variant,
 ) -> Option<u32> {
     if let syn::Data::Enum(data) = &ast.data {
-        return data
+        data
             .variants
             .iter()
             .position(|v| v.ident == variant.ident)
-            .map(|index| index as u32);
+            .map(|index| index as u32)
     } else {
-        return None;
+        None
     }
 }

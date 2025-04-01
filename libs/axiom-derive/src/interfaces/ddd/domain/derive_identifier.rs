@@ -14,7 +14,7 @@ pub fn derive_identifier(
         _ => panic!(),
     };
 
-    return proc_macro::TokenStream::from(tokens);
+    proc_macro::TokenStream::from(tokens)
 }
 
 fn derive_for_struct(
@@ -36,7 +36,7 @@ fn derive_for_struct(
     let struct_eq_impl = derive_eq(ast);
     let struct_hash_impl = derive_hash_for_struct(ast, data);
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics axiom::interfaces::ddd::domain::Identifier for #struct_ident #struct_type_generics #struct_where_clause_with_identifier_bounds {}
 
         impl #struct_impl_generics axiom::interfaces::ddd::domain::ValueObject for #struct_ident #struct_type_generics #struct_where_clause_with_value_object_bounds {}
@@ -46,7 +46,7 @@ fn derive_for_struct(
         #struct_partial_eq_impl
         #struct_eq_impl
         #struct_hash_impl
-    };
+    }
 }
 
 fn derive_for_enum(
@@ -68,7 +68,7 @@ fn derive_for_enum(
     let enum_eq_impl = derive_eq(ast);
     let enum_hash_impl = derive_hash_for_enum(ast, data);
 
-    return quote! {
+    quote! {
         impl #enum_impl_generics axiom::interfaces::ddd::domain::Identifier for #enum_ident #enum_type_generics #enum_where_clause_with_identifier_bounds {}
 
         impl #enum_impl_generics axiom::interfaces::ddd::domain::ValueObject for #enum_ident #enum_type_generics #enum_where_clause_with_value_object_bounds {}
@@ -78,31 +78,31 @@ fn derive_for_enum(
         #enum_partial_eqimpl
         #enum_eq_impl
         #enum_hash_impl
-    };
+    }
 }
 
 fn generate_where_clause_with_identifier_bounds_from_derive_input(
     ast: &syn::DeriveInput,
 ) -> proc_macro2::TokenStream {
-    return generate_where_clause_with_trait_bounds_from_derive_input(
+    generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {
                 #type_ident: axiom::interfaces::ddd::domain::Identifier
             }
         },
         ast,
-    );
+    )
 }
 
 fn generate_where_clause_with_value_object_bounds_from_derive_input(
     ast: &syn::DeriveInput,
 ) -> proc_macro2::TokenStream {
-    return generate_where_clause_with_trait_bounds_from_derive_input(
+    generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {
                 #type_ident: axiom::interfaces::ddd::domain::ValueObject
             }
         },
         ast,
-    );
+    )
 }

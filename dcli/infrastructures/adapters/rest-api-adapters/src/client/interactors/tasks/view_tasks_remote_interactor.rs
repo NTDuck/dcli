@@ -34,6 +34,6 @@ impl<Handle: PointerHandle> ViewTasksBoundary
 
         let response = response.into();
 
-        return response;
+        response
     }
 }

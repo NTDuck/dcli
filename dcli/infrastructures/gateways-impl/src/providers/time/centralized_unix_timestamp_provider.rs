@@ -15,7 +15,7 @@ impl TimestampProvider for CentralizedSystemTimestampProvider {
             .duration_since(Self::EPOCH)
             .unwrap()
             .as_millis() as i64;
-        return Timestamp::from_millis_since_epoch(millis_since_epoch);
+        Timestamp::from_millis_since_epoch(millis_since_epoch)
     }
 }
 

@@ -12,7 +12,7 @@ pub fn derive_entity(
         _ => panic!(),
     };
 
-    return proc_macro::TokenStream::from(tokens);
+    proc_macro::TokenStream::from(tokens)
 }
 
 fn derive_for_struct(
@@ -21,10 +21,10 @@ fn derive_for_struct(
 ) -> proc_macro2::TokenStream {
     let fields = &data.fields;
 
-    return match fields {
+    match fields {
         syn::Fields::Named(fields) => derive_for_ordinary_struct(ast, fields),
         _ => panic!(),
-    };
+    }
 }
 
 #[allow(clippy::expect_fun_call)]
@@ -66,7 +66,7 @@ fn derive_for_ordinary_struct(
     let identifier_field_ident = &identifier_field.ident;
     let identifier_field_type = &identifier_field.ty;
 
-    return quote! {
+    quote! {
         impl #struct_impl_generics axiom::interfaces::ddd::domain::Entity for #struct_ident #struct_type_generics #struct_where_clause_with_entity_bounds {
             type Identifier = #identifier_field_type;
 
@@ -104,91 +104,91 @@ fn derive_for_ordinary_struct(
         }
 
         impl #struct_impl_generics Eq for #struct_ident #struct_type_generics #struct_where_clause_with_eq_bounds {}
-    };
+    }
 }
 
 fn generate_where_clause_with_entity_bounds_from_derive_input(
     ast: &syn::DeriveInput,
 ) -> proc_macro2::TokenStream {
-    return generate_where_clause_with_trait_bounds_from_derive_input(
+    generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {
                 #type_ident: axiom::interfaces::ddd::domain::Entity
             }
         },
         ast,
-    );
+    )
 }
 
 fn generate_where_clause_with_value_object_bounds_from_derive_input(
     ast: &syn::DeriveInput,
 ) -> proc_macro2::TokenStream {
-    return generate_where_clause_with_trait_bounds_from_derive_input(
+    generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {
                 #type_ident: axiom::interfaces::ddd::domain::ValueObject
             }
         },
         ast,
-    );
+    )
 }
 
 fn generate_where_clause_with_debug_bounds_from_derive_input(
     ast: &syn::DeriveInput,
 ) -> proc_macro2::TokenStream {
-    return generate_where_clause_with_trait_bounds_from_derive_input(
+    generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {
                 #type_ident: std::fmt::Debug
             }
         },
         ast,
-    );
+    )
 }
 
 fn generate_where_clause_with_clone_bounds_from_derive_input(
     ast: &syn::DeriveInput,
 ) -> proc_macro2::TokenStream {
-    return generate_where_clause_with_trait_bounds_from_derive_input(
+    generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {
                 #type_ident: Clone
             }
         },
         ast,
-    );
+    )
 }
 
 fn generate_where_clause_with_partial_eq_bounds_from_derive_input(
     ast: &syn::DeriveInput,
 ) -> proc_macro2::TokenStream {
-    return generate_where_clause_with_trait_bounds_from_derive_input(
+    generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {
                 #type_ident: PartialEq
             }
         },
         ast,
-    );
+    )
 }
 
 fn generate_where_clause_with_eq_bounds_from_derive_input(
     ast: &syn::DeriveInput,
 ) -> proc_macro2::TokenStream {
-    return generate_where_clause_with_trait_bounds_from_derive_input(
+    generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {
                 #type_ident: Eq
             }
         },
         ast,
-    );
+    )
 }
 
 fn get_identifier_field_for_ordinary_struct(
     fields: &syn::FieldsNamed,
 ) -> Option<&syn::Field> {
-    return fields.named.iter().find(|field| {
+    fields.named.iter().find(|field| {
         field
             .attrs
             .iter()
@@ -205,7 +205,7 @@ fn get_identifier_field_for_ordinary_struct(
             .any(|attr_ident| {
                 ACCEPTED_ATTRIBUTES.contains(&attr_ident.as_str())
             })
-    });
+    })
 }
 
 fn extract_nested_meta_lists_from_attr(
@@ -216,14 +216,14 @@ fn extract_nested_meta_lists_from_attr(
         return None;
     }
 
-    return attr.meta.require_list().ok().cloned();
+    attr.meta.require_list().ok().cloned()
 }
 
 fn extract_nested_meta_lists_from_meta_list(
     meta_list: &syn::MetaList,
     expected_attr_ident: &str,
 ) -> Vec<syn::MetaList> {
-    return meta_list
+    meta_list
         .parse_args_with(syn::punctuated::Punctuated::<syn::Meta, syn::Token![,]>::parse_terminated)
         .map(|punctuated| punctuated
             .into_iter()
@@ -234,13 +234,13 @@ fn extract_nested_meta_lists_from_meta_list(
                 .flatten()
                 .cloned())
             .collect())
-        .unwrap_or_default();
+        .unwrap_or_default()
 }
 
 fn extract_nested_attr_idents_from_meta_list(
     meta_list: syn::MetaList,
 ) -> Vec<String> {
-    return meta_list
+    meta_list
         .parse_args_with(syn::punctuated::Punctuated::<syn::Path, syn::Token![,]>::parse_terminated)
         .ok()
         .map(|punctuated| punctuated
@@ -251,7 +251,7 @@ fn extract_nested_attr_idents_from_meta_list(
                 .collect::<Vec<_>>()
                 .join(SEGMENT_SEPARATOR))
             .collect())
-        .unwrap_or_default();
+        .unwrap_or_default()
 }
 
 const ACCEPTED_ATTRIBUTES: [&str; 3] =

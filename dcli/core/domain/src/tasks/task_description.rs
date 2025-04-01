@@ -18,13 +18,13 @@ impl TryFrom<String> for TaskDescription {
         Self::ensure_no_length_overflow(description)?;
 
         let description = description.to_string();
-        return Ok(TaskDescription(description));
+        Ok(TaskDescription(description))
     }
 }
 
 impl TaskDescription {
     fn remove_trailing_and_leading_whitespaces(description: &str) -> &str {
-        return description.trim();
+        description.trim()
     }
 
     fn ensure_no_length_underflow(
@@ -37,7 +37,7 @@ impl TaskDescription {
             });
         }
 
-        return Ok(());
+        Ok(())
     }
 
     fn ensure_no_length_overflow(
@@ -50,7 +50,7 @@ impl TaskDescription {
             });
         }
 
-        return Ok(());
+        Ok(())
     }
 }
 
