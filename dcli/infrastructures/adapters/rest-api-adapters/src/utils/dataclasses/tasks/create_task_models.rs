@@ -77,6 +77,7 @@ impl Into<CreateTaskOkResponseModel> for CreateTaskOkViewModel {
     }
 }
 
+#[allow(clippy::enum_variant_names)]
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub enum CreateTaskErrViewModel {
     TaskDescriptionLengthUnderflow {

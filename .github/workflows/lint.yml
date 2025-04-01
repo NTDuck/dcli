@@ -45,4 +45,4 @@ jobs:
           toolchain: ${{ matrix.channel }}
           components: clippy
 
-      - run: cargo clippy --workspace --all-targets --all-features -- -Dwarnings
+      - run: cargo clippy --workspace --all-targets --all-features

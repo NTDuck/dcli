@@ -27,6 +27,7 @@ fn derive_for_struct(
     };
 }
 
+#[allow(clippy::expect_fun_call)]
 fn derive_for_ordinary_struct(
     ast: &syn::DeriveInput,
     fields: &syn::FieldsNamed,
@@ -54,7 +55,7 @@ fn derive_for_ordinary_struct(
         .expect(&format!(
             "Struct `{}` must have one field implementing \
              `axiom::interfaces::ddd::domain::Identifier` and annotated {}",
-            struct_ident.to_string(),
+            struct_ident,
             ACCEPTED_ATTRIBUTES
                 .iter()
                 .map(|attr| format!("`#[axiom(attributes({attr}))]`"))

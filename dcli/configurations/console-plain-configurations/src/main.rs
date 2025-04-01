@@ -17,6 +17,7 @@ use use_cases::dataclasses::pagination::MIN_PAGE_NUMBER;
 use use_cases::dataclasses::tasks::TaskStatusModel;
 use use_cases::gateways::pointers::SharedPointer as SharedPointer_;
 
+#[allow(clippy::single_match)]
 fn main() {
     type SharedPointer<T> = SharedPointer_<T, PointerHandle>;
     type PointerHandle = PointerHandleWithStrategy<PointerStrategy>;

@@ -21,7 +21,7 @@ impl CentralizedSnowflakeProvider {
             .fetch_update(
                 Ordering::Relaxed,
                 Ordering::Relaxed,
-                |sequence_number| Some((sequence_number) + 1 & 0xfff),
+                |sequence_number| Some((sequence_number + 1) & 0xfff),
             )
             .unwrap();
     }

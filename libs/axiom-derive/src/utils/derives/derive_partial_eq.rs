@@ -187,7 +187,7 @@ fn generate_where_clause_with_partial_eq_bounds_from_derive_input(
     );
 }
 
-fn get_idents_with_self_prefixed(idents: &Vec<syn::Ident>) -> Vec<syn::Ident> {
+fn get_idents_with_self_prefixed(idents: &[syn::Ident]) -> Vec<syn::Ident> {
     return idents
         .iter()
         .map(|ident| format_ident!("self{}", ident))
@@ -195,7 +195,7 @@ fn get_idents_with_self_prefixed(idents: &Vec<syn::Ident>) -> Vec<syn::Ident> {
         .collect();
 }
 
-fn get_idents_with_other_prefixed(idents: &Vec<syn::Ident>) -> Vec<syn::Ident> {
+fn get_idents_with_other_prefixed(idents: &[syn::Ident]) -> Vec<syn::Ident> {
     return idents
         .iter()
         .map(|ident| format_ident!("other{}", ident))

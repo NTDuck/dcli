@@ -1,3 +1,5 @@
+#![allow(clippy::redundant_allocation)]
+
 use std::fmt::Debug;
 
 use axiom_derive::New;

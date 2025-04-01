@@ -35,4 +35,5 @@ fn test_string_slice_wrapper() {
     verify_trait_bounds(StringSliceWrapper("tomfoolery"));
 }
 
+#[allow(clippy::implied_bounds_in_impls)]
 fn verify_trait_bounds(_: impl Deref + DerefMut) {}
