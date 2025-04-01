@@ -71,7 +71,7 @@ async fn main() {
         .init();
     
     let listener = TcpListener::bind("127.0.0.1:4444").await.unwrap();
-    println!("Running on {}://{} ...", "http", listener.local_addr().unwrap());
+    tracing::info!("Running on {}://{}", "http", listener.local_addr().unwrap());
     
     axum::serve(listener, router).await.unwrap();
 }
