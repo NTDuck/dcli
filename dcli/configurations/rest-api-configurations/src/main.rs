@@ -12,6 +12,7 @@ use rest_api_adapters::server::handlers::tasks::view_tasks;
 use rest_api_adapters::server::states::TasksState;
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
+use tower_http::compression::CompressionLayer;
 use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
 use use_cases::boundaries::tasks::CreateTaskBoundary;
@@ -58,8 +59,16 @@ async fn main() {
     let router = Router::new()
         .layer(ServiceBuilder::new()
             .layer(TraceLayer::new_for_http())
-            .layer(CorsLayer::new()))
+            .layer(CorsLayer::new())
+            .layer(CompressionLayer::new()))
         .nest("/task", tasks_router);
+
+    tracing_subscriber::fmt()
+        .compact()
+        .pretty()
+        .with_max_level(tracing::Level::DEBUG)
+        .with_target(false)
+        .init();
     
     let listener = TcpListener::bind("127.0.0.1:4444").await.unwrap();
     println!("Running on {}://{} ...", "http", listener.local_addr().unwrap());

@@ -11,7 +11,9 @@ gateways-impl = { path = "../../infrastructures/gateways-impl", features = ["chr
 axum = "0.8"
 tokio = { version = "1.44", features = ["macros", "rt-multi-thread"] }
 tower = "0.5"
-tower-http = { version = "0.6", features = ["cors", "trace"] }
+tower-http = { version = "0.6", features = ["compression-zstd", "cors", "trace"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
 
 [lints]
 workspace = true
