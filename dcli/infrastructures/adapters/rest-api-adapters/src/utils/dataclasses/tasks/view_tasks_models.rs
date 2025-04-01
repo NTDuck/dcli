@@ -5,7 +5,10 @@ use use_cases::boundaries::tasks::ViewTasksErrResponseModel;
 use use_cases::boundaries::tasks::ViewTasksOkResponseModel;
 use use_cases::boundaries::tasks::ViewTasksRequestModel;
 use use_cases::boundaries::tasks::ViewTasksResponseModel;
+#[cfg(feature = "server")]
 use use_cases::dataclasses::pagination::PaginationRequest;
+#[cfg(feature = "client")]
+use use_cases::dataclasses::pagination::PaginationResponse;
 use use_cases::dataclasses::tasks::TaskModel;
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
@@ -45,6 +48,7 @@ pub enum ViewTasksViewModel {
     Err(ViewTasksErrViewModel),
 }
 
+#[cfg(feature = "server")]
 impl From<ViewTasksResponseModel> for ViewTasksViewModel {
     fn from(response: ViewTasksResponseModel) -> Self {
         let response = response
@@ -58,11 +62,12 @@ impl From<ViewTasksResponseModel> for ViewTasksViewModel {
     }
 }
 
-impl Into<Result<ViewTasksOkViewModel, ViewTasksErrViewModel>> for ViewTasksViewModel {
-    fn into(self) -> Result<ViewTasksOkViewModel, ViewTasksErrViewModel> {
+#[cfg(feature = "client")]
+impl Into<ViewTasksResponseModel> for ViewTasksViewModel {
+    fn into(self) -> ViewTasksResponseModel {
         match self {
-            Self::Ok(response) => Ok(response),
-            Self::Err(response) => Err(response),
+            Self::Ok(response) => Ok(response.into()),
+            Self::Err(response) => Err(response.into()),
         }
     }
 }
@@ -77,6 +82,7 @@ pub struct ViewTasksOkViewModel {
     pub max_page_number: usize,
 }
 
+#[cfg(feature = "server")]
 impl From<ViewTasksOkResponseModel> for ViewTasksOkViewModel {
     fn from(response: ViewTasksOkResponseModel) -> Self {
         let pagination_response = response.pagination_response;
@@ -92,11 +98,35 @@ impl From<ViewTasksOkResponseModel> for ViewTasksOkViewModel {
     }
 }
 
+#[cfg(feature = "client")]
+impl Into<ViewTasksOkResponseModel> for ViewTasksOkViewModel {
+    fn into(self) -> ViewTasksOkResponseModel {
+        return ViewTasksOkResponseModel {
+            pagination_response: PaginationResponse {
+                items: self.tasks,
+
+                page_size: self.page_size,
+                max_page_size: self.max_page_size,
+                page_number: self.page_number,
+                max_page_number: self.max_page_number,
+            },
+        };
+    }
+}
+
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct ViewTasksErrViewModel;
 
+#[cfg(feature = "server")]
 impl From<ViewTasksErrResponseModel> for ViewTasksErrViewModel {
     fn from(_: ViewTasksErrResponseModel) -> Self {
         return Self;
+    }
+}
+
+#[cfg(feature = "client")]
+impl Into<ViewTasksErrResponseModel> for ViewTasksErrViewModel {
+    fn into(self) -> ViewTasksErrResponseModel {
+        return ViewTasksErrResponseModel;
     }
 }

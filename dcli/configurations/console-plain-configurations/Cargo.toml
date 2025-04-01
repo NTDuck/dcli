@@ -4,12 +4,13 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
-serde = { workspace = true }
-
-use-cases = { path = "../../core/use-cases" }
+use-cases = { path = "../../core/use-cases", features = ["boundaries", "gateways"] }
 rest-api-adapters = { path = "../../infrastructures/adapters/rest-api-adapters", features = ["client"] }
 
+gateways-impl = { path = "../../infrastructures/gateways-impl" }
+
 clap = "4.5"
+ureq = "3.0"
 
 [lints]
 workspace = true

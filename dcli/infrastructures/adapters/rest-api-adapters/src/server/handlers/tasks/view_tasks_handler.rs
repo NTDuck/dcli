@@ -1,3 +1,4 @@
+use axum::extract::Query;
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
@@ -11,7 +12,7 @@ use crate::server::states::TasksState;
 
 pub async fn view_tasks<Handle: PointerHandle>(
     State(state): State<SharedPointer<TasksState<Handle>, Handle>>,
-    Json(request): Json<ViewTasksRequestObject>,
+    Query(request): Query<ViewTasksRequestObject>,
 ) -> impl IntoResponse {
     let request = request.into();
     let response = state.as_ref().view_tasks_boundary.as_ref().apply(request);

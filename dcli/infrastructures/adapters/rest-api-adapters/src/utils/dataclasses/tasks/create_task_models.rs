@@ -36,6 +36,7 @@ pub enum CreateTaskViewModel {
     Err(CreateTaskErrViewModel),
 }
 
+#[cfg(feature = "server")]
 impl From<CreateTaskResponseModel> for CreateTaskViewModel {
     fn from(response: CreateTaskResponseModel) -> Self {
         let response = response
@@ -49,11 +50,12 @@ impl From<CreateTaskResponseModel> for CreateTaskViewModel {
     }
 }
 
-impl Into<Result<CreateTaskOkViewModel, CreateTaskErrViewModel>> for CreateTaskViewModel {
-    fn into(self) -> Result<CreateTaskOkViewModel, CreateTaskErrViewModel> {
+#[cfg(feature = "client")]
+impl Into<CreateTaskResponseModel> for CreateTaskViewModel {
+    fn into(self) -> CreateTaskResponseModel {
         match self {
-            Self::Ok(response) => Ok(response),
-            Self::Err(response) => Err(response),
+            Self::Ok(response) => Ok(response.into()),
+            Self::Err(response) => Err(response.into()),
         }
     }
 }
@@ -61,12 +63,14 @@ impl Into<Result<CreateTaskOkViewModel, CreateTaskErrViewModel>> for CreateTaskV
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct CreateTaskOkViewModel;
 
+#[cfg(feature = "server")]
 impl From<CreateTaskOkResponseModel> for CreateTaskOkViewModel {
     fn from(_: CreateTaskOkResponseModel) -> Self {
         return Self;
     }
 }
 
+#[cfg(feature = "client")]
 impl Into<CreateTaskOkResponseModel> for CreateTaskOkViewModel {
     fn into(self) -> CreateTaskOkResponseModel {
         return CreateTaskOkResponseModel;
@@ -85,6 +89,7 @@ pub enum CreateTaskErrViewModel {
     },
 }
 
+#[cfg(feature = "server")]
 impl From<CreateTaskErrResponseModel> for CreateTaskErrViewModel {
     fn from(response: CreateTaskErrResponseModel) -> Self {
         match response {
@@ -106,6 +111,7 @@ impl From<CreateTaskErrResponseModel> for CreateTaskErrViewModel {
     }
 }
 
+#[cfg(feature = "client")]
 impl Into<CreateTaskErrResponseModel> for CreateTaskErrViewModel {
     fn into(self) -> CreateTaskErrResponseModel {
         match self {
