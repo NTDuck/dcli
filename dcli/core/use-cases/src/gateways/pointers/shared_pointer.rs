@@ -6,7 +6,7 @@ use std::ops::DerefMut;
 use crate::gateways::pointers::PointerHandle;
 
 /// Inspired by [archery](https://github.com/orium/archery).
-/// 
+///
 /// See: [Higher Kinded Types in Rust](https://joshlf.com/post/2018/10/18/rust-higher-kinded-types-already/)
 pub struct SharedPointer<T, Handle: PointerHandle> {
     handle: ManuallyDrop<Handle>,
@@ -18,18 +18,17 @@ unsafe impl<T, Handle> Send for SharedPointer<T, Handle>
 where
     T: Send + Sync,
     Handle: PointerHandle,
-{}
+{
+}
 
 unsafe impl<T, Handle> Sync for SharedPointer<T, Handle>
 where
     T: Send + Sync,
     Handle: PointerHandle,
-{}
+{
+}
 
-impl<T, Handle> Unpin for SharedPointer<T, Handle>
-where
-    Handle: PointerHandle,
-{}
+impl<T, Handle> Unpin for SharedPointer<T, Handle> where Handle: PointerHandle {}
 
 impl<T, Handle> SharedPointer<T, Handle>
 where
@@ -62,9 +61,7 @@ where
     Handle: PointerHandle,
 {
     fn clone(&self) -> Self {
-        let handle = unsafe {
-            self.handle.shallow_clone::<T>()
-        };
+        let handle = unsafe { self.handle.shallow_clone::<T>() };
         return Self::new_from_handle(handle);
     }
 }

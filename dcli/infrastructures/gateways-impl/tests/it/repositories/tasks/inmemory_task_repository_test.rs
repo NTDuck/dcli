@@ -11,7 +11,7 @@ fn given_empty_repository_when_save_task_then_contains_task() {
     let mut repository = InMemoryTaskRepository::new();
 
     repository.save(new_task_with_id(42));
-    
+
     assert!(repository.contains(new_task_id(42)));
 }
 
@@ -58,7 +58,8 @@ fn given_repository_with_multiple_tasks_when_clear_then_repository_is_empty() {
 }
 
 #[test]
-fn given_repository_with_different_statuses_when_clear_by_status_then_removes_only_matching_status() {
+fn given_repository_with_different_statuses_when_clear_by_status_then_removes_only_matching_status(
+) {
     let mut repository = InMemoryTaskRepository::new();
     repository.save(new_task_with_id_and_status(42, TaskStatus::Pending));
     repository.save(new_task_with_id_and_status(43, TaskStatus::Pending));
@@ -69,7 +70,7 @@ fn given_repository_with_different_statuses_when_clear_by_status_then_removes_on
     repository.save(new_task_with_id_and_status(1235, TaskStatus::Completed));
     repository.save(new_task_with_id_and_status(1236, TaskStatus::Completed));
     repository.save(new_task_with_id_and_status(1237, TaskStatus::Completed));
-    
+
     repository.clear_by_status(TaskStatus::Completed);
 
     assert!(repository.contains(new_task_id(42)));
@@ -99,6 +100,7 @@ fn new_task_with_id_and_status(id: u64, status: TaskStatus) -> Task {
 fn new_task_id(id: u64) -> TaskId {
     return TaskId::new(
         Timestamp::from_millis_since_epoch(id as i64),
-        Default::default(), Default::default(),
+        Default::default(),
+        Default::default(),
     );
 }

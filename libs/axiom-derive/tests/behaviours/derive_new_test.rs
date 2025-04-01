@@ -50,7 +50,9 @@ fn test_ordinary_struct_with_generics() {
             ],
         ),
         OrdinaryStructWithGenerics {
-            pointer: Box::new(Box::new(Box::new(OrdinaryStructWithNoFields {}))),
+            pointer: Box::new(Box::new(Box::new(
+                OrdinaryStructWithNoFields {},
+            ))),
             vector: vec![
                 OrdinaryStructWithNoFields {},
                 OrdinaryStructWithNoFields {},
@@ -69,18 +71,10 @@ struct OrdinaryStructWithLifetimes<'a, 'b, 'c> {
 
 #[test]
 fn test_ordinary_struct_with_lifetimes() {
-    let (text, number, flag) = (
-        "tomfoolery".to_owned(),
-        42,
-        false,
-    );
+    let (text, number, flag) = ("tomfoolery".to_owned(), 42, false);
 
     verify_trait_bounds(
-        OrdinaryStructWithLifetimes::new(
-            &text,
-            &number,
-            &flag,
-        ),
+        OrdinaryStructWithLifetimes::new(&text, &number, &flag),
         OrdinaryStructWithLifetimes {
             text: &text,
             number: &number,
@@ -123,18 +117,13 @@ fn test_new_type() {
 }
 
 #[derive(New, PartialEq, Debug)]
-struct TupleStructWithGenerics<T, U>(
-    Box<Box<Box<T>>>,
-    Vec<U>,
-);
+struct TupleStructWithGenerics<T, U>(Box<Box<Box<T>>>, Vec<U>);
 
 #[test]
 fn test_tuple_struct_with_generics() {
     verify_trait_bounds(
         TupleStructWithGenerics::new(
-            Box::new(Box::new(Box::new(
-                TupleStructWithNoFields::new(),
-            ))),
+            Box::new(Box::new(Box::new(TupleStructWithNoFields::new()))),
             vec![
                 TupleStructWithNoFields::new(),
                 TupleStructWithNoFields::new(),
@@ -142,9 +131,7 @@ fn test_tuple_struct_with_generics() {
             ],
         ),
         TupleStructWithGenerics(
-            Box::new(Box::new(Box::new(
-                TupleStructWithNoFields(),
-            ))),
+            Box::new(Box::new(Box::new(TupleStructWithNoFields()))),
             vec![
                 TupleStructWithNoFields(),
                 TupleStructWithNoFields(),
@@ -160,44 +147,25 @@ struct NewTypeWithGenerics<T>(Box<Box<Box<T>>>);
 #[test]
 fn test_new_type_with_generics() {
     verify_trait_bounds(
-        NewTypeWithGenerics::new(
-            Box::new(Box::new(Box::new(
-                TupleStructWithNoFields(),
-            ))),
-        ),
-        NewTypeWithGenerics(
-            Box::new(Box::new(Box::new(
-                TupleStructWithNoFields(),
-            ))),
-        ),
+        NewTypeWithGenerics::new(Box::new(Box::new(Box::new(
+            TupleStructWithNoFields(),
+        )))),
+        NewTypeWithGenerics(Box::new(Box::new(Box::new(
+            TupleStructWithNoFields(),
+        )))),
     );
 }
 
 #[derive(New, PartialEq, Debug)]
-struct TupleStructWithLifetimes<'a, 'b, 'c>(
-    &'a str,
-    &'b u64,
-    &'c bool,
-);
+struct TupleStructWithLifetimes<'a, 'b, 'c>(&'a str, &'b u64, &'c bool);
 
 #[test]
 fn test_tuple_struct_with_lifetimes() {
-    let (text, number, flag) = (
-        "tomfoolery".to_owned(),
-        42,
-        false,
-    );
+    let (text, number, flag) = ("tomfoolery".to_owned(), 42, false);
 
     verify_trait_bounds(
-        TupleStructWithLifetimes::new(
-            &text,
-            &number,
-            &flag,
-        ), TupleStructWithLifetimes(
-            &text,
-            &number,
-            &flag,
-        ),
+        TupleStructWithLifetimes::new(&text, &number, &flag),
+        TupleStructWithLifetimes(&text, &number, &flag),
     );
 }
 
@@ -207,7 +175,8 @@ struct EnumWithOnlyUnitVariants;
 #[test]
 fn test_enum_with_only_unit_variants() {
     verify_trait_bounds(
-        EnumWithOnlyUnitVariants::new(), EnumWithOnlyUnitVariants,
+        EnumWithOnlyUnitVariants::new(),
+        EnumWithOnlyUnitVariants,
     );
 }
 
@@ -227,25 +196,19 @@ enum EnumWithOnlyStructVariants {
 #[test]
 fn test_enum_with_only_struct_variants() {
     verify_trait_bounds(
-        EnumWithOnlyStructVariants::new_quid(
-            "tomfoolery".to_owned(),
-        ),
+        EnumWithOnlyStructVariants::new_quid("tomfoolery".to_owned()),
         EnumWithOnlyStructVariants::Quid {
             text: "tomfoolery".to_owned(),
         },
     );
     verify_trait_bounds(
-        EnumWithOnlyStructVariants::new_pro(
-            42,
-        ),
+        EnumWithOnlyStructVariants::new_pro(42),
         EnumWithOnlyStructVariants::Pro {
             number: 42,
         },
     );
     verify_trait_bounds(
-        EnumWithOnlyStructVariants::new_quo(
-            false,
-        ),
+        EnumWithOnlyStructVariants::new_quo(false),
         EnumWithOnlyStructVariants::Quo {
             flag: false,
         },
@@ -289,11 +252,7 @@ enum EnumWithMixedVariants {
 #[test]
 fn test_enum_with_mixed_variants() {
     verify_trait_bounds(
-        EnumWithMixedVariants::new_quid(
-            "tomfoolery".to_owned(),
-            42,
-            false,
-        ),
+        EnumWithMixedVariants::new_quid("tomfoolery".to_owned(), 42, false),
         EnumWithMixedVariants::Quid {
             text: "tomfoolery".to_owned(),
             number: 42,
@@ -301,23 +260,18 @@ fn test_enum_with_mixed_variants() {
         },
     );
     verify_trait_bounds(
-        EnumWithMixedVariants::new_pro(
-            "tomfoolery".to_owned(), 
-            42, 
-            false,
-        ),
-        EnumWithMixedVariants::Pro(
-            "tomfoolery".to_owned(),
-            42,
-            false,
-        ),
+        EnumWithMixedVariants::new_pro("tomfoolery".to_owned(), 42, false),
+        EnumWithMixedVariants::Pro("tomfoolery".to_owned(), 42, false),
     );
     verify_trait_bounds(
-        EnumWithMixedVariants::new_quo(), EnumWithMixedVariants::Quo,
+        EnumWithMixedVariants::new_quo(),
+        EnumWithMixedVariants::Quo,
     );
 }
 
-
-fn verify_trait_bounds<T: Debug + PartialEq>(factory_constructed: T, manually_constructed: T) {
+fn verify_trait_bounds<T: Debug + PartialEq>(
+    factory_constructed: T,
+    manually_constructed: T,
+) {
     assert_eq!(factory_constructed, manually_constructed);
 }

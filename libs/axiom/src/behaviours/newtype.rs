@@ -1,1 +1,1 @@
-pub use derive::NewType as NewType;
+pub use derive::NewType;

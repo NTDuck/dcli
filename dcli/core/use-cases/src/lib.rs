@@ -6,4 +6,4 @@ pub mod interactors;
 
 mod utils;
 
-pub use self::utils::dataclasses as dataclasses;
+pub use self::utils::dataclasses;

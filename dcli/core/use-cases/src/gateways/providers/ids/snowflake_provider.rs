@@ -1,5 +1,5 @@
-use domain::ids::SnowflakeWorkerNumber;
 use domain::ids::SnowflakeSequenceNumber;
+use domain::ids::SnowflakeWorkerNumber;
 
 use crate::utils::interfaces::Gateway;
 

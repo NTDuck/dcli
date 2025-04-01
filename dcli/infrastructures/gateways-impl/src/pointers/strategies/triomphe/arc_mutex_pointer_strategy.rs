@@ -26,11 +26,15 @@ impl PointerStrategy for ArcMutexPointerStrategy {
         return Arc::clone(typed);
     }
 
-    fn as_ref<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl Deref<Target = T> + 'br {
+    fn as_ref<'br, T: 'br>(
+        typed: &'br Self::Typed<T>,
+    ) -> impl Deref<Target = T> + 'br {
         return typed.lock().unwrap();
     }
 
-    fn as_mut<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl DerefMut<Target = T> + 'br {
+    fn as_mut<'br, T: 'br>(
+        typed: &'br Self::Typed<T>,
+    ) -> impl DerefMut<Target = T> + 'br {
         return typed.lock().unwrap();
     }
 }

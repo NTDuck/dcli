@@ -31,8 +31,7 @@ impl Add for Interval {
     type Output = Self;
 
     fn add(self, interval: Interval) -> Self::Output {
-        let millis = self.as_millis()
-            .saturating_add(interval.as_millis());
+        let millis = self.as_millis().saturating_add(interval.as_millis());
         return Self::from_millis(millis);
     }
 }
@@ -41,8 +40,7 @@ impl Sub for Interval {
     type Output = Self;
 
     fn sub(self, interval: Interval) -> Self::Output {
-        let millis = self.as_millis()
-            .saturating_sub(interval.as_millis());
+        let millis = self.as_millis().saturating_sub(interval.as_millis());
         return Self::from_millis(millis);
     }
 }

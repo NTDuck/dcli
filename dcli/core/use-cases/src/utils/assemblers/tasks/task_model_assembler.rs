@@ -1,8 +1,8 @@
 use domain::tasks::Task;
+
 use crate::gateways::formatters::time::TimestampFormatter;
 use crate::gateways::pointers::PointerHandle;
 use crate::gateways::pointers::SharedPointer;
-
 use crate::utils::assemblers::tasks::TaskStatusModelAssembler;
 use crate::utils::dataclasses::tasks::TaskModel;
 

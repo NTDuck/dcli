@@ -19,7 +19,10 @@ pub mod axiom {
 
                 pub trait Identifier: ValueObject + Hash {}
 
-                pub trait ValueObject: Debug + Send + Sync + Clone + PartialEq + Eq {}
+                pub trait ValueObject:
+                    Debug + Send + Sync + Clone + PartialEq + Eq
+                {
+                }
             }
         }
     }

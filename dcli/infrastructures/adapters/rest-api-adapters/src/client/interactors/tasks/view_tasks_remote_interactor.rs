@@ -16,15 +16,21 @@ pub struct ViewTasksRemoteInteractor<Handle: PointerHandle> {
     uri: &'static str,
 }
 
-impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksRemoteInteractor<Handle> {
+impl<Handle: PointerHandle> ViewTasksBoundary
+    for ViewTasksRemoteInteractor<Handle>
+{
     fn apply(&self, request: ViewTasksRequestModel) -> ViewTasksResponseModel {
         let request: ViewTasksRequestObject = request.into();
 
-        let response = self.agent.as_ref()
+        let response = self
+            .agent
+            .as_ref()
             .get(append_query(self.uri, &request))
-            .call().unwrap()
+            .call()
+            .unwrap()
             .into_body()
-            .read_json::<ViewTasksViewModel>().unwrap();
+            .read_json::<ViewTasksViewModel>()
+            .unwrap();
 
         let response = response.into();
 

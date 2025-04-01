@@ -19,11 +19,11 @@ where
         let untyped = Strategy::into_untyped(typed);
         return Self::new_from_untyped(untyped);
     }
-    
+
     fn as_ref<'br, T: 'br>(&'br self) -> impl Deref<Target = T> + 'br {
         return Strategy::as_ref(self.as_typed_ref());
     }
-    
+
     fn as_mut<'br, T: 'br>(&'br self) -> impl DerefMut<Target = T> + 'br {
         return Strategy::as_mut(self.as_typed_ref());
     }
@@ -52,24 +52,22 @@ where
     }
 
     fn as_typed_ref<T>(&self) -> &Strategy::Typed<T> {
-        let raw_const_pointer = (self.untyped.deref() as *const Strategy::Untyped)
+        let raw_const_pointer = (self.untyped.deref()
+            as *const Strategy::Untyped)
             .cast::<Strategy::Typed<T>>();
 
         Strategy::check_binary_compatibility::<T>();
 
-        return unsafe {
-            &*raw_const_pointer
-        };
+        return unsafe { &*raw_const_pointer };
     }
 
     fn as_typed_mut<T>(&mut self) -> &mut Strategy::Typed<T> {
-        let raw_mut_pointer = (self.untyped.deref_mut() as *mut Strategy::Untyped)
+        let raw_mut_pointer = (self.untyped.deref_mut()
+            as *mut Strategy::Untyped)
             .cast::<Strategy::Typed<T>>();
 
         Strategy::check_binary_compatibility::<T>();
 
-        return unsafe {
-            &mut *raw_mut_pointer
-        };
+        return unsafe { &mut *raw_mut_pointer };
     }
 }

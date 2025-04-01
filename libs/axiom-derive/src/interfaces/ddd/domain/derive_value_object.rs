@@ -3,7 +3,9 @@ use quote::quote;
 use crate::utils::ast::*;
 use crate::utils::derives::*;
 
-pub fn derive_value_object(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn derive_value_object(
+    tokens: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
     let ast = syn::parse_macro_input!(tokens as syn::DeriveInput);
 
     let tokens = match &ast.data {
@@ -15,12 +17,17 @@ pub fn derive_value_object(tokens: proc_macro::TokenStream) -> proc_macro::Token
     return proc_macro::TokenStream::from(tokens);
 }
 
-fn derive_for_struct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
+fn derive_for_struct(
+    ast: &syn::DeriveInput,
+    data: &syn::DataStruct,
+) -> proc_macro2::TokenStream {
     let struct_ident = &ast.ident;
-    let (struct_impl_generics, struct_type_generics, _) = ast.generics.split_for_impl();
+    let (struct_impl_generics, struct_type_generics, _) =
+        ast.generics.split_for_impl();
 
-    let struct_where_clause_with_value_object_bounds = generate_where_clause_with_value_object_bounds_from_derive_input(ast);
-    
+    let struct_where_clause_with_value_object_bounds =
+        generate_where_clause_with_value_object_bounds_from_derive_input(ast);
+
     let struct_debug_impl = derive_debug_for_struct(ast, data);
     let struct_clone_impl = derive_clone_for_struct(ast, data);
     let struct_partial_eq_impl = derive_partial_eq_for_struct(ast, data);
@@ -36,11 +43,16 @@ fn derive_for_struct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_mac
     };
 }
 
-fn derive_for_enum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
+fn derive_for_enum(
+    ast: &syn::DeriveInput,
+    data: &syn::DataEnum,
+) -> proc_macro2::TokenStream {
     let enum_ident = &ast.ident;
-    let (enum_impl_generics, enum_type_generics, _) = ast.generics.split_for_impl();
+    let (enum_impl_generics, enum_type_generics, _) =
+        ast.generics.split_for_impl();
 
-    let enum_where_clause_with_value_object_bounds = generate_where_clause_with_value_object_bounds_from_derive_input(ast);
+    let enum_where_clause_with_value_object_bounds =
+        generate_where_clause_with_value_object_bounds_from_derive_input(ast);
 
     let enum_debug_impl = derive_debug_for_enum(ast, data);
     let enum_clone_impl = derive_clone_for_enum(ast, data);
@@ -57,10 +69,14 @@ fn derive_for_enum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2:
     };
 }
 
-fn generate_where_clause_with_value_object_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+fn generate_where_clause_with_value_object_bounds_from_derive_input(
+    ast: &syn::DeriveInput,
+) -> proc_macro2::TokenStream {
     return generate_where_clause_with_trait_bounds_from_derive_input(
-        |type_ident| quote! {
-            #type_ident: axiom::interfaces::ddd::domain::ValueObject
+        |type_ident| {
+            quote! {
+                #type_ident: axiom::interfaces::ddd::domain::ValueObject
+            }
         },
         ast,
     );

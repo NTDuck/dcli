@@ -1,1 +1,1 @@
-pub use derive::New as New;
+pub use derive::New;

@@ -5,7 +5,7 @@ use serde::Serialize;
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct PaginationResponse<T> {
     pub items: Vec<T>,
-    
+
     pub page_size: usize,
     pub max_page_size: usize,
     pub page_number: usize,

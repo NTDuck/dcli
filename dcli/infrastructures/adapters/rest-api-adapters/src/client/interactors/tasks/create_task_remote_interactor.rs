@@ -15,15 +15,24 @@ pub struct CreateTaskRemoteInteractor<Handle: PointerHandle> {
     uri: &'static str,
 }
 
-impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskRemoteInteractor<Handle> {
-    fn apply(&self, request: CreateTaskRequestModel) -> CreateTaskResponseModel {
+impl<Handle: PointerHandle> CreateTaskBoundary
+    for CreateTaskRemoteInteractor<Handle>
+{
+    fn apply(
+        &self,
+        request: CreateTaskRequestModel,
+    ) -> CreateTaskResponseModel {
         let request: CreateTaskRequestObject = request.into();
 
-        let response = self.agent.as_ref()
+        let response = self
+            .agent
+            .as_ref()
             .post(self.uri)
-            .send_json(request).unwrap()
+            .send_json(request)
+            .unwrap()
             .into_body()
-            .read_json::<CreateTaskViewModel>().unwrap();
+            .read_json::<CreateTaskViewModel>()
+            .unwrap();
 
         let response = response.into();
 

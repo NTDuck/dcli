@@ -6,9 +6,9 @@ use axum::Json;
 use use_cases::gateways::pointers::PointerHandle;
 use use_cases::gateways::pointers::SharedPointer;
 
+use crate::server::states::TasksState;
 use crate::utils::dataclasses::tasks::ViewTasksRequestObject;
 use crate::utils::dataclasses::tasks::ViewTasksViewModel;
-use crate::server::states::TasksState;
 
 pub async fn view_tasks<Handle: PointerHandle>(
     State(state): State<SharedPointer<TasksState<Handle>, Handle>>,
@@ -22,6 +22,6 @@ pub async fn view_tasks<Handle: PointerHandle>(
         ViewTasksViewModel::Ok(_) => StatusCode::OK,
         ViewTasksViewModel::Err(_) => StatusCode::BAD_REQUEST,
     };
-    
+
     return (status_code, Json(response));
 }

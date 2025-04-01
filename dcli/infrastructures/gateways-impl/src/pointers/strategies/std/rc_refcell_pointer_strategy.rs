@@ -14,7 +14,7 @@ impl PointerStrategy for RcRefCellPointerStrategy {
     fn into_typed<T>(obj: T) -> Self::Typed<T> {
         return Rc::new(RefCell::new(obj));
     }
-    
+
     fn into_untyped<T>(typed: Self::Typed<T>) -> Self::Untyped {
         return unsafe {
             std::mem::transmute::<Self::Typed<T>, Self::Untyped>(typed)
@@ -25,11 +25,15 @@ impl PointerStrategy for RcRefCellPointerStrategy {
         return Rc::clone(typed);
     }
 
-    fn as_ref<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl Deref<Target = T> + 'br {
+    fn as_ref<'br, T: 'br>(
+        typed: &'br Self::Typed<T>,
+    ) -> impl Deref<Target = T> + 'br {
         return typed.borrow();
     }
 
-    fn as_mut<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl DerefMut<Target = T> + 'br {
+    fn as_mut<'br, T: 'br>(
+        typed: &'br Self::Typed<T>,
+    ) -> impl DerefMut<Target = T> + 'br {
         return typed.borrow_mut();
     }
 }

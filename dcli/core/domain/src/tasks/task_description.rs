@@ -9,9 +9,10 @@ pub struct TaskDescription(String);
 
 impl TryFrom<String> for TaskDescription {
     type Error = TaskDescriptionError;
-    
+
     fn try_from(description: String) -> Result<Self, Self::Error> {
-        let description = Self::remove_trailing_and_leading_whitespaces(&description);
+        let description =
+            Self::remove_trailing_and_leading_whitespaces(&description);
 
         Self::ensure_no_length_underflow(description)?;
         Self::ensure_no_length_overflow(description)?;
@@ -26,7 +27,9 @@ impl TaskDescription {
         return description.trim();
     }
 
-    fn ensure_no_length_underflow(description: &str) -> Result<(), TaskDescriptionError> {
+    fn ensure_no_length_underflow(
+        description: &str,
+    ) -> Result<(), TaskDescriptionError> {
         if description.len() < MIN_LENGTH_REQUIRED {
             return Err(TaskDescriptionError::LengthUnderflow {
                 actual_length: description.len(),
@@ -37,7 +40,9 @@ impl TaskDescription {
         return Ok(());
     }
 
-    fn ensure_no_length_overflow(description: &str) -> Result<(), TaskDescriptionError> {
+    fn ensure_no_length_overflow(
+        description: &str,
+    ) -> Result<(), TaskDescriptionError> {
         if description.len() > MAX_LENGTH_ALLOWED {
             return Err(TaskDescriptionError::LengthOverflow {
                 actual_length: description.len(),

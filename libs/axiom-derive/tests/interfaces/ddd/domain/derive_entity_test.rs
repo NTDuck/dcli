@@ -68,7 +68,10 @@ pub mod axiom {
                 #[allow(dead_code)]
                 pub trait Identifier: ValueObject + Hash {}
 
-                pub trait ValueObject: Debug + Send + Sync + Clone + PartialEq + Eq {}
+                pub trait ValueObject:
+                    Debug + Send + Sync + Clone + PartialEq + Eq
+                {
+                }
             }
         }
     }

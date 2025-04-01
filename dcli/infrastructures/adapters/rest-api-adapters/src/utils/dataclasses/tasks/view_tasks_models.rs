@@ -21,7 +21,7 @@ pub struct ViewTasksRequestObject {
 impl From<ViewTasksRequestModel> for ViewTasksRequestObject {
     fn from(request: ViewTasksRequestModel) -> Self {
         let pagination_request = request.pagination_request;
-        
+
         return Self {
             page_number: pagination_request.page_number,
             max_page_size: pagination_request.max_page_size,
@@ -75,7 +75,7 @@ impl Into<ViewTasksResponseModel> for ViewTasksViewModel {
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct ViewTasksOkViewModel {
     pub tasks: Vec<TaskModel>,
-    
+
     pub page_size: usize,
     pub max_page_size: usize,
     pub page_number: usize,
