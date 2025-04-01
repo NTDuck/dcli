@@ -1,3 +1,5 @@
 [alias]
 run-rest-api = "run -p rest-api-configurations"
 run-console = "run -p console-plain-configurations"
+lint-rustfmt = "fmt --all"
+lint-clippy = "clippy --fix --workspace --all-targets --all-features --allow-dirty"

@@ -72,18 +72,21 @@ async fn main() {
         )
         .nest("/task", tasks_router);
 
+    let listener = TcpListener::bind("127.0.0.1:4444").await.unwrap();
+
     tracing_subscriber::fmt()
         .compact()
         .pretty()
         .with_max_level(tracing::Level::DEBUG)
         .with_target(false)
+        .with_file(false)
+        .with_line_number(false)
         .init();
 
-    let listener = TcpListener::bind("127.0.0.1:4444").await.unwrap();
     tracing::info!(
         "Running on {}://{}",
         "http",
-        listener.local_addr().unwrap()
+        listener.local_addr().unwrap(),
     );
 
     axum::serve(listener, router).await.unwrap();
