@@ -18,18 +18,14 @@ pub fn derive_newtype(tokens: TokenStream) -> TokenStream {
 pub fn derive_data_transfer_object_without_deserialize(
     tokens: TokenStream,
 ) -> TokenStream {
-    crate::interfaces::derive_data_transfer_object_without_deserialize(
-        tokens,
-    )
+    crate::interfaces::derive_data_transfer_object_without_deserialize(tokens)
 }
 
 #[proc_macro_derive(DataTransferObjectWithoutSerde)]
 pub fn derive_data_transfer_object_without_serde(
     tokens: TokenStream,
 ) -> TokenStream {
-    crate::interfaces::derive_data_transfer_object_without_serde(
-        tokens,
-    )
+    crate::interfaces::derive_data_transfer_object_without_serde(tokens)
 }
 
 #[proc_macro_derive(Entity, attributes(axiom))]

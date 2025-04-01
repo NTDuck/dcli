@@ -13,8 +13,7 @@ pub fn derive_clone_for_struct(
             derive_clone_for_ordinary_struct(ast, fields),
         syn::Fields::Unnamed(fields) =>
             derive_clone_for_tuple_struct(ast, fields),
-        syn::Fields::Unit =>
-            derive_clone_for_unit_struct(ast),
+        syn::Fields::Unit => derive_clone_for_unit_struct(ast),
     }
 }
 
@@ -101,8 +100,7 @@ pub fn derive_clone_for_enum(
                 derive_clone_for_struct_variant(variant, fields),
             syn::Fields::Unnamed(fields) =>
                 derive_clone_for_tuple_variant(variant, fields),
-            syn::Fields::Unit =>
-                derive_clone_for_unit_variant(variant),
+            syn::Fields::Unit => derive_clone_for_unit_variant(variant),
         })
         .collect::<Vec<_>>();
 

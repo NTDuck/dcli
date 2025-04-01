@@ -93,14 +93,12 @@ fn derive_for_enum(
 
     let variant_new_methods = variants
         .iter()
-        .map(|variant| {
-            match &variant.fields {
-                syn::Fields::Named(fields) =>
-                    derive_for_struct_variant(variant, fields),
-                syn::Fields::Unnamed(fields) =>
-                    derive_for_tuple_variant(variant, fields),
-                syn::Fields::Unit => derive_for_unit_variant(variant),
-            }
+        .map(|variant| match &variant.fields {
+            syn::Fields::Named(fields) =>
+                derive_for_struct_variant(variant, fields),
+            syn::Fields::Unnamed(fields) =>
+                derive_for_tuple_variant(variant, fields),
+            syn::Fields::Unit => derive_for_unit_variant(variant),
         })
         .collect::<Vec<_>>();
 

@@ -13,8 +13,7 @@ pub fn derive_serialize_for_struct(
             derive_serialize_for_ordinary_struct(ast, fields),
         syn::Fields::Unnamed(fields) =>
             derive_serialize_for_tuple_struct(ast, fields),
-        syn::Fields::Unit =>
-            derive_serialize_for_unit_struct(ast),
+        syn::Fields::Unit => derive_serialize_for_unit_struct(ast),
     }
 }
 
@@ -272,8 +271,7 @@ fn get_variant_index(
     variant: &syn::Variant,
 ) -> Option<u32> {
     if let syn::Data::Enum(data) = &ast.data {
-        data
-            .variants
+        data.variants
             .iter()
             .position(|v| v.ident == variant.ident)
             .map(|index| index as u32)

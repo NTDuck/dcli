@@ -13,8 +13,7 @@ pub fn derive_debug_for_struct(
             derive_debug_for_ordinary_struct(ast, fields),
         syn::Fields::Unnamed(fields) =>
             derive_debug_for_tuple_struct(ast, fields),
-        syn::Fields::Unit =>
-            derive_debug_for_unit_struct(ast),
+        syn::Fields::Unit => derive_debug_for_unit_struct(ast),
     }
 }
 
@@ -105,8 +104,7 @@ pub fn derive_debug_for_enum(
                 derive_debug_for_struct_variant(ast, variant, fields),
             syn::Fields::Unnamed(fields) =>
                 derive_debug_for_tuple_variant(ast, variant, fields),
-            syn::Fields::Unit =>
-                derive_debug_for_unit_variant(variant),
+            syn::Fields::Unit => derive_debug_for_unit_variant(variant),
         })
         .collect::<Vec<_>>();
 

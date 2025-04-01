@@ -16,9 +16,7 @@ impl PointerStrategy for ArcMutexPointerStrategy {
     }
 
     fn into_untyped<T>(typed: Self::Typed<T>) -> Self::Untyped {
-        unsafe {
-            std::mem::transmute::<Self::Typed<T>, Self::Untyped>(typed)
-        }
+        unsafe { std::mem::transmute::<Self::Typed<T>, Self::Untyped>(typed) }
     }
 
     fn shallow_clone<T>(typed: &Self::Typed<T>) -> Self::Typed<T> {

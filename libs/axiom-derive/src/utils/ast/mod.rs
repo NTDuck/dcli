@@ -35,11 +35,7 @@ pub fn generate_where_clause_with_trait_bounds_from_derive_input(
 pub fn get_field_idents_from_named_fields(
     fields: &syn::FieldsNamed,
 ) -> Vec<syn::Ident> {
-    fields
-        .named
-        .iter()
-        .filter_map(|field| field.ident.clone())
-        .collect()
+    fields.named.iter().filter_map(|field| field.ident.clone()).collect()
 }
 
 pub fn get_field_idents_from_unnamed_fields(

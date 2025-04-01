@@ -14,8 +14,7 @@ pub fn derive_partial_eq_for_struct(
             derive_partial_eq_for_ordinary_struct(ast, fields),
         syn::Fields::Unnamed(fields) =>
             derive_partial_eq_for_tuple_struct(ast, fields),
-        syn::Fields::Unit =>
-            derive_partial_eq_for_unit_struct(ast),
+        syn::Fields::Unit => derive_partial_eq_for_unit_struct(ast),
     }
 }
 
@@ -99,8 +98,7 @@ pub fn derive_partial_eq_for_enum(
                 derive_partial_eq_for_struct_variant(variant, fields),
             syn::Fields::Unnamed(fields) =>
                 derive_partial_eq_for_tuple_variant(variant, fields),
-            syn::Fields::Unit =>
-                derive_partial_eq_for_unit_variant(variant),
+            syn::Fields::Unit => derive_partial_eq_for_unit_variant(variant),
         })
         .collect::<Vec<_>>();
 

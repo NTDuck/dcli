@@ -16,8 +16,7 @@ impl CentralizedSnowflakeProvider {
     fn compute_and_assign_next_sequence_number(
         &self,
     ) -> SnowflakeSequenceNumber {
-        self
-            .sequence_number
+        self.sequence_number
             .fetch_update(
                 Ordering::Relaxed,
                 Ordering::Relaxed,
