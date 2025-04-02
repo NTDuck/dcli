@@ -1,10 +1,12 @@
 use cucumber::World;
-use repositories::tasks::inmemory_task_repository_test;
+use worlds::repositories::tasks::InMemoryTaskRepositoryWorld;
 
-mod repositories;
+pub mod steps;
+pub mod worlds;
+
 mod utils;
 
-#[tokio::main]
+#[tokio::test]
 async fn main() {
-    inmemory_task_repository_test::World::run("tests/.features/tasks/task_repository.feature").await
+    InMemoryTaskRepositoryWorld::run("tests/.features/repositories/tasks/task_repository.feature").await
 }

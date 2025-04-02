@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use std::str::FromStr;
 
 use cucumber::given;
@@ -14,6 +15,11 @@ use use_cases::gateways::repositories::tasks::TaskRepository;
 use rayon::prelude::*;
 
 use crate::utils::cucumber::parameters::ids::SnowflakeParameter;
+
+pub struct TaskRepositoryWorld<Repository: TaskRepository> {
+    task_repository: Repository,
+    task_count: usize,
+}
 
 #[derive(cucumber::World, Debug)]
 pub struct World {
