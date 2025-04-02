@@ -11,6 +11,7 @@ use use_cases::gateways::repositories::tasks::TaskRepository;
 
 use crate::utils::dataclasses::pagination::PaginationRange;
 
+#[derive(Debug)]
 pub struct InMemoryTaskRepository {
     tasks_by_ids: BTreeMap<Reverse<TaskId>, Task>,
 }

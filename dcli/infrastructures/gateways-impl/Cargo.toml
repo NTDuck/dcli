@@ -14,6 +14,11 @@ chrono = { version = "0.4", optional = true }
 triomphe = { version = "0.1", optional = true }
 uuid = { version = "1.12", features = ["v4", "fast-rng", "macro-diagnostics"], optional = true }
 
+[dev-dependencies]
+cucumber = "0.21"
+tokio = { version = "1.44", features = ["macros", "rt-multi-thread"] }
+rayon = "1.10"
+
 [features]
 chrono = ["dep:chrono"]
 triomphe = ["dep:triomphe"]
@@ -22,6 +27,7 @@ uuid = ["dep:uuid"]
 [lib]
 test = false
 doctest = false
+harness = false
 
 [lints]
 workspace = true
