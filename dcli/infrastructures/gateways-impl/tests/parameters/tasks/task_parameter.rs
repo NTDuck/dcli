@@ -6,7 +6,7 @@ use domain::tasks::TaskStatus;
 use crate::parameters::ids::SnowflakeParameter;
 
 #[derive(cucumber::Parameter)]
-#[param(name = "task", regex = r"^\d+$")]
+#[param(name = "task", regex = r".+")]
 pub struct TaskParameter(Task);
 
 impl FromStr for TaskParameter {

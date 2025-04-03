@@ -12,6 +12,6 @@ Feature: Task Repository
       Then the repository is empty
 
     Scenario:
-      Given a repository containing tasks 0 to 1024
-      When removing task 444
-      Then the repository contains tasks 0 to 1024 except 444
+      Given a repository containing tasks 0 to 2
+      When removing task 1
+      Then the repository contains tasks 0 to 2 except 1

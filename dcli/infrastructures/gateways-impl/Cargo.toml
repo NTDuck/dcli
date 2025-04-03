@@ -16,9 +16,7 @@ uuid = { version = "1.12", features = ["v4", "fast-rng", "macro-diagnostics"], o
 
 [dev-dependencies]
 cucumber = "0.21"
-paste = "1.0"
 tokio = { version = "1.44", features = ["macros", "rt-multi-thread"] }
-rayon = "1.10"
 
 [features]
 chrono = ["dep:chrono"]
