@@ -26,9 +26,9 @@ triomphe = ["dep:triomphe"]
 uuid = ["dep:uuid"]
 
 [lib]
-test = false
+# test = false
 doctest = false
-harness = false
+# harness = false
 
 [lints]
 workspace = true

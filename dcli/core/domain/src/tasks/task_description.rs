@@ -7,10 +7,10 @@ use serde::Serialize;
 #[derive(ddd::ValueObject, NewType)]
 pub struct TaskDescription(String);
 
-impl TryFrom<String> for TaskDescription {
+impl TryFrom<&str> for TaskDescription {
     type Error = TaskDescriptionError;
 
-    fn try_from(description: String) -> Result<Self, Self::Error> {
+    fn try_from(description: &str) -> Result<Self, Self::Error> {
         let description =
             Self::remove_trailing_and_leading_whitespaces(&description);
 
@@ -19,6 +19,14 @@ impl TryFrom<String> for TaskDescription {
 
         let description = description.to_string();
         Ok(TaskDescription(description))
+    }
+}
+
+impl TryFrom<String> for TaskDescription {
+    type Error = TaskDescriptionError;
+
+    fn try_from(description: String) -> Result<Self, Self::Error> {
+        Self::try_from(description.as_str())
     }
 }
 
