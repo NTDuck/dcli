@@ -4,7 +4,7 @@ use chrono::Utc;
 use domain::time::Timestamp;
 use use_cases::gateways::formatters::time::TimestampFormatter;
 
-#[derive(New)]
+#[derive(New, Debug)]
 pub struct Rfc2822TimestampFormatter;
 
 impl TimestampFormatter for Rfc2822TimestampFormatter {

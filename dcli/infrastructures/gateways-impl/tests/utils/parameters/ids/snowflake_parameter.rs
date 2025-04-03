@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use domain::ids::Snowflake;
 
-use crate::utils::cucumber::parameters::time::TimestampParameter;
+use crate::utils::parameters::time::TimestampParameter;
 
 #[derive(cucumber::Parameter)]
 #[param(name = "snowflake", regex = r"^\d+$")]

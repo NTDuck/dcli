@@ -1,3 +1,5 @@
-pub trait Gateway: Send + Sync {}
+use std::fmt::Debug;
 
-impl<T> Gateway for T where T: Send + Sync {}
+pub trait Gateway: Send + Sync + Debug {}
+
+impl<T> Gateway for T where T: Send + Sync + Debug {}

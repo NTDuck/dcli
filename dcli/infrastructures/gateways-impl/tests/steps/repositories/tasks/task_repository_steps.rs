@@ -14,35 +14,17 @@ use use_cases::dataclasses::pagination::UNBOUNDED_PAGINATION_REQUEST;
 use use_cases::gateways::repositories::tasks::TaskRepository;
 use rayon::prelude::*;
 
-use crate::utils::cucumber::parameters::ids::SnowflakeParameter;
-
-pub struct TaskRepositoryWorld<Repository: TaskRepository> {
-    task_repository: Repository,
-    task_count: usize,
-}
-
-#[derive(cucumber::World, Debug)]
-pub struct World {
-    task_repository: InMemoryTaskRepository,
-    task_count: usize,
-}
-
-impl Default for World {
-    fn default() -> Self {
-        Self {
-            task_repository: InMemoryTaskRepository::new(),
-            task_count: 0,
-        }
-    }
-}
+use crate::utils::parameters::ids::SnowflakeParameter;
+use crate::steps::repositories::tasks::TaskRepositoryWorld;
+use crate::steps::repositories::tasks::TaskRepositoryWorldHandle;
 
 #[given(expr = "a repository with {int} task(s)")]
-pub fn setup(world: &mut World, task_count: usize) {
+pub fn setup<Handle: TaskRepositoryWorldHandle>(world: &mut TaskRepositoryWorld<Handle>, task_count: usize) {
     add(world, task_count);
 }
 
 #[when(expr = "adding {int} task(s)")]
-pub fn add(world: &mut World, task_count: usize) {
+pub fn add<Handle: TaskRepositoryWorldHandle>(world: &mut TaskRepositoryWorld<Handle>, task_count: usize) {
     (0..task_count)
         .map(|i| (i + world.task_count).to_string())
         .map(|s| SnowflakeParameter::from_str(&s).unwrap().into())
@@ -53,7 +35,7 @@ pub fn add(world: &mut World, task_count: usize) {
 }
 
 #[when(expr = "removing {int} task(s)")]
-pub fn remove(world: &mut World, task_count: usize) {
+pub fn remove<Handle: TaskRepositoryWorldHandle>(world: &mut TaskRepositoryWorld<Handle>, task_count: usize) {
     (0..task_count)
         .map(|i| (i + world.task_count).to_string())
         .map(|s| SnowflakeParameter::from_str(&s).unwrap().into())
@@ -63,13 +45,13 @@ pub fn remove(world: &mut World, task_count: usize) {
 }
 
 #[when(expr = "clearing all tasks")]
-pub fn clear(world: &mut World) {
+pub fn clear<Handle: TaskRepositoryWorldHandle>(world: &mut TaskRepositoryWorld<Handle>) {
     world.task_repository.clear();
     world.task_count = 0;
 }
 
 #[then(expr = "the repository has {int} task(s)")]
-pub fn has(world: &mut World, task_count: usize) {
+pub fn has<Handle: TaskRepositoryWorldHandle>(world: &mut TaskRepositoryWorld<Handle>, task_count: usize) {
     assert_eq!(world.task_count, task_count);
 
     let tasks = (0..task_count)
