@@ -6,7 +6,7 @@ use domain::ids::SnowflakeSequenceNumber;
 use domain::ids::SnowflakeWorkerNumber;
 use use_cases::gateways::providers::ids::SnowflakeProvider;
 
-#[derive(New, Debug, Default)]
+#[derive(New, Default)]
 pub struct CentralizedSnowflakeProvider {
     worker_number: SnowflakeWorkerNumber,
     sequence_number: AtomicU16,

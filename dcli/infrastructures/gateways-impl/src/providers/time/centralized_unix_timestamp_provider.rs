@@ -5,7 +5,7 @@ use axiom::behaviours::New;
 use domain::time::Timestamp;
 use use_cases::gateways::providers::time::TimestampProvider;
 
-#[derive(New, Debug)]
+#[derive(New)]
 pub struct CentralizedSystemTimestampProvider;
 
 impl TimestampProvider for CentralizedSystemTimestampProvider {
