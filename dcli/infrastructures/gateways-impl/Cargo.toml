@@ -15,6 +15,7 @@ triomphe = { version = "0.1", optional = true }
 uuid = { version = "1.12", features = ["v4", "fast-rng", "macro-diagnostics"], optional = true }
 
 [dev-dependencies]
+rayon = "1.10"
 
 [features]
 chrono = ["dep:chrono"]
