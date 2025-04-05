@@ -15,8 +15,6 @@ triomphe = { version = "0.1", optional = true }
 uuid = { version = "1.12", features = ["v4", "fast-rng", "macro-diagnostics"], optional = true }
 
 [dev-dependencies]
-cucumber = "0.21"
-tokio = { version = "1.44", features = ["macros", "rt-multi-thread"] }
 rspec = "1.0"
 
 [features]
@@ -25,7 +23,7 @@ triomphe = ["dep:triomphe"]
 uuid = ["dep:uuid"]
 
 [lib]
-# test = false
+test = false
 doctest = false
 # harness = false
 

@@ -15,31 +15,31 @@ pub struct TaskRepositorySuite;
 impl TaskRepositorySuite {
     pub fn with<Handle: TaskRepositoryEnvironmentHandle + 'static>(env: TaskRepositoryEnvironment<Handle>) -> Suite<TaskRepositoryEnvironment<Handle>> {
         rspec::suite(std::any::type_name::<Handle::TaskRepository>().rsplit("::").next().unwrap(), env.clone(), |_| {
-            given("an empty repository", env.clone(), |ctx| {
+            rspec::run(&given("an empty repository", env.clone(), |ctx| {
                 ctx.before(given_empty_repository);
 
                 ctx.when("adding task 0", |ctx| {
                     ctx.before(|env| when_adding_task(env, 0));
                     ctx.then("the repository contains task 0", |env| then_contains_only_task(env, 0));
                 });
-            });
+            }));
 
-            given("an empty repository", env.clone(), |ctx| {
+            rspec::run(&given("an empty repository", env.clone(), |ctx| {
                 ctx.before(given_empty_repository);
 
                 ctx.when("removing task 0", |ctx| {
                     ctx.then("the repository is empty", |env| then_empty(env));
                 });
-            });
+            }));
 
-            given("a repository containing tasks 0 to 1024", env.clone(), |ctx| {
+            rspec::run(&given("a repository containing tasks 0 to 1024", env.clone(), |ctx| {
                 ctx.before(|env| given_repository_containing_tasks_range(env, 0..=1024));
 
                 ctx.when("removing task 444", |ctx| {
                     ctx.before(|env| when_removing_task(env, 444));
                     ctx.then("the repository contains task 0 to 1024 except 444", |env| then_contains_tasks_except(env, 0..=1024, 444));
                 });
-            });
+            }));
         })
     }
 }
