@@ -50,11 +50,11 @@ fn derive_for_single_fielded_tuple_struct(
 
     quote! {
         impl #struct_impl_generics #struct_ident #struct_type_generics #struct_where_clause {
-            pub fn #as_method_ident(&self) -> &#field_type {
+            fn #as_method_ident(&self) -> &#field_type {
                 return &self.0;
             }
 
-            pub fn #to_method_ident(self) -> #field_type {
+            fn #to_method_ident(self) -> #field_type {
                 return self.0;
             }
         }

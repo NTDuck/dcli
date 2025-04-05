@@ -13,6 +13,7 @@ domain = { path = "../domain" }
 boundaries = []
 gateways = []
 interactors = ["boundaries", "gateways"]
+test = []
 
 [lib]
 test = false

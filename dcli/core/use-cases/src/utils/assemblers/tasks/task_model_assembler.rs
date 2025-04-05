@@ -25,7 +25,7 @@ impl<Handle: PointerHandle> TaskModelAssembler<Handle> {
         let created_at = task.id.get_timestamp();
 
         return TaskModel {
-            id: task.id.to_u64(),
+            id: task.id.into(),
             description: task.description.to_string(),
             status: self.task_status_model_assembler.assemble(task.status),
             created_at: self.timestamp_formatter.as_ref().format(created_at),
