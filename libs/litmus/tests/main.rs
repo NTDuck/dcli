@@ -34,3 +34,25 @@ fn long_computation() -> Result<(), Failed> {
 fn compile_fail_dummy() -> Result<(), Failed> {
     Ok(())
 }
+
+/*
+Consumer API should look like this:
+Feature ~ Into<Trial>
+
+let args = {...}
+let feature = Feature::named("Task Repository")
+    .with(Background::unnamed()
+        .given("foo", {...})
+        .and("bar", {...}))
+    .with(Rule::named("`save()` works")
+        .with(Scenario::unnamed()
+            .given("pre 1", {...})
+            .and("pre 2", {...})
+            .when("action", {...})
+            .and("other action", {...})
+            .then("outcome", {...})
+            .but("outcome", {...})));
+litmus::run(feature);
+
+this is pretty ergonomic!
+*/
