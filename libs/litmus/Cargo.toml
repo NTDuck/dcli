@@ -1,0 +1,19 @@
+[package]
+name = "litmus"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+libtest-mimic = "0.8"
+
+[lib]
+test = false
+doctest = false
+
+[lints]
+workspace = true
+
+[[test]]
+name = "main"
+path = "tests/main.rs"
+harness = false
