@@ -1,5 +1,5 @@
 use std::{process::ExitCode, thread, time};
-use libtest_mimic::{Arguments, Trial, Failed};
+use libtest::{Arguments, Trial, Failed};
 
 pub fn main() -> ExitCode {
     let args = Arguments::from_args();
@@ -12,7 +12,7 @@ pub fn main() -> ExitCode {
         Trial::test("check_katara", check_katara),
     ];
 
-    libtest_mimic::run(&args, tests).exit_code()
+    libtest::run(&args, tests).exit_code()
 }
 
 // Tests
