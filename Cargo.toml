@@ -11,6 +11,9 @@ resolver = "2"
 
 [workspace.package]
 edition = "2021"
+license = "BSD-3-Clause"
+repository = "https://github.com/NTDuck/dcli"
+publish = false
 
 [workspace.dependencies]
 # Cross-cutting concerns, centralized

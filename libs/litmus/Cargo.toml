@@ -1,7 +1,11 @@
 [package]
 name = "litmus"
 version = "0.1.0"
+description = "a macro-free BDD test harness."
 edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = true
 
 [dependencies]
 libtest = { package = "libtest-mimic", version = "0.8" }
