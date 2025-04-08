@@ -1,20 +1,22 @@
+mod empty;
 mod given;
 mod when;
 mod then;
 
+pub use self::empty::*;
 pub use self::given::*;
 pub use self::when::*;
 pub use self::then::*;
 
 use crate::utils::aliases::MaybeOwnedStr;
 
-pub(crate) struct Step<Body> {
+pub(crate) struct Step<FnImpl> {
     pub label: StepLabel,
     pub description: MaybeOwnedStr,
-    pub body: Body,
+    pub callback: FnImpl,
 }
 
-impl<Body> std::fmt::Display for Step<Body> {
+impl<FnImpl> std::fmt::Display for Step<FnImpl> {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(formatter, "{} {}", self.label, self.description)
     }
@@ -27,20 +29,4 @@ pub(crate) enum StepLabel {
     Then,
     And,
     But,
-}
-
-pub(crate) trait StepBody: Send + 'static {}
-
-impl<T> StepBody for T
-where
-    T: Send + 'static
-{
-}
-
-pub(crate) trait World: Default {}
-
-impl<T> World for T
-where
-    T: Default,
-{
 }
