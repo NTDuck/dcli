@@ -37,13 +37,16 @@ where
 
 impl<'g, 'w, 't, G, W, T, World> From<Scenario<'g, 'w, 't, G, W, T, World>> for libtest::Trial
 where
-    G: FnOnce(&mut World) + Send,
-    W: FnOnce(&mut World) + Send,
-    T: FnOnce(&World) + Send,
+    'g: 'static,
+    'w: 'static,
+    't: 'static,
+    G: FnOnce(&mut World) + Send + 'static,
+    W: FnOnce(&mut World) + Send + 'static,
+    T: FnOnce(&World) + Send + 'static,
     World: Default,
 {
     fn from(scenario: Scenario<'g, 'w, 't, G, W, T, World>) -> Self {
-        let body = || {
+        let scenario_body = move || {
             let mut world = World::default();
 
             scenario.given_steps
@@ -64,7 +67,7 @@ where
             Result::<(), libtest::Failed>::Ok(())
         };
         
-        libtest::Trial::test(scenario.description, body)
+        libtest::Trial::test(scenario.description, scenario_body)
     }
 }
 
@@ -88,7 +91,7 @@ impl<'s> ScenarioEmptyState<'s> {
         let given_steps = vec![step];
 
         ScenarioGivenState {
-            scenario_description: self.scenario_description,
+            description: self.scenario_description,
             given_steps,
             _phantom: PhantomData,
         }

@@ -1,58 +1,83 @@
-use std::{process::ExitCode, thread, time};
+use std::{collections::{HashMap, HashSet}, marker::PhantomData, mem::MaybeUninit, process::ExitCode, thread, time};
 use libtest::{Arguments, Trial, Failed};
+use litmus::elements::Scenario;
 
 pub fn main() -> ExitCode {
-    let args = Arguments::from_args();
+    type World = RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>;
 
+    // let args = Arguments::from_args();
+    // let tests = Scenario::unnamed()
+    //     .given("an empty repository", |_: World| {})
+    //     .when("adding task 0", |world| {});
     let tests = vec![
-        Trial::test("check_toph", check_toph),
-        Trial::test("check_sokka", check_sokka),
-        Trial::test("long_computation", long_computation).with_ignored_flag(true),
-        Trial::test("foo", compile_fail_dummy).with_kind("compile-fail"),
-        Trial::test("check_katara", check_katara),
+        libtest::Trial::test(name, runner)
     ];
-
-    libtest::run(&args, tests).exit_code()
 }
 
-// Tests
+pub trait Repository<T> {
+    fn add(&mut self, item: T);
+    fn remove(&mut self, item: T);
+    fn clear(&mut self);
 
-fn check_toph() -> Result<(), Failed> {
-    Ok(())
-}
-fn check_katara() -> Result<(), Failed> {
-    Ok(())
-}
-fn check_sokka() -> Result<(), Failed> {
-    Ok(())
-    // Err("Sokka tripped and fell :(".into())
-}
-fn long_computation() -> Result<(), Failed> {
-    thread::sleep(time::Duration::from_secs(1));
-    Ok(())
-}
-fn compile_fail_dummy() -> Result<(), Failed> {
-    Ok(())
+    fn contains(&self, item: T) -> bool;
 }
 
-/*
-Consumer API should look like this:
-Feature ~ Into<Trial>
+pub struct RepositoryWorld<T, Handle: RepositoryWorldHandle<T>> {
+    pub repository: Handle::Repository,
+}
 
-let args = {...}
-let feature = Feature::named("Task Repository")
-    .with(Background::unnamed()
-        .given("foo", {...})
-        .and("bar", {...}))
-    .with(Rule::named("`save()` works")
-        .with(Scenario::unnamed()
-            .given("pre 1", {...})
-            .and("pre 2", {...})
-            .when("action", {...})
-            .and("other action", {...})
-            .then("outcome", {...})
-            .but("outcome", {...})));
-litmus::run(feature);
+impl<T, Handle: RepositoryWorldHandle<T>> Default for RepositoryWorld<T, Handle> {
+    fn default() -> Self {
+        Self {
+            repository: Handle::default(),
+        }
+    }
+}
 
-this is pretty ergonomic!
-*/
+pub trait RepositoryWorldHandle<T> {
+    type Repository: Repository<T>;
+
+    fn default() -> Self::Repository;
+}
+
+pub struct InMemoryRepository<T>(HashSet<T>);
+
+impl<T> Default for InMemoryRepository<T> {
+    fn default() -> Self {
+        Self(HashSet::new())
+    }
+}
+
+impl<T> Repository<T> for InMemoryRepository<T>
+where
+    T: Eq + std::hash::Hash,
+{
+    fn add(&mut self, item: T) {
+        self.0.insert(item);
+    }
+    
+    fn remove(&mut self, item: T) {
+        self.0.remove(&item);
+    }
+    
+    fn clear(&mut self) {
+        self.0.clear();
+    }
+    
+    fn contains(&self, item: T) -> bool {
+        self.0.contains(&item)
+    }
+}
+
+pub struct InMemoryRepositoryWorldHandle<T>(PhantomData<T>);
+
+impl<T> RepositoryWorldHandle<T> for InMemoryRepositoryWorldHandle<T>
+where
+    T: Eq + std::hash::Hash,
+{
+    type Repository = InMemoryRepository<T>;
+    
+    fn default() -> Self::Repository {
+        Self::Repository::default()
+    }
+}
