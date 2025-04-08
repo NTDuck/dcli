@@ -9,6 +9,7 @@ publish = true
 
 [dependencies]
 libtest = { package = "libtest-mimic", version = "0.8" }
+strum = { version = "0.27", features = ["derive"] }
 
 [lib]
 test = false

@@ -1,7 +1,7 @@
 mod given;
-mod then;
 mod when;
+mod then;
 
 pub use self::given::*;
-pub use self::then::*;
 pub use self::when::*;
+pub use self::then::*;
