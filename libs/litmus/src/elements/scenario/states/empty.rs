@@ -1,16 +1,21 @@
+use std::marker::PhantomData;
+
 use crate::{elements::{GivenFn, World}, utils::aliases::MaybeOwnedStr};
 
 use super::{ScenarioGivenState, Step, StepLabel};
 
-pub struct ScenarioEmptyState {
+pub struct ScenarioEmptyState<WorldImpl> {
     pub(crate) description: Option<MaybeOwnedStr>,
+    pub(crate) world: PhantomData<WorldImpl>,
 }
 
-impl ScenarioEmptyState {
-    pub fn given<GivenFnImpl, WorldImpl>(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<GivenFnImpl>) -> ScenarioGivenState<GivenFnImpl>
+impl<WorldImpl> ScenarioEmptyState<WorldImpl>
+where
+    WorldImpl: World,
+{
+    pub fn given<GivenFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: GivenFnImpl) -> ScenarioGivenState<GivenFnImpl, WorldImpl>
     where
         GivenFnImpl: GivenFn<WorldImpl>,
-        WorldImpl: World,
     {
         let step = Step {
             label: StepLabel::Given,
@@ -23,6 +28,7 @@ impl ScenarioEmptyState {
         ScenarioGivenState {
             description: self.description,
             given_steps,
+            world: self.world,
         }
     }
 }

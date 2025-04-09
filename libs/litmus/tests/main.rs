@@ -7,7 +7,7 @@ pub fn main() -> ExitCode {
 
     let args = Arguments::from_args();
     let tests = vec![
-        Scenario::unnamed()
+        Scenario::<World>::unnamed()
             .given("an empty repository", (|_: &mut World| {}).infallible())
             .when("adding task 0", (|world: &mut World| world.repository.add(0)).infallible())
             .then("the repository should contain task 0", |world: &World| {
@@ -15,8 +15,7 @@ pub fn main() -> ExitCode {
                     return Err(Failed::from("Expected task 0 to be present, found absent"));
                 }
                 Ok(())
-            })
-            .into_trail(),
+            }),
     ];
 
     litmus::run(&args, tests).exit_code()

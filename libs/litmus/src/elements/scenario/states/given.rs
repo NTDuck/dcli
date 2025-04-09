@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use crate::elements::GivenFn;
 use crate::elements::WhenFn;
 use crate::elements::World;
@@ -7,17 +9,18 @@ use super::Step;
 use super::StepLabel;
 use super::ScenarioWhenState;
 
-pub struct ScenarioGivenState<GivenFnImpl> {
+pub struct ScenarioGivenState<GivenFnImpl, WorldImpl> {
     pub(crate) description: Option<MaybeOwnedStr>,
     pub(crate) given_steps: Vec<Step<GivenFnImpl>>,
+    pub(crate) world: PhantomData<WorldImpl>,
 }
 
-impl<GivenFnImpl> ScenarioGivenState<GivenFnImpl> {
-    pub fn and<WorldImpl>(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<GivenFnImpl>) -> Self
-    where
-        GivenFnImpl: GivenFn<WorldImpl>,
-        WorldImpl: World,
-    {
+impl<GivenFnImpl, WorldImpl> ScenarioGivenState<GivenFnImpl, WorldImpl>
+where
+    GivenFnImpl: GivenFn<WorldImpl>,
+    WorldImpl: World,
+{
+    pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: GivenFnImpl) -> Self {
         let step = Step {
             label: StepLabel::And,
             description: description.into(),
@@ -27,11 +30,7 @@ impl<GivenFnImpl> ScenarioGivenState<GivenFnImpl> {
         self.with_step(step)
     }
 
-    pub fn but<WorldImpl>(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<GivenFnImpl>) -> Self
-    where
-        GivenFnImpl: GivenFn<WorldImpl>,
-        WorldImpl: World,
-    {
+    pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: GivenFnImpl) -> Self {
         let step = Step {
             label: StepLabel::But,
             description: description.into(),
@@ -41,11 +40,9 @@ impl<GivenFnImpl> ScenarioGivenState<GivenFnImpl> {
         self.with_step(step)
     }
 
-    pub fn when<WhenFnImpl, WorldImpl>(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<WhenFnImpl>) -> ScenarioWhenState<GivenFnImpl, WhenFnImpl>
+    pub fn when<WhenFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: WhenFnImpl) -> ScenarioWhenState<GivenFnImpl, WhenFnImpl, WorldImpl>
     where
-        GivenFnImpl: GivenFn<WorldImpl>,
         WhenFnImpl: WhenFn<WorldImpl>,
-        WorldImpl: World,
     {
         let step = Step {
             label: StepLabel::When,
@@ -59,16 +56,13 @@ impl<GivenFnImpl> ScenarioGivenState<GivenFnImpl> {
             description: self.description,
             given_steps: self.given_steps,
             when_steps,
+            world: self.world,
         }
     }
 
-    fn with_step<WorldImpl>(self, step: impl Into<Step<GivenFnImpl>>) -> Self
-    where
-        GivenFnImpl: GivenFn<WorldImpl>,
-        WorldImpl: World,
-    {
+    fn with_step(self, step: Step<GivenFnImpl>) -> Self {
         let mut given_steps = self.given_steps;
-        given_steps.push(step.into());
+        given_steps.push(step);
 
         Self {
             given_steps,

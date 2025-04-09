@@ -1,22 +1,25 @@
-use crate::{elements::{GivenFn, ThenFn, WhenFn, World}, utils::aliases::MaybeOwnedStr, IntoTrial};
+use std::marker::PhantomData;
+
+use crate::{elements::{GivenFn, ThenFn, WhenFn, World}, utils::aliases::MaybeOwnedStr};
 
 use super::{Step, StepLabel};
 
-pub struct ScenarioThenState<GivenFnImpl, WhenFnImpl, ThenFnImpl> {
+pub struct ScenarioThenState<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl> {
     pub(crate) description: Option<MaybeOwnedStr>,
     pub(crate) given_steps: Vec<Step<GivenFnImpl>>,
     pub(crate) when_steps: Vec<Step<WhenFnImpl>>,
     pub(crate) then_steps: Vec<Step<ThenFnImpl>>,
+    pub(crate) world: PhantomData<WorldImpl>,
 }
 
-impl<GivenFnImpl, WhenFnImpl, ThenFnImpl> ScenarioThenState<GivenFnImpl, WhenFnImpl, ThenFnImpl> {
-    pub fn and<WorldImpl>(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<ThenFnImpl>) -> Self
-    where
-        GivenFnImpl: GivenFn<WorldImpl>,
-        WhenFnImpl: WhenFn<WorldImpl>,
-        ThenFnImpl: ThenFn<WorldImpl>,
-        WorldImpl: World,
-    {
+impl<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl> ScenarioThenState<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl>
+where
+    GivenFnImpl: GivenFn<WorldImpl>,
+    WhenFnImpl: WhenFn<WorldImpl>,
+    ThenFnImpl: ThenFn<WorldImpl>,
+    WorldImpl: World,
+{
+    pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: ThenFnImpl) -> Self {
         let step = Step {
             label: StepLabel::And,
             description: description.into(),
@@ -26,13 +29,7 @@ impl<GivenFnImpl, WhenFnImpl, ThenFnImpl> ScenarioThenState<GivenFnImpl, WhenFnI
         self.with_step(step)
     }
 
-    pub fn but<WorldImpl>(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<ThenFnImpl>) -> Self
-    where
-        GivenFnImpl: GivenFn<WorldImpl>,
-        WhenFnImpl: WhenFn<WorldImpl>,
-        ThenFnImpl: ThenFn<WorldImpl>,
-        WorldImpl: World,
-    {
+    pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: ThenFnImpl) -> Self {
         let step = Step {
             label: StepLabel::But,
             description: description.into(),
@@ -42,15 +39,9 @@ impl<GivenFnImpl, WhenFnImpl, ThenFnImpl> ScenarioThenState<GivenFnImpl, WhenFnI
         self.with_step(step)
     }
 
-    fn with_step<WorldImpl>(self, step: impl Into<Step<ThenFnImpl>>) -> Self
-    where
-        GivenFnImpl: GivenFn<WorldImpl>,
-        WhenFnImpl: WhenFn<WorldImpl>,
-        ThenFnImpl: ThenFn<WorldImpl>,
-        WorldImpl: World,
-    {
+    fn with_step(self, step: Step<ThenFnImpl>) -> Self {
         let mut then_steps = self.then_steps;
-        then_steps.push(step.into());
+        then_steps.push(step);
 
         Self {
             then_steps,
@@ -59,20 +50,21 @@ impl<GivenFnImpl, WhenFnImpl, ThenFnImpl> ScenarioThenState<GivenFnImpl, WhenFnI
     }
 }
 
-impl<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl> IntoTrial<WorldImpl> for ScenarioThenState<GivenFnImpl, WhenFnImpl, ThenFnImpl>
+impl<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl> From<ScenarioThenState<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl>> for libtest::Trial
 where
     GivenFnImpl: GivenFn<WorldImpl>,
     WhenFnImpl: WhenFn<WorldImpl>,
     ThenFnImpl: ThenFn<WorldImpl>,
     WorldImpl: World,
-{
-    fn into_trail(self) -> libtest::Trial {
-        let Self {
+{    
+    fn from(scenario: ScenarioThenState<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl>) -> Self {
+        let ScenarioThenState {
             description,
             given_steps,
             when_steps,
             then_steps,
-        } = self;
+            ..
+        } = scenario;
 
         let description = match description {
             Some(description) => description,
