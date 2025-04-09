@@ -10,12 +10,8 @@ pub fn main() -> ExitCode {
         Scenario::<World>::unnamed()
             .given("an empty repository", |_| Ok(()))
             .when("adding task 0", |world| world.repository.add(0).ok())
-            .then("the repository should contain task 0", |world| {
-                world.repository.contains(&0)
-                    .expect(true, "expected task 0 to be present, found absent")?;
-
-                Ok(())
-            })
+            .then("the repository should contain task 0", |world| world.repository.contains(&0)
+                .expect(true, "expected task 0 to be present, found absent"))
     ];
 
     litmus::run(&args, tests).exit_code()
