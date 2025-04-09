@@ -1,21 +1,33 @@
 use std::{collections::HashSet, marker::PhantomData, process::ExitCode};
 use libtest::{Arguments, Failed};
-use litmus::{elements::Scenario, InfallibleExt, IntoTrial};
+use litmus::{elements::Scenario, InfallibleExt};
 
 pub fn main() -> ExitCode {
     type World = RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>;
+    type GivenFn = fn(&mut World) -> Result<(), Failed>;
+    type WhenFn = fn(&mut World) -> Result<(), Failed>;
+    type ThenFn = fn(&World) -> Result<(), Failed>;
 
     let args = Arguments::from_args();
     let tests = vec![
         Scenario::<World>::unnamed()
-            .given("an empty repository", (|_: &mut World| {}).infallible())
-            .when("adding task 0", (|world: &mut World| world.repository.add(0)).infallible())
-            .then("the repository should contain task 0", |world: &World| {
-                if !world.repository.contains(&0) {
-                    return Err(Failed::from("Expected task 0 to be present, found absent"));
+            .given::<GivenFn>(
+                "an empty repository", 
+                |_: &mut World| Ok(())
+            )
+            .when::<WhenFn>(
+                "adding task 0", 
+                (|world: &mut World| { world.repository.add(0); Ok(()) })
+            )
+            .then::<ThenFn>(
+                "the repository should contain task 0", 
+                |world: &World| {
+                    if !world.repository.contains(&0) {
+                        return Err("Expected task 0 to be present, found absent".into());
+                    }
+                    Ok(())
                 }
-                Ok(())
-            }),
+            )
     ];
 
     litmus::run(&args, tests).exit_code()

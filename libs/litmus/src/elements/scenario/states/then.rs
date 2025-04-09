@@ -99,7 +99,7 @@ where
                         .map(|step| format!("{}", step))
                 )
                 .collect::<Vec<_>>()
-                .join(" ")
+                .join(" | ")
                 .into()
         }
 
