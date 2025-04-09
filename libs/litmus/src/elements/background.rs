@@ -168,7 +168,7 @@ where
     }
 }
 
-pub(super) struct FinalizedBackground<GivenStepFnImpl, WorldImpl> {
+pub struct FinalizedBackground<GivenStepFnImpl, WorldImpl> {
     pub(super) description: MaybeOwnedStr,
     pub(super) ignored: bool,
 
