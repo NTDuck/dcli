@@ -1,3 +1,4 @@
+mod aliases;
 mod background;
 mod feature;
 mod rule;
