@@ -338,7 +338,7 @@ where
     }
 }
 
-pub(super) struct FinalizedScenario<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl> {
+pub struct FinalizedScenario<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl> {
     pub(super) description: MaybeOwnedStr,
     pub(super) ignored: bool,
 
