@@ -335,20 +335,20 @@ where
 }
 
 pub(super) struct FinalizedScenario<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl> {
-    description: MaybeOwnedStr,
-    ignored: bool,
+    pub(super) description: MaybeOwnedStr,
+    pub(super) ignored: bool,
 
-    given_step_callbacks: Vec<GivenStepFnImpl>,
-    when_step_callbacks: Vec<WhenStepFnImpl>,
-    then_step_callbacks: Vec<ThenStepFnImpl>,
+    pub(super) given_step_callbacks: Vec<GivenStepFnImpl>,
+    pub(super) when_step_callbacks: Vec<WhenStepFnImpl>,
+    pub(super) then_step_callbacks: Vec<ThenStepFnImpl>,
 
     phantom: PhantomData<WorldImpl>,
 }
 
 struct Step<StepFnImpl> {
-    pub label: StepLabel,
-    pub description: MaybeOwnedStr,
-    pub callback: StepFnImpl,
+    label: StepLabel,
+    description: MaybeOwnedStr,
+    callback: StepFnImpl,
 }
 
 impl<StepFnImpl> std::fmt::Display for Step<StepFnImpl> {
