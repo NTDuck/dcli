@@ -1,9 +1,13 @@
 use std::marker::PhantomData;
 
-use crate::elements::aliases::World;
-use crate::elements::aliases::GivenStepFn;
-use crate::elements::aliases::ThenStepFn;
-use crate::elements::aliases::WhenStepFn;
+use crate::elements::step::World;
+use crate::elements::step::GivenStepFn;
+use crate::elements::step::ThenStepFn;
+use crate::elements::step::WhenStepFn;
+use crate::elements::step::Step;
+use crate::elements::step::StepLabel;
+use crate::elements::VecExt;
+use crate::elements::VecStepExt;
 use crate::utils::aliases::MaybeOwnedStr;
 
 pub use UnconfiguredScenario as Scenario;
@@ -343,57 +347,4 @@ pub(super) struct FinalizedScenario<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnI
     pub(super) then_step_callbacks: Vec<ThenStepFnImpl>,
 
     phantom: PhantomData<WorldImpl>,
-}
-
-struct Step<StepFnImpl> {
-    label: StepLabel,
-    description: MaybeOwnedStr,
-    callback: StepFnImpl,
-}
-
-impl<StepFnImpl> std::fmt::Display for Step<StepFnImpl> {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(formatter, "{} {}", self.label, self.description)
-    }
-}
-
-#[derive(strum::Display)]
-enum StepLabel {
-    Given,
-    When,
-    Then,
-    And,
-    But,
-}
-
-trait VecExt<T> {
-    fn with(self, item: T) -> Self;
-}
-
-impl<T> VecExt<T> for Vec<T> {
-    fn with(self, item: T) -> Self {
-        let mut this = self;
-        this.push(item);
-        this
-    }
-}
-
-trait VecStepExt<StepFnImpl> {
-    fn format(&self) -> impl IntoIterator<Item = String>;
-    fn callbacks(self) -> Vec<StepFnImpl>;
-}
-
-impl<StepFnImpl> VecStepExt<StepFnImpl> for Vec<Step<StepFnImpl>> {
-    fn format(&self) -> impl IntoIterator<Item = String> {
-        self
-            .iter()
-            .map(|step| format!("{}", step))
-    }
-    
-    fn callbacks(self) -> Vec<StepFnImpl> {
-        self
-            .into_iter()
-            .map(|step| step.callback)
-            .collect()
-    }
 }
