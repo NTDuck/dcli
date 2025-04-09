@@ -1,15 +1,18 @@
-pub trait InfallibleExt<Args, E>: FnOnce(Args) -> () {
-    fn infallible(self) -> impl FnOnce(Args) -> Result<(), E>;
-}
+pub trait ResultExt<E> {
+    fn ok(&self) -> Result<(), E> {
+        Ok(())
+    }
 
-impl<T, Args, E> InfallibleExt<Args, E> for T
-where
-    T: FnOnce(Args) -> (),
-{
-    fn infallible(self) -> impl FnOnce(Args) -> Result<(), E> {
-        move |args| {
-            (self)(args);
+    fn expect(&self, value: impl Into<Self>, err: impl Into<E>) -> Result<(), E>
+    where
+        Self: Sized + PartialEq,
+    {
+        if *self != value.into() {
+            Err(err.into())
+        } else {
             Ok(())
         }
     }
 }
+
+impl<T> ResultExt<libtest::Failed> for T {}

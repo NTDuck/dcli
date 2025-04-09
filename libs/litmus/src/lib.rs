@@ -1,7 +1,7 @@
 pub mod elements;
 mod utils;
 
-pub use self::utils::extensions::InfallibleExt;
+pub use self::utils::extensions::ResultExt;
 
 pub fn run(args: &libtest::Arguments, tests: Vec<impl Into<libtest::Trial>>) -> libtest::Conclusion {
     let tests = tests
