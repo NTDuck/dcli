@@ -1,7 +1,6 @@
 use std::marker::PhantomData;
 
-use crate::{elements::{GivenFn, Scenario, ScenarioFn, ThenFn, WhenFn, World}, utils::aliases::MaybeOwnedStr};
-use crate::utils::extensions::InfallibleExt;
+use crate::{elements::{GivenFn, Scenario, ThenFn, WhenFn, World}, utils::aliases::MaybeOwnedStr};
 
 use super::{Step, StepLabel};
 
@@ -62,15 +61,32 @@ impl<GivenFnImpl, WhenFnImpl, ThenFnImpl> ScenarioThenState<GivenFnImpl, WhenFnI
     }
 }
 
-impl<GivenFnImpl, WhenFnImpl, ThenFnImpl, ScenarioFnImpl, WorldImpl> From<ScenarioThenState<GivenFnImpl, WhenFnImpl, ThenFnImpl>> for Scenario<ScenarioFnImpl, WorldImpl>
+impl<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl> From<ScenarioThenState<GivenFnImpl, WhenFnImpl, ThenFnImpl>> for Scenario<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl>
 where
     GivenFnImpl: GivenFn<WorldImpl>,
     WhenFnImpl: WhenFn<WorldImpl>,
     ThenFnImpl: ThenFn<WorldImpl>,
-    ScenarioFnImpl: ScenarioFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(state: ScenarioThenState<GivenFnImpl, WhenFnImpl, ThenFnImpl>) -> Self {
+        let ScenarioThenState {
+            description,
+            given_steps,
+            when_steps,
+            then_steps,
+        } = state;
+
+        return Self {
+            description: match description {
+                Some(description) => description,
+                None => compute_description(&given_steps, &when_steps, &then_steps),
+            },
+            given_steps,
+            when_steps,
+            then_steps,
+            _phantom: PhantomData,
+        };
+
         fn compute_description<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl>(
             given_steps: &[Step<GivenFnImpl>],
             when_steps: &[Step<WhenFnImpl>],
@@ -98,55 +114,6 @@ where
                 .collect::<Vec<_>>()
                 .join(" ")
                 .into()
-            }
-
-        fn compute_callback<GivenFnImpl, WhenFnImpl, ThenFnImpl, ScenarioFnImpl, WorldImpl>(
-            given_steps: &[Step<GivenFnImpl>],
-            when_steps: &[Step<WhenFnImpl>],
-            then_steps: &[Step<ThenFnImpl>],
-        ) -> impl ScenarioFn<WorldImpl>
-        where
-            GivenFnImpl: GivenFn<WorldImpl>,
-            WhenFnImpl: WhenFn<WorldImpl>,
-            ThenFnImpl: ThenFn<WorldImpl>,
-            WorldImpl: World,
-        {
-            move || {
-                let mut world = WorldImpl::default();
-    
-                given_steps
-                    .iter()
-                    .map(|step| step.callback)
-                    .try_for_each(|given| given(&mut world));
-    
-                when_steps
-                    .iter()
-                    .map(|step| step.callback)
-                    .try_for_each(|when| when(&mut world));
-    
-                then_steps
-                    .iter()
-                    .map(|step| step.callback)
-                    .try_for_each(|then| then(&world));
-    
-                Ok(())
-            }
-        }
-
-        let ScenarioThenState {
-            description,
-            given_steps,
-            when_steps,
-            then_steps,
-        } = state;
-
-        Self {
-            description: match description {
-                Some(description) => description,
-                None => compute_description(&given_steps, &when_steps, &then_steps),
-            },
-            callback: compute_callback(&given_steps, &when_steps, &then_steps),
-            _phantom: PhantomData,
         }
     }
 }

@@ -8,13 +8,15 @@ use crate::utils::aliases::MaybeOwnedStr;
 pub use self::aliases::*;
 pub use self::states::*;
 
-pub struct Scenario<ScenarioFnImpl, WorldImpl> {
+pub struct Scenario<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl> {
     pub(crate) description: MaybeOwnedStr,
-    pub(crate) callback: ScenarioFnImpl,
+    pub(crate) given_steps: Vec<Step<GivenFnImpl>>,
+    pub(crate) when_steps: Vec<Step<WhenFnImpl>>,
+    pub(crate) then_steps: Vec<Step<ThenFnImpl>>,
     pub(crate) _phantom: PhantomData<WorldImpl>,
 }
 
-impl<ScenarioFnImpl, WorldImpl> Scenario<ScenarioFnImpl, WorldImpl> {
+impl<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl> Scenario<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl> {
     pub fn named(description: impl Into<MaybeOwnedStr>) -> ScenarioEmptyState {
         ScenarioEmptyState {
             description: Some(description.into()),
@@ -28,12 +30,33 @@ impl<ScenarioFnImpl, WorldImpl> Scenario<ScenarioFnImpl, WorldImpl> {
     }
 }
 
-impl<ScenarioFnImpl, WorldImpl> From<Scenario<ScenarioFnImpl, WorldImpl>> for libtest::Trial
+impl<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl> From<Scenario<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl>> for libtest::Trial
 where
-    ScenarioFnImpl: ScenarioFn<WorldImpl>,
+    GivenFnImpl: GivenFn<WorldImpl>,
+    WhenFnImpl: WhenFn<WorldImpl>,
+    ThenFnImpl: ThenFn<WorldImpl>,
     WorldImpl: World,
 {
-    fn from(scenario: Scenario<ScenarioFnImpl, WorldImpl>) -> Self {
-        Self::test(scenario.description, scenario.callback)
+    fn from(scenario: Scenario<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl>) -> Self {
+        Self::test(scenario.description, move || {
+            let mut world = WorldImpl::default();
+
+            scenario.given_steps
+                .into_iter()
+                .map(|step| step.callback)
+                .try_for_each(|given| given(&mut world))?;
+
+            scenario.when_steps
+                .into_iter()
+                .map(|step| step.callback)
+                .try_for_each(|when| when(&mut world))?;
+
+            scenario.then_steps
+                .into_iter()
+                .map(|step| step.callback)
+                .try_for_each(|then| then(&world))?;
+
+            Ok(())
+        })
     }
 }

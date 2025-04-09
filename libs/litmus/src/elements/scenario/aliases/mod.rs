@@ -1,12 +1,3 @@
-pub trait ScenarioFn<WorldImpl>: FnOnce() -> Result<(), libtest::Failed> + Send + Sync + 'static {}
-
-impl<WorldImpl, T> ScenarioFn<WorldImpl> for T
-where
-    T: FnOnce() -> Result<(), libtest::Failed> + Send + Sync + 'static,
-    WorldImpl: World,
-{
-}
-
 pub trait GivenFn<WorldImpl>: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static {}
 
 impl<WorldImpl, T> GivenFn<WorldImpl> for T
