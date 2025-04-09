@@ -5,13 +5,12 @@ use crate::elements::step::GivenStepFn;
 use crate::elements::step::ThenStepFn;
 use crate::elements::step::WhenStepFn;
 use crate::elements::step::VecExt;
+use crate::elements::background::FinalizedBackground;
+use crate::elements::rule::FinalizedRule;
 use crate::elements::scenario::FinalizedScenario;
 use crate::utils::aliases::MaybeOwnedStr;
 
 pub use UnconfiguredFeature as Feature;
-
-use super::FinalizedBackground;
-use super::FinalizedRule;
 
 pub struct UnconfiguredFeature<WorldImpl> {
     phantom: PhantomData<WorldImpl>,
@@ -232,6 +231,18 @@ where
     WorldImpl: World,
 {
     fn from(feature: FeatureWithRulesOrScenariosLastConfigured<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>) -> Self {
+        let FeatureWithRulesOrScenariosLastConfigured {
+            description,
+            ignored,
+            
+            background,
+            rules,
+            scenarios,
+        } = feature;
+
+        // let capacity = rules.len() + scenarios.len();
+        // let trials = Vec::with_capacity(capacity);
+
         todo!()
     }
 }
