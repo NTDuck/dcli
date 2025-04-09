@@ -48,11 +48,11 @@ where
 {
 }
 
-pub trait World: Default {}
+pub trait World: Default + Send + Sync + 'static {}
 
 impl<T> World for T
 where
-    T: Default,
+    T: Default + Send + Sync + 'static,
 {
 }
 

@@ -228,21 +228,80 @@ where
 impl<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl> From<FeatureWithRulesOrScenariosLastConfigured<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>> for Vec<libtest::Trial>
 where
     GivenStepFnImpl: GivenStepFn<WorldImpl>,
+    WhenStepFnImpl: WhenStepFn<WorldImpl>,
+    ThenStepFnImpl: ThenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(feature: FeatureWithRulesOrScenariosLastConfigured<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>) -> Self {
-        let FeatureWithRulesOrScenariosLastConfigured {
-            description,
-            ignored,
-            
-            background,
-            rules,
-            scenarios,
-        } = feature;
+        let capacity = feature.rules.len() + feature.scenarios.len();
+        let mut trials = Vec::with_capacity(capacity);
 
-        // let capacity = rules.len() + scenarios.len();
-        // let trials = Vec::with_capacity(capacity);
+        feature.scenarios
+            .into_iter()
+            .map(|scenario| libtest::Trial::test(scenario.description, move || {
+                let mut world = WorldImpl::default();
 
-        todo!()
+                if let Some(background) = feature.background {
+                    background.given_step_callbacks
+                        .into_iter()
+                        .try_for_each(|given| given(&mut world))?;
+                }
+
+                scenario.given_step_callbacks
+                    .into_iter()
+                    .try_for_each(|given| given(&mut world))?;
+
+                scenario.when_step_callbacks
+                    .into_iter()
+                    .try_for_each(|when| when(&mut world))?;
+
+                scenario.then_step_callbacks
+                    .into_iter()
+                    .try_for_each(|then| then(&world))?;
+
+                Ok(())
+            })
+                .with_ignored_flag(scenario.ignored)
+                .with_kind(format!("{}", feature.description)))
+            .for_each(|trial| trials.push(trial));
+
+        feature.rules
+            .into_iter()
+            .map(|rule| rule.scenarios
+                .into_iter()
+                .map(|scenario| libtest::Trial::test(scenario.description, move || {
+                    let mut world = WorldImpl::default();
+    
+                    if let Some(background) = feature.background {
+                        background.given_step_callbacks
+                            .into_iter()
+                            .try_for_each(|given| given(&mut world))?;
+                    }
+
+                    if let Some(background) = rule.background {
+                        background.given_step_callbacks
+                            .into_iter()
+                            .try_for_each(|given| given(&mut world))?;
+                    }
+    
+                    scenario.given_step_callbacks
+                        .into_iter()
+                        .try_for_each(|given| given(&mut world))?;
+    
+                    scenario.when_step_callbacks
+                        .into_iter()
+                        .try_for_each(|when| when(&mut world))?;
+    
+                    scenario.then_step_callbacks
+                        .into_iter()
+                        .try_for_each(|then| then(&world))?;
+    
+                    Ok(())
+                })
+                    .with_ignored_flag(rule.ignored || scenario.ignored)
+                    .with_kind(format!("{} | {}", feature.description, rule.description)))
+                .for_each(|trial| trials.push(trial)));
+        
+        trials
     }
 }
