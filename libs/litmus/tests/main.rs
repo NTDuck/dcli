@@ -1,25 +1,33 @@
-use std::{collections::{HashMap, HashSet}, marker::PhantomData, mem::MaybeUninit, process::ExitCode, thread, time};
-use libtest::{Arguments, Trial, Failed};
-use litmus::elements::Scenario;
+use std::{collections::HashSet, marker::PhantomData, process::ExitCode};
+use libtest::{Arguments, Failed};
+use litmus::{elements::Scenario, InfallibleExt, IntoTrial};
 
 pub fn main() -> ExitCode {
     type World = RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>;
 
-    // let args = Arguments::from_args();
-    // let tests = Scenario::unnamed()
-    //     .given("an empty repository", |_: World| {})
-    //     .when("adding task 0", |world| {});
+    let args = Arguments::from_args();
     let tests = vec![
-        libtest::Trial::test(name, runner)
+        Scenario::unnamed()
+            .given("an empty repository", (|_: &mut World| {}).infallible())
+            .when("adding task 0", (|world: &mut World| world.repository.add(0)).infallible())
+            .then("the repository should contain task 0", |world: &World| {
+                if !world.repository.contains(&0) {
+                    return Err(Failed::from("Expected task 0 to be present, found absent"));
+                }
+                Ok(())
+            })
+            .into_trail(),
     ];
+
+    litmus::run(&args, tests).exit_code()
 }
 
 pub trait Repository<T> {
     fn add(&mut self, item: T);
-    fn remove(&mut self, item: T);
+    fn remove(&mut self, item: &T);
     fn clear(&mut self);
 
-    fn contains(&self, item: T) -> bool;
+    fn contains(&self, item: &T) -> bool;
 }
 
 pub struct RepositoryWorld<T, Handle: RepositoryWorldHandle<T>> {
@@ -56,16 +64,16 @@ where
         self.0.insert(item);
     }
     
-    fn remove(&mut self, item: T) {
-        self.0.remove(&item);
+    fn remove(&mut self, item: &T) {
+        self.0.remove(item);
     }
     
     fn clear(&mut self) {
         self.0.clear();
     }
     
-    fn contains(&self, item: T) -> bool {
-        self.0.contains(&item)
+    fn contains(&self, item: &T) -> bool {
+        self.0.contains(item)
     }
 }
 

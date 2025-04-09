@@ -1,6 +1,4 @@
-use std::marker::PhantomData;
-
-use crate::{elements::{GivenFn, Scenario, ThenFn, WhenFn, World}, utils::aliases::MaybeOwnedStr};
+use crate::{elements::{GivenFn, ThenFn, WhenFn, World}, utils::aliases::MaybeOwnedStr, IntoTrial};
 
 use super::{Step, StepLabel};
 
@@ -61,31 +59,28 @@ impl<GivenFnImpl, WhenFnImpl, ThenFnImpl> ScenarioThenState<GivenFnImpl, WhenFnI
     }
 }
 
-impl<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl> From<ScenarioThenState<GivenFnImpl, WhenFnImpl, ThenFnImpl>> for Scenario<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl>
+impl<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl> IntoTrial<WorldImpl> for ScenarioThenState<GivenFnImpl, WhenFnImpl, ThenFnImpl>
 where
     GivenFnImpl: GivenFn<WorldImpl>,
     WhenFnImpl: WhenFn<WorldImpl>,
     ThenFnImpl: ThenFn<WorldImpl>,
     WorldImpl: World,
 {
-    fn from(state: ScenarioThenState<GivenFnImpl, WhenFnImpl, ThenFnImpl>) -> Self {
-        let ScenarioThenState {
+    fn into_trail(self) -> libtest::Trial {
+        let Self {
             description,
             given_steps,
             when_steps,
             then_steps,
-        } = state;
+        } = self;
 
-        return Self {
-            description: match description {
-                Some(description) => description,
-                None => compute_description(&given_steps, &when_steps, &then_steps),
-            },
-            given_steps,
-            when_steps,
-            then_steps,
-            _phantom: PhantomData,
+        let description = match description {
+            Some(description) => description,
+            None => compute_description(&given_steps, &when_steps, &then_steps),
         };
+        let callback = compute_callback(given_steps, when_steps, then_steps);
+
+        return libtest::Trial::test(description, callback);
 
         fn compute_description<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl>(
             given_steps: &[Step<GivenFnImpl>],
@@ -114,6 +109,39 @@ where
                 .collect::<Vec<_>>()
                 .join(" ")
                 .into()
+        }
+
+        fn compute_callback<GivenFnImpl, WhenFnImpl, ThenFnImpl, WorldImpl>(
+            given_steps: Vec<Step<GivenFnImpl>>,
+            when_steps: Vec<Step<WhenFnImpl>>,
+            then_steps: Vec<Step<ThenFnImpl>>,
+        ) -> impl FnOnce() -> Result<(), libtest::Failed> + Send + 'static
+        where
+            GivenFnImpl: GivenFn<WorldImpl>,
+            WhenFnImpl: WhenFn<WorldImpl>,
+            ThenFnImpl: ThenFn<WorldImpl>,
+            WorldImpl: World,
+        {
+            move || {
+                let mut world = WorldImpl::default();
+    
+                given_steps
+                    .into_iter()
+                    .map(|step| step.callback)
+                    .try_for_each(|given| given(&mut world))?;
+    
+                when_steps
+                    .into_iter()
+                    .map(|step| step.callback)
+                    .try_for_each(|when| when(&mut world))?;
+    
+                then_steps
+                    .into_iter()
+                    .map(|step| step.callback)
+                    .try_for_each(|then| then(&world))?;
+    
+                Ok(())
+            }
         }
     }
 }
