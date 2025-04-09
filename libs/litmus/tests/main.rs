@@ -1,6 +1,7 @@
 use std::{collections::HashSet, marker::PhantomData, process::ExitCode};
 use libtest::Arguments;
-use litmus::{elements::Scenario, ResultExt};
+use litmus::elements::Scenario;
+use litmus::prelude::*;
 
 pub fn main() -> ExitCode {
     type World = RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>;

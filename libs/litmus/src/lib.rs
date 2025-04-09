@@ -1,7 +1,7 @@
+pub mod assertions;
 pub mod elements;
+pub mod prelude;
 mod utils;
-
-pub use self::utils::extensions::ResultExt;
 
 pub fn run(args: &libtest::Arguments, tests: Vec<impl Into<libtest::Trial>>) -> libtest::Conclusion {
     let tests = tests
