@@ -56,7 +56,7 @@ where
         }
     }
 
-    pub fn given<GivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<GivenStepFnImpl>) -> ScenarioWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl>
+    pub fn given<GivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> ScenarioWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl>
     where
         GivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
@@ -88,7 +88,7 @@ impl<WorldImpl> ScenarioWithIgnoredLastConfigured<WorldImpl>
 where
     WorldImpl: World,
 {
-    pub fn given<GivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<GivenStepFnImpl>) -> ScenarioWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl>
+    pub fn given<GivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> ScenarioWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl>
     where
         GivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
@@ -123,7 +123,7 @@ where
     GivenStepFnImpl: GivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<GivenStepFnImpl>) -> Self {
+    pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> Self {
         let step = Step {
             label: StepLabel::And,
             description: description.into(),
@@ -136,7 +136,7 @@ where
         }
     }
 
-    pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<GivenStepFnImpl>) -> Self {
+    pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> Self {
         let step = Step {
             label: StepLabel::But,
             description: description.into(),
@@ -149,7 +149,7 @@ where
         }
     }
 
-    pub fn when<WhenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<WhenStepFnImpl>) -> ScenarioWithWhenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, WorldImpl>
+    pub fn when<WhenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: WhenStepFnImpl) -> ScenarioWithWhenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, WorldImpl>
     where
         WhenStepFnImpl: WhenStepFn<WorldImpl>,
     {
@@ -187,7 +187,7 @@ where
     WhenStepFnImpl: WhenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<WhenStepFnImpl>) -> Self {
+    pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: WhenStepFnImpl) -> Self {
         let step = Step {
             label: StepLabel::And,
             description: description.into(),
@@ -200,7 +200,7 @@ where
         }
     }
 
-    pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<WhenStepFnImpl>) -> Self {
+    pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: WhenStepFnImpl) -> Self {
         let step = Step {
             label: StepLabel::But,
             description: description.into(),
@@ -213,7 +213,7 @@ where
         }
     }
 
-    pub fn then<ThenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<ThenStepFnImpl>) -> ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>
+    pub fn then<ThenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: ThenStepFnImpl) -> ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>
     where
         ThenStepFnImpl: ThenStepFn<WorldImpl>,
     {
@@ -254,7 +254,7 @@ where
     ThenStepFnImpl: ThenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<ThenStepFnImpl>) -> Self {
+    pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: ThenStepFnImpl) -> Self {
         let step = Step {
             label: StepLabel::And,
             description: description.into(),
@@ -267,7 +267,7 @@ where
         }
     }
 
-    pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<ThenStepFnImpl>) -> Self {
+    pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: ThenStepFnImpl) -> Self {
         let step = Step {
             label: StepLabel::But,
             description: description.into(),

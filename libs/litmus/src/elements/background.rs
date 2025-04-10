@@ -46,7 +46,7 @@ where
         }
     }
 
-    pub fn given<GivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<GivenStepFnImpl>) -> BackgroundWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl>
+    pub fn given<GivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> BackgroundWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl>
     where
         GivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
@@ -78,7 +78,7 @@ impl<WorldImpl> BackgroundWithIgnoredLastConfigured<WorldImpl>
 where
     WorldImpl: World,
 {
-    pub fn given<GivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<GivenStepFnImpl>) -> BackgroundWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl>
+    pub fn given<GivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> BackgroundWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl>
     where
         GivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
@@ -113,7 +113,7 @@ where
     GivenStepFnImpl: GivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<GivenStepFnImpl>) -> Self {
+    pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> Self {
         let step = Step {
             label: StepLabel::And,
             description: description.into(),
@@ -126,7 +126,7 @@ where
         }
     }
 
-    pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: impl Into<GivenStepFnImpl>) -> Self {
+    pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> Self {
         let step = Step {
             label: StepLabel::But,
             description: description.into(),

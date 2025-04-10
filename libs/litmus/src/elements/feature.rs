@@ -241,11 +241,11 @@ where
             .map(|scenario| libtest::Trial::test(scenario.description, move || {
                 let mut world = WorldImpl::default();
 
-                if let Some(background) = feature.background {
-                    background.given_step_callbacks
-                        .into_iter()
-                        .try_for_each(|given| given(&mut world))?;
-                }
+                // if let Some(background) = feature.background {
+                //     background.given_step_callbacks
+                //         .into_iter()
+                //         .try_for_each(|given| given(&mut world))?;
+                // }
 
                 scenario.given_step_callbacks
                     .into_iter()
@@ -267,40 +267,49 @@ where
 
         feature.rules
             .into_iter()
-            .map(|rule| rule.scenarios
-                .into_iter()
-                .map(|scenario| libtest::Trial::test(scenario.description, move || {
-                    let mut world = WorldImpl::default();
-    
-                    if let Some(background) = feature.background {
-                        background.given_step_callbacks
-                            .into_iter()
-                            .try_for_each(|given| given(&mut world))?;
-                    }
+            .flat_map(|rule| {
+                let feature_description = feature.description.clone();
+                let rule_description = rule.description.clone();
+                let rule_ignored = rule.ignored;
+                
+                rule.scenarios
+                    .into_iter()
+                    .map(move |scenario| {
+                        let rule_description = rule_description.clone();
+                        libtest::Trial::test(scenario.description, move || {
+                            let mut world = WorldImpl::default();
 
-                    if let Some(background) = rule.background {
-                        background.given_step_callbacks
-                            .into_iter()
-                            .try_for_each(|given| given(&mut world))?;
-                    }
-    
-                    scenario.given_step_callbacks
-                        .into_iter()
-                        .try_for_each(|given| given(&mut world))?;
-    
-                    scenario.when_step_callbacks
-                        .into_iter()
-                        .try_for_each(|when| when(&mut world))?;
-    
-                    scenario.then_step_callbacks
-                        .into_iter()
-                        .try_for_each(|then| then(&world))?;
-    
-                    Ok(())
-                })
-                    .with_ignored_flag(rule.ignored || scenario.ignored)
-                    .with_kind(format!("{} | {}", feature.description, rule.description)))
-                .for_each(|trial| trials.push(trial)));
+                            // if let Some(background) = &feature.background {
+                            //     background.given_step_callbacks
+                            //         .iter()
+                            //         .try_for_each(|given| given(&mut world))?;
+                            // }
+
+                            // if let Some(background) = &rule.background {
+                            //     background.given_step_callbacks
+                            //         .iter()
+                            //         .try_for_each(|given| given(&mut world))?;
+                            // }
+
+                            scenario.given_step_callbacks
+                                .into_iter()
+                                .try_for_each(|given| given(&mut world))?;
+
+                            scenario.when_step_callbacks
+                                .into_iter()
+                                .try_for_each(|when| when(&mut world))?;
+
+                            scenario.then_step_callbacks
+                                .into_iter()
+                                .try_for_each(|then| then(&world))?;
+
+                            Ok(())
+                        })
+                        .with_ignored_flag(rule_ignored || scenario.ignored)
+                        .with_kind(format!("{} | {}", feature_description, rule_description))
+                    })
+            })
+            .for_each(|trial| trials.push(trial));
         
         trials
     }
