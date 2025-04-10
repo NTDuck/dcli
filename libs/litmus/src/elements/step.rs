@@ -1,32 +1,39 @@
 use crate::utils::aliases::MaybeOwnedStr;
 
-pub(crate) struct Step<StepFnImpl> {
+pub(crate) struct Steps<StepFnImpl> {
     pub(crate) metas: Vec<StepMeta>,
     pub(crate) callback: StepFnImpl,
 }
 
-impl<StepFnImpl> Step<StepFnImpl> {
-    pub fn with<OtherStepFnImpl, Args, R>(self, meta: StepMeta, callback: OtherStepFnImpl) -> Step<OtherStepFnImpl>
+impl<StepFnImpl> Steps<StepFnImpl> {
+    pub fn with<'w, OtherStepFnImpl, WorldImpl>(self, step: Step<OtherStepFnImpl>) -> Steps<impl FnOnce(&'w mut WorldImpl) -> Result<(), libtest::Failed>>
     where
-        StepFnImpl: FnOnce(Args) -> R,
-        OtherStepFnImpl: FnOnce(Args) -> R,
+        StepFnImpl: FnOnce(&'w mut WorldImpl) -> Result<(), libtest::Failed>,
+        OtherStepFnImpl: FnOnce(&'w mut WorldImpl) -> Result<(), libtest::Failed>,
+        WorldImpl: 'w,
     {
         let mut metas = self.metas;
-        metas.push(meta);
+        metas.push(step.meta);
 
-        let callback = move |args: Args| {
-            self.callback(args);
-            callback(args);
+        let callback = move |world: &mut World| {
+            (self.callback)(world)?;
+            (step.callback)(world)?;
+            Ok(())
         };
 
-        Step {
+        Steps {
             metas,
             callback,
         }
     }
 }
 
-impl<StepFnImpl> std::fmt::Display for Step<StepFnImpl> {
+pub(crate) struct Step<StepFnImpl> {
+    pub(crate) meta: StepMeta,
+    pub(crate) callback: StepFnImpl,
+}
+
+impl<StepFnImpl> std::fmt::Display for Steps<StepFnImpl> {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let joined = self.metas
             .iter()
@@ -102,16 +109,4 @@ impl<T> World for T
 where
     T: Default + Send + Sync + 'static,
 {
-}
-
-pub(crate) trait VecExt<T> {
-    fn with(self, item: T) -> Self;
-}
-
-impl<T> VecExt<T> for Vec<T> {
-    fn with(self, item: T) -> Self {
-        let mut this = self;
-        this.push(item);
-        this
-    }
 }
