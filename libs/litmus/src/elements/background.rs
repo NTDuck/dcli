@@ -1,4 +1,5 @@
 use std::marker::PhantomData;
+use std::sync::Arc;
 
 use crate::elements::step::World;
 use crate::elements::step::GivenStepFn;
@@ -161,18 +162,22 @@ where
                 None => false,
             },
 
-            given_step_callbacks: given_steps.callbacks(),
+            given_step_callbacks: given_steps.callbacks()
+                .into_iter()
+                .map(Arc::new)
+                .collect(),
 
             phantom: PhantomData,
         }
     }
 }
 
+#[derive(Clone)]
 pub struct FinalizedBackground<GivenStepFnImpl, WorldImpl> {
     pub(super) description: MaybeOwnedStr,
     pub(super) ignored: bool,
 
-    pub(super) given_step_callbacks: Vec<GivenStepFnImpl>,
+    pub(super) given_step_callbacks: Vec<Arc<GivenStepFnImpl>>,
 
     phantom: PhantomData<WorldImpl>,
 }

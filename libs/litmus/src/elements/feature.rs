@@ -238,31 +238,36 @@ where
 
         feature.scenarios
             .into_iter()
-            .map(|scenario| libtest::Trial::test(scenario.description, move || {
-                let mut world = WorldImpl::default();
+            .map(|scenario| {
+                let feature_background_callbacks = feature.background.as_ref()
+                    .map(|background| background.given_step_callbacks.clone());
 
-                // if let Some(background) = feature.background {
-                //     background.given_step_callbacks
-                //         .into_iter()
-                //         .try_for_each(|given| given(&mut world))?;
-                // }
+                libtest::Trial::test(scenario.description, move || {
+                    let mut world = WorldImpl::default();
 
-                scenario.given_step_callbacks
-                    .into_iter()
-                    .try_for_each(|given| given(&mut world))?;
-
-                scenario.when_step_callbacks
-                    .into_iter()
-                    .try_for_each(|when| when(&mut world))?;
-
-                scenario.then_step_callbacks
-                    .into_iter()
-                    .try_for_each(|then| then(&world))?;
-
-                Ok(())
+                    if let Some(feature_background_callbacks) = feature_background_callbacks {
+                        feature_background_callbacks
+                            .into_iter()
+                            .try_for_each(|given| given(&mut world))?;
+                    }
+    
+                    scenario.given_step_callbacks
+                        .into_iter()
+                        .try_for_each(|given| given(&mut world))?;
+    
+                    scenario.when_step_callbacks
+                        .into_iter()
+                        .try_for_each(|when| when(&mut world))?;
+    
+                    scenario.then_step_callbacks
+                        .into_iter()
+                        .try_for_each(|then| then(&world))?;
+    
+                    Ok(())
+                })
+                    .with_ignored_flag(scenario.ignored)
+                    .with_kind(format!("{}", feature.description))
             })
-                .with_ignored_flag(scenario.ignored)
-                .with_kind(format!("{}", feature.description)))
             .for_each(|trial| trials.push(trial));
 
         feature.rules
@@ -271,42 +276,49 @@ where
                 let feature_description = feature.description.clone();
                 let rule_description = rule.description.clone();
                 let rule_ignored = rule.ignored;
+
+                let feature_background_callbacks = feature.background.as_ref()
+                    .map(|background| background.given_step_callbacks.clone());
+                let rule_background_callbacks = rule.background.as_ref()
+                    .map(|background| background.given_step_callbacks.clone());
                 
                 rule.scenarios
                     .into_iter()
                     .map(move |scenario| {
-                        let rule_description = rule_description.clone();
+                        let feature_background_callbacks = feature_background_callbacks.clone();
+                        let rule_background_callbacks = rule_background_callbacks.clone();
+
                         libtest::Trial::test(scenario.description, move || {
                             let mut world = WorldImpl::default();
-
-                            // if let Some(background) = &feature.background {
-                            //     background.given_step_callbacks
-                            //         .iter()
-                            //         .try_for_each(|given| given(&mut world))?;
-                            // }
-
-                            // if let Some(background) = &rule.background {
-                            //     background.given_step_callbacks
-                            //         .iter()
-                            //         .try_for_each(|given| given(&mut world))?;
-                            // }
-
+    
+                            if let Some(feature_background_callbacks) = feature_background_callbacks {
+                                feature_background_callbacks
+                                    .into_iter()
+                                    .try_for_each(|given| given(&mut world))?;
+                            }
+    
+                            if let Some(rule_background_callbacks) = rule_background_callbacks {
+                                rule_background_callbacks
+                                    .into_iter()
+                                    .try_for_each(|given| given(&mut world))?;
+                            }
+    
                             scenario.given_step_callbacks
                                 .into_iter()
                                 .try_for_each(|given| given(&mut world))?;
-
+    
                             scenario.when_step_callbacks
                                 .into_iter()
                                 .try_for_each(|when| when(&mut world))?;
-
+    
                             scenario.then_step_callbacks
                                 .into_iter()
                                 .try_for_each(|then| then(&world))?;
-
+    
                             Ok(())
                         })
-                        .with_ignored_flag(rule_ignored || scenario.ignored)
-                        .with_kind(format!("{} | {}", feature_description, rule_description))
+                            .with_ignored_flag(rule_ignored || scenario.ignored)
+                            .with_kind(format!("{} | {}", feature_description, rule_description))
                     })
             })
             .for_each(|trial| trials.push(trial));

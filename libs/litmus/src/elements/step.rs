@@ -21,11 +21,11 @@ pub(crate) enum StepLabel {
     But,
 }
 
-pub trait GivenStepFn<WorldImpl>: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static {}
+pub trait GivenStepFn<WorldImpl>: Fn(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static {}
 
 impl<WorldImpl, T> GivenStepFn<WorldImpl> for T
 where
-    T: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static,
+    T: Fn(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static,
     WorldImpl: World,
 {
 }
