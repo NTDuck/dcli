@@ -6,9 +6,9 @@ pub(crate) struct Steps<StepFnImpl> {
 }
 
 impl<StepFnImpl> Steps<StepFnImpl> {
-    pub fn chain_background<WorldImpl>(self, step: Step<impl BackgroundStepFn<WorldImpl>>) -> Steps<impl BackgroundStepFn<WorldImpl>>
+    pub(crate) fn chain_given_background<WorldImpl>(self, step: Step<impl BackgroundGivenStepFn<WorldImpl>>) -> Steps<impl BackgroundGivenStepFn<WorldImpl>>
     where
-        StepFnImpl: BackgroundStepFn<WorldImpl>,
+        StepFnImpl: BackgroundGivenStepFn<WorldImpl>,
         WorldImpl: World,
     {
         let mut metas = self.metas;
@@ -21,7 +21,7 @@ impl<StepFnImpl> Steps<StepFnImpl> {
             callback,
         };
 
-        fn chain_callback<WorldImpl>(lhs: impl BackgroundStepFn<WorldImpl>, rhs: impl BackgroundStepFn<WorldImpl>) -> impl BackgroundStepFn<WorldImpl>
+        fn chain_callback<WorldImpl>(lhs: impl BackgroundGivenStepFn<WorldImpl>, rhs: impl BackgroundGivenStepFn<WorldImpl>) -> impl BackgroundGivenStepFn<WorldImpl>
         where
             WorldImpl: World,
         {
@@ -32,7 +32,7 @@ impl<StepFnImpl> Steps<StepFnImpl> {
         }
     }
 
-    pub fn chain_given<WorldImpl>(self, step: Step<impl GivenStepFn<WorldImpl>>) -> Steps<impl GivenStepFn<WorldImpl>>
+    pub(crate) fn chain_given<WorldImpl>(self, step: Step<impl GivenStepFn<WorldImpl>>) -> Steps<impl GivenStepFn<WorldImpl>>
     where
         StepFnImpl: GivenStepFn<WorldImpl>,
         WorldImpl: World,
@@ -58,7 +58,7 @@ impl<StepFnImpl> Steps<StepFnImpl> {
         }
     }
 
-    pub fn chain_when<WorldImpl>(self, step: Step<impl WhenStepFn<WorldImpl>>) -> Steps<impl WhenStepFn<WorldImpl>>
+    pub(crate) fn chain_when<WorldImpl>(self, step: Step<impl WhenStepFn<WorldImpl>>) -> Steps<impl WhenStepFn<WorldImpl>>
     where
         StepFnImpl: WhenStepFn<WorldImpl>,
         WorldImpl: World,
@@ -84,7 +84,7 @@ impl<StepFnImpl> Steps<StepFnImpl> {
         }
     }
 
-    pub fn chain_then<WorldImpl>(self, step: Step<impl ThenStepFn<WorldImpl>>) -> Steps<impl ThenStepFn<WorldImpl>>
+    pub(crate) fn chain_then<WorldImpl>(self, step: Step<impl ThenStepFn<WorldImpl>>) -> Steps<impl ThenStepFn<WorldImpl>>
     where
         StepFnImpl: ThenStepFn<WorldImpl>,
         WorldImpl: World,
@@ -150,9 +150,9 @@ pub(crate) enum StepLabel {
 
 pub(crate) const STEP_DELIMITER: &str = " | ";
 
-pub trait BackgroundStepFn<WorldImpl>: Fn(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static {}
+pub trait BackgroundGivenStepFn<WorldImpl>: Fn(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static {}
 
-impl<WorldImpl, T> BackgroundStepFn<WorldImpl> for T
+impl<WorldImpl, T> BackgroundGivenStepFn<WorldImpl> for T
 where
     T: Fn(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static,
     WorldImpl: World,
