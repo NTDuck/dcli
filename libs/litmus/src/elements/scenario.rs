@@ -4,10 +4,10 @@ use crate::elements::step::World;
 use crate::elements::step::GivenStepFn;
 use crate::elements::step::ThenStepFn;
 use crate::elements::step::WhenStepFn;
-use crate::elements::step::Step;
+use crate::elements::step::StepMeta;
 use crate::elements::step::StepLabel;
 use crate::elements::VecExt;
-use crate::elements::VecStepExt;
+use crate::elements::VecStepMetaExt;
 use crate::utils::aliases::MaybeOwnedStr;
 
 pub use UnconfiguredScenario as Scenario;
@@ -60,7 +60,7 @@ where
     where
         GivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::Given,
             description: description.into(),
             callback: callback.into(),
@@ -70,7 +70,7 @@ where
             description: self.description,
             ignored: None,
 
-            given_steps: vec![step],
+            given_steps_meta: vec![step],
 
             phantom: PhantomData,
         }
@@ -92,7 +92,7 @@ where
     where
         GivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::Given,
             description: description.into(),
             callback: callback.into(),
@@ -102,7 +102,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: vec![step],
+            given_steps_meta: vec![step],
 
             phantom: PhantomData,
         }
@@ -113,7 +113,7 @@ pub struct ScenarioWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
-    given_steps: Vec<Step<GivenStepFnImpl>>,
+    given_step: 
 
     phantom: PhantomData<WorldImpl>,
 }
@@ -124,27 +124,27 @@ where
     WorldImpl: World,
 {
     pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> Self {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::And,
             description: description.into(),
             callback: callback.into(),
         };
 
         Self {
-            given_steps: self.given_steps.with(step),
+            given_steps_meta: self.given_steps_meta.with(step),
             ..self
         }
     }
 
     pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> Self {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::But,
             description: description.into(),
             callback: callback.into(),
         };
 
         Self {
-            given_steps: self.given_steps.with(step),
+            given_steps_meta: self.given_steps_meta.with(step),
             ..self
         }
     }
@@ -153,7 +153,7 @@ where
     where
         WhenStepFnImpl: WhenStepFn<WorldImpl>,
     {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::When,
             description: description.into(),
             callback: callback.into(),
@@ -163,7 +163,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps,
+            given_steps: self.given_steps_meta,
             when_steps: vec![step],
 
             phantom: PhantomData,
@@ -175,8 +175,8 @@ pub struct ScenarioWithWhenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, 
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
-    given_steps: Vec<Step<GivenStepFnImpl>>,
-    when_steps: Vec<Step<WhenStepFnImpl>>,
+    given_steps: Vec<StepMeta<GivenStepFnImpl>>,
+    when_steps: Vec<StepMeta<WhenStepFnImpl>>,
 
     phantom: PhantomData<WorldImpl>,
 }
@@ -188,7 +188,7 @@ where
     WorldImpl: World,
 {
     pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: WhenStepFnImpl) -> Self {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::And,
             description: description.into(),
             callback: callback.into(),
@@ -201,7 +201,7 @@ where
     }
 
     pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: WhenStepFnImpl) -> Self {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::But,
             description: description.into(),
             callback: callback.into(),
@@ -217,7 +217,7 @@ where
     where
         ThenStepFnImpl: ThenStepFn<WorldImpl>,
     {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::Then,
             description: description.into(),
             callback: callback.into(),
@@ -240,9 +240,9 @@ pub struct ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, 
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
-    given_steps: Vec<Step<GivenStepFnImpl>>,
-    when_steps: Vec<Step<WhenStepFnImpl>>,
-    then_steps: Vec<Step<ThenStepFnImpl>>,
+    given_steps: Vec<StepMeta<GivenStepFnImpl>>,
+    when_steps: Vec<StepMeta<WhenStepFnImpl>>,
+    then_steps: Vec<StepMeta<ThenStepFnImpl>>,
 
     phantom: PhantomData<WorldImpl>,
 }
@@ -255,7 +255,7 @@ where
     WorldImpl: World,
 {
     pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: ThenStepFnImpl) -> Self {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::And,
             description: description.into(),
             callback: callback.into(),
@@ -268,7 +268,7 @@ where
     }
 
     pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: ThenStepFnImpl) -> Self {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::But,
             description: description.into(),
             callback: callback.into(),
@@ -317,9 +317,9 @@ where
         };
 
         fn compute_default_description<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>(
-            given_steps: &Vec<Step<GivenStepFnImpl>>,
-            when_steps: &Vec<Step<WhenStepFnImpl>>,
-            then_steps: &Vec<Step<ThenStepFnImpl>>,
+            given_steps: &Vec<StepMeta<GivenStepFnImpl>>,
+            when_steps: &Vec<StepMeta<WhenStepFnImpl>>,
+            then_steps: &Vec<StepMeta<ThenStepFnImpl>>,
         ) -> MaybeOwnedStr
         where
             GivenStepFnImpl: GivenStepFn<WorldImpl>,
@@ -328,9 +328,9 @@ where
             WorldImpl: World,
         {
             std::iter::empty()
-                .chain(given_steps.format())
-                .chain(when_steps.format())
-                .chain(then_steps.format())
+                .chain(given_steps.fmt())
+                .chain(when_steps.fmt())
+                .chain(then_steps.fmt())
                 .collect::<Vec<_>>()
                 .join(" | ")
                 .into()

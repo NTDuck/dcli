@@ -3,9 +3,9 @@ use std::sync::Arc;
 
 use crate::elements::step::World;
 use crate::elements::step::GivenStepFn;
-use crate::elements::step::Step;
+use crate::elements::step::StepMeta;
 use crate::elements::step::StepLabel;
-use crate::elements::VecStepExt;
+use crate::elements::VecStepMetaExt;
 use crate::elements::VecExt;
 use crate::utils::aliases::MaybeOwnedStr;
 
@@ -51,7 +51,7 @@ where
     where
         GivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::Given,
             description: description.into(),
             callback: callback.into(),
@@ -83,7 +83,7 @@ where
     where
         GivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::Given,
             description: description.into(),
             callback: callback.into(),
@@ -104,7 +104,7 @@ pub struct BackgroundWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl> {
     description: MaybeOwnedStr,
     ignored: Option<bool>,
 
-    given_steps: Vec<Step<GivenStepFnImpl>>,
+    given_steps: Vec<StepMeta<GivenStepFnImpl>>,
 
     phantom: PhantomData<WorldImpl>,
 }
@@ -115,7 +115,7 @@ where
     WorldImpl: World,
 {
     pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> Self {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::And,
             description: description.into(),
             callback: callback.into(),
@@ -128,7 +128,7 @@ where
     }
 
     pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> Self {
-        let step = Step {
+        let step = StepMeta {
             label: StepLabel::But,
             description: description.into(),
             callback: callback.into(),
