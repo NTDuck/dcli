@@ -6,24 +6,107 @@ pub(crate) struct Steps<StepFnImpl> {
 }
 
 impl<StepFnImpl> Steps<StepFnImpl> {
-    pub fn with<'w, OtherStepFnImpl, WorldImpl>(self, step: Step<OtherStepFnImpl>) -> Steps<impl FnOnce(&'w mut WorldImpl) -> Result<(), libtest::Failed>>
+    pub fn chain_background<WorldImpl>(self, step: Step<impl BackgroundStepFn<WorldImpl>>) -> Steps<impl BackgroundStepFn<WorldImpl>>
     where
-        StepFnImpl: FnOnce(&'w mut WorldImpl) -> Result<(), libtest::Failed>,
-        OtherStepFnImpl: FnOnce(&'w mut WorldImpl) -> Result<(), libtest::Failed>,
-        WorldImpl: 'w,
+        StepFnImpl: BackgroundStepFn<WorldImpl>,
+        WorldImpl: World,
     {
         let mut metas = self.metas;
         metas.push(step.meta);
 
-        let callback = move |world: &mut World| {
-            (self.callback)(world)?;
-            (step.callback)(world)?;
-            Ok(())
-        };
+        let callback = chain_callback(self.callback, step.callback);
 
-        Steps {
+        return Steps {
             metas,
             callback,
+        };
+
+        fn chain_callback<WorldImpl>(lhs: impl BackgroundStepFn<WorldImpl>, rhs: impl BackgroundStepFn<WorldImpl>) -> impl BackgroundStepFn<WorldImpl>
+        where
+            WorldImpl: World,
+        {
+            move |world| {
+                lhs(world)?;
+                rhs(world)
+            }
+        }
+    }
+
+    pub fn chain_given<WorldImpl>(self, step: Step<impl GivenStepFn<WorldImpl>>) -> Steps<impl GivenStepFn<WorldImpl>>
+    where
+        StepFnImpl: GivenStepFn<WorldImpl>,
+        WorldImpl: World,
+    {
+        let mut metas = self.metas;
+        metas.push(step.meta);
+
+        let callback = chain_callback(self.callback, step.callback);
+
+        return Steps {
+            metas,
+            callback,
+        };
+
+        fn chain_callback<WorldImpl>(lhs: impl GivenStepFn<WorldImpl>, rhs: impl GivenStepFn<WorldImpl>) -> impl GivenStepFn<WorldImpl>
+        where
+            WorldImpl: World,
+        {
+            move |world| {
+                lhs(world)?;
+                rhs(world)
+            }
+        }
+    }
+
+    pub fn chain_when<WorldImpl>(self, step: Step<impl WhenStepFn<WorldImpl>>) -> Steps<impl WhenStepFn<WorldImpl>>
+    where
+        StepFnImpl: WhenStepFn<WorldImpl>,
+        WorldImpl: World,
+    {
+        let mut metas = self.metas;
+        metas.push(step.meta);
+
+        let callback = chain_callback(self.callback, step.callback);
+
+        return Steps {
+            metas,
+            callback,
+        };
+
+        fn chain_callback<WorldImpl>(lhs: impl WhenStepFn<WorldImpl>, rhs: impl WhenStepFn<WorldImpl>) -> impl WhenStepFn<WorldImpl>
+        where
+            WorldImpl: World,
+        {
+            move |world| {
+                lhs(world)?;
+                rhs(world)
+            }
+        }
+    }
+
+    pub fn chain_then<WorldImpl>(self, step: Step<impl ThenStepFn<WorldImpl>>) -> Steps<impl ThenStepFn<WorldImpl>>
+    where
+        StepFnImpl: ThenStepFn<WorldImpl>,
+        WorldImpl: World,
+    {
+        let mut metas = self.metas;
+        metas.push(step.meta);
+
+        let callback = chain_callback(self.callback, step.callback);
+
+        return Steps {
+            metas,
+            callback,
+        };
+
+        fn chain_callback<WorldImpl>(lhs: impl ThenStepFn<WorldImpl>, rhs: impl ThenStepFn<WorldImpl>) -> impl ThenStepFn<WorldImpl>
+        where
+            WorldImpl: World,
+        {
+            move |world| {
+                lhs(world)?;
+                rhs(world)
+            }
         }
     }
 }

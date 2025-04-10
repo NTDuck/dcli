@@ -1,4 +1,4 @@
-# litmus
+# [litmus](https://en.wikipedia.org/wiki/Litmus)
 
 a macro-free BDD test harness.<br>
 inspired by [cucumber](https://crates.io/crates/cucumber) and [rspec](https://crates.io/crates/rspec).

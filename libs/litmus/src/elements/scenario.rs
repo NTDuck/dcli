@@ -124,7 +124,10 @@ where
     GivenStepFnImpl: GivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> Self {
+    pub fn and<OtherGivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherGivenStepFnImpl) -> ScenarioWithGivenStepsLastConfigured<impl GivenStepFn<WorldImpl>, WorldImpl>
+    where
+        OtherGivenStepFnImpl: GivenStepFn<WorldImpl>,
+    {
         let step = Step {
             meta: StepMeta {
                 label: StepLabel::And,
@@ -133,13 +136,20 @@ where
             callback,
         };
 
-        Self {
-            given_steps: self.given_steps.with(step),
-            ..self
+        ScenarioWithGivenStepsLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+
+            given_steps: self.given_steps.chain_given(step),
+
+            phantom: PhantomData,
         }
     }
 
-    pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> Self {
+    pub fn but<OtherGivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherGivenStepFnImpl) -> ScenarioWithGivenStepsLastConfigured<impl GivenStepFn<WorldImpl>, WorldImpl>
+    where
+        OtherGivenStepFnImpl: GivenStepFn<WorldImpl>,
+    {
         let step = Step {
             meta: StepMeta {
                 label: StepLabel::But,
@@ -148,9 +158,13 @@ where
             callback,
         };
 
-        Self {
-            given_steps: self.given_steps.with(step),
-            ..self
+        ScenarioWithGivenStepsLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+
+            given_steps: self.given_steps.chain_given(step),
+
+            phantom: PhantomData,
         }
     }
 
@@ -192,7 +206,10 @@ where
     WhenStepFnImpl: WhenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: WhenStepFnImpl) -> Self {
+    pub fn and<OtherWhenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherWhenStepFnImpl) -> ScenarioWithWhenStepsLastConfigured<GivenStepFnImpl, impl WhenStepFn<WorldImpl>, WorldImpl>
+    where
+        OtherWhenStepFnImpl: WhenStepFn<WorldImpl>,
+    {
         let step = Step {
             meta: StepMeta {
                 label: StepLabel::And,
@@ -201,13 +218,21 @@ where
             callback,
         };
 
-        Self {
-            when_steps: self.when_steps.with(step),
-            ..self
+        ScenarioWithWhenStepsLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+
+            given_steps: self.given_steps,
+            when_steps: self.when_steps.chain_when(step),
+
+            phantom: PhantomData,
         }
     }
 
-    pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: WhenStepFnImpl) -> Self {
+    pub fn but<OtherWhenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherWhenStepFnImpl) -> ScenarioWithWhenStepsLastConfigured<GivenStepFnImpl, impl WhenStepFn<WorldImpl>, WorldImpl>
+    where
+        OtherWhenStepFnImpl: WhenStepFn<WorldImpl>,
+    {
         let step = Step {
             meta: StepMeta {
                 label: StepLabel::But,
@@ -216,9 +241,14 @@ where
             callback,
         };
 
-        Self {
-            when_steps: self.when_steps.with(step),
-            ..self
+        ScenarioWithWhenStepsLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+
+            given_steps: self.given_steps,
+            when_steps: self.when_steps.chain_when(step),
+
+            phantom: PhantomData,
         }
     }
 
@@ -263,7 +293,10 @@ where
     ThenStepFnImpl: ThenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and(self, description: impl Into<MaybeOwnedStr>, callback: ThenStepFnImpl) -> Self {
+    pub fn and<OtherThenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherThenStepFnImpl) -> ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, impl ThenStepFn<WorldImpl>, WorldImpl>
+    where
+        OtherThenStepFnImpl: ThenStepFn<WorldImpl>,
+    {
         let step = Step {
             meta: StepMeta {
                 label: StepLabel::And,
@@ -272,13 +305,22 @@ where
             callback,
         };
 
-        Self {
-            then_steps: self.then_steps.with(step),
-            ..self
+        ScenarioWithThenStepsLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+
+            given_steps: self.given_steps,
+            when_steps: self.when_steps,
+            then_steps: self.then_steps.chain_then(step),
+
+            phantom: PhantomData,
         }
     }
 
-    pub fn but(self, description: impl Into<MaybeOwnedStr>, callback: ThenStepFnImpl) -> Self {
+    pub fn but<OtherThenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherThenStepFnImpl) -> ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, impl ThenStepFn<WorldImpl>, WorldImpl>
+    where
+        OtherThenStepFnImpl: ThenStepFn<WorldImpl>,
+    {
         let step = Step {
             meta: StepMeta {
                 label: StepLabel::But,
@@ -287,9 +329,15 @@ where
             callback,
         };
 
-        Self {
-            then_steps: self.then_steps.with(step),
-            ..self
+        ScenarioWithThenStepsLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+
+            given_steps: self.given_steps,
+            when_steps: self.when_steps,
+            then_steps: self.then_steps.chain_then(step),
+
+            phantom: PhantomData,
         }
     }
 }
@@ -312,10 +360,10 @@ where
             ..
         } = scenario;
 
-        return Self {
+        Self {
             description: match description {
                 Some(description) => description,
-                None => [&given_steps, &when_steps, &then_steps].join(STEP_DELIMITER),
+                None => format!("{}{}{}{}{}", given_steps, STEP_DELIMITER, when_steps, STEP_DELIMITER, then_steps).into(),
             },
             ignored: match ignored {
                 Some(ignored) => ignored,
@@ -327,7 +375,7 @@ where
             then_steps_callback: then_steps.callback,
 
             phantom: PhantomData,
-        };
+        }
     }
 }
 
