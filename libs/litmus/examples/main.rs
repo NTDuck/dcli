@@ -5,7 +5,7 @@ use litmus::prelude::*;
 pub fn main() -> ExitCode {
     type World = RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>;
 
-    let trials = Feature::named("Number Repository")
+    let trials = Feature::<World>::named("Number Repository")
         .ignored(false)
         .background(Background::named("Nothingness")
             .ignored(true)
@@ -19,7 +19,7 @@ pub fn main() -> ExitCode {
                 .given("a repository with task `MAX`", |w| w.repository.add(usize::MAX).ok())
                 .and("a repository with task `MAX - 1`", |w| w.repository.add(usize::MAX - 1).ok())
                 .and("a repository with task `MAX - 2`", |w| w.repository.add(usize::MAX - 2).ok()))
-            .scenario(|ctx| Scenario::<_, World>::from(ctx)
+            .scenario(|ctx| Scenario::<_, _, World>::from(ctx)
                 .unnamed()
                 .given("a populated repository", |_| ok())
                 .when("doing nothing", |_| ok())
@@ -33,13 +33,13 @@ pub fn main() -> ExitCode {
 
                     Ok(())
                 })))
-        .scenario(|ctx| Scenario::<_, World>::from(ctx)
+        .scenario(|ctx| Scenario::<_, _, World>::from(ctx)
             .unnamed()
             .given("an empty repository", |_| ok())
             .when("adding 0", |w| w.repository.add(0).ok())
             .then("the repository should contain 0", |w| w.repository.contains(&0)
                 .expect(true, "expected 0 to be present, found absent")))
-        .scenario(|ctx| Scenario::<_, World>::from(ctx)
+        .scenario(|ctx| Scenario::<_, _, World>::from(ctx)
             .unnamed()
             .given("a repository containing 0", |w| w.repository.add(0).ok())
             .and("1", |w| w.repository.add(1).ok())
