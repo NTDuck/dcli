@@ -1,5 +1,3 @@
-use std::marker::PhantomData;
-
 use crate::elements::step::World;
 use crate::elements::step::BackgroundGivenStepFn;
 use crate::elements::background::BackgroundContext;
@@ -243,7 +241,7 @@ impl<BackgroundGivenStepFnImpl, WorldImpl> From<RuleWithScenariosLastConfigured<
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Default)]
 pub struct RuleContext<BackgroundGivenStepFnImpl, WorldImpl> {
     pub(super) description: Option<MaybeOwnedStr>,
     pub(super) ignored: Option<bool>,
@@ -252,40 +250,17 @@ pub struct RuleContext<BackgroundGivenStepFnImpl, WorldImpl> {
     pub(super) background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
-// impl<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl> From<RuleWithScenariosLastConfigured<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>> for FinalizedRule<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>
-// where
-//     GivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
-//     WorldImpl: World,
-// {
-//     fn from(rule: RuleWithScenariosLastConfigured<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>) -> Self {
-//         let RuleWithScenariosLastConfigured {
-//             description,
-//             ignored,
-
-//             background,
-//             scenarios,
-//             ..
-//         } = rule;
-
-//         Self {
-//             description,
-//             ignored: match ignored {
-//                 Some(ignored) => ignored,
-//                 None => false,
-//             },
-
-//             background,
-//             scenarios,
-
-//             phantom: PhantomData,
-//         }
-//     }
-// }
-
-// pub struct FinalizedRule<BackgroundGivenStepFnImpl, WorldImpl> {
-//     pub(super) description: MaybeOwnedStr,
-//     pub(super) ignored: bool,
-
-//     pub(super) background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
-//     pub(super) trials: Vec<libtest::Trial>,
-// }
+impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for RuleContext<BackgroundGivenStepFnImpl, WorldImpl>
+where
+    BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    WorldImpl: World,
+{
+    fn clone(&self) -> Self {
+        Self { 
+            description: self.description.clone(), 
+            ignored: self.ignored.clone(), 
+            feature: self.feature.clone(), 
+            background: self.background.clone(),
+        }
+    }
+}
