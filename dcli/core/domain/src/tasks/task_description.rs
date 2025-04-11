@@ -12,7 +12,7 @@ impl TryFrom<&str> for TaskDescription {
 
     fn try_from(description: &str) -> Result<Self, Self::Error> {
         let description =
-            Self::remove_trailing_and_leading_whitespaces(&description);
+            Self::remove_trailing_and_leading_whitespaces(description);
 
         Self::ensure_no_length_underflow(description)?;
         Self::ensure_no_length_overflow(description)?;

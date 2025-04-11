@@ -178,10 +178,7 @@ where
                 Some(description) => description,
                 None => unreachable!(),
             },
-            ignored: match ignored {
-                Some(ignored) => ignored,
-                None => false,
-            },
+            ignored: ignored.unwrap_or(false),
 
             given_steps_callback: Arc::new(given_steps.callback),
 
@@ -203,7 +200,7 @@ impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for BackgroundContext<Backgroun
     fn clone(&self) -> Self {
         Self {
             description: self.description.clone(),
-            ignored: self.ignored.clone(),
+            ignored: self.ignored,
             
             given_steps_callback: self.given_steps_callback.clone(),
             

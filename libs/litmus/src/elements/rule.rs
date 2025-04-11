@@ -151,7 +151,7 @@ where
     {
         RuleContext {
             description: self.description.clone(),
-            ignored: self.ignored.clone(),
+            ignored: self.ignored,
 
             feature: self.feature.clone(),
             background: None,
@@ -198,7 +198,7 @@ where
     {
         RuleContext {
             description: self.description.clone(),
-            ignored: self.ignored.clone(),
+            ignored: self.ignored,
 
             feature: self.feature.clone(),
             background: self.background.clone(),
@@ -246,7 +246,7 @@ where
     fn as_context(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
         RuleContext {
             description: self.description.clone(),
-            ignored: self.ignored.clone(),
+            ignored: self.ignored,
 
             feature: self.feature.clone(),
             background: self.background.clone(),
@@ -283,7 +283,7 @@ where
     fn clone(&self) -> Self {
         Self { 
             description: self.description.clone(),
-            ignored: self.ignored.clone(),
+            ignored: self.ignored,
 
             feature: self.feature.clone(),
             background: self.background.clone(),

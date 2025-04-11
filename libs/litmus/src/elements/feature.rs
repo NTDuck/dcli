@@ -169,7 +169,7 @@ where
     {
         FeatureContext {
             description: self.description.clone(),
-            ignored: self.ignored.clone(),
+            ignored: self.ignored,
 
             background: None,
         }
@@ -228,7 +228,7 @@ where
     {
         FeatureContext {
             description: self.description.clone(),
-            ignored: self.ignored.clone(),
+            ignored: self.ignored,
 
             background: self.background.clone(),
         }
@@ -295,7 +295,7 @@ where
     {
         FeatureContext {
             description: self.description.clone(),
-            ignored: self.ignored.clone(),
+            ignored: self.ignored,
 
             background: self.background.clone(),
         }
@@ -320,7 +320,7 @@ impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for FeatureContext<BackgroundGi
     fn clone(&self) -> Self {
         Self {
             description: self.description.clone(),
-            ignored: self.ignored.clone(),
+            ignored: self.ignored,
             
             background: self.background.clone(),
         }
