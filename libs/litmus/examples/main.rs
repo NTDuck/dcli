@@ -117,7 +117,7 @@ impl From<RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>> for Vec<
 
                         Ok(())
                     })))
-            .scenario(|ctx| Scenario::<_, _, World>::from(ctx)
+            .scenario(|ctx| Scenario::from(ctx)
                 .unnamed()
                 .given("an empty repository", |_| ok())
                 .when("adding 0", |world| {
@@ -126,7 +126,7 @@ impl From<RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>> for Vec<
                 })
                 .then("the repository should contain 0", |world| world.repository.contains(&0)
                     .expect(true, "expected 0 to be present, found absent")))
-            .scenario(|ctx| Scenario::<_, _, World>::from(ctx)
+            .scenario(|ctx| Scenario::from(ctx)
                 .unnamed()
                 .given("a repository containing 0", |world| {
                     world.repository.add(0);
