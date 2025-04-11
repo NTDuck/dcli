@@ -5,7 +5,7 @@ description = "a macro-free BDD test harness."
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-keywords = ["litmus", "test", "harness", "cucumber", "gherkin", "libtest-mimic", "bdd", "tdd", "atdd"]
+keywords = ["bdd", "test", "harness", "cucumber", "gherkin"]
 categories = ["development-tools::testing"]
 publish = true
 
