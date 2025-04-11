@@ -5,7 +5,7 @@ use litmus::prelude::*;
 pub fn main() -> ExitCode {
     type World = RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>;
 
-    let trials = Feature::named("Number Repository")
+    let trials = Feature::<World>::named("Number Repository")
         .ignored(false)
         .background(Background::named("Nothingness")
             .ignored(true)
@@ -14,21 +14,21 @@ pub fn main() -> ExitCode {
             .but("still nothing", |_| ok()))
         .rule(|ctx| Rule::from(ctx)
             .named("Big numbers should work as well")
-            // .ignored(true)
+            .ignored(true)
             .background(Background::<World>::named("Populate repository with big numbers")
-                .given("a repository with task `MAX`", |w| w.repository.add(usize::MAX).ok())
-                .and("a repository with task `MAX - 1`", |w| w.repository.add(usize::MAX - 1).ok())
-                .and("a repository with task `MAX - 2`", |w| w.repository.add(usize::MAX - 2).ok()))
+                .given("a repository with task `MAX`", |world| world.repository.add(usize::MAX).ok())
+                .and("a repository with task `MAX - 1`", |world| world.repository.add(usize::MAX - 1).ok())
+                .and("a repository with task `MAX - 2`", |world| world.repository.add(usize::MAX - 2).ok()))
             .scenario(|ctx| Scenario::from(ctx)
                 .unnamed()
                 .given("a populated repository", |_| ok())
                 .when("doing nothing", |_| ok())
-                .then("the repository should contain all populated numbers", |w| {
-                    w.repository.contains(&usize::MAX)
+                .then("the repository should contain all populated numbers", |world| {
+                    world.repository.contains(&usize::MAX)
                         .expect(true, "expected `MAX` to be present, found absent")?;
-                    w.repository.contains(&(usize::MAX - 1))
+                    world.repository.contains(&(usize::MAX - 1))
                         .expect(true, "expected `MAX - 1` to be present, found absent")?;
-                    w.repository.contains(&(usize::MAX - 2))
+                    world.repository.contains(&(usize::MAX - 2))
                         .expect(true, "expected `MAX - 2` to be present, found absent")?;
 
                     Ok(())
@@ -36,18 +36,18 @@ pub fn main() -> ExitCode {
         .scenario(|ctx| Scenario::<_, _, World>::from(ctx)
             .unnamed()
             .given("an empty repository", |_| ok())
-            .when("adding 0", |w| w.repository.add(0).ok())
-            .then("the repository should contain 0", |w| w.repository.contains(&0)
+            .when("adding 0", |world| world.repository.add(0).ok())
+            .then("the repository should contain 0", |world| world.repository.contains(&0)
                 .expect(true, "expected 0 to be present, found absent")))
         .scenario(|ctx| Scenario::<_, _, World>::from(ctx)
             .unnamed()
-            .given("a repository containing 0", |w| w.repository.add(0).ok())
-            .and("1", |w| w.repository.add(1).ok())
-            .when("removing 0", |w| w.repository.remove(&0).ok())
+            .given("a repository containing 0", |world| world.repository.add(0).ok())
+            .and("1", |world| world.repository.add(1).ok())
+            .when("removing 0", |world| world.repository.remove(&0).ok())
             .but("not removing 1", |_| ok())
-            .then("the repository should contain 1", |w| w.repository.contains(&1)
+            .then("the repository should contain 1", |world| world.repository.contains(&1)
                 .expect(true, "expected 1 to be present, found absent"))
-            .but("not 0", |w| w.repository.contains(&0)
+            .but("not 0", |world| world.repository.contains(&0)
                 .expect(false, "expected 0 to be absent, found present")))
         ;
 

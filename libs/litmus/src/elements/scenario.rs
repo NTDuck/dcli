@@ -19,10 +19,9 @@ pub struct UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackground
     context: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
-impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> From<FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>> for UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+impl<FeatureBackgroundGivenStepFnImpl, WorldImpl> From<FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>> for UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, fn(&mut WorldImpl) -> Result<(), libtest::Failed>, WorldImpl> // Unused RuleBackgroundGivenStepFnImpl substituted with no-op default
 where
     FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
