@@ -1,10 +1,12 @@
 [package]
 name = "litmus"
-version = "0.2.0"
+version = "0.2.1"
 description = "a macro-free BDD test harness."
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
+keywords = ["litmus", "test", "harness", "cucumber", "gherkin", "libtest-mimic", "bdd", "tdd", "atdd"]
+categories = ["development-tools::testing"]
 publish = true
 
 [dependencies]
