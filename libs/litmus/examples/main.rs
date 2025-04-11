@@ -1,36 +1,56 @@
 use std::{collections::HashSet, marker::PhantomData, process::ExitCode};
-use libtest::Arguments;
-use litmus::elements::{Background, Scenario};
+use litmus::elements::{Background, Feature, Rule, Scenario};
 use litmus::prelude::*;
 
 pub fn main() -> ExitCode {
     type World = RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>;
 
-    // let trials = Feature::named("Number Repository")
-    //     .with_scenario(Scenario::<World>::unnamed()
-    //         .given("an empty repository", |_| Ok(()))
-    //         .when("adding task 0", |world| world.repository.add(0).ok())
-    //         .then("the repository should contain task 0", |world| world.repository.contains(&0)
-    //             .expect(true, "expected task 0 to be present, found absent"))
-    //     );
+    let trials = Feature::named("Number Repository")
+        .ignored(false)
+        .background(Background::named("Nothingness")
+            .ignored(true)
+            .given("nothing", |_| ok())
+            .and("nothing", |_| ok())
+            .but("still nothing", |_| ok()))
+        .rule(|ctx| Rule::<_, World>::from(ctx)
+            .named("Big numbers should work as well")
+            // .ignored(true)
+            .background(Background::<World>::named("Populate repository with big numbers")
+                .given("a repository with task `MAX`", |w| w.repository.add(usize::MAX).ok())
+                .and("a repository with task `MAX - 1`", |w| w.repository.add(usize::MAX - 1).ok())
+                .and("a repository with task `MAX - 2`", |w| w.repository.add(usize::MAX - 2).ok()))
+            .scenario(|ctx| Scenario::<_, World>::from(ctx)
+                .unnamed()
+                .given("a populated repository", |_| ok())
+                .when("doing nothing", |_| ok())
+                .then("the repository should contain all populated numbers", |w| {
+                    w.repository.contains(&usize::MAX)
+                        .expect(true, "expected `MAX` to be present, found absent")?;
+                    w.repository.contains(&(usize::MAX - 1))
+                        .expect(true, "expected `MAX - 1` to be present, found absent")?;
+                    w.repository.contains(&(usize::MAX - 2))
+                        .expect(true, "expected `MAX - 2` to be present, found absent")?;
 
-    let _ = Background::<World>::named("do-nothing background")
-        .given("an empty repository", |_| Ok(()))
-        .and("an empty repository", |_| Ok(()))
-        .but("an empty repository", |_| Ok(()));
+                    Ok(())
+                })))
+        .scenario(|ctx| Scenario::<_, World>::from(ctx)
+            .unnamed()
+            .given("an empty repository", |_| ok())
+            .when("adding 0", |w| w.repository.add(0).ok())
+            .then("the repository should contain 0", |w| w.repository.contains(&0)
+                .expect(true, "expected 0 to be present, found absent")))
+        .scenario(|ctx| Scenario::<_, World>::from(ctx)
+            .unnamed()
+            .given("a repository containing 0", |w| w.repository.add(0).ok())
+            .and("1", |w| w.repository.add(1).ok())
+            .when("removing 0", |w| w.repository.remove(&0).ok())
+            .but("not removing 1", |_| ok())
+            .then("the repository should contain 1", |w| w.repository.contains(&1)
+                .expect(true, "expected 1 to be present, found absent"))
+            .but("not 0", |w| w.repository.contains(&0)
+                .expect(false, "expected 0 to be absent, found present")));
 
-    let _ = Scenario::<World>::unnamed()
-        .given("an empty repository", |_| Ok(()))
-        .when("adding task 0", |world| world.repository.add(0).ok())
-        .and("adding task 1", |world| world.repository.add(1).ok())
-        .then("the repository should contain task 0", |world| world.repository.contains(&0)
-            .expect(true, "expected task 0 to be present, found absent"))
-        .but("the repository should not contain task 10", |world| world.repository.contains(&10)
-            .expect(true, "expected task 10 to be absent, found present"));
-
-    libtest::run(&Arguments::from_args(), vec![]).exit_code()
-
-    // litmus::run_with_cli_args(trials).exit_code()
+    litmus::run(trials).exit_code()
 }
 
 pub trait Repository<T> {

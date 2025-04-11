@@ -7,12 +7,12 @@ pub use UnconfiguredRule as Rule;
 
 use super::FeatureContext;
 
-pub struct UnconfiguredRule<BackgroundGivenStepFnImpl, WorldImpl> {
-    feature: FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>,
+pub struct UnconfiguredRule<FeatureBackgroundGivenStepFnImpl, WorldImpl> {
+    feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
-impl<BackgroundGivenStepFnImpl, WorldImpl> From<FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>> for UnconfiguredRule<BackgroundGivenStepFnImpl, WorldImpl> {
-    fn from(feature: FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Self {
+impl<FeatureBackgroundGivenStepFnImpl, WorldImpl> From<FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>> for UnconfiguredRule<FeatureBackgroundGivenStepFnImpl, WorldImpl> {
+    fn from(feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
         Self {
             feature,
         }
