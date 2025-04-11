@@ -1,5 +1,5 @@
 use std::marker::PhantomData;
-use std::sync::Arc;
+use std::rc::Rc;
 
 use crate::elements::step::World;
 use crate::elements::step::BackgroundGivenStepFn;
@@ -21,7 +21,7 @@ where
 {
     pub fn named(description: impl Into<MaybeOwnedStr>) -> BackgroundWithDescriptionLastConfigured<WorldImpl> {
         BackgroundWithDescriptionLastConfigured {
-            description: description.into(),
+            description: Some(description.into()),
 
             phantom: PhantomData,
         }
@@ -29,7 +29,7 @@ where
 }
 
 pub struct BackgroundWithDescriptionLastConfigured<WorldImpl> {
-    description: MaybeOwnedStr,
+    description: Option<MaybeOwnedStr>,
 
     phantom: PhantomData<WorldImpl>,
 }
@@ -69,7 +69,7 @@ where
 }
 
 pub struct BackgroundWithIgnoredLastConfigured<WorldImpl> {
-    description: MaybeOwnedStr,
+    description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
     phantom: PhantomData<WorldImpl>,
@@ -101,7 +101,7 @@ where
 }
 
 pub struct BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl> {
-    description: MaybeOwnedStr,
+    description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
     given_steps: Steps<BackgroundGivenStepFnImpl>,
@@ -130,7 +130,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain_given_background(step),
+            given_steps: self.given_steps.chain_background_given(step),
 
             phantom: PhantomData,
         }
@@ -152,14 +152,14 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain_given_background(step),
+            given_steps: self.given_steps.chain_background_given(step),
 
             phantom: PhantomData,
         }
     }
 }
 
-impl<BackgroundGivenStepFnImpl, WorldImpl> From<BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>> for FinalizedBackground<BackgroundGivenStepFnImpl, WorldImpl>
+impl<BackgroundGivenStepFnImpl, WorldImpl> From<BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>> for BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>
 where
     BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
@@ -174,24 +174,40 @@ where
         } = background;
 
         Self {
-            description,
+            description: match description {
+                Some(description) => description,
+                None => unreachable!(),
+            },
             ignored: match ignored {
                 Some(ignored) => ignored,
                 None => false,
             },
 
-            given_steps_callback: Arc::new(given_steps.callback),
+            given_steps_callback: Rc::new(given_steps.callback),
 
             phantom: PhantomData,
         }
     }
 }
 
-pub struct FinalizedBackground<BackgroundGivenStepFnImpl, WorldImpl> {
+pub struct BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl> {
     pub(super) description: MaybeOwnedStr,
     pub(super) ignored: bool,
 
-    pub(super) given_steps_callback: Arc<BackgroundGivenStepFnImpl>,
+    pub(super) given_steps_callback: Rc<BackgroundGivenStepFnImpl>,
 
     phantom: PhantomData<WorldImpl>,
+}
+
+impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl> {
+    fn clone(&self) -> Self {
+        Self {
+            description: self.description.clone(),
+            ignored: self.ignored.clone(),
+            
+            given_steps_callback: self.given_steps_callback.clone(),
+            
+            phantom: PhantomData,
+        }
+    }
 }

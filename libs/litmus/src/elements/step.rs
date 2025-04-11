@@ -6,7 +6,7 @@ pub(crate) struct Steps<StepFnImpl> {
 }
 
 impl<StepFnImpl> Steps<StepFnImpl> {
-    pub(crate) fn chain_given_background<WorldImpl>(self, step: Step<impl BackgroundGivenStepFn<WorldImpl>>) -> Steps<impl BackgroundGivenStepFn<WorldImpl>>
+    pub(crate) fn chain_background_given<WorldImpl>(self, step: Step<impl BackgroundGivenStepFn<WorldImpl>>) -> Steps<impl BackgroundGivenStepFn<WorldImpl>>
     where
         StepFnImpl: BackgroundGivenStepFn<WorldImpl>,
         WorldImpl: World,
@@ -32,9 +32,9 @@ impl<StepFnImpl> Steps<StepFnImpl> {
         }
     }
 
-    pub(crate) fn chain_given<WorldImpl>(self, step: Step<impl GivenStepFn<WorldImpl>>) -> Steps<impl GivenStepFn<WorldImpl>>
+    pub(crate) fn chain_scenario_given<WorldImpl>(self, step: Step<impl ScenarioGivenStepFn<WorldImpl>>) -> Steps<impl ScenarioGivenStepFn<WorldImpl>>
     where
-        StepFnImpl: GivenStepFn<WorldImpl>,
+        StepFnImpl: ScenarioGivenStepFn<WorldImpl>,
         WorldImpl: World,
     {
         let mut metas = self.metas;
@@ -47,7 +47,7 @@ impl<StepFnImpl> Steps<StepFnImpl> {
             callback,
         };
 
-        fn chain_callback<WorldImpl>(lhs: impl GivenStepFn<WorldImpl>, rhs: impl GivenStepFn<WorldImpl>) -> impl GivenStepFn<WorldImpl>
+        fn chain_callback<WorldImpl>(lhs: impl ScenarioGivenStepFn<WorldImpl>, rhs: impl ScenarioGivenStepFn<WorldImpl>) -> impl ScenarioGivenStepFn<WorldImpl>
         where
             WorldImpl: World,
         {
@@ -58,9 +58,9 @@ impl<StepFnImpl> Steps<StepFnImpl> {
         }
     }
 
-    pub(crate) fn chain_when<WorldImpl>(self, step: Step<impl WhenStepFn<WorldImpl>>) -> Steps<impl WhenStepFn<WorldImpl>>
+    pub(crate) fn chain_scenario_when<WorldImpl>(self, step: Step<impl ScenarioWhenStepFn<WorldImpl>>) -> Steps<impl ScenarioWhenStepFn<WorldImpl>>
     where
-        StepFnImpl: WhenStepFn<WorldImpl>,
+        StepFnImpl: ScenarioWhenStepFn<WorldImpl>,
         WorldImpl: World,
     {
         let mut metas = self.metas;
@@ -73,7 +73,7 @@ impl<StepFnImpl> Steps<StepFnImpl> {
             callback,
         };
 
-        fn chain_callback<WorldImpl>(lhs: impl WhenStepFn<WorldImpl>, rhs: impl WhenStepFn<WorldImpl>) -> impl WhenStepFn<WorldImpl>
+        fn chain_callback<WorldImpl>(lhs: impl ScenarioWhenStepFn<WorldImpl>, rhs: impl ScenarioWhenStepFn<WorldImpl>) -> impl ScenarioWhenStepFn<WorldImpl>
         where
             WorldImpl: World,
         {
@@ -84,9 +84,9 @@ impl<StepFnImpl> Steps<StepFnImpl> {
         }
     }
 
-    pub(crate) fn chain_then<WorldImpl>(self, step: Step<impl ThenStepFn<WorldImpl>>) -> Steps<impl ThenStepFn<WorldImpl>>
+    pub(crate) fn chain_scenario_then<WorldImpl>(self, step: Step<impl ScenarioThenStepFn<WorldImpl>>) -> Steps<impl ScenarioThenStepFn<WorldImpl>>
     where
-        StepFnImpl: ThenStepFn<WorldImpl>,
+        StepFnImpl: ScenarioThenStepFn<WorldImpl>,
         WorldImpl: World,
     {
         let mut metas = self.metas;
@@ -99,7 +99,7 @@ impl<StepFnImpl> Steps<StepFnImpl> {
             callback,
         };
 
-        fn chain_callback<WorldImpl>(lhs: impl ThenStepFn<WorldImpl>, rhs: impl ThenStepFn<WorldImpl>) -> impl ThenStepFn<WorldImpl>
+        fn chain_callback<WorldImpl>(lhs: impl ScenarioThenStepFn<WorldImpl>, rhs: impl ScenarioThenStepFn<WorldImpl>) -> impl ScenarioThenStepFn<WorldImpl>
         where
             WorldImpl: World,
         {
@@ -159,27 +159,27 @@ where
 {
 }
 
-pub trait GivenStepFn<WorldImpl>: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static {}
+pub trait ScenarioGivenStepFn<WorldImpl>: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static {}
 
-impl<WorldImpl, T> GivenStepFn<WorldImpl> for T
+impl<WorldImpl, T> ScenarioGivenStepFn<WorldImpl> for T
 where
     T: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static,
     WorldImpl: World,
 {
 }
 
-pub trait WhenStepFn<WorldImpl>: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static {}
+pub trait ScenarioWhenStepFn<WorldImpl>: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static {}
 
-impl<WorldImpl, T> WhenStepFn<WorldImpl> for T
+impl<WorldImpl, T> ScenarioWhenStepFn<WorldImpl> for T
 where
     T: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static,
     WorldImpl: World,
 {
 }
 
-pub trait ThenStepFn<WorldImpl>: FnOnce(&WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static {}
+pub trait ScenarioThenStepFn<WorldImpl>: FnOnce(&WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static {}
 
-impl<WorldImpl, T> ThenStepFn<WorldImpl> for T
+impl<WorldImpl, T> ScenarioThenStepFn<WorldImpl> for T
 where
     T: FnOnce(&WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static,
     WorldImpl: World,

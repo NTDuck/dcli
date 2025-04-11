@@ -1,9 +1,9 @@
 use std::marker::PhantomData;
 
 use crate::elements::step::World;
-use crate::elements::step::GivenStepFn;
-use crate::elements::step::ThenStepFn;
-use crate::elements::step::WhenStepFn;
+use crate::elements::step::ScenarioGivenStepFn;
+use crate::elements::step::ScenarioThenStepFn;
+use crate::elements::step::ScenarioWhenStepFn;
 use crate::elements::step::StepMeta;
 use crate::elements::step::Step;
 use crate::elements::step::Steps;
@@ -59,7 +59,7 @@ where
 
     pub fn given<GivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> ScenarioWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl>
     where
-        GivenStepFnImpl: GivenStepFn<WorldImpl>,
+        GivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
     {
         ScenarioWithGivenStepsLastConfigured {
             description: self.description,
@@ -91,7 +91,7 @@ where
 {
     pub fn given<GivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: GivenStepFnImpl) -> ScenarioWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl>
     where
-        GivenStepFnImpl: GivenStepFn<WorldImpl>,
+        GivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
     {
         ScenarioWithGivenStepsLastConfigured {
             description: self.description,
@@ -121,12 +121,12 @@ pub struct ScenarioWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl> {
 
 impl<GivenStepFnImpl, WorldImpl> ScenarioWithGivenStepsLastConfigured<GivenStepFnImpl, WorldImpl>
 where
-    GivenStepFnImpl: GivenStepFn<WorldImpl>,
+    GivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and<OtherGivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherGivenStepFnImpl) -> ScenarioWithGivenStepsLastConfigured<impl GivenStepFn<WorldImpl>, WorldImpl>
+    pub fn and<OtherGivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherGivenStepFnImpl) -> ScenarioWithGivenStepsLastConfigured<impl ScenarioGivenStepFn<WorldImpl>, WorldImpl>
     where
-        OtherGivenStepFnImpl: GivenStepFn<WorldImpl>,
+        OtherGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -140,15 +140,15 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain_given(step),
+            given_steps: self.given_steps.chain_scenario_given(step),
 
             phantom: PhantomData,
         }
     }
 
-    pub fn but<OtherGivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherGivenStepFnImpl) -> ScenarioWithGivenStepsLastConfigured<impl GivenStepFn<WorldImpl>, WorldImpl>
+    pub fn but<OtherGivenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherGivenStepFnImpl) -> ScenarioWithGivenStepsLastConfigured<impl ScenarioGivenStepFn<WorldImpl>, WorldImpl>
     where
-        OtherGivenStepFnImpl: GivenStepFn<WorldImpl>,
+        OtherGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -162,7 +162,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain_given(step),
+            given_steps: self.given_steps.chain_scenario_given(step),
 
             phantom: PhantomData,
         }
@@ -170,7 +170,7 @@ where
 
     pub fn when<WhenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: WhenStepFnImpl) -> ScenarioWithWhenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, WorldImpl>
     where
-        WhenStepFnImpl: WhenStepFn<WorldImpl>,
+        WhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
     {
         ScenarioWithWhenStepsLastConfigured {
             description: self.description,
@@ -202,13 +202,13 @@ pub struct ScenarioWithWhenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, 
 
 impl<GivenStepFnImpl, WhenStepFnImpl, WorldImpl> ScenarioWithWhenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, WorldImpl>
 where
-    GivenStepFnImpl: GivenStepFn<WorldImpl>,
-    WhenStepFnImpl: WhenStepFn<WorldImpl>,
+    GivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
+    WhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and<OtherWhenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherWhenStepFnImpl) -> ScenarioWithWhenStepsLastConfigured<GivenStepFnImpl, impl WhenStepFn<WorldImpl>, WorldImpl>
+    pub fn and<OtherWhenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherWhenStepFnImpl) -> ScenarioWithWhenStepsLastConfigured<GivenStepFnImpl, impl ScenarioWhenStepFn<WorldImpl>, WorldImpl>
     where
-        OtherWhenStepFnImpl: WhenStepFn<WorldImpl>,
+        OtherWhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -223,15 +223,15 @@ where
             ignored: self.ignored,
 
             given_steps: self.given_steps,
-            when_steps: self.when_steps.chain_when(step),
+            when_steps: self.when_steps.chain_scenario_when(step),
 
             phantom: PhantomData,
         }
     }
 
-    pub fn but<OtherWhenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherWhenStepFnImpl) -> ScenarioWithWhenStepsLastConfigured<GivenStepFnImpl, impl WhenStepFn<WorldImpl>, WorldImpl>
+    pub fn but<OtherWhenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherWhenStepFnImpl) -> ScenarioWithWhenStepsLastConfigured<GivenStepFnImpl, impl ScenarioWhenStepFn<WorldImpl>, WorldImpl>
     where
-        OtherWhenStepFnImpl: WhenStepFn<WorldImpl>,
+        OtherWhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -246,7 +246,7 @@ where
             ignored: self.ignored,
 
             given_steps: self.given_steps,
-            when_steps: self.when_steps.chain_when(step),
+            when_steps: self.when_steps.chain_scenario_when(step),
 
             phantom: PhantomData,
         }
@@ -254,7 +254,7 @@ where
 
     pub fn then<ThenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: ThenStepFnImpl) -> ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>
     where
-        ThenStepFnImpl: ThenStepFn<WorldImpl>,
+        ThenStepFnImpl: ScenarioThenStepFn<WorldImpl>,
     {
         ScenarioWithThenStepsLastConfigured {
             description: self.description,
@@ -288,14 +288,14 @@ pub struct ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, 
 
 impl<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl> ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>
 where
-    GivenStepFnImpl: GivenStepFn<WorldImpl>,
-    WhenStepFnImpl: WhenStepFn<WorldImpl>,
-    ThenStepFnImpl: ThenStepFn<WorldImpl>,
+    GivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
+    WhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
+    ThenStepFnImpl: ScenarioThenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and<OtherThenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherThenStepFnImpl) -> ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, impl ThenStepFn<WorldImpl>, WorldImpl>
+    pub fn and<OtherThenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherThenStepFnImpl) -> ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, impl ScenarioThenStepFn<WorldImpl>, WorldImpl>
     where
-        OtherThenStepFnImpl: ThenStepFn<WorldImpl>,
+        OtherThenStepFnImpl: ScenarioThenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -311,15 +311,15 @@ where
 
             given_steps: self.given_steps,
             when_steps: self.when_steps,
-            then_steps: self.then_steps.chain_then(step),
+            then_steps: self.then_steps.chain_scenario_then(step),
 
             phantom: PhantomData,
         }
     }
 
-    pub fn but<OtherThenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherThenStepFnImpl) -> ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, impl ThenStepFn<WorldImpl>, WorldImpl>
+    pub fn but<OtherThenStepFnImpl>(self, description: impl Into<MaybeOwnedStr>, callback: OtherThenStepFnImpl) -> ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, impl ScenarioThenStepFn<WorldImpl>, WorldImpl>
     where
-        OtherThenStepFnImpl: ThenStepFn<WorldImpl>,
+        OtherThenStepFnImpl: ScenarioThenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -335,7 +335,7 @@ where
 
             given_steps: self.given_steps,
             when_steps: self.when_steps,
-            then_steps: self.then_steps.chain_then(step),
+            then_steps: self.then_steps.chain_scenario_then(step),
 
             phantom: PhantomData,
         }
@@ -344,9 +344,9 @@ where
 
 impl<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl> From<ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>> for FinalizedScenario<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>
 where
-    GivenStepFnImpl: GivenStepFn<WorldImpl>,
-    WhenStepFnImpl: WhenStepFn<WorldImpl>,
-    ThenStepFnImpl: ThenStepFn<WorldImpl>,
+    GivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
+    WhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
+    ThenStepFnImpl: ScenarioThenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(scenario: ScenarioWithThenStepsLastConfigured<GivenStepFnImpl, WhenStepFnImpl, ThenStepFnImpl, WorldImpl>) -> Self {

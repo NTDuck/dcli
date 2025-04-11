@@ -1,6 +1,6 @@
 use std::{collections::HashSet, marker::PhantomData, process::ExitCode};
 use libtest::Arguments;
-use litmus::elements::Scenario;
+use litmus::elements::{Background, Scenario};
 use litmus::prelude::*;
 
 pub fn main() -> ExitCode {
@@ -14,11 +14,19 @@ pub fn main() -> ExitCode {
     //             .expect(true, "expected task 0 to be present, found absent"))
     //     );
 
+    let _ = Background::<World>::named("do-nothing background")
+        .given("an empty repository", |_| Ok(()))
+        .and("an empty repository", |_| Ok(()))
+        .but("an empty repository", |_| Ok(()));
+
     let _ = Scenario::<World>::unnamed()
         .given("an empty repository", |_| Ok(()))
         .when("adding task 0", |world| world.repository.add(0).ok())
+        .and("adding task 1", |world| world.repository.add(1).ok())
         .then("the repository should contain task 0", |world| world.repository.contains(&0)
-            .expect(true, "expected task 0 to be present, found absent"));
+            .expect(true, "expected task 0 to be present, found absent"))
+        .but("the repository should not contain task 10", |world| world.repository.contains(&10)
+            .expect(true, "expected task 10 to be absent, found present"));
 
     libtest::run(&Arguments::from_args(), vec![]).exit_code()
 
