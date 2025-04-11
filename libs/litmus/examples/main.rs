@@ -5,21 +5,21 @@ use litmus::prelude::*;
 pub fn main() -> ExitCode {
     type World = RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>;
 
-    let trials = Feature::<World>::named("Number Repository")
+    let trials = Feature::named("Number Repository")
         .ignored(false)
         .background(Background::named("Nothingness")
             .ignored(true)
             .given("nothing", |_| ok())
             .and("nothing", |_| ok())
             .but("still nothing", |_| ok()))
-        .rule(|ctx| Rule::<_, World>::from(ctx)
+        .rule(|ctx| Rule::from(ctx)
             .named("Big numbers should work as well")
             // .ignored(true)
             .background(Background::<World>::named("Populate repository with big numbers")
                 .given("a repository with task `MAX`", |w| w.repository.add(usize::MAX).ok())
                 .and("a repository with task `MAX - 1`", |w| w.repository.add(usize::MAX - 1).ok())
                 .and("a repository with task `MAX - 2`", |w| w.repository.add(usize::MAX - 2).ok()))
-            .scenario(|ctx| Scenario::<_, _, World>::from(ctx)
+            .scenario(|ctx| Scenario::from(ctx)
                 .unnamed()
                 .given("a populated repository", |_| ok())
                 .when("doing nothing", |_| ok())
@@ -48,7 +48,8 @@ pub fn main() -> ExitCode {
             .then("the repository should contain 1", |w| w.repository.contains(&1)
                 .expect(true, "expected 1 to be present, found absent"))
             .but("not 0", |w| w.repository.contains(&0)
-                .expect(false, "expected 0 to be absent, found present")));
+                .expect(false, "expected 0 to be absent, found present")))
+        ;
 
     litmus::run(trials).exit_code()
 }
