@@ -65,16 +65,12 @@ pub struct CreateTaskOkViewModel;
 
 #[cfg(feature = "server")]
 impl From<CreateTaskOkResponseModel> for CreateTaskOkViewModel {
-    fn from(_: CreateTaskOkResponseModel) -> Self {
-        Self
-    }
+    fn from(_: CreateTaskOkResponseModel) -> Self { Self }
 }
 
 #[cfg(feature = "client")]
 impl From<CreateTaskOkViewModel> for CreateTaskOkResponseModel {
-    fn from(_: CreateTaskOkViewModel) -> Self {
-        CreateTaskOkResponseModel
-    }
+    fn from(_: CreateTaskOkViewModel) -> Self { CreateTaskOkResponseModel }
 }
 
 #[allow(clippy::enum_variant_names)]

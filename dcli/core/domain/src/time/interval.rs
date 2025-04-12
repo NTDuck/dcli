@@ -9,13 +9,9 @@ use axiom::interfaces::ddd;
 pub struct Interval(i64);
 
 impl Interval {
-    pub const fn from_millis(millis: i64) -> Self {
-        Self(millis)
-    }
+    pub const fn from_millis(millis: i64) -> Self { Self(millis) }
 
-    pub const fn as_millis(&self) -> i64 {
-        self.0
-    }
+    pub const fn as_millis(&self) -> i64 { self.0 }
 }
 
 impl Neg for Interval {

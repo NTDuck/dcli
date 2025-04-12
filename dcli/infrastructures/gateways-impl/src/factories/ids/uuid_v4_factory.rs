@@ -6,7 +6,5 @@ use use_cases::gateways::factories::ids::UuidFactory;
 pub struct UuidV4Factory;
 
 impl UuidFactory for UuidV4Factory {
-    fn create(&self) -> Uuid {
-        Uuid::new(uuid::Uuid::new_v4().as_u128())
-    }
+    fn create(&self) -> Uuid { Uuid::new(uuid::Uuid::new_v4().as_u128()) }
 }

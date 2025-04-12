@@ -11,9 +11,7 @@ impl PointerStrategy for RcRefCellPointerStrategy {
     type Typed<T> = Rc<RefCell<T>>;
     type Untyped = Self::Typed<()>;
 
-    fn into_typed<T>(obj: T) -> Self::Typed<T> {
-        Rc::new(RefCell::new(obj))
-    }
+    fn into_typed<T>(obj: T) -> Self::Typed<T> { Rc::new(RefCell::new(obj)) }
 
     fn into_untyped<T>(typed: Self::Typed<T>) -> Self::Untyped {
         unsafe { std::mem::transmute::<Self::Typed<T>, Self::Untyped>(typed) }

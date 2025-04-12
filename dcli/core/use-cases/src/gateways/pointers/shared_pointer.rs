@@ -39,9 +39,7 @@ where
         Self::new_from_handle(handle)
     }
 
-    pub fn as_ref(&self) -> impl Deref<Target = T> + '_ {
-        self.handle.as_ref()
-    }
+    pub fn as_ref(&self) -> impl Deref<Target = T> + '_ { self.handle.as_ref() }
 
     pub fn as_mut(&self) -> impl DerefMut<Target = T> + '_ {
         self.handle.as_mut()

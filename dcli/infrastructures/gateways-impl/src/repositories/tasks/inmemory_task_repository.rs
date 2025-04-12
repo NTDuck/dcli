@@ -64,9 +64,7 @@ impl TaskRepository for InMemoryTaskRepository {
         self.tasks_by_ids.contains_key(&Reverse(task_id))
     }
 
-    fn clear(&mut self) {
-        self.tasks_by_ids.clear();
-    }
+    fn clear(&mut self) { self.tasks_by_ids.clear(); }
 
     fn clear_by_status(&mut self, status: TaskStatus) {
         self.tasks_by_ids.retain(|_, task| task.status != status);

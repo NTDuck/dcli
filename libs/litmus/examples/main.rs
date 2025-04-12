@@ -26,7 +26,9 @@ pub struct RepositoryWorld<T, Handle: RepositoryWorldHandle<T>> {
     pub repository: Handle::Repository,
 }
 
-impl<T, Handle: RepositoryWorldHandle<T>> Default for RepositoryWorld<T, Handle> {
+impl<T, Handle: RepositoryWorldHandle<T>> Default
+    for RepositoryWorld<T, Handle>
+{
     fn default() -> Self {
         Self {
             repository: Handle::default(),
@@ -43,30 +45,20 @@ pub trait RepositoryWorldHandle<T> {
 pub struct InMemoryRepository<T>(HashSet<T>);
 
 impl<T> Default for InMemoryRepository<T> {
-    fn default() -> Self {
-        Self(HashSet::new())
-    }
+    fn default() -> Self { Self(HashSet::new()) }
 }
 
 impl<T> Repository<T> for InMemoryRepository<T>
 where
     T: Eq + std::hash::Hash,
 {
-    fn add(&mut self, item: T) {
-        self.0.insert(item);
-    }
-    
-    fn remove(&mut self, item: &T) {
-        self.0.remove(item);
-    }
-    
-    fn clear(&mut self) {
-        self.0.clear();
-    }
-    
-    fn contains(&self, item: &T) -> bool {
-        self.0.contains(item)
-    }
+    fn add(&mut self, item: T) { self.0.insert(item); }
+
+    fn remove(&mut self, item: &T) { self.0.remove(item); }
+
+    fn clear(&mut self) { self.0.clear(); }
+
+    fn contains(&self, item: &T) -> bool { self.0.contains(item) }
 }
 
 pub struct InMemoryRepositoryWorldHandle<T>(PhantomData<T>);
@@ -76,13 +68,14 @@ where
     T: Eq + std::hash::Hash,
 {
     type Repository = InMemoryRepository<T>;
-    
-    fn default() -> Self::Repository {
-        Self::Repository::default()
-    }
+
+    fn default() -> Self::Repository { Self::Repository::default() }
 }
 
-impl From<RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>> for Vec<libtest::Trial> {
+impl From<RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>>
+    for Vec<libtest::Trial>
+{
+    #[rustfmt::skip]
     fn from(_: RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>) -> Self {
         type World = RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>;
 

@@ -27,9 +27,7 @@ impl CentralizedSnowflakeProvider {
 }
 
 impl SnowflakeProvider for CentralizedSnowflakeProvider {
-    fn get_worker_number(&self) -> SnowflakeWorkerNumber {
-        self.worker_number
-    }
+    fn get_worker_number(&self) -> SnowflakeWorkerNumber { self.worker_number }
 
     fn get_sequence_number(&self) -> SnowflakeSequenceNumber {
         self.compute_and_assign_next_sequence_number()
