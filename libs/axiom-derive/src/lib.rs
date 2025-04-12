@@ -9,11 +9,6 @@ pub fn derive_new(tokens: TokenStream) -> TokenStream {
     crate::behaviours::derive_new(tokens)
 }
 
-#[proc_macro_derive(NewType)]
-pub fn derive_newtype(tokens: TokenStream) -> TokenStream {
-    crate::behaviours::derive_newtype(tokens)
-}
-
 #[proc_macro_derive(DataTransferObjectWithoutDeserialize)]
 pub fn derive_data_transfer_object_without_deserialize(tokens: TokenStream) -> TokenStream {
     crate::interfaces::derive_data_transfer_object_without_deserialize(tokens)
