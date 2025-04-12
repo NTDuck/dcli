@@ -18,6 +18,7 @@ publish = false
 [workspace.dependencies]
 # Cross-cutting concerns, centralized
 axiom = { path = "libs/axiom" }
+litmus = { path = "libs/litmus" }
 
 # Crates that we choose to marry
 # See: https://blessed.rs/crates

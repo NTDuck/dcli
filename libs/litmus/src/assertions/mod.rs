@@ -7,7 +7,11 @@ pub trait AssertionExt {
         Ok(())
     }
 
-    fn expect(&self, value: impl Into<Self>, err: impl Into<libtest::Failed>) -> Result<(), libtest::Failed>
+    fn expect(
+        &self,
+        value: impl Into<Self>,
+        err: impl Into<libtest::Failed>,
+    ) -> Result<(), libtest::Failed>
     where
         Self: Sized + PartialEq,
     {
