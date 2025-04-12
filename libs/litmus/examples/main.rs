@@ -1,5 +1,11 @@
-use std::{collections::HashSet, marker::PhantomData, process::ExitCode};
-use litmus::elements::{Background, Feature, Rule, Scenario};
+use std::collections::HashSet;
+use std::marker::PhantomData;
+use std::process::ExitCode;
+
+use litmus::elements::Background;
+use litmus::elements::Feature;
+use litmus::elements::Rule;
+use litmus::elements::Scenario;
 use litmus::prelude::*;
 
 pub fn main() -> ExitCode {
