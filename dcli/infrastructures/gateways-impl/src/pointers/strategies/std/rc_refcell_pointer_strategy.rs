@@ -23,15 +23,11 @@ impl PointerStrategy for RcRefCellPointerStrategy {
         Rc::clone(typed)
     }
 
-    fn as_ref<'br, T: 'br>(
-        typed: &'br Self::Typed<T>,
-    ) -> impl Deref<Target = T> + 'br {
+    fn as_ref<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl Deref<Target = T> + 'br {
         typed.borrow()
     }
 
-    fn as_mut<'br, T: 'br>(
-        typed: &'br Self::Typed<T>,
-    ) -> impl DerefMut<Target = T> + 'br {
+    fn as_mut<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl DerefMut<Target = T> + 'br {
         typed.borrow_mut()
     }
 }

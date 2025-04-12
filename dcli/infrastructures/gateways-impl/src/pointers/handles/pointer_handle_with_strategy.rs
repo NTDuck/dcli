@@ -52,9 +52,7 @@ where
     }
 
     fn as_typed_ref<T>(&self) -> &Strategy::Typed<T> {
-        let raw_const_pointer = (self.untyped.deref()
-            as *const Strategy::Untyped)
-            .cast::<Strategy::Typed<T>>();
+        let raw_const_pointer = (self.untyped.deref() as *const Strategy::Untyped).cast::<Strategy::Typed<T>>();
 
         Strategy::check_binary_compatibility::<T>();
 
@@ -62,9 +60,7 @@ where
     }
 
     fn as_typed_mut<T>(&mut self) -> &mut Strategy::Typed<T> {
-        let raw_mut_pointer = (self.untyped.deref_mut()
-            as *mut Strategy::Untyped)
-            .cast::<Strategy::Typed<T>>();
+        let raw_mut_pointer = (self.untyped.deref_mut() as *mut Strategy::Untyped).cast::<Strategy::Typed<T>>();
 
         Strategy::check_binary_compatibility::<T>();
 

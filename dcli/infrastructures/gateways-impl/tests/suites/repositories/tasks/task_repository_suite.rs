@@ -36,8 +36,7 @@ macro_rules! given {
     };
 
     (a repository containing tasks { $idx_start:expr }to { $idx_end:expr }) => {
-        let mut world =
-            World::given_repository_with_task_range($idx_start..=$idx_end);
+        let mut world = World::given_repository_with_task_range($idx_start..=$idx_end);
     };
 }
 
@@ -60,13 +59,8 @@ macro_rules! then {
         world.then_repository_contains_only_task($idx);
     };
 
-    (
-        the repository contains task { $idx_start:expr }to { $idx_end:expr }except { $idx_except:expr }
-    ) => {
-        world.then_repository_contains_task_range_except(
-            $idx_start..=$idx_end,
-            $idx_except,
-        );
+    (the repository contains task { $idx_start:expr }to { $idx_end:expr }except { $idx_except:expr }) => {
+        world.then_repository_contains_task_range_except($idx_start..=$idx_end, $idx_except);
     };
 }
 

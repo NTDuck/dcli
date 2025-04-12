@@ -18,28 +18,22 @@ impl Snowflake {
     ) -> Self {
         let encoded_timestamp = Self::encode_timestamp(timestamp);
         let encoded_worker_number = Self::encode_worker_number(worker_number);
-        let encoded_sequence_number =
-            Self::encode_sequence_number(sequence_number);
+        let encoded_sequence_number = Self::encode_sequence_number(sequence_number);
 
-        Self(
-            encoded_timestamp | encoded_worker_number | encoded_sequence_number,
-        )
+        Self(encoded_timestamp | encoded_worker_number | encoded_sequence_number)
     }
 
     pub fn get_timestamp(&self) -> Timestamp {
-        let encoded_millis =
-            (self.as_u64() >> TIMESTAMP_SHIFT) & TIMESTAMP_BITMASK;
+        let encoded_millis = (self.as_u64() >> TIMESTAMP_SHIFT) & TIMESTAMP_BITMASK;
         Timestamp::from_millis_since_epoch(encoded_millis as i64)
     }
 
     pub fn get_worker_number(&self) -> SnowflakeWorkerNumber {
-        ((self.as_u64() >> WORKER_NUMBER_SHIFT) & WORKER_NUMBER_BITMASK)
-            as SnowflakeWorkerNumber
+        ((self.as_u64() >> WORKER_NUMBER_SHIFT) & WORKER_NUMBER_BITMASK) as SnowflakeWorkerNumber
     }
 
     pub fn get_sequence_number(&self) -> SnowflakeSequenceNumber {
-        ((self.as_u64() >> SEQUENCE_NUMBER_SHIFT) & SEQUENCE_NUMBER_BITMASK)
-            as SnowflakeSequenceNumber
+        ((self.as_u64() >> SEQUENCE_NUMBER_SHIFT) & SEQUENCE_NUMBER_BITMASK) as SnowflakeSequenceNumber
     }
 
     fn encode_timestamp(timestamp: Timestamp) -> u64 {

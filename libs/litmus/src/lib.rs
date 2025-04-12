@@ -9,9 +9,6 @@ pub fn run(trials: impl Into<Vec<libtest::Trial>>) -> libtest::Conclusion {
     run_with_args(&args, trials.into())
 }
 
-pub fn run_with_args(
-    args: &libtest::Arguments,
-    trials: impl Into<Vec<libtest::Trial>>,
-) -> libtest::Conclusion {
+pub fn run_with_args(args: &libtest::Arguments, trials: impl Into<Vec<libtest::Trial>>) -> libtest::Conclusion {
     libtest::run(args, trials.into())
 }

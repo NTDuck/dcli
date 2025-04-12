@@ -15,9 +15,7 @@ impl<WorldImpl> UnconfiguredFeature<WorldImpl>
 where
     WorldImpl: World,
 {
-    pub fn named(
-        description: impl Into<MaybeOwnedStr>,
-    ) -> FeatureWithDescriptionLastConfigured<WorldImpl> {
+    pub fn named(description: impl Into<MaybeOwnedStr>) -> FeatureWithDescriptionLastConfigured<WorldImpl> {
         FeatureWithDescriptionLastConfigured {
             description: Some(description.into()),
 
@@ -36,10 +34,7 @@ impl<WorldImpl> FeatureWithDescriptionLastConfigured<WorldImpl>
 where
     WorldImpl: World,
 {
-    pub fn ignored(
-        self,
-        ignored: impl Into<bool>,
-    ) -> FeatureWithIgnoredLastConfigured<WorldImpl> {
+    pub fn ignored(self, ignored: impl Into<bool>) -> FeatureWithIgnoredLastConfigured<WorldImpl> {
         FeatureWithIgnoredLastConfigured {
             description: self.description,
             ignored: Some(ignored.into()),
@@ -50,9 +45,7 @@ where
 
     pub fn background<BackgroundGivenStepFnImpl>(
         self,
-        background: impl Into<
-            BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>,
-        >,
+        background: impl Into<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
     ) -> FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
@@ -68,10 +61,7 @@ where
     pub fn rule<F, R, BackgroundGivenStepFnImpl>(
         self,
         f: F,
-    ) -> FeatureWithRulesOrScenariosLastConfigured<
-        BackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+    ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
         R: Into<Vec<libtest::Trial>>,
@@ -92,10 +82,7 @@ where
     pub fn scenario<F, R, BackgroundGivenStepFnImpl>(
         self,
         f: F,
-    ) -> FeatureWithRulesOrScenariosLastConfigured<
-        BackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+    ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
         R: Into<libtest::Trial>,
@@ -113,9 +100,7 @@ where
         }
     }
 
-    fn as_context<BackgroundGivenStepFnImpl>(
-        &self,
-    ) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    fn as_context<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
@@ -141,9 +126,7 @@ where
 {
     pub fn background<BackgroundGivenStepFnImpl>(
         self,
-        background: impl Into<
-            BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>,
-        >,
+        background: impl Into<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
     ) -> FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
@@ -159,10 +142,7 @@ where
     pub fn rule<F, R, BackgroundGivenStepFnImpl>(
         self,
         f: F,
-    ) -> FeatureWithRulesOrScenariosLastConfigured<
-        BackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+    ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
         R: Into<Vec<libtest::Trial>>,
@@ -183,10 +163,7 @@ where
     pub fn scenario<F, R, BackgroundGivenStepFnImpl>(
         self,
         f: F,
-    ) -> FeatureWithRulesOrScenariosLastConfigured<
-        BackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+    ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
         R: Into<libtest::Trial>,
@@ -204,9 +181,7 @@ where
         }
     }
 
-    fn as_context<BackgroundGivenStepFnImpl>(
-        &self,
-    ) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    fn as_context<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
@@ -219,29 +194,19 @@ where
     }
 }
 
-pub struct FeatureWithBackgroundLastConfigured<
-    BackgroundGivenStepFnImpl,
-    WorldImpl,
-> {
+pub struct FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
     background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
-impl<BackgroundGivenStepFnImpl, WorldImpl>
-    FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+impl<BackgroundGivenStepFnImpl, WorldImpl> FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
 where
     BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn rule<F, R>(
-        self,
-        f: F,
-    ) -> FeatureWithRulesOrScenariosLastConfigured<
-        BackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+    pub fn rule<F, R>(self, f: F) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
         R: Into<Vec<libtest::Trial>>,
@@ -258,13 +223,7 @@ where
         }
     }
 
-    pub fn scenario<F, R>(
-        self,
-        f: F,
-    ) -> FeatureWithRulesOrScenariosLastConfigured<
-        BackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+    pub fn scenario<F, R>(self, f: F) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
         R: Into<libtest::Trial>,
@@ -294,10 +253,7 @@ where
     }
 }
 
-pub struct FeatureWithRulesOrScenariosLastConfigured<
-    BackgroundGivenStepFnImpl,
-    WorldImpl,
-> {
+pub struct FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
@@ -307,10 +263,7 @@ pub struct FeatureWithRulesOrScenariosLastConfigured<
 }
 
 impl<BackgroundGivenStepFnImpl, WorldImpl>
-    FeatureWithRulesOrScenariosLastConfigured<
-        BackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+    FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
 where
     BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
@@ -369,19 +322,9 @@ where
 }
 
 impl<BackgroundGivenStepFnImpl, WorldImpl>
-    From<
-        FeatureWithRulesOrScenariosLastConfigured<
-            BackgroundGivenStepFnImpl,
-            WorldImpl,
-        >,
-    > for Vec<libtest::Trial>
+    From<FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>> for Vec<libtest::Trial>
 {
-    fn from(
-        feature: FeatureWithRulesOrScenariosLastConfigured<
-            BackgroundGivenStepFnImpl,
-            WorldImpl,
-        >,
-    ) -> Self {
+    fn from(feature: FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>) -> Self {
         feature.trials
     }
 }
@@ -391,13 +334,10 @@ pub struct FeatureContext<BackgroundGivenStepFnImpl, WorldImpl> {
     pub(super) description: Option<MaybeOwnedStr>,
     pub(super) ignored: Option<bool>,
 
-    pub(super) background:
-        Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
+    pub(super) background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
-impl<BackgroundGivenStepFnImpl, WorldImpl> Clone
-    for FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
-{
+impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for FeatureContext<BackgroundGivenStepFnImpl, WorldImpl> {
     fn clone(&self) -> Self {
         Self {
             description: self.description.clone(),

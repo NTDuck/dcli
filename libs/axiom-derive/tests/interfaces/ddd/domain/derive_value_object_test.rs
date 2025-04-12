@@ -16,10 +16,7 @@ pub mod axiom {
             pub mod domain {
                 use std::fmt::Debug;
 
-                pub trait ValueObject:
-                    Debug + Send + Sync + Clone + PartialEq + Eq
-                {
-                }
+                pub trait ValueObject: Debug + Send + Sync + Clone + PartialEq + Eq {}
             }
         }
     }

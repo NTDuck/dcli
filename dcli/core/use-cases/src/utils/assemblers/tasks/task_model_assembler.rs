@@ -12,9 +12,7 @@ pub struct TaskModelAssembler<Handle: PointerHandle> {
 }
 
 impl<Handle: PointerHandle> TaskModelAssembler<Handle> {
-    pub fn new(
-        timestamp_formatter: SharedPointer<Box<dyn TimestampFormatter>, Handle>,
-    ) -> Self {
+    pub fn new(timestamp_formatter: SharedPointer<Box<dyn TimestampFormatter>, Handle>) -> Self {
         Self {
             timestamp_formatter,
             task_status_model_assembler: TaskStatusModelAssembler,

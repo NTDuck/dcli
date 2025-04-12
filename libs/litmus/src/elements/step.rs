@@ -142,12 +142,7 @@ pub(crate) struct Step<StepFnImpl> {
 
 impl<StepFnImpl> std::fmt::Display for Steps<StepFnImpl> {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let joined = self
-            .metas
-            .iter()
-            .map(|meta| format!("{}", meta))
-            .collect::<Vec<_>>()
-            .join(STEP_DELIMITER);
+        let joined = self.metas.iter().map(|meta| format!("{}", meta)).collect::<Vec<_>>().join(STEP_DELIMITER);
 
         write!(formatter, "{}", joined)
     }
@@ -182,10 +177,7 @@ pub trait BackgroundGivenStepFn<WorldImpl>:
 
 impl<WorldImpl, T> BackgroundGivenStepFn<WorldImpl> for T
 where
-    T: Fn(&mut WorldImpl) -> Result<(), libtest::Failed>
-        + Send
-        + Sync
-        + 'static,
+    T: Fn(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static,
     WorldImpl: World,
 {
 }
@@ -197,10 +189,7 @@ pub trait ScenarioGivenStepFn<WorldImpl>:
 
 impl<WorldImpl, T> ScenarioGivenStepFn<WorldImpl> for T
 where
-    T: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed>
-        + Send
-        + Sync
-        + 'static,
+    T: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static,
     WorldImpl: World,
 {
 }
@@ -212,10 +201,7 @@ pub trait ScenarioWhenStepFn<WorldImpl>:
 
 impl<WorldImpl, T> ScenarioWhenStepFn<WorldImpl> for T
 where
-    T: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed>
-        + Send
-        + Sync
-        + 'static,
+    T: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static,
     WorldImpl: World,
 {
 }
@@ -227,10 +213,7 @@ pub trait ScenarioThenStepFn<WorldImpl>:
 
 impl<WorldImpl, T> ScenarioThenStepFn<WorldImpl> for T
 where
-    T: FnOnce(&WorldImpl) -> Result<(), libtest::Failed>
-        + Send
-        + Sync
-        + 'static,
+    T: FnOnce(&WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static,
     WorldImpl: World,
 {
 }

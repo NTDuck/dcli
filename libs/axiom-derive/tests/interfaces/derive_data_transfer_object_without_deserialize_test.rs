@@ -18,15 +18,7 @@ pub mod axiom {
         use serde::Deserialize;
         use serde::Serialize;
 
-        pub trait DataTransferObject:
-            Debug
-            + Send
-            + Sync
-            + Clone
-            + Serialize
-            + for<'de> Deserialize<'de>
-        {
-        }
+        pub trait DataTransferObject: Debug + Send + Sync + Clone + Serialize + for<'de> Deserialize<'de> {}
     }
 }
 

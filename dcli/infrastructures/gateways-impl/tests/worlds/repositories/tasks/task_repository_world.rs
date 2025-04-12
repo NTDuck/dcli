@@ -33,14 +33,10 @@ impl<Handle: TaskRepositoryWorldHandle> TaskRepositoryWorld<Handle> {
         world
     }
 
-    pub fn given_repository_with_task_range(
-        idx_range: RangeInclusive<usize>,
-    ) -> Self {
+    pub fn given_repository_with_task_range(idx_range: RangeInclusive<usize>) -> Self {
         let mut world = Self::given_empty_repository();
 
-        idx_range
-            .map(|idx| Param(idx).into())
-            .for_each(|task| world.task_repository.save(task));
+        idx_range.map(|idx| Param(idx).into()).for_each(|task| world.task_repository.save(task));
 
         world
     }
@@ -57,9 +53,7 @@ impl<Handle: TaskRepositoryWorldHandle> TaskRepositoryWorld<Handle> {
 
     pub fn then_repository_is_empty(&self) {
         let pagination_request = UNBOUNDED_PAGINATION_REQUEST;
-        let pagination_response = self
-            .task_repository
-            .show_reverse_chronologically_ordered(pagination_request);
+        let pagination_response = self.task_repository.show_reverse_chronologically_ordered(pagination_request);
 
         assert!(pagination_response.items.is_empty());
         assert!(pagination_response.page_size == 0);
@@ -72,19 +66,13 @@ impl<Handle: TaskRepositoryWorldHandle> TaskRepositoryWorld<Handle> {
         assert!(self.task_repository.get_by_id(task.id) == Some(task.clone()));
 
         let pagination_request = UNBOUNDED_PAGINATION_REQUEST;
-        let pagination_response = self
-            .task_repository
-            .show_reverse_chronologically_ordered(pagination_request);
+        let pagination_response = self.task_repository.show_reverse_chronologically_ordered(pagination_request);
 
         assert!(pagination_response.items == vec![task]);
         assert!(pagination_response.page_size == 1);
     }
 
-    pub fn then_repository_contains_task_range_except(
-        &self,
-        idx_range: RangeInclusive<usize>,
-        idx_except: usize,
-    ) {
+    pub fn then_repository_contains_task_range_except(&self, idx_range: RangeInclusive<usize>, idx_except: usize) {
         let task_except = Param(idx_except).into();
 
         let tasks = idx_range
@@ -93,19 +81,11 @@ impl<Handle: TaskRepositoryWorldHandle> TaskRepositoryWorld<Handle> {
             .filter(|task| *task != task_except)
             .collect::<Vec<Task>>();
 
-        assert!(tasks
-            .par_iter()
-            .map(|task| task.id)
-            .all(|task_id| self.task_repository.contains(task_id)));
-        assert!(tasks
-            .par_iter()
-            .cloned()
-            .all(|task| self.task_repository.get_by_id(task.id) == Some(task)));
+        assert!(tasks.par_iter().map(|task| task.id).all(|task_id| self.task_repository.contains(task_id)));
+        assert!(tasks.par_iter().cloned().all(|task| self.task_repository.get_by_id(task.id) == Some(task)));
 
         let pagination_request = UNBOUNDED_PAGINATION_REQUEST;
-        let pagination_response = self
-            .task_repository
-            .show_reverse_chronologically_ordered(pagination_request);
+        let pagination_response = self.task_repository.show_reverse_chronologically_ordered(pagination_request);
 
         assert!(pagination_response.items == tasks);
         assert!(pagination_response.page_size == tasks.len());

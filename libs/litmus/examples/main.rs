@@ -26,9 +26,7 @@ pub struct RepositoryWorld<T, Handle: RepositoryWorldHandle<T>> {
     pub repository: Handle::Repository,
 }
 
-impl<T, Handle: RepositoryWorldHandle<T>> Default
-    for RepositoryWorld<T, Handle>
-{
+impl<T, Handle: RepositoryWorldHandle<T>> Default for RepositoryWorld<T, Handle> {
     fn default() -> Self {
         Self {
             repository: Handle::default(),
@@ -84,9 +82,7 @@ where
     }
 }
 
-impl From<RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>>
-    for Vec<libtest::Trial>
-{
+impl From<RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>> for Vec<libtest::Trial> {
     #[rustfmt::skip]
     fn from(_: RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>) -> Self {
         type World = RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>;

@@ -288,23 +288,29 @@ macro_rules! __test_common_enums_with_mixed_variants {
 macro_rules! __test_common_enums {
     ($derive_clause:tt, $test_fn:ident) => {
         crate::utils::templates::common_combinations::__test_empty_enum!($derive_clause);
-        crate::utils::templates::common_combinations::__test_common_enums_with_only_struct_variants!($derive_clause, $test_fn);
-        crate::utils::templates::common_combinations::__test_common_enums_with_only_tuple_variants!($derive_clause, $test_fn);
-        crate::utils::templates::common_combinations::__test_common_enums_with_only_unit_variants!($derive_clause, $test_fn);
-        crate::utils::templates::common_combinations::__test_common_enums_with_mixed_variants!($derive_clause, $test_fn);
+        crate::utils::templates::common_combinations::__test_common_enums_with_only_struct_variants!(
+            $derive_clause,
+            $test_fn
+        );
+        crate::utils::templates::common_combinations::__test_common_enums_with_only_tuple_variants!(
+            $derive_clause,
+            $test_fn
+        );
+        crate::utils::templates::common_combinations::__test_common_enums_with_only_unit_variants!(
+            $derive_clause,
+            $test_fn
+        );
+        crate::utils::templates::common_combinations::__test_common_enums_with_mixed_variants!(
+            $derive_clause,
+            $test_fn
+        );
     };
 }
 
 macro_rules! test_common_combinations {
     (derives = # $derive_clause:tt,test_fn = $test_fn:ident,) => {
-        crate::utils::templates::common_combinations::__test_common_structs!(
-            $derive_clause,
-            $test_fn
-        );
-        crate::utils::templates::common_combinations::__test_common_enums!(
-            $derive_clause,
-            $test_fn
-        );
+        crate::utils::templates::common_combinations::__test_common_structs!($derive_clause, $test_fn);
+        crate::utils::templates::common_combinations::__test_common_enums!($derive_clause, $test_fn);
     };
 }
 

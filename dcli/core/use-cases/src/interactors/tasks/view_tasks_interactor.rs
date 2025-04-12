@@ -24,21 +24,16 @@ impl<Handle: PointerHandle> ViewTasksInteractor<Handle> {
     ) -> Self {
         Self {
             task_repository: task_repository.clone(),
-            response_model_assembler: ViewTasksResponseModelAssembler::new(
-                timestamp_formatter.clone(),
-            ),
+            response_model_assembler: ViewTasksResponseModelAssembler::new(timestamp_formatter.clone()),
         }
     }
 }
 
 impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksInteractor<Handle> {
     fn apply(&self, request: ViewTasksRequestModel) -> ViewTasksResponseModel {
-        let pagination_response = self
-            .task_repository
-            .as_ref()
-            .show_reverse_chronologically_ordered(request.pagination_request);
-        let response_model =
-            self.response_model_assembler.assemble(pagination_response);
+        let pagination_response =
+            self.task_repository.as_ref().show_reverse_chronologically_ordered(request.pagination_request);
+        let response_model = self.response_model_assembler.assemble(pagination_response);
 
         response_model
     }
@@ -49,20 +44,13 @@ pub struct ViewTasksResponseModelAssembler<Handle: PointerHandle> {
 }
 
 impl<Handle: PointerHandle> ViewTasksResponseModelAssembler<Handle> {
-    pub fn new(
-        timestamp_formatter: SharedPointer<Box<dyn TimestampFormatter>, Handle>,
-    ) -> Self {
+    pub fn new(timestamp_formatter: SharedPointer<Box<dyn TimestampFormatter>, Handle>) -> Self {
         Self {
-            task_model_assembler: TaskModelAssembler::new(
-                timestamp_formatter.clone(),
-            ),
+            task_model_assembler: TaskModelAssembler::new(timestamp_formatter.clone()),
         }
     }
 
-    pub fn assemble(
-        &self,
-        pagination_response: PaginationResponse<Task>,
-    ) -> ViewTasksResponseModel {
+    pub fn assemble(&self, pagination_response: PaginationResponse<Task>) -> ViewTasksResponseModel {
         Ok(ViewTasksOkResponseModel {
             pagination_response: PaginationResponse {
                 items: pagination_response

@@ -15,10 +15,7 @@ pub fn derive_new(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     proc_macro::TokenStream::from(tokens)
 }
 
-fn derive_for_struct(
-    ast: &syn::DeriveInput,
-    data: &syn::DataStruct,
-) -> proc_macro2::TokenStream {
+fn derive_for_struct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
     let fields = &data.fields;
 
     match fields {
@@ -28,13 +25,9 @@ fn derive_for_struct(
     }
 }
 
-fn derive_for_ordinary_struct(
-    ast: &syn::DeriveInput,
-    fields: &syn::FieldsNamed,
-) -> proc_macro2::TokenStream {
+fn derive_for_ordinary_struct(ast: &syn::DeriveInput, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let struct_ident = &ast.ident;
-    let (struct_impl_generics, struct_type_generics, struct_where_clause) =
-        ast.generics.split_for_impl();
+    let (struct_impl_generics, struct_type_generics, struct_where_clause) = ast.generics.split_for_impl();
     let method_ident = get_method_ident_for_struct();
 
     let field_idents = get_field_idents_from_named_fields(fields);
@@ -49,13 +42,9 @@ fn derive_for_ordinary_struct(
     }
 }
 
-fn derive_for_tuple_struct(
-    ast: &syn::DeriveInput,
-    fields: &syn::FieldsUnnamed,
-) -> proc_macro2::TokenStream {
+fn derive_for_tuple_struct(ast: &syn::DeriveInput, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let struct_ident = &ast.ident;
-    let (struct_impl_generics, struct_type_generics, struct_where_clause) =
-        ast.generics.split_for_impl();
+    let (struct_impl_generics, struct_type_generics, struct_where_clause) = ast.generics.split_for_impl();
     let method_ident = get_method_ident_for_struct();
 
     let field_idents = get_field_idents_from_unnamed_fields(fields);
@@ -72,8 +61,7 @@ fn derive_for_tuple_struct(
 
 fn derive_for_unit_struct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let struct_ident = &ast.ident;
-    let (struct_impl_generics, struct_type_generics, struct_where_clause) =
-        ast.generics.split_for_impl();
+    let (struct_impl_generics, struct_type_generics, struct_where_clause) = ast.generics.split_for_impl();
     let method_ident = get_method_ident_for_struct();
 
     quote! {
@@ -85,26 +73,20 @@ fn derive_for_unit_struct(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     }
 }
 
-fn derive_for_enum(
-    ast: &syn::DeriveInput,
-    data: &syn::DataEnum,
-) -> proc_macro2::TokenStream {
+fn derive_for_enum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
     let variants = &data.variants;
 
     let variant_new_methods = variants
         .iter()
         .map(|variant| match &variant.fields {
-            syn::Fields::Named(fields) =>
-                derive_for_struct_variant(variant, fields),
-            syn::Fields::Unnamed(fields) =>
-                derive_for_tuple_variant(variant, fields),
+            syn::Fields::Named(fields) => derive_for_struct_variant(variant, fields),
+            syn::Fields::Unnamed(fields) => derive_for_tuple_variant(variant, fields),
             syn::Fields::Unit => derive_for_unit_variant(variant),
         })
         .collect::<Vec<_>>();
 
     let enum_ident = &ast.ident;
-    let (enum_impl_generics, enum_type_generics, enum_where_clause) =
-        ast.generics.split_for_impl();
+    let (enum_impl_generics, enum_type_generics, enum_where_clause) = ast.generics.split_for_impl();
 
     quote! {
         impl #enum_impl_generics #enum_ident #enum_type_generics #enum_where_clause {
@@ -113,10 +95,7 @@ fn derive_for_enum(
     }
 }
 
-fn derive_for_struct_variant(
-    variant: &syn::Variant,
-    fields: &syn::FieldsNamed,
-) -> proc_macro2::TokenStream {
+fn derive_for_struct_variant(variant: &syn::Variant, fields: &syn::FieldsNamed) -> proc_macro2::TokenStream {
     let variant_ident = &variant.ident;
     let method_ident = get_method_ident_for_enum_from_variant(variant);
 
@@ -130,10 +109,7 @@ fn derive_for_struct_variant(
     }
 }
 
-fn derive_for_tuple_variant(
-    variant: &syn::Variant,
-    fields: &syn::FieldsUnnamed,
-) -> proc_macro2::TokenStream {
+fn derive_for_tuple_variant(variant: &syn::Variant, fields: &syn::FieldsUnnamed) -> proc_macro2::TokenStream {
     let variant_ident = &variant.ident;
     let method_ident = get_method_ident_for_enum_from_variant(variant);
 
@@ -162,15 +138,11 @@ fn get_method_ident_for_struct() -> syn::Ident {
     format_ident!("{BASE_METHOD_IDENT}")
 }
 
-fn get_method_ident_for_enum_from_variant(
-    variant: &syn::Variant,
-) -> syn::Ident {
+fn get_method_ident_for_enum_from_variant(variant: &syn::Variant) -> syn::Ident {
     let variant_ident = &variant.ident;
 
-    let unformatted_method_ident =
-        format_ident!("{BASE_METHOD_IDENT}{variant_ident}");
-    let formatted_method_ident =
-        convert_ident_to_snake_case(&unformatted_method_ident);
+    let unformatted_method_ident = format_ident!("{BASE_METHOD_IDENT}{variant_ident}");
+    let formatted_method_ident = convert_ident_to_snake_case(&unformatted_method_ident);
 
     formatted_method_ident
 }

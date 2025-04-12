@@ -16,9 +16,7 @@ pub struct ViewTasksRemoteInteractor<Handle: PointerHandle> {
     uri: &'static str,
 }
 
-impl<Handle: PointerHandle> ViewTasksBoundary
-    for ViewTasksRemoteInteractor<Handle>
-{
+impl<Handle: PointerHandle> ViewTasksBoundary for ViewTasksRemoteInteractor<Handle> {
     fn apply(&self, request: ViewTasksRequestModel) -> ViewTasksResponseModel {
         let request: ViewTasksRequestObject = request.into();
 

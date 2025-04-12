@@ -25,8 +25,7 @@ impl Add<Interval> for Timestamp {
     type Output = Self;
 
     fn add(self, interval: Interval) -> Self::Output {
-        let millis_since_epoch =
-            self.as_millis_since_epoch().saturating_add(interval.as_millis());
+        let millis_since_epoch = self.as_millis_since_epoch().saturating_add(interval.as_millis());
         Self::from_millis_since_epoch(millis_since_epoch)
     }
 }
@@ -35,8 +34,7 @@ impl Sub<Interval> for Timestamp {
     type Output = Self;
 
     fn sub(self, interval: Interval) -> Self::Output {
-        let millis_since_epoch =
-            self.as_millis_since_epoch().saturating_sub(interval.as_millis());
+        let millis_since_epoch = self.as_millis_since_epoch().saturating_sub(interval.as_millis());
         Self::from_millis_since_epoch(millis_since_epoch)
     }
 }
@@ -45,9 +43,7 @@ impl Sub<Self> for Timestamp {
     type Output = Interval;
 
     fn sub(self, other: Self) -> Self::Output {
-        let millis = self
-            .as_millis_since_epoch()
-            .saturating_sub(other.as_millis_since_epoch());
+        let millis = self.as_millis_since_epoch().saturating_sub(other.as_millis_since_epoch());
         Interval::from_millis(millis)
     }
 }

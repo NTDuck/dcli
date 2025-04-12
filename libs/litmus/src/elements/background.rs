@@ -19,9 +19,7 @@ impl<WorldImpl> UnconfiguredBackground<WorldImpl>
 where
     WorldImpl: World,
 {
-    pub fn named(
-        description: impl Into<MaybeOwnedStr>,
-    ) -> BackgroundWithDescriptionLastConfigured<WorldImpl> {
+    pub fn named(description: impl Into<MaybeOwnedStr>) -> BackgroundWithDescriptionLastConfigured<WorldImpl> {
         BackgroundWithDescriptionLastConfigured {
             description: Some(description.into()),
 
@@ -40,10 +38,7 @@ impl<WorldImpl> BackgroundWithDescriptionLastConfigured<WorldImpl>
 where
     WorldImpl: World,
 {
-    pub fn ignored(
-        self,
-        ignored: impl Into<bool>,
-    ) -> BackgroundWithIgnoredLastConfigured<WorldImpl> {
+    pub fn ignored(self, ignored: impl Into<bool>) -> BackgroundWithIgnoredLastConfigured<WorldImpl> {
         BackgroundWithIgnoredLastConfigured {
             description: self.description,
             ignored: Some(ignored.into()),
@@ -56,10 +51,7 @@ where
         self,
         description: impl Into<MaybeOwnedStr>,
         callback: BackgroundGivenStepFnImpl,
-    ) -> BackgroundWithGivenStepsLastConfigured<
-        BackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+    ) -> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
@@ -95,10 +87,7 @@ where
         self,
         description: impl Into<MaybeOwnedStr>,
         callback: BackgroundGivenStepFnImpl,
-    ) -> BackgroundWithGivenStepsLastConfigured<
-        BackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+    ) -> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
@@ -119,10 +108,7 @@ where
     }
 }
 
-pub struct BackgroundWithGivenStepsLastConfigured<
-    BackgroundGivenStepFnImpl,
-    WorldImpl,
-> {
+pub struct BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
@@ -131,8 +117,7 @@ pub struct BackgroundWithGivenStepsLastConfigured<
     phantom: PhantomData<WorldImpl>,
 }
 
-impl<BackgroundGivenStepFnImpl, WorldImpl>
-    BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+impl<BackgroundGivenStepFnImpl, WorldImpl> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
 where
     BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
@@ -141,10 +126,7 @@ where
         self,
         description: impl Into<MaybeOwnedStr>,
         callback: OtherBackgroundGivenStepFnImpl,
-    ) -> BackgroundWithGivenStepsLastConfigured<
-        impl BackgroundGivenStepFn<WorldImpl>,
-        WorldImpl,
-    >
+    ) -> BackgroundWithGivenStepsLastConfigured<impl BackgroundGivenStepFn<WorldImpl>, WorldImpl>
     where
         OtherBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
@@ -170,10 +152,7 @@ where
         self,
         description: impl Into<MaybeOwnedStr>,
         callback: OtherBackgroundGivenStepFnImpl,
-    ) -> BackgroundWithGivenStepsLastConfigured<
-        impl BackgroundGivenStepFn<WorldImpl>,
-        WorldImpl,
-    >
+    ) -> BackgroundWithGivenStepsLastConfigured<impl BackgroundGivenStepFn<WorldImpl>, WorldImpl>
     where
         OtherBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
@@ -197,22 +176,13 @@ where
 }
 
 impl<BackgroundGivenStepFnImpl, WorldImpl>
-    From<
-        BackgroundWithGivenStepsLastConfigured<
-            BackgroundGivenStepFnImpl,
-            WorldImpl,
-        >,
-    > for BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>
+    From<BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>>
+    for BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>
 where
     BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    fn from(
-        background: BackgroundWithGivenStepsLastConfigured<
-            BackgroundGivenStepFnImpl,
-            WorldImpl,
-        >,
-    ) -> Self {
+    fn from(background: BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>) -> Self {
         let BackgroundWithGivenStepsLastConfigured {
             description,
             ignored,
@@ -244,9 +214,7 @@ pub struct BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl> {
     phantom: PhantomData<WorldImpl>,
 }
 
-impl<BackgroundGivenStepFnImpl, WorldImpl> Clone
-    for BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>
-{
+impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl> {
     fn clone(&self) -> Self {
         Self {
             description: self.description.clone(),

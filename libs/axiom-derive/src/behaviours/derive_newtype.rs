@@ -3,9 +3,7 @@ use quote::quote;
 
 use crate::utils::ast::*;
 
-pub fn derive_newtype(
-    tokens: proc_macro::TokenStream,
-) -> proc_macro::TokenStream {
+pub fn derive_newtype(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse_macro_input!(tokens as syn::DeriveInput);
 
     let tokens = match &ast.data {
@@ -16,10 +14,7 @@ pub fn derive_newtype(
     proc_macro::TokenStream::from(tokens)
 }
 
-fn derive_for_struct(
-    ast: &syn::DeriveInput,
-    data: &syn::DataStruct,
-) -> proc_macro2::TokenStream {
+fn derive_for_struct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
     let fields = &data.fields;
 
     let syn::Fields::Unnamed(fields) = fields else {
@@ -35,13 +30,9 @@ fn derive_for_struct(
     derive_for_single_fielded_tuple_struct(ast, field)
 }
 
-fn derive_for_single_fielded_tuple_struct(
-    ast: &syn::DeriveInput,
-    field: &syn::Field,
-) -> proc_macro2::TokenStream {
+fn derive_for_single_fielded_tuple_struct(ast: &syn::DeriveInput, field: &syn::Field) -> proc_macro2::TokenStream {
     let struct_ident = &ast.ident;
-    let (struct_impl_generics, struct_type_generics, struct_where_clause) =
-        ast.generics.split_for_impl();
+    let (struct_impl_generics, struct_type_generics, struct_where_clause) = ast.generics.split_for_impl();
 
     let field_type = &field.ty;
     let field_type_ident = get_field_type_ident_from_field(field);

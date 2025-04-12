@@ -15,13 +15,8 @@ pub struct CreateTaskRemoteInteractor<Handle: PointerHandle> {
     uri: &'static str,
 }
 
-impl<Handle: PointerHandle> CreateTaskBoundary
-    for CreateTaskRemoteInteractor<Handle>
-{
-    fn apply(
-        &self,
-        request: CreateTaskRequestModel,
-    ) -> CreateTaskResponseModel {
+impl<Handle: PointerHandle> CreateTaskBoundary for CreateTaskRemoteInteractor<Handle> {
+    fn apply(&self, request: CreateTaskRequestModel) -> CreateTaskResponseModel {
         let request: CreateTaskRequestObject = request.into();
 
         let response = self

@@ -16,8 +16,7 @@ pub struct ViewTasksRequestModel {
     pub pagination_request: PaginationRequest,
 }
 
-pub type ViewTasksResponseModel =
-    Result<ViewTasksOkResponseModel, ViewTasksErrResponseModel>;
+pub type ViewTasksResponseModel = Result<ViewTasksOkResponseModel, ViewTasksErrResponseModel>;
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct ViewTasksOkResponseModel {

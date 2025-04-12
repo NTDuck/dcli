@@ -32,15 +32,11 @@ pub fn generate_where_clause_with_trait_bounds_from_derive_input(
     }
 }
 
-pub fn get_field_idents_from_named_fields(
-    fields: &syn::FieldsNamed,
-) -> Vec<syn::Ident> {
+pub fn get_field_idents_from_named_fields(fields: &syn::FieldsNamed) -> Vec<syn::Ident> {
     fields.named.iter().filter_map(|field| field.ident.clone()).collect()
 }
 
-pub fn get_field_idents_from_unnamed_fields(
-    fields: &syn::FieldsUnnamed,
-) -> Vec<syn::Ident> {
+pub fn get_field_idents_from_unnamed_fields(fields: &syn::FieldsUnnamed) -> Vec<syn::Ident> {
     return (0..fields.unnamed.len()).map(format_field_index).collect();
 
     fn format_field_index(field_index: usize) -> syn::Ident {
@@ -48,21 +44,15 @@ pub fn get_field_idents_from_unnamed_fields(
     }
 }
 
-pub fn get_field_indices_from_unnamed_fields(
-    fields: &syn::FieldsUnnamed,
-) -> Vec<syn::Index> {
+pub fn get_field_indices_from_unnamed_fields(fields: &syn::FieldsUnnamed) -> Vec<syn::Index> {
     (0..fields.unnamed.len()).map(syn::Index::from).collect()
 }
 
-pub fn get_field_types_from_named_fields(
-    fields: &syn::FieldsNamed,
-) -> Vec<&syn::Type> {
+pub fn get_field_types_from_named_fields(fields: &syn::FieldsNamed) -> Vec<&syn::Type> {
     fields.named.iter().map(|field| &field.ty).collect()
 }
 
-pub fn get_field_types_from_unnamed_fields(
-    fields: &syn::FieldsUnnamed,
-) -> Vec<&syn::Type> {
+pub fn get_field_types_from_unnamed_fields(fields: &syn::FieldsUnnamed) -> Vec<&syn::Type> {
     fields.unnamed.iter().map(|field| &field.ty).collect()
 }
 

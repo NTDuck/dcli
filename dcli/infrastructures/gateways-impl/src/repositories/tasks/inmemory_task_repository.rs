@@ -36,15 +36,9 @@ impl TaskRepository for InMemoryTaskRepository {
         self.tasks_by_ids.get(&Reverse(task_id)).cloned()
     }
 
-    fn show_reverse_chronologically_ordered(
-        &self,
-        pagination_request: PaginationRequest,
-    ) -> PaginationResponse<Task> {
+    fn show_reverse_chronologically_ordered(&self, pagination_request: PaginationRequest) -> PaginationResponse<Task> {
         let reverse_chronologically_ordered_tasks = self.tasks_by_ids.values();
-        Self::compute_pagination_response(
-            reverse_chronologically_ordered_tasks,
-            pagination_request,
-        )
+        Self::compute_pagination_response(reverse_chronologically_ordered_tasks, pagination_request)
     }
 
     fn show_reverse_chronologically_ordered_by_status(
@@ -54,10 +48,7 @@ impl TaskRepository for InMemoryTaskRepository {
     ) -> PaginationResponse<Task> {
         let reverse_chronologically_ordered_tasks_by_status =
             self.tasks_by_ids.values().filter(|task| task.status == status);
-        Self::compute_pagination_response(
-            reverse_chronologically_ordered_tasks_by_status,
-            pagination_request,
-        )
+        Self::compute_pagination_response(reverse_chronologically_ordered_tasks_by_status, pagination_request)
     }
 
     fn contains(&self, task_id: TaskId) -> bool {
@@ -80,19 +71,11 @@ impl InMemoryTaskRepository {
     ) -> PaginationResponse<Task> {
         let pagination_range = PaginationRange::from(&pagination_request);
 
-        let unpaginated_tasks_count =
-            Self::compute_iterator_size(&unpaginated_tasks);
-        let max_page_number = Self::compute_max_page_number(
-            unpaginated_tasks_count,
-            pagination_request.max_page_size,
-        );
+        let unpaginated_tasks_count = Self::compute_iterator_size(&unpaginated_tasks);
+        let max_page_number = Self::compute_max_page_number(unpaginated_tasks_count, pagination_request.max_page_size);
 
-        let paginated_tasks: Vec<_> = unpaginated_tasks
-            .into_iter()
-            .skip(pagination_range.offset)
-            .take(pagination_range.limit)
-            .cloned()
-            .collect();
+        let paginated_tasks: Vec<_> =
+            unpaginated_tasks.into_iter().skip(pagination_range.offset).take(pagination_range.limit).cloned().collect();
         let paginated_tasks_count = paginated_tasks.len();
 
         PaginationResponse {
@@ -109,10 +92,7 @@ impl InMemoryTaskRepository {
         upper_bound.expect("Iterator has no known upper bound")
     }
 
-    fn compute_max_page_number(
-        number_of_tasks: usize,
-        max_page_size: usize,
-    ) -> usize {
+    fn compute_max_page_number(number_of_tasks: usize, max_page_size: usize) -> usize {
         match number_of_tasks {
             0 => MIN_PAGE_NUMBER,
             _ => number_of_tasks.div_ceil(max_page_size),

@@ -18,12 +18,8 @@ pub trait PointerStrategy: Sized {
 
     fn shallow_clone<T>(typed: &Self::Typed<T>) -> Self::Typed<T>;
 
-    fn as_ref<'br, T: 'br>(
-        typed: &'br Self::Typed<T>,
-    ) -> impl Deref<Target = T> + 'br;
-    fn as_mut<'br, T: 'br>(
-        typed: &'br Self::Typed<T>,
-    ) -> impl DerefMut<Target = T> + 'br;
+    fn as_ref<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl Deref<Target = T> + 'br;
+    fn as_mut<'br, T: 'br>(typed: &'br Self::Typed<T>) -> impl DerefMut<Target = T> + 'br;
 
     fn check_binary_compatibility<T>() {
         std::hint::black_box(Self::into_untyped::<T>);

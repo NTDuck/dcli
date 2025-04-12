@@ -5,8 +5,7 @@ use serde::Serialize;
 use crate::utils::interfaces::Boundary;
 
 pub trait CreateTaskBoundary: Boundary {
-    fn apply(&self, request: CreateTaskRequestModel)
-        -> CreateTaskResponseModel;
+    fn apply(&self, request: CreateTaskRequestModel) -> CreateTaskResponseModel;
 }
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
@@ -14,8 +13,7 @@ pub struct CreateTaskRequestModel {
     pub task_description: String,
 }
 
-pub type CreateTaskResponseModel =
-    Result<CreateTaskOkResponseModel, CreateTaskErrResponseModel>;
+pub type CreateTaskResponseModel = Result<CreateTaskOkResponseModel, CreateTaskErrResponseModel>;
 
 #[derive(DataTransferObjectWithoutSerde, Serialize, Deserialize)]
 pub struct CreateTaskOkResponseModel;

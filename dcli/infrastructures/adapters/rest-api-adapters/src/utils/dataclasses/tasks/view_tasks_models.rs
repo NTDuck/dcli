@@ -51,9 +51,7 @@ pub enum ViewTasksViewModel {
 #[cfg(feature = "server")]
 impl From<ViewTasksResponseModel> for ViewTasksViewModel {
     fn from(model: ViewTasksResponseModel) -> Self {
-        let model = model
-            .map(ViewTasksOkViewModel::from)
-            .map_err(ViewTasksErrViewModel::from);
+        let model = model.map(ViewTasksOkViewModel::from).map_err(ViewTasksErrViewModel::from);
 
         match model {
             Ok(model) => Self::Ok(model),

@@ -3,9 +3,7 @@ use quote::quote;
 use crate::utils::ast::*;
 use crate::utils::derives::*;
 
-pub fn derive_identifier(
-    tokens: proc_macro::TokenStream,
-) -> proc_macro::TokenStream {
+pub fn derive_identifier(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse_macro_input!(tokens as syn::DeriveInput);
 
     let tokens = match &ast.data {
@@ -17,13 +15,9 @@ pub fn derive_identifier(
     proc_macro::TokenStream::from(tokens)
 }
 
-fn derive_for_struct(
-    ast: &syn::DeriveInput,
-    data: &syn::DataStruct,
-) -> proc_macro2::TokenStream {
+fn derive_for_struct(ast: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
     let struct_ident = &ast.ident;
-    let (struct_impl_generics, struct_type_generics, _) =
-        ast.generics.split_for_impl();
+    let (struct_impl_generics, struct_type_generics, _) = ast.generics.split_for_impl();
 
     let struct_where_clause_with_identifier_bounds =
         generate_where_clause_with_identifier_bounds_from_derive_input(ast);
@@ -49,16 +43,11 @@ fn derive_for_struct(
     }
 }
 
-fn derive_for_enum(
-    ast: &syn::DeriveInput,
-    data: &syn::DataEnum,
-) -> proc_macro2::TokenStream {
+fn derive_for_enum(ast: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
     let enum_ident = &ast.ident;
-    let (enum_impl_generics, enum_type_generics, _) =
-        ast.generics.split_for_impl();
+    let (enum_impl_generics, enum_type_generics, _) = ast.generics.split_for_impl();
 
-    let enum_where_clause_with_identifier_bounds =
-        generate_where_clause_with_identifier_bounds_from_derive_input(ast);
+    let enum_where_clause_with_identifier_bounds = generate_where_clause_with_identifier_bounds_from_derive_input(ast);
     let enum_where_clause_with_value_object_bounds =
         generate_where_clause_with_value_object_bounds_from_derive_input(ast);
 
@@ -81,9 +70,7 @@ fn derive_for_enum(
     }
 }
 
-fn generate_where_clause_with_identifier_bounds_from_derive_input(
-    ast: &syn::DeriveInput,
-) -> proc_macro2::TokenStream {
+fn generate_where_clause_with_identifier_bounds_from_derive_input(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     generate_where_clause_with_trait_bounds_from_derive_input(
         |type_ident| {
             quote! {

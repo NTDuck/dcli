@@ -14,20 +14,11 @@ use crate::elements::step::World;
 use crate::elements::STEP_DELIMITER;
 use crate::utils::aliases::MaybeOwnedStr;
 
-pub struct UnconfiguredScenario<
-    FeatureBackgroundGivenStepFnImpl,
-    RuleBackgroundGivenStepFnImpl,
-    WorldImpl,
-> {
-    context: Context<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >,
+pub struct UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
+    context: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
-impl<FeatureBackgroundGivenStepFnImpl, WorldImpl>
-    From<FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>>
+impl<FeatureBackgroundGivenStepFnImpl, WorldImpl> From<FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>>
     for UnconfiguredScenario<
         FeatureBackgroundGivenStepFnImpl,
         fn(&mut WorldImpl) -> Result<(), libtest::Failed>,
@@ -38,60 +29,30 @@ where
     FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    fn from(
-        feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-    ) -> Self {
+    fn from(feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
         Self {
             context: Context::Feature(feature),
         }
     }
 }
 
-impl<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
-    From<
-        RuleContext<
-            FeatureBackgroundGivenStepFnImpl,
-            RuleBackgroundGivenStepFnImpl,
-            WorldImpl,
-        >,
-    >
-    for UnconfiguredScenario<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    From<RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>>
+    for UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
     FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    fn from(
-        rule: RuleContext<
-            FeatureBackgroundGivenStepFnImpl,
-            RuleBackgroundGivenStepFnImpl,
-            WorldImpl,
-        >,
-    ) -> Self {
+    fn from(rule: RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
         Self {
             context: Context::Rule(rule),
         }
     }
 }
 
-impl<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
-    UnconfiguredScenario<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
     FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
@@ -100,11 +61,8 @@ where
     pub fn named(
         self,
         description: impl Into<MaybeOwnedStr>,
-    ) -> ScenarioWithDescriptionLastConfigured<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    > {
+    ) -> ScenarioWithDescriptionLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    {
         ScenarioWithDescriptionLastConfigured {
             description: Some(description.into()),
 
@@ -114,11 +72,8 @@ where
 
     pub fn unnamed(
         self,
-    ) -> ScenarioWithDescriptionLastConfigured<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    > {
+    ) -> ScenarioWithDescriptionLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    {
         ScenarioWithDescriptionLastConfigured {
             description: None,
 
@@ -134,23 +89,11 @@ pub struct ScenarioWithDescriptionLastConfigured<
 > {
     description: Option<MaybeOwnedStr>,
 
-    context: Context<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >,
+    context: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
-impl<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
-    ScenarioWithDescriptionLastConfigured<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    ScenarioWithDescriptionLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
     FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
@@ -159,11 +102,8 @@ where
     pub fn ignored(
         self,
         ignored: impl Into<bool>,
-    ) -> ScenarioWithIgnoredLastConfigured<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    > {
+    ) -> ScenarioWithIgnoredLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    {
         ScenarioWithIgnoredLastConfigured {
             description: self.description,
             ignored: Some(ignored.into()),
@@ -202,31 +142,16 @@ where
     }
 }
 
-pub struct ScenarioWithIgnoredLastConfigured<
-    FeatureBackgroundGivenStepFnImpl,
-    RuleBackgroundGivenStepFnImpl,
-    WorldImpl,
-> {
+pub struct ScenarioWithIgnoredLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+{
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
-    context: Context<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >,
+    context: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
-impl<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
-    ScenarioWithIgnoredLastConfigured<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    ScenarioWithIgnoredLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
     FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
@@ -273,19 +198,10 @@ pub struct ScenarioWithGivenStepsLastConfigured<
 
     given_steps: Steps<ScenarioGivenStepFnImpl>,
 
-    context: Context<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >,
+    context: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
-impl<
-        ScenarioGivenStepFnImpl,
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
+impl<ScenarioGivenStepFnImpl, FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     ScenarioWithGivenStepsLastConfigured<
         ScenarioGivenStepFnImpl,
         FeatureBackgroundGivenStepFnImpl,
@@ -405,11 +321,7 @@ pub struct ScenarioWithWhenStepsLastConfigured<
     given_steps: Steps<ScenarioGivenStepFnImpl>,
     when_steps: Steps<ScenarioWhenStepFnImpl>,
 
-    context: Context<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >,
+    context: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
 impl<
@@ -548,11 +460,7 @@ pub struct ScenarioWithThenStepsLastConfigured<
     when_steps: Steps<ScenarioWhenStepFnImpl>,
     then_steps: Steps<ScenarioThenStepFnImpl>,
 
-    context: Context<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >,
+    context: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
 impl<
@@ -690,116 +598,76 @@ where
             Some(description) => description,
             None => format!(
                 "{}{}{}{}{}",
-                scenario.given_steps,
-                STEP_DELIMITER,
-                scenario.when_steps,
-                STEP_DELIMITER,
-                scenario.then_steps
+                scenario.given_steps, STEP_DELIMITER, scenario.when_steps, STEP_DELIMITER, scenario.then_steps
             )
             .into(),
         };
 
         match scenario.context {
-            Context::Feature(feature) =>
-                libtest::Trial::test(scenario_description, move || {
-                    let mut world = WorldImpl::default();
+            Context::Feature(feature) => libtest::Trial::test(scenario_description, move || {
+                let mut world = WorldImpl::default();
 
-                    if let Some(feature_background) = feature.background {
-                        if !feature_background.ignored {
-                            (feature_background.given_steps_callback)(
-                                &mut world,
-                            )?;
-                        }
+                if let Some(feature_background) = feature.background {
+                    if !feature_background.ignored {
+                        (feature_background.given_steps_callback)(&mut world)?;
                     }
+                }
 
-                    (scenario.given_steps.callback)(&mut world)?;
-                    (scenario.when_steps.callback)(&mut world)?;
-                    (scenario.then_steps.callback)(&world)?;
+                (scenario.given_steps.callback)(&mut world)?;
+                (scenario.when_steps.callback)(&mut world)?;
+                (scenario.then_steps.callback)(&world)?;
 
-                    Ok(())
-                })
-                .with_ignored_flag(
-                    feature.ignored.unwrap_or(false)
-                        || scenario.ignored.unwrap_or(false),
-                )
-                .with_kind(match feature.description {
-                    Some(description) => description,
-                    None => "".into(),
-                }),
-            Context::Rule(rule) =>
-                libtest::Trial::test(scenario_description, move || {
-                    let mut world = WorldImpl::default();
+                Ok(())
+            })
+            .with_ignored_flag(feature.ignored.unwrap_or(false) || scenario.ignored.unwrap_or(false))
+            .with_kind(match feature.description {
+                Some(description) => description,
+                None => "".into(),
+            }),
+            Context::Rule(rule) => libtest::Trial::test(scenario_description, move || {
+                let mut world = WorldImpl::default();
 
-                    if let Some(feature_background) = rule.feature.background {
-                        if !feature_background.ignored {
-                            (feature_background.given_steps_callback)(
-                                &mut world,
-                            )?;
-                        }
+                if let Some(feature_background) = rule.feature.background {
+                    if !feature_background.ignored {
+                        (feature_background.given_steps_callback)(&mut world)?;
                     }
+                }
 
-                    if let Some(rule_background) = rule.background {
-                        if !rule_background.ignored {
-                            (rule_background.given_steps_callback)(&mut world)?;
-                        }
+                if let Some(rule_background) = rule.background {
+                    if !rule_background.ignored {
+                        (rule_background.given_steps_callback)(&mut world)?;
                     }
+                }
 
-                    (scenario.given_steps.callback)(&mut world)?;
-                    (scenario.when_steps.callback)(&mut world)?;
-                    (scenario.then_steps.callback)(&world)?;
+                (scenario.given_steps.callback)(&mut world)?;
+                (scenario.when_steps.callback)(&mut world)?;
+                (scenario.then_steps.callback)(&world)?;
 
-                    Ok(())
-                })
-                .with_ignored_flag(
-                    rule.feature.ignored.unwrap_or(false)
-                        || rule.ignored.unwrap_or(false)
-                        || scenario.ignored.unwrap_or(false),
-                )
-                .with_kind(
-                    match (rule.feature.description, rule.description) {
-                        (Some(feature_description), Some(rule_description)) =>
-                            format!(
-                                "{}{}{}",
-                                feature_description,
-                                STEP_DELIMITER,
-                                rule_description
-                            )
-                            .into(),
-                        (Some(feature_description), None) =>
-                            feature_description,
-                        (None, Some(rule_description)) => rule_description,
-                        (None, None) => "".into(),
-                    },
-                ),
+                Ok(())
+            })
+            .with_ignored_flag(
+                rule.feature.ignored.unwrap_or(false)
+                    || rule.ignored.unwrap_or(false)
+                    || scenario.ignored.unwrap_or(false),
+            )
+            .with_kind(match (rule.feature.description, rule.description) {
+                (Some(feature_description), Some(rule_description)) =>
+                    format!("{}{}{}", feature_description, STEP_DELIMITER, rule_description).into(),
+                (Some(feature_description), None) => feature_description,
+                (None, Some(rule_description)) => rule_description,
+                (None, None) => "".into(),
+            }),
         }
     }
 }
 
-enum Context<
-    FeatureBackgroundGivenStepFnImpl,
-    RuleBackgroundGivenStepFnImpl,
-    WorldImpl,
-> {
+enum Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
     Feature(FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>),
-    Rule(
-        RuleContext<
-            FeatureBackgroundGivenStepFnImpl,
-            RuleBackgroundGivenStepFnImpl,
-            WorldImpl,
-        >,
-    ),
+    Rule(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>),
 }
 
-impl<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepImpl,
-        WorldImpl,
-    > Clone
-    for Context<
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepImpl,
-        WorldImpl,
-    >
+impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepImpl, WorldImpl> Clone
+    for Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepImpl, WorldImpl>
 where
     FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     RuleBackgroundGivenStepImpl: BackgroundGivenStepFn<WorldImpl>,

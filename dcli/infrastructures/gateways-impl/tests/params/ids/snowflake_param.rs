@@ -11,13 +11,7 @@ impl From<Param<usize>> for Snowflake {
 }
 
 impl From<Param<(usize, usize, usize)>> for Snowflake {
-    fn from(
-        Param((millis, worker_number, sequence_number)): Param<(
-            usize,
-            usize,
-            usize,
-        )>,
-    ) -> Self {
+    fn from(Param((millis, worker_number, sequence_number)): Param<(usize, usize, usize)>) -> Self {
         let timestamp = Param(millis).into();
         let worker_number = worker_number as SnowflakeWorkerNumber;
         let sequence_number = sequence_number as SnowflakeSequenceNumber;

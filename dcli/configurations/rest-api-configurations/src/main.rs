@@ -40,28 +40,19 @@ async fn main() {
     let task_repository: SharedPointer<Box<dyn TaskRepository>> =
         SharedPointer::new(Box::new(InMemoryTaskRepository::new()));
 
-    let create_task_interactor: SharedPointer<Box<dyn CreateTaskBoundary>> =
-        SharedPointer::new(Box::new(CreateTaskInteractor::new(
-            timestamp_provider.clone(),
-            snowflake_provider.clone(),
-            task_repository.clone(),
-        )));
+    let create_task_interactor: SharedPointer<Box<dyn CreateTaskBoundary>> = SharedPointer::new(Box::new(
+        CreateTaskInteractor::new(timestamp_provider.clone(), snowflake_provider.clone(), task_repository.clone()),
+    ));
     let view_tasks_interactor: SharedPointer<Box<dyn ViewTasksBoundary>> =
-        SharedPointer::new(Box::new(ViewTasksInteractor::new(
-            timestamp_formatter.clone(),
-            task_repository.clone(),
-        )));
+        SharedPointer::new(Box::new(ViewTasksInteractor::new(timestamp_formatter.clone(), task_repository.clone())));
 
-    let tasks_state: SharedPointer<TasksState<_>> =
-        SharedPointer::new(TasksState {
-            create_task_boundary: create_task_interactor.clone(),
-            view_tasks_boundary: view_tasks_interactor.clone(),
-        });
+    let tasks_state: SharedPointer<TasksState<_>> = SharedPointer::new(TasksState {
+        create_task_boundary: create_task_interactor.clone(),
+        view_tasks_boundary: view_tasks_interactor.clone(),
+    });
 
-    let tasks_router = Router::new()
-        .route("/create", post(create_task))
-        .route("/view", get(view_tasks))
-        .with_state(tasks_state);
+    let tasks_router =
+        Router::new().route("/create", post(create_task)).route("/view", get(view_tasks)).with_state(tasks_state);
 
     let router = Router::new()
         .layer(
@@ -83,11 +74,7 @@ async fn main() {
         .with_line_number(false)
         .init();
 
-    tracing::info!(
-        "Running on {}://{}",
-        "http",
-        listener.local_addr().unwrap(),
-    );
+    tracing::info!("Running on {}://{}", "http", listener.local_addr().unwrap(),);
 
     axum::serve(listener, router).await.unwrap();
 }
