@@ -59,7 +59,9 @@ impl Snowflake {
 }
 
 impl From<Snowflake> for u64 {
-    fn from(snowflake: Snowflake) -> Self { snowflake.to_u64() }
+    fn from(snowflake: Snowflake) -> Self {
+        snowflake.to_u64()
+    }
 }
 
 pub type SnowflakeWorkerNumber = u16;

@@ -45,20 +45,30 @@ pub trait RepositoryWorldHandle<T> {
 pub struct InMemoryRepository<T>(HashSet<T>);
 
 impl<T> Default for InMemoryRepository<T> {
-    fn default() -> Self { Self(HashSet::new()) }
+    fn default() -> Self {
+        Self(HashSet::new())
+    }
 }
 
 impl<T> Repository<T> for InMemoryRepository<T>
 where
     T: Eq + std::hash::Hash,
 {
-    fn add(&mut self, item: T) { self.0.insert(item); }
+    fn add(&mut self, item: T) {
+        self.0.insert(item);
+    }
 
-    fn remove(&mut self, item: &T) { self.0.remove(item); }
+    fn remove(&mut self, item: &T) {
+        self.0.remove(item);
+    }
 
-    fn clear(&mut self) { self.0.clear(); }
+    fn clear(&mut self) {
+        self.0.clear();
+    }
 
-    fn contains(&self, item: &T) -> bool { self.0.contains(item) }
+    fn contains(&self, item: &T) -> bool {
+        self.0.contains(item)
+    }
 }
 
 pub struct InMemoryRepositoryWorldHandle<T>(PhantomData<T>);
@@ -69,7 +79,9 @@ where
 {
     type Repository = InMemoryRepository<T>;
 
-    fn default() -> Self::Repository { Self::Repository::default() }
+    fn default() -> Self::Repository {
+        Self::Repository::default()
+    }
 }
 
 impl From<RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>>

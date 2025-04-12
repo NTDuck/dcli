@@ -12,7 +12,9 @@ impl PointerStrategy for ArcMutexPointerStrategy {
     type Typed<T> = Arc<Mutex<T>>;
     type Untyped = Self::Typed<()>;
 
-    fn into_typed<T>(obj: T) -> Self::Typed<T> { Arc::new(Mutex::new(obj)) }
+    fn into_typed<T>(obj: T) -> Self::Typed<T> {
+        Arc::new(Mutex::new(obj))
+    }
 
     fn into_untyped<T>(typed: Self::Typed<T>) -> Self::Untyped {
         unsafe { std::mem::transmute::<Self::Typed<T>, Self::Untyped>(typed) }

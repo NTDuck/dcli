@@ -11,7 +11,9 @@ impl PointerStrategy for ArcRwLockSharedPointerStrategy {
     type Typed<T> = Arc<RwLock<T>>;
     type Untyped = Self::Typed<()>;
 
-    fn into_typed<T>(obj: T) -> Self::Typed<T> { Arc::new(RwLock::new(obj)) }
+    fn into_typed<T>(obj: T) -> Self::Typed<T> {
+        Arc::new(RwLock::new(obj))
+    }
 
     fn into_untyped<T>(typed: Self::Typed<T>) -> Self::Untyped {
         unsafe { std::mem::transmute::<Self::Typed<T>, Self::Untyped>(typed) }

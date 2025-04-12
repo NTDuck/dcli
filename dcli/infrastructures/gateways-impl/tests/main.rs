@@ -11,7 +11,9 @@ pub struct InMemoryTaskRepositoryWorldHandle;
 impl TaskRepositoryWorldHandle for InMemoryTaskRepositoryWorldHandle {
     type TaskRepository = InMemoryTaskRepository;
 
-    fn new() -> Self::TaskRepository { InMemoryTaskRepository::new() }
+    fn new() -> Self::TaskRepository {
+        InMemoryTaskRepository::new()
+    }
 }
 
 task_repository_suite::suite!(handle = InMemoryTaskRepositoryWorldHandle);

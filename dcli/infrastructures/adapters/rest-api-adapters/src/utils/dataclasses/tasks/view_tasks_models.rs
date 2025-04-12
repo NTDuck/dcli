@@ -119,10 +119,14 @@ pub struct ViewTasksErrViewModel;
 
 #[cfg(feature = "server")]
 impl From<ViewTasksErrResponseModel> for ViewTasksErrViewModel {
-    fn from(_: ViewTasksErrResponseModel) -> Self { Self }
+    fn from(_: ViewTasksErrResponseModel) -> Self {
+        Self
+    }
 }
 
 #[cfg(feature = "client")]
 impl From<ViewTasksErrViewModel> for ViewTasksErrResponseModel {
-    fn from(_: ViewTasksErrViewModel) -> Self { ViewTasksErrResponseModel }
+    fn from(_: ViewTasksErrViewModel) -> Self {
+        ViewTasksErrResponseModel
+    }
 }

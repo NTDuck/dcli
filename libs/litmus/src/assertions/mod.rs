@@ -1,7 +1,11 @@
-pub fn ok() -> Result<(), libtest::Failed> { Ok(()) }
+pub fn ok() -> Result<(), libtest::Failed> {
+    Ok(())
+}
 
 pub trait AssertionExt {
-    fn ok(&self) -> Result<(), libtest::Failed> { Ok(()) }
+    fn ok(&self) -> Result<(), libtest::Failed> {
+        Ok(())
+    }
 
     fn expect(
         &self,

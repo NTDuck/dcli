@@ -7,7 +7,9 @@ use axiom_derive::NewType;
 struct IntegerWrapper(i32);
 
 #[test]
-fn test_integer_wrapper() { verify_trait_bounds(IntegerWrapper(42)); }
+fn test_integer_wrapper() {
+    verify_trait_bounds(IntegerWrapper(42));
+}
 
 #[derive(NewType)]
 struct StringWrapper(String);

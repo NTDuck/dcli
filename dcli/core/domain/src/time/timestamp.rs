@@ -12,9 +12,13 @@ pub struct Timestamp(i64);
 impl Timestamp {
     pub const EPOCH: Self = Self::from_millis_since_epoch(0);
 
-    pub const fn from_millis_since_epoch(millis: i64) -> Self { Self(millis) }
+    pub const fn from_millis_since_epoch(millis: i64) -> Self {
+        Self(millis)
+    }
 
-    pub const fn as_millis_since_epoch(&self) -> i64 { self.0 }
+    pub const fn as_millis_since_epoch(&self) -> i64 {
+        self.0
+    }
 }
 
 impl Add<Interval> for Timestamp {
