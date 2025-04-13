@@ -2,10 +2,13 @@ use std::marker::PhantomData;
 
 pub use UnconfiguredFeature as Feature;
 
-use crate::elements::background::BackgroundContext;
-use crate::elements::step::BackgroundGivenStepFn;
-use crate::elements::step::World;
+use crate::elements::BackgroundContext;
+use crate::elements::BackgroundGivenStepFn;
+use crate::elements::World;
 use crate::utils::aliases::MaybeOwnedStr;
+
+use super::FinalizableRule;
+use super::FinalizableScenario;
 
 pub struct UnconfiguredFeature<WorldImpl> {
     phantom: PhantomData<WorldImpl>,
@@ -58,49 +61,53 @@ where
         }
     }
 
-    pub fn rule<F, R, BackgroundGivenStepFnImpl>(
+    pub fn rule<FromContext, Rule, BackgroundGivenStepFnImpl>(
         self,
-        f: F,
+        from_ctx: FromContext,
     ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
-        F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
-        R: Into<Vec<libtest::Trial>>,
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        Rule: FinalizableRule,
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
-        let context = self.as_context();
-        let trials = f(context).into();
+        let ctx = self.as_ctx();
+        let rule = from_ctx(ctx);
+        let trials = rule.into();
 
         FeatureWithRulesOrScenariosLastConfigured {
             description: self.description,
             ignored: None,
 
             background: None,
+            
             trials,
         }
     }
 
-    pub fn scenario<F, R, BackgroundGivenStepFnImpl>(
+    pub fn scenario<FromContext, Scenario, BackgroundGivenStepFnImpl>(
         self,
-        f: F,
+        from_ctx: FromContext,
     ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
-        F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
-        R: Into<libtest::Trial>,
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
-        let context = self.as_context();
-        let trial = f(context).into();
+        let ctx = self.as_ctx();
+        let scenario = from_ctx(ctx);
+        let trials = vec![scenario.into()];
 
         FeatureWithRulesOrScenariosLastConfigured {
             description: self.description,
             ignored: None,
 
             background: None,
-            trials: vec![trial],
+
+            trials,
         }
     }
 
-    fn as_context<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    fn as_ctx<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
@@ -139,49 +146,53 @@ where
         }
     }
 
-    pub fn rule<F, R, BackgroundGivenStepFnImpl>(
+    pub fn rule<FromContext, Rule, BackgroundGivenStepFnImpl>(
         self,
-        f: F,
+        from_ctx: FromContext,
     ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
-        F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
-        R: Into<Vec<libtest::Trial>>,
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        Rule: FinalizableRule,
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
-        let context = self.as_context();
-        let trials = f(context).into();
+        let ctx = self.as_ctx();
+        let rule = from_ctx(ctx);
+        let trials = rule.into();
 
         FeatureWithRulesOrScenariosLastConfigured {
             description: self.description,
             ignored: self.ignored,
 
             background: None,
+
             trials,
         }
     }
 
-    pub fn scenario<F, R, BackgroundGivenStepFnImpl>(
+    pub fn scenario<FromContext, Scenario, BackgroundGivenStepFnImpl>(
         self,
-        f: F,
+        from_ctx: FromContext,
     ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
-        F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
-        R: Into<libtest::Trial>,
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
-        let context = self.as_context();
-        let trial = f(context).into();
+        let ctx = self.as_ctx();
+        let scenario = from_ctx(ctx);
+        let trials = vec![scenario.into()];
 
         FeatureWithRulesOrScenariosLastConfigured {
             description: self.description,
             ignored: self.ignored,
 
             background: None,
-            trials: vec![trial],
+
+            trials,
         }
     }
 
-    fn as_context<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    fn as_ctx<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
@@ -206,41 +217,45 @@ where
     BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn rule<F, R>(self, f: F) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    pub fn rule<FromContext, Rule>(self, from_ctx: FromContext) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
-        F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
-        R: Into<Vec<libtest::Trial>>,
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        Rule: FinalizableRule,
     {
-        let context = self.as_context();
-        let trials = f(context).into();
+        let ctx = self.as_ctx();
+        let rule = from_ctx(ctx);
+        let trials = rule.into();
 
         FeatureWithRulesOrScenariosLastConfigured {
             description: self.description,
             ignored: self.ignored,
 
-            background: None,
+            background: self.background,
+
             trials,
         }
     }
 
-    pub fn scenario<F, R>(self, f: F) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    pub fn scenario<FromContext, Scenario>(self, from_ctx: FromContext) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
-        F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
-        R: Into<libtest::Trial>,
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
     {
-        let context = self.as_context();
-        let trial = f(context).into();
+        let ctx = self.as_ctx();
+        let scenario = from_ctx(ctx);
+        let trials = vec![scenario.into()];
 
         FeatureWithRulesOrScenariosLastConfigured {
             description: self.description,
             ignored: self.ignored,
 
-            background: None,
-            trials: vec![trial],
+            background: self.background,
+
+            trials,
         }
     }
 
-    fn as_context(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    fn as_ctx(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
@@ -268,47 +283,49 @@ where
     BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn rule<F, R>(self, f: F) -> Self
+    pub fn rule<FromContext, Rule>(self, from_ctx: FromContext) -> Self
     where
-        F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
-        R: Into<Vec<libtest::Trial>>,
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        Rule: FinalizableRule,
     {
-        let context = self.as_context();
-        let mut trials = f(context).into();
+        let ctx = self.as_ctx();
+        let rule = from_ctx(ctx);
 
-        let mut this_trials = self.trials;
-        this_trials.append(&mut trials);
+        let mut trials = self.trials;
+        trials.extend(rule.into());
 
         Self {
             description: self.description,
             ignored: self.ignored,
 
-            background: None,
-            trials: this_trials,
+            background: self.background,
+
+            trials,
         }
     }
 
-    pub fn scenario<F, R>(self, f: F) -> Self
+    pub fn scenario<FromContext, Scenario>(self, from_ctx: FromContext) -> Self
     where
-        F: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> R,
-        R: Into<libtest::Trial>,
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
     {
-        let context = self.as_context();
-        let trial = f(context).into();
+        let ctx = self.as_ctx();
+        let scenario = from_ctx(ctx);
 
-        let mut this_trials = self.trials;
-        this_trials.push(trial);
+        let mut trials = self.trials;
+        trials.push(scenario.into());
 
         Self {
             description: self.description,
             ignored: self.ignored,
 
-            background: None,
-            trials: this_trials,
+            background: self.background,
+
+            trials,
         }
     }
 
-    fn as_context(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    fn as_ctx(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {

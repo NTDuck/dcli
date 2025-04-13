@@ -1,52 +1,51 @@
 pub use UnconfiguredScenario as Scenario;
 
 use super::FeatureContext;
-use super::RuleContext;
-use crate::elements::step::BackgroundGivenStepFn;
-use crate::elements::step::ScenarioGivenStepFn;
-use crate::elements::step::ScenarioThenStepFn;
-use crate::elements::step::ScenarioWhenStepFn;
-use crate::elements::step::Step;
-use crate::elements::step::StepLabel;
-use crate::elements::step::StepMeta;
-use crate::elements::step::Steps;
-use crate::elements::step::World;
+use super::RuleCtx;
+use crate::elements::BackgroundGivenStepFn;
+use crate::elements::ScenarioGivenStepFn;
+use crate::elements::ScenarioThenStepFn;
+use crate::elements::ScenarioWhenStepFn;
+use crate::elements::Step;
+use crate::elements::StepLabel;
+use crate::elements::StepMeta;
+use crate::elements::Steps;
+use crate::elements::World;
 use crate::elements::STEP_DELIMITER;
 use crate::utils::aliases::MaybeOwnedStr;
 
 pub struct UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
-    context: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
+    ctx: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, WorldImpl> From<FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>>
     for UnconfiguredScenario<
         FeatureBackgroundGivenStepFnImpl,
-        fn(&mut WorldImpl) -> Result<(), libtest::Failed>,
+        fn(&mut WorldImpl) -> Result<(), libtest::Failed>, // Unused RuleBackgroundGivenStepFnImpl substituted with no-op default
         WorldImpl,
     >
-// Unused RuleBackgroundGivenStepFnImpl substituted with no-op default
 where
     FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
         Self {
-            context: Context::Feature(feature),
+            ctx: Context::Feature(feature),
         }
     }
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
-    From<RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>>
+    From<RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>>
     for UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
     FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    fn from(rule: RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
+    fn from(rule: RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
         Self {
-            context: Context::Rule(rule),
+            ctx: Context::Rule(rule),
         }
     }
 }
@@ -66,7 +65,7 @@ where
         ScenarioWithDescriptionLastConfigured {
             description: Some(description.into()),
 
-            context: self.context,
+            context: self.ctx,
         }
     }
 
@@ -77,7 +76,7 @@ where
         ScenarioWithDescriptionLastConfigured {
             description: None,
 
-            context: self.context,
+            context: self.ctx,
         }
     }
 }
@@ -239,7 +238,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain_scenario_given(step),
+            given_steps: self.given_steps.chain_scenario_given_step(step),
 
             context: self.context,
         }
@@ -270,7 +269,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain_scenario_given(step),
+            given_steps: self.given_steps.chain_scenario_given_step(step),
 
             context: self.context,
         }
@@ -372,7 +371,7 @@ where
             ignored: self.ignored,
 
             given_steps: self.given_steps,
-            when_steps: self.when_steps.chain_scenario_when(step),
+            when_steps: self.when_steps.chain_scenario_when_step(step),
 
             context: self.context,
         }
@@ -405,7 +404,7 @@ where
             ignored: self.ignored,
 
             given_steps: self.given_steps,
-            when_steps: self.when_steps.chain_scenario_when(step),
+            when_steps: self.when_steps.chain_scenario_when_step(step),
 
             context: self.context,
         }
@@ -516,7 +515,7 @@ where
 
             given_steps: self.given_steps,
             when_steps: self.when_steps,
-            then_steps: self.then_steps.chain_scenario_then(step),
+            then_steps: self.then_steps.chain_scenario_then_step(step),
 
             context: self.context,
         }
@@ -551,11 +550,19 @@ where
 
             given_steps: self.given_steps,
             when_steps: self.when_steps,
-            then_steps: self.then_steps.chain_scenario_then(step),
+            then_steps: self.then_steps.chain_scenario_then_step(step),
 
             context: self.context,
         }
     }
+}
+
+pub trait FinalizableScenario: Into<libtest::Trial> {}
+
+impl<T> FinalizableScenario for T
+where
+    T: Into<libtest::Trial>,
+{
 }
 
 impl<
@@ -663,7 +670,7 @@ where
 
 enum Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
     Feature(FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>),
-    Rule(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>),
+    Rule(RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>),
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepImpl, WorldImpl> Clone

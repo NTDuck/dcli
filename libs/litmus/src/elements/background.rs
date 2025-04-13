@@ -3,12 +3,12 @@ use std::sync::Arc;
 
 pub use UnconfiguredBackground as Background;
 
-use crate::elements::step::BackgroundGivenStepFn;
-use crate::elements::step::Step;
-use crate::elements::step::StepLabel;
-use crate::elements::step::StepMeta;
-use crate::elements::step::Steps;
-use crate::elements::step::World;
+use crate::elements::BackgroundGivenStepFn;
+use crate::elements::Step;
+use crate::elements::StepLabel;
+use crate::elements::StepMeta;
+use crate::elements::Steps;
+use crate::elements::World;
 use crate::utils::aliases::MaybeOwnedStr;
 
 pub struct UnconfiguredBackground<WorldImpl> {
@@ -55,17 +55,19 @@ where
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
+        let step = Step {
+            meta: StepMeta {
+                label: StepLabel::Given,
+                description: description.into(),
+            },
+            callback,
+        };
+
         BackgroundWithGivenStepsLastConfigured {
             description: self.description,
             ignored: None,
 
-            given_steps: Steps {
-                metas: vec![StepMeta {
-                    label: StepLabel::Given,
-                    description: description.into(),
-                }],
-                callback,
-            },
+            given_steps: Steps::from(step),
 
             phantom: PhantomData,
         }
@@ -91,17 +93,19 @@ where
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
+        let step = Step {
+            meta: StepMeta {
+                label: StepLabel::Given,
+                description: description.into(),
+            },
+            callback,
+        };
+
         BackgroundWithGivenStepsLastConfigured {
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: Steps {
-                metas: vec![StepMeta {
-                    label: StepLabel::Given,
-                    description: description.into(),
-                }],
-                callback,
-            },
+            given_steps: Steps::from(step),
 
             phantom: PhantomData,
         }
@@ -142,7 +146,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain_background_given(step),
+            given_steps: self.given_steps.chain_background_given_step(step),
 
             phantom: PhantomData,
         }
@@ -168,11 +172,19 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain_background_given(step),
+            given_steps: self.given_steps.chain_background_given_step(step),
 
             phantom: PhantomData,
         }
     }
+}
+
+pub trait FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>: Into<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>> {}
+
+impl<T, BackgroundGivenStepFnImpl, WorldImpl> FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl> for T
+where
+    T: Into<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
+{
 }
 
 impl<BackgroundGivenStepFnImpl, WorldImpl>
