@@ -84,6 +84,7 @@ where
 
 impl From<RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>> for Vec<libtest::Trial> {
     #[rustfmt::skip]
+    #[allow(clippy::unit_arg)]
     fn from(_: RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>) -> Self {
         type World = RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>;
 
