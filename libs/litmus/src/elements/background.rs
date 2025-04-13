@@ -110,6 +110,58 @@ where
             phantom: PhantomData,
         }
     }
+
+    pub fn suite<BackgroundGivenStepFnImpl>(
+        self,
+        description: impl Into<MaybeOwnedStr>,
+        callback: BackgroundGivenStepFnImpl,
+    ) -> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    {
+        let step = Step {
+            meta: StepMeta {
+                label: StepLabel::Suite,
+                description: description.into(),
+            },
+            callback,
+        };
+
+        BackgroundWithGivenStepsLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+
+            given_steps: Steps::from(step),
+
+            phantom: PhantomData,
+        }
+    }
+
+    pub fn describe<BackgroundGivenStepFnImpl>(
+        self,
+        description: impl Into<MaybeOwnedStr>,
+        callback: BackgroundGivenStepFnImpl,
+    ) -> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    {
+        let step = Step {
+            meta: StepMeta {
+                label: StepLabel::Describe,
+                description: description.into(),
+            },
+            callback,
+        };
+
+        BackgroundWithGivenStepsLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+
+            given_steps: Steps::from(step),
+
+            phantom: PhantomData,
+        }
+    }
 }
 
 pub struct BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl> {
