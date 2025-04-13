@@ -1,10 +1,13 @@
 pub use UnconfiguredRule as Rule;
 
-use super::FeatureContext;
+use crate::elements::FeatureContext;
 use crate::elements::BackgroundContext;
 use crate::elements::BackgroundGivenStepFn;
 use crate::elements::World;
 use crate::utils::aliases::MaybeOwnedStr;
+
+use crate::elements::FinalizableBackground;
+use crate::elements::FinalizableScenario;
 
 pub struct UnconfiguredRule<FeatureBackgroundGivenStepFnImpl, WorldImpl> {
     feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
@@ -63,7 +66,7 @@ where
 
     pub fn background<RuleBackgroundGivenStepFnImpl>(
         self,
-        background: impl Into<BackgroundContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+        background: impl FinalizableBackground<RuleBackgroundGivenStepFnImpl, WorldImpl>,
     ) -> RuleWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
         RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
@@ -77,17 +80,18 @@ where
         }
     }
 
-    pub fn scenario<F, R, RuleBackgroundGivenStepFnImpl>(
+    pub fn scenario<FromContext, Scenario, RuleBackgroundGivenStepFnImpl>(
         self,
-        f: F,
+        from_ctx: FromContext,
     ) -> RuleWithScenariosLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
-        F: FnOnce(RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> R,
-        R: Into<libtest::Trial>,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
         RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
-        let context = self.as_context();
-        let trial = f(context).into();
+        let ctx = self.as_ctx();
+        let scenario = from_ctx(ctx);
+        let trials = vec![scenario.into()];
 
         RuleWithScenariosLastConfigured {
             description: self.description,
@@ -96,17 +100,17 @@ where
             feature: self.feature,
             background: None,
 
-            trials: vec![trial],
+            trials,
         }
     }
 
-    fn as_context<RuleBackgroundGivenStepFnImpl>(
+    fn as_ctx<RuleBackgroundGivenStepFnImpl>(
         &self,
-    ) -> RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
         RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
-        RuleCtx {
+        RuleContext {
             description: self.description.clone(),
             ignored: None,
 
@@ -131,7 +135,7 @@ where
 {
     pub fn background<RuleBackgroundGivenStepFnImpl>(
         self,
-        background: impl Into<BackgroundContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+        background: impl FinalizableBackground<RuleBackgroundGivenStepFnImpl, WorldImpl>,
     ) -> RuleWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
         RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
@@ -145,17 +149,18 @@ where
         }
     }
 
-    pub fn scenario<F, R, RuleBackgroundGivenStepFnImpl>(
+    pub fn scenario<FromContext, Scenario, RuleBackgroundGivenStepFnImpl>(
         self,
-        f: F,
+        from_ctx: FromContext,
     ) -> RuleWithScenariosLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
-        F: FnOnce(RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> R,
-        R: Into<libtest::Trial>,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
         RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
-        let context = self.as_context();
-        let trial = f(context).into();
+        let ctx = self.as_ctx();
+        let scenario = from_ctx(ctx);
+        let trials = vec![scenario.into()];
 
         RuleWithScenariosLastConfigured {
             description: self.description,
@@ -164,17 +169,17 @@ where
             feature: self.feature,
             background: None,
 
-            trials: vec![trial],
+            trials,
         }
     }
 
-    fn as_context<RuleBackgroundGivenStepFnImpl>(
+    fn as_ctx<RuleBackgroundGivenStepFnImpl>(
         &self,
-    ) -> RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
         RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
-        RuleCtx {
+        RuleContext {
             description: self.description.clone(),
             ignored: self.ignored,
 
@@ -184,8 +189,7 @@ where
     }
 }
 
-pub struct RuleWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
-{
+pub struct RuleWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
@@ -200,16 +204,17 @@ where
     RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn scenario<F, R>(
+    pub fn scenario<FromContext, Scenario>(
         self,
-        f: F,
+        from_ctx: FromContext,
     ) -> RuleWithScenariosLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
-        F: FnOnce(RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> R,
-        R: Into<libtest::Trial>,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
     {
-        let context = self.as_context();
-        let trial = f(context).into();
+        let ctx = self.as_ctx();
+        let scenario = from_ctx(ctx);
+        let trials = vec![scenario.into()];
 
         RuleWithScenariosLastConfigured {
             description: self.description,
@@ -218,15 +223,15 @@ where
             feature: self.feature,
             background: self.background,
 
-            trials: vec![trial],
+            trials,
         }
     }
 
-    fn as_context(&self) -> RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    fn as_ctx(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
         RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
-        RuleCtx {
+        RuleContext {
             description: self.description.clone(),
             ignored: self.ignored,
 
@@ -253,29 +258,30 @@ where
     RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn scenario<F, R>(self, f: F) -> Self
+    pub fn scenario<FromContext, Scenario>(self, from_ctx: FromContext) -> Self
     where
-        F: FnOnce(RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> R,
-        R: Into<libtest::Trial>,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
     {
-        let context = self.as_context();
-        let trial = f(context).into();
+        let ctx = self.as_ctx();
+        let scenario = from_ctx(ctx);
 
-        let mut this_trials = self.trials;
-        this_trials.push(trial);
+        let mut trials = self.trials;
+        trials.push(scenario.into());
 
-        Self {
+        RuleWithScenariosLastConfigured {
             description: self.description,
             ignored: self.ignored,
 
             feature: self.feature,
             background: self.background,
-            trials: this_trials,
+
+            trials,
         }
     }
 
-    fn as_context(&self) -> RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
-        RuleCtx {
+    fn as_ctx(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
+        RuleContext {
             description: self.description.clone(),
             ignored: self.ignored,
 
@@ -313,7 +319,7 @@ where
 }
 
 #[derive(Default)]
-pub struct RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
+pub struct RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
     pub(super) description: Option<MaybeOwnedStr>,
     pub(super) ignored: Option<bool>,
 
@@ -322,7 +328,7 @@ pub struct RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnIm
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> Clone
-    for RuleCtx<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    for RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
     FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,

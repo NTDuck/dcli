@@ -7,8 +7,9 @@ use crate::elements::BackgroundGivenStepFn;
 use crate::elements::World;
 use crate::utils::aliases::MaybeOwnedStr;
 
-use super::FinalizableRule;
-use super::FinalizableScenario;
+use crate::elements::FinalizableBackground;
+use crate::elements::FinalizableRule;
+use crate::elements::FinalizableScenario;
 
 pub struct UnconfiguredFeature<WorldImpl> {
     phantom: PhantomData<WorldImpl>,
@@ -48,7 +49,7 @@ where
 
     pub fn background<BackgroundGivenStepFnImpl>(
         self,
-        background: impl Into<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
+        background: impl FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>,
     ) -> FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
@@ -133,7 +134,7 @@ where
 {
     pub fn background<BackgroundGivenStepFnImpl>(
         self,
-        background: impl Into<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
+        background: impl FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>,
     ) -> FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,

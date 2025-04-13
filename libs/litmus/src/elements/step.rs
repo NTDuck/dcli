@@ -104,6 +104,7 @@ impl std::fmt::Display for StepMeta {
     }
 }
 
+#[allow(dead_code)]
 #[derive(strum::Display)]
 pub(crate) enum StepLabel {
     // Flavor A
