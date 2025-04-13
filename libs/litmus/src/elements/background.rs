@@ -231,11 +231,13 @@ where
     }
 }
 
-pub trait FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>: Into<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>> {}
+pub trait FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>:
+    Into<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>
+{
+}
 
-impl<T, BackgroundGivenStepFnImpl, WorldImpl> FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl> for T
-where
-    T: Into<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
+impl<T, BackgroundGivenStepFnImpl, WorldImpl> FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl> for T where
+    T: Into<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>
 {
 }
 

@@ -1,13 +1,12 @@
 pub use UnconfiguredRule as Rule;
 
-use crate::elements::FeatureContext;
 use crate::elements::BackgroundContext;
 use crate::elements::BackgroundGivenStepFn;
-use crate::elements::World;
-use crate::utils::aliases::MaybeOwnedStr;
-
+use crate::elements::FeatureContext;
 use crate::elements::FinalizableBackground;
 use crate::elements::FinalizableScenario;
+use crate::elements::World;
+use crate::utils::aliases::MaybeOwnedStr;
 
 pub struct UnconfiguredRule<FeatureBackgroundGivenStepFnImpl, WorldImpl> {
     feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
@@ -85,7 +84,8 @@ where
         from_ctx: FromContext,
     ) -> RuleWithScenariosLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        FromContext:
+            FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
         RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
@@ -154,7 +154,8 @@ where
         from_ctx: FromContext,
     ) -> RuleWithScenariosLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        FromContext:
+            FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
         RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     {
@@ -189,7 +190,8 @@ where
     }
 }
 
-pub struct RuleWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
+pub struct RuleWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+{
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
@@ -209,7 +211,8 @@ where
         from_ctx: FromContext,
     ) -> RuleWithScenariosLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        FromContext:
+            FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
     {
         let ctx = self.as_ctx();
@@ -260,7 +263,8 @@ where
 {
     pub fn scenario<FromContext, Scenario>(self, from_ctx: FromContext) -> Self
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        FromContext:
+            FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
     {
         let ctx = self.as_ctx();
@@ -293,11 +297,7 @@ where
 
 pub trait FinalizableRule: Into<Vec<libtest::Trial>> {}
 
-impl<T> FinalizableRule for T
-where 
-    T: Into<Vec<libtest::Trial>>,
-{
-}
+impl<T> FinalizableRule for T where T: Into<Vec<libtest::Trial>> {}
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     From<RuleWithScenariosLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>>

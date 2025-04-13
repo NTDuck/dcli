@@ -829,11 +829,7 @@ where
 
 pub trait FinalizableScenario: Into<libtest::Trial> {}
 
-impl<T> FinalizableScenario for T
-where
-    T: Into<libtest::Trial>,
-{
-}
+impl<T> FinalizableScenario for T where T: Into<libtest::Trial> {}
 
 impl<
         ScenarioGivenStepFnImpl,

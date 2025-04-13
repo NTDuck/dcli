@@ -6,7 +6,10 @@ pub(crate) struct Steps<StepFnImpl> {
 }
 
 impl<StepFnImpl> Steps<StepFnImpl> {
-    pub(crate) fn chain_background_given_step<WorldImpl>(self, step: Step<impl BackgroundGivenStepFn<WorldImpl>>) -> Steps<impl BackgroundGivenStepFn<WorldImpl>>
+    pub(crate) fn chain_background_given_step<WorldImpl>(
+        self,
+        step: Step<impl BackgroundGivenStepFn<WorldImpl>>,
+    ) -> Steps<impl BackgroundGivenStepFn<WorldImpl>>
     where
         StepFnImpl: BackgroundGivenStepFn<WorldImpl>,
         WorldImpl: World,
@@ -22,7 +25,10 @@ impl<StepFnImpl> Steps<StepFnImpl> {
         }
     }
 
-    pub(crate) fn chain_scenario_given_step<WorldImpl>(self, step: Step<impl ScenarioGivenStepFn<WorldImpl>>) -> Steps<impl ScenarioGivenStepFn<WorldImpl>>
+    pub(crate) fn chain_scenario_given_step<WorldImpl>(
+        self,
+        step: Step<impl ScenarioGivenStepFn<WorldImpl>>,
+    ) -> Steps<impl ScenarioGivenStepFn<WorldImpl>>
     where
         StepFnImpl: ScenarioGivenStepFn<WorldImpl>,
         WorldImpl: World,
@@ -38,7 +44,10 @@ impl<StepFnImpl> Steps<StepFnImpl> {
         }
     }
 
-    pub(crate) fn chain_scenario_when_step<WorldImpl>(self, step: Step<impl ScenarioWhenStepFn<WorldImpl>>) -> Steps<impl ScenarioWhenStepFn<WorldImpl>>
+    pub(crate) fn chain_scenario_when_step<WorldImpl>(
+        self,
+        step: Step<impl ScenarioWhenStepFn<WorldImpl>>,
+    ) -> Steps<impl ScenarioWhenStepFn<WorldImpl>>
     where
         StepFnImpl: ScenarioWhenStepFn<WorldImpl>,
         WorldImpl: World,
@@ -54,7 +63,10 @@ impl<StepFnImpl> Steps<StepFnImpl> {
         }
     }
 
-    pub(crate) fn chain_scenario_then_step<WorldImpl>(self, step: Step<impl ScenarioThenStepFn<WorldImpl>>) -> Steps<impl ScenarioThenStepFn<WorldImpl>>
+    pub(crate) fn chain_scenario_then_step<WorldImpl>(
+        self,
+        step: Step<impl ScenarioThenStepFn<WorldImpl>>,
+    ) -> Steps<impl ScenarioThenStepFn<WorldImpl>>
     where
         StepFnImpl: ScenarioThenStepFn<WorldImpl>,
         WorldImpl: World,

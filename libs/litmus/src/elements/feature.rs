@@ -4,12 +4,11 @@ pub use UnconfiguredFeature as Feature;
 
 use crate::elements::BackgroundContext;
 use crate::elements::BackgroundGivenStepFn;
-use crate::elements::World;
-use crate::utils::aliases::MaybeOwnedStr;
-
 use crate::elements::FinalizableBackground;
 use crate::elements::FinalizableRule;
 use crate::elements::FinalizableScenario;
+use crate::elements::World;
+use crate::utils::aliases::MaybeOwnedStr;
 
 pub struct UnconfiguredFeature<WorldImpl> {
     phantom: PhantomData<WorldImpl>,
@@ -80,7 +79,7 @@ where
             ignored: None,
 
             background: None,
-            
+
             trials,
         }
     }
@@ -218,7 +217,10 @@ where
     BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn rule<FromContext, Rule>(self, from_ctx: FromContext) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    pub fn rule<FromContext, Rule>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
@@ -237,7 +239,10 @@ where
         }
     }
 
-    pub fn scenario<FromContext, Scenario>(self, from_ctx: FromContext) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    pub fn scenario<FromContext, Scenario>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
