@@ -3,12 +3,11 @@ use std::sync::Arc;
 
 pub use UnconfiguredBackground as Background;
 
-use crate::elements::ReusableGivenStepFn;
 use crate::elements::Step;
 use crate::elements::StepLabel;
-use crate::elements::StepMeta;
-use crate::elements::Steps;
 use crate::elements::World;
+use crate::elements::ReusableGivenStepFn;
+use crate::elements::ReusableGivenSteps;
 use crate::utils::aliases::MaybeOwnedStr;
 
 pub struct UnconfiguredBackground<WorldImpl> {
@@ -56,10 +55,8 @@ where
         BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Given,
-                description: description.into(),
-            },
+            label: StepLabel::Given,
+            description: description.into(),
             callback,
         };
 
@@ -67,7 +64,7 @@ where
             description: self.description,
             ignored: None,
 
-            given_steps: Steps::from(step),
+            given_steps: ReusableGivenSteps::from(step),
 
             phantom: PhantomData,
         }
@@ -94,10 +91,8 @@ where
         BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Given,
-                description: description.into(),
-            },
+            label: StepLabel::Given,
+            description: description.into(),
             callback,
         };
 
@@ -105,59 +100,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: Steps::from(step),
-
-            phantom: PhantomData,
-        }
-    }
-
-    pub fn suite<BackgroundGivenStepFnImpl>(
-        self,
-        description: impl Into<MaybeOwnedStr>,
-        callback: BackgroundGivenStepFnImpl,
-    ) -> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
-    where
-        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    {
-        let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Suite,
-                description: description.into(),
-            },
-            callback,
-        };
-
-        BackgroundWithGivenStepsLastConfigured {
-            description: self.description,
-            ignored: self.ignored,
-
-            given_steps: Steps::from(step),
-
-            phantom: PhantomData,
-        }
-    }
-
-    pub fn describe<BackgroundGivenStepFnImpl>(
-        self,
-        description: impl Into<MaybeOwnedStr>,
-        callback: BackgroundGivenStepFnImpl,
-    ) -> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
-    where
-        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    {
-        let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Describe,
-                description: description.into(),
-            },
-            callback,
-        };
-
-        BackgroundWithGivenStepsLastConfigured {
-            description: self.description,
-            ignored: self.ignored,
-
-            given_steps: Steps::from(step),
+            given_steps: ReusableGivenSteps::from(step),
 
             phantom: PhantomData,
         }
@@ -168,7 +111,7 @@ pub struct BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, Wor
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
-    given_steps: Steps<BackgroundGivenStepFnImpl>,
+    given_steps: ReusableGivenSteps<BackgroundGivenStepFnImpl>,
 
     phantom: PhantomData<WorldImpl>,
 }
@@ -187,10 +130,8 @@ where
         OtherBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::And,
-                description: description.into(),
-            },
+            label: StepLabel::And,
+            description: description.into(),
             callback,
         };
 
@@ -198,7 +139,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain_background_given_step(step),
+            given_steps: self.given_steps.chain(step),
 
             phantom: PhantomData,
         }
@@ -213,10 +154,8 @@ where
         OtherBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::But,
-                description: description.into(),
-            },
+            label: StepLabel::But,
+            description: description.into(),
             callback,
         };
 
@@ -224,7 +163,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain_background_given_step(step),
+            given_steps: self.given_steps.chain(step),
 
             phantom: PhantomData,
         }

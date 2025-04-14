@@ -319,16 +319,18 @@ where
 }
 
 #[derive(Default)]
-pub struct RuleContext<BackgroundGivenStepFnImpl, WorldImpl> {
+pub struct RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
     pub(super) description: Option<MaybeOwnedStr>,
     pub(super) ignored: Option<bool>,
 
-    pub(super) background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
+    pub(super) feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
+    pub(super) background: Option<BackgroundContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
-impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for RuleContext<BackgroundGivenStepFnImpl, WorldImpl>
+impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> Clone for RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
-    BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn clone(&self) -> Self {
@@ -336,6 +338,7 @@ where
             description: self.description.clone(),
             ignored: self.ignored,
 
+            feature: self.feature.clone(),
             background: self.background.clone(),
         }
     }
