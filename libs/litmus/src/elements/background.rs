@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 pub use UnconfiguredBackground as Background;
 
-use crate::elements::BackgroundGivenStepFn;
+use crate::elements::ReusableGivenStepFn;
 use crate::elements::Step;
 use crate::elements::StepLabel;
 use crate::elements::StepMeta;
@@ -53,7 +53,7 @@ where
         callback: BackgroundGivenStepFnImpl,
     ) -> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
-        BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -91,7 +91,7 @@ where
         callback: BackgroundGivenStepFnImpl,
     ) -> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
-        BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -117,7 +117,7 @@ where
         callback: BackgroundGivenStepFnImpl,
     ) -> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
-        BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -143,7 +143,7 @@ where
         callback: BackgroundGivenStepFnImpl,
     ) -> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
-        BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -175,16 +175,16 @@ pub struct BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, Wor
 
 impl<BackgroundGivenStepFnImpl, WorldImpl> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
 where
-    BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn and<OtherBackgroundGivenStepFnImpl>(
         self,
         description: impl Into<MaybeOwnedStr>,
         callback: OtherBackgroundGivenStepFnImpl,
-    ) -> BackgroundWithGivenStepsLastConfigured<impl BackgroundGivenStepFn<WorldImpl>, WorldImpl>
+    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl>
     where
-        OtherBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+        OtherBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -208,9 +208,9 @@ where
         self,
         description: impl Into<MaybeOwnedStr>,
         callback: OtherBackgroundGivenStepFnImpl,
-    ) -> BackgroundWithGivenStepsLastConfigured<impl BackgroundGivenStepFn<WorldImpl>, WorldImpl>
+    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl>
     where
-        OtherBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+        OtherBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -245,7 +245,7 @@ impl<BackgroundGivenStepFnImpl, WorldImpl>
     From<BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>>
     for BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>
 where
-    BackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(background: BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>) -> Self {

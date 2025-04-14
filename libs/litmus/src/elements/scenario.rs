@@ -2,10 +2,10 @@ pub use UnconfiguredScenario as Scenario;
 
 use super::FeatureContext;
 use super::RuleContext;
-use crate::elements::BackgroundGivenStepFn;
-use crate::elements::ScenarioGivenStepFn;
-use crate::elements::ScenarioThenStepFn;
-use crate::elements::ScenarioWhenStepFn;
+use crate::elements::ReusableGivenStepFn;
+use crate::elements::GivenStepFn;
+use crate::elements::ThenStepFn;
+use crate::elements::WhenStepFn;
 use crate::elements::Step;
 use crate::elements::StepLabel;
 use crate::elements::StepMeta;
@@ -25,7 +25,7 @@ impl<FeatureBackgroundGivenStepFnImpl, WorldImpl> From<FeatureContext<FeatureBac
         WorldImpl,
     >
 where
-    FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
@@ -41,8 +41,8 @@ impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     From<RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>>
     for UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(rule: RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
@@ -55,8 +55,8 @@ where
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn named(
@@ -96,8 +96,8 @@ pub struct ScenarioWithDescriptionLastConfigured<
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     ScenarioWithDescriptionLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn ignored(
@@ -124,7 +124,7 @@ where
         WorldImpl,
     >
     where
-        ScenarioGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
+        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -155,7 +155,7 @@ where
         WorldImpl,
     >
     where
-        ScenarioGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
+        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -186,7 +186,7 @@ where
         WorldImpl,
     >
     where
-        ScenarioGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
+        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -218,8 +218,8 @@ pub struct ScenarioWithIgnoredLastConfigured<FeatureBackgroundGivenStepFnImpl, R
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     ScenarioWithIgnoredLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn given<ScenarioGivenStepFnImpl>(
@@ -233,7 +233,7 @@ where
         WorldImpl,
     >
     where
-        ScenarioGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
+        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -264,7 +264,7 @@ where
         WorldImpl,
     >
     where
-        ScenarioGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
+        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -295,7 +295,7 @@ where
         WorldImpl,
     >
     where
-        ScenarioGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
+        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -338,9 +338,9 @@ impl<ScenarioGivenStepFnImpl, FeatureBackgroundGivenStepFnImpl, RuleBackgroundGi
         WorldImpl,
     >
 where
-    ScenarioGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
-    FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn and<OtherScenarioGivenStepFnImpl>(
@@ -348,13 +348,13 @@ where
         description: impl Into<MaybeOwnedStr>,
         callback: OtherScenarioGivenStepFnImpl,
     ) -> ScenarioWithGivenStepsLastConfigured<
-        impl ScenarioGivenStepFn<WorldImpl>,
+        impl GivenStepFn<WorldImpl>,
         FeatureBackgroundGivenStepFnImpl,
         RuleBackgroundGivenStepFnImpl,
         WorldImpl,
     >
     where
-        OtherScenarioGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
+        OtherScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -379,13 +379,13 @@ where
         description: impl Into<MaybeOwnedStr>,
         callback: OtherScenarioGivenStepFnImpl,
     ) -> ScenarioWithGivenStepsLastConfigured<
-        impl ScenarioGivenStepFn<WorldImpl>,
+        impl GivenStepFn<WorldImpl>,
         FeatureBackgroundGivenStepFnImpl,
         RuleBackgroundGivenStepFnImpl,
         WorldImpl,
     >
     where
-        OtherScenarioGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
+        OtherScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -417,7 +417,7 @@ where
         WorldImpl,
     >
     where
-        ScenarioWhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
+        ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -450,7 +450,7 @@ where
         WorldImpl,
     >
     where
-        ScenarioWhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
+        ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -483,7 +483,7 @@ where
         WorldImpl,
     >
     where
-        ScenarioWhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
+        ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -536,10 +536,10 @@ impl<
         WorldImpl,
     >
 where
-    ScenarioGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
-    ScenarioWhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
-    FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
+    ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn and<OtherScenarioWhenStepFnImpl>(
@@ -548,13 +548,13 @@ where
         callback: OtherScenarioWhenStepFnImpl,
     ) -> ScenarioWithWhenStepsLastConfigured<
         ScenarioGivenStepFnImpl,
-        impl ScenarioWhenStepFn<WorldImpl>,
+        impl WhenStepFn<WorldImpl>,
         FeatureBackgroundGivenStepFnImpl,
         RuleBackgroundGivenStepFnImpl,
         WorldImpl,
     >
     where
-        OtherScenarioWhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
+        OtherScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -581,13 +581,13 @@ where
         callback: OtherScenarioWhenStepFnImpl,
     ) -> ScenarioWithWhenStepsLastConfigured<
         ScenarioGivenStepFnImpl,
-        impl ScenarioWhenStepFn<WorldImpl>,
+        impl WhenStepFn<WorldImpl>,
         FeatureBackgroundGivenStepFnImpl,
         RuleBackgroundGivenStepFnImpl,
         WorldImpl,
     >
     where
-        OtherScenarioWhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
+        OtherScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -621,7 +621,7 @@ where
         WorldImpl,
     >
     where
-        ScenarioThenStepFnImpl: ScenarioThenStepFn<WorldImpl>,
+        ScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -656,7 +656,7 @@ where
         WorldImpl,
     >
     where
-        ScenarioThenStepFnImpl: ScenarioThenStepFn<WorldImpl>,
+        ScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -691,7 +691,7 @@ where
         WorldImpl,
     >
     where
-        ScenarioThenStepFnImpl: ScenarioThenStepFn<WorldImpl>,
+        ScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -749,11 +749,11 @@ impl<
         WorldImpl,
     >
 where
-    ScenarioGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
-    ScenarioWhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
-    ScenarioThenStepFnImpl: ScenarioThenStepFn<WorldImpl>,
-    FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
+    ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
+    ScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn and<OtherScenarioThenStepFnImpl>(
@@ -763,13 +763,13 @@ where
     ) -> ScenarioWithThenStepsLastConfigured<
         ScenarioGivenStepFnImpl,
         ScenarioWhenStepFnImpl,
-        impl ScenarioThenStepFn<WorldImpl>,
+        impl ThenStepFn<WorldImpl>,
         FeatureBackgroundGivenStepFnImpl,
         RuleBackgroundGivenStepFnImpl,
         WorldImpl,
     >
     where
-        OtherScenarioThenStepFnImpl: ScenarioThenStepFn<WorldImpl>,
+        OtherScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -798,13 +798,13 @@ where
     ) -> ScenarioWithThenStepsLastConfigured<
         ScenarioGivenStepFnImpl,
         ScenarioWhenStepFnImpl,
-        impl ScenarioThenStepFn<WorldImpl>,
+        impl ThenStepFn<WorldImpl>,
         FeatureBackgroundGivenStepFnImpl,
         RuleBackgroundGivenStepFnImpl,
         WorldImpl,
     >
     where
-        OtherScenarioThenStepFnImpl: ScenarioThenStepFn<WorldImpl>,
+        OtherScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
     {
         let step = Step {
             meta: StepMeta {
@@ -850,11 +850,11 @@ impl<
         >,
     > for libtest::Trial
 where
-    ScenarioGivenStepFnImpl: ScenarioGivenStepFn<WorldImpl>,
-    ScenarioWhenStepFnImpl: ScenarioWhenStepFn<WorldImpl>,
-    ScenarioThenStepFnImpl: ScenarioThenStepFn<WorldImpl>,
-    FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
+    ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
+    ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
+    ScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(
@@ -942,8 +942,8 @@ enum Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, Wo
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepImpl, WorldImpl> Clone
     for Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: BackgroundGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepImpl: BackgroundGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    RuleBackgroundGivenStepImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn clone(&self) -> Self {
