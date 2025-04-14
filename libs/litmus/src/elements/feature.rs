@@ -360,7 +360,11 @@ pub struct FeatureContext<BackgroundGivenStepFnImpl, WorldImpl> {
     pub(super) background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
-impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for FeatureContext<BackgroundGivenStepFnImpl, WorldImpl> {
+impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+where 
+    BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    WorldImpl: World,
+{
     fn clone(&self) -> Self {
         Self {
             description: self.description.clone(),

@@ -8,46 +8,20 @@ use crate::elements::ThenStepFn;
 use crate::elements::WhenStepFn;
 use crate::elements::Step;
 use crate::elements::StepLabel;
-use crate::elements::StepMeta;
-use crate::elements::Steps;
+use crate::elements::GivenSteps;
+use crate::elements::WhenSteps;
+use crate::elements::ThenSteps;
 use crate::elements::World;
-use crate::elements::STEP_DELIMITER;
 use crate::utils::aliases::MaybeOwnedStr;
 
 pub struct UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
-    ctx: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
+    ctx: ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
-impl<FeatureBackgroundGivenStepFnImpl, WorldImpl> From<FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>>
-    for UnconfiguredScenario<
-        FeatureBackgroundGivenStepFnImpl,
-        NoOpFeatureBackgroundGivenStepFnImpl<WorldImpl>,
-        WorldImpl,
-    >
-where
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    WorldImpl: World,
-{
-    fn from(feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
+impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> From<ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>> for UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
+    fn from(ctx: ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
         Self {
-            ctx: Context::Feature(feature),
-        }
-    }
-}
-
-type NoOpFeatureBackgroundGivenStepFnImpl<WorldImpl> = fn(&mut WorldImpl) -> Result<(), libtest::Failed>;
-
-impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
-    From<RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>>
-    for UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
-where
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    WorldImpl: World,
-{
-    fn from(rule: RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
-        Self {
-            ctx: Context::Rule(rule),
+            ctx,
         }
     }
 }
@@ -90,7 +64,7 @@ pub struct ScenarioWithDescriptionLastConfigured<
 > {
     description: Option<MaybeOwnedStr>,
 
-    ctx: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
+    ctx: ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
@@ -127,10 +101,8 @@ where
         ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Given,
-                description: description.into(),
-            },
+            label: StepLabel::Given,
+            description: description.into(),
             callback,
         };
 
@@ -138,69 +110,7 @@ where
             description: self.description,
             ignored: None,
 
-            given_steps: Steps::from(step),
-
-            ctx: self.ctx,
-        }
-    }
-
-    pub fn suite<ScenarioGivenStepFnImpl>(
-        self,
-        description: impl Into<MaybeOwnedStr>,
-        callback: ScenarioGivenStepFnImpl,
-    ) -> ScenarioWithGivenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
-    where
-        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
-    {
-        let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Suite,
-                description: description.into(),
-            },
-            callback,
-        };
-
-        ScenarioWithGivenStepsLastConfigured {
-            description: self.description,
-            ignored: None,
-
-            given_steps: Steps::from(step),
-
-            ctx: self.ctx,
-        }
-    }
-
-    pub fn describe<ScenarioGivenStepFnImpl>(
-        self,
-        description: impl Into<MaybeOwnedStr>,
-        callback: ScenarioGivenStepFnImpl,
-    ) -> ScenarioWithGivenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
-    where
-        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
-    {
-        let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Describe,
-                description: description.into(),
-            },
-            callback,
-        };
-
-        ScenarioWithGivenStepsLastConfigured {
-            description: self.description,
-            ignored: None,
-
-            given_steps: Steps::from(step),
+            given_steps: GivenSteps::from(step),
 
             ctx: self.ctx,
         }
@@ -212,7 +122,7 @@ pub struct ScenarioWithIgnoredLastConfigured<FeatureBackgroundGivenStepFnImpl, R
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
-    ctx: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
+    ctx: ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
@@ -236,10 +146,8 @@ where
         ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Given,
-                description: description.into(),
-            },
+            label: StepLabel::Given,
+            description: description.into(),
             callback,
         };
 
@@ -247,69 +155,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: Steps::from(step),
-
-            ctx: self.ctx,
-        }
-    }
-
-    pub fn suite<ScenarioGivenStepFnImpl>(
-        self,
-        description: impl Into<MaybeOwnedStr>,
-        callback: ScenarioGivenStepFnImpl,
-    ) -> ScenarioWithGivenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
-    where
-        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
-    {
-        let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Suite,
-                description: description.into(),
-            },
-            callback,
-        };
-
-        ScenarioWithGivenStepsLastConfigured {
-            description: self.description,
-            ignored: self.ignored,
-
-            given_steps: Steps::from(step),
-
-            ctx: self.ctx,
-        }
-    }
-
-    pub fn describe<ScenarioGivenStepFnImpl>(
-        self,
-        description: impl Into<MaybeOwnedStr>,
-        callback: ScenarioGivenStepFnImpl,
-    ) -> ScenarioWithGivenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
-    where
-        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
-    {
-        let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Describe,
-                description: description.into(),
-            },
-            callback,
-        };
-
-        ScenarioWithGivenStepsLastConfigured {
-            description: self.description,
-            ignored: self.ignored,
-
-            given_steps: Steps::from(step),
+            given_steps: GivenSteps::from(step),
 
             ctx: self.ctx,
         }
@@ -325,9 +171,9 @@ pub struct ScenarioWithGivenStepsLastConfigured<
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
-    given_steps: Steps<ScenarioGivenStepFnImpl>,
+    given_steps: GivenSteps<ScenarioGivenStepFnImpl>,
 
-    ctx: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
+    ctx: ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
 impl<ScenarioGivenStepFnImpl, FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
@@ -357,10 +203,8 @@ where
         OtherScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::And,
-                description: description.into(),
-            },
+            label: StepLabel::And,
+            description: description.into(),
             callback,
         };
 
@@ -368,7 +212,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain_scenario_given_step(step),
+            given_steps: self.given_steps.chain(step),
 
             ctx: self.ctx,
         }
@@ -388,10 +232,8 @@ where
         OtherScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::But,
-                description: description.into(),
-            },
+            label: StepLabel::But,
+            description: description.into(),
             callback,
         };
 
@@ -399,7 +241,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain_scenario_given_step(step),
+            given_steps: self.given_steps.chain(step),
 
             ctx: self.ctx,
         }
@@ -420,10 +262,8 @@ where
         ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::When,
-                description: description.into(),
-            },
+            label: StepLabel::When,
+            description: description.into(),
             callback,
         };
 
@@ -432,73 +272,7 @@ where
             ignored: self.ignored,
 
             given_steps: self.given_steps,
-            when_steps: Steps::from(step),
-
-            ctx: self.ctx,
-        }
-    }
-
-    pub fn context<ScenarioWhenStepFnImpl>(
-        self,
-        description: impl Into<MaybeOwnedStr>,
-        callback: ScenarioWhenStepFnImpl,
-    ) -> ScenarioWithWhenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        ScenarioWhenStepFnImpl,
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
-    where
-        ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
-    {
-        let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Context,
-                description: description.into(),
-            },
-            callback,
-        };
-
-        ScenarioWithWhenStepsLastConfigured {
-            description: self.description,
-            ignored: self.ignored,
-
-            given_steps: self.given_steps,
-            when_steps: Steps::from(step),
-
-            ctx: self.ctx,
-        }
-    }
-
-    pub fn specify<ScenarioWhenStepFnImpl>(
-        self,
-        description: impl Into<MaybeOwnedStr>,
-        callback: ScenarioWhenStepFnImpl,
-    ) -> ScenarioWithWhenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        ScenarioWhenStepFnImpl,
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
-    where
-        ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
-    {
-        let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Specify,
-                description: description.into(),
-            },
-            callback,
-        };
-
-        ScenarioWithWhenStepsLastConfigured {
-            description: self.description,
-            ignored: self.ignored,
-
-            given_steps: self.given_steps,
-            when_steps: Steps::from(step),
+            when_steps: WhenSteps::from(step),
 
             ctx: self.ctx,
         }
@@ -515,10 +289,10 @@ pub struct ScenarioWithWhenStepsLastConfigured<
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
-    given_steps: Steps<ScenarioGivenStepFnImpl>,
-    when_steps: Steps<ScenarioWhenStepFnImpl>,
+    given_steps: GivenSteps<ScenarioGivenStepFnImpl>,
+    when_steps: WhenSteps<ScenarioWhenStepFnImpl>,
 
-    ctx: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
+    ctx: ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
 impl<
@@ -557,10 +331,8 @@ where
         OtherScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::And,
-                description: description.into(),
-            },
+            label: StepLabel::And,
+            description: description.into(),
             callback,
         };
 
@@ -569,7 +341,7 @@ where
             ignored: self.ignored,
 
             given_steps: self.given_steps,
-            when_steps: self.when_steps.chain_scenario_when_step(step),
+            when_steps: self.when_steps.chain(step),
 
             ctx: self.ctx,
         }
@@ -590,10 +362,8 @@ where
         OtherScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::But,
-                description: description.into(),
-            },
+            label: StepLabel::But,
+            description: description.into(),
             callback,
         };
 
@@ -602,7 +372,7 @@ where
             ignored: self.ignored,
 
             given_steps: self.given_steps,
-            when_steps: self.when_steps.chain_scenario_when_step(step),
+            when_steps: self.when_steps.chain(step),
 
             ctx: self.ctx,
         }
@@ -624,10 +394,8 @@ where
         ScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Then,
-                description: description.into(),
-            },
+            label: StepLabel::Then,
+            description: description.into(),
             callback,
         };
 
@@ -637,77 +405,7 @@ where
 
             given_steps: self.given_steps,
             when_steps: self.when_steps,
-            then_steps: Steps::from(step),
-
-            ctx: self.ctx,
-        }
-    }
-
-    pub fn example<ScenarioThenStepFnImpl>(
-        self,
-        description: impl Into<MaybeOwnedStr>,
-        callback: ScenarioThenStepFnImpl,
-    ) -> ScenarioWithThenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        ScenarioWhenStepFnImpl,
-        ScenarioThenStepFnImpl,
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
-    where
-        ScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
-    {
-        let step = Step {
-            meta: StepMeta {
-                label: StepLabel::Example,
-                description: description.into(),
-            },
-            callback,
-        };
-
-        ScenarioWithThenStepsLastConfigured {
-            description: self.description,
-            ignored: self.ignored,
-
-            given_steps: self.given_steps,
-            when_steps: self.when_steps,
-            then_steps: Steps::from(step),
-
-            ctx: self.ctx,
-        }
-    }
-
-    pub fn it<ScenarioThenStepFnImpl>(
-        self,
-        description: impl Into<MaybeOwnedStr>,
-        callback: ScenarioThenStepFnImpl,
-    ) -> ScenarioWithThenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        ScenarioWhenStepFnImpl,
-        ScenarioThenStepFnImpl,
-        FeatureBackgroundGivenStepFnImpl,
-        RuleBackgroundGivenStepFnImpl,
-        WorldImpl,
-    >
-    where
-        ScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
-    {
-        let step = Step {
-            meta: StepMeta {
-                label: StepLabel::It,
-                description: description.into(),
-            },
-            callback,
-        };
-
-        ScenarioWithThenStepsLastConfigured {
-            description: self.description,
-            ignored: self.ignored,
-
-            given_steps: self.given_steps,
-            when_steps: self.when_steps,
-            then_steps: Steps::from(step),
+            then_steps: ThenSteps::from(step),
 
             ctx: self.ctx,
         }
@@ -725,11 +423,11 @@ pub struct ScenarioWithThenStepsLastConfigured<
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
-    given_steps: Steps<ScenarioGivenStepFnImpl>,
-    when_steps: Steps<ScenarioWhenStepFnImpl>,
-    then_steps: Steps<ScenarioThenStepFnImpl>,
+    given_steps: GivenSteps<ScenarioGivenStepFnImpl>,
+    when_steps: WhenSteps<ScenarioWhenStepFnImpl>,
+    then_steps: ThenSteps<ScenarioThenStepFnImpl>,
 
-    ctx: Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
+    ctx: ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
 impl<
@@ -772,10 +470,8 @@ where
         OtherScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::And,
-                description: description.into(),
-            },
+            label: StepLabel::And,
+            description: description.into(),
             callback,
         };
 
@@ -785,7 +481,7 @@ where
 
             given_steps: self.given_steps,
             when_steps: self.when_steps,
-            then_steps: self.then_steps.chain_scenario_then_step(step),
+            then_steps: self.then_steps.chain(step),
 
             ctx: self.ctx,
         }
@@ -807,10 +503,8 @@ where
         OtherScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
     {
         let step = Step {
-            meta: StepMeta {
-                label: StepLabel::But,
-                description: description.into(),
-            },
+            label: StepLabel::But,
+            description: description.into(),
             callback,
         };
 
@@ -820,7 +514,7 @@ where
 
             given_steps: self.given_steps,
             when_steps: self.when_steps,
-            then_steps: self.then_steps.chain_scenario_then_step(step),
+            then_steps: self.then_steps.chain(step),
 
             ctx: self.ctx,
         }
@@ -867,89 +561,54 @@ where
             WorldImpl,
         >,
     ) -> Self {
-        let scenario_description = match scenario.description {
+        let description = match scenario.description {
             Some(description) => description,
-            None => format!(
-                "{}{}{}{}{}",
-                scenario.given_steps, STEP_DELIMITER, scenario.when_steps, STEP_DELIMITER, scenario.then_steps
-            )
-            .into(),
+            None => format!("{} | {} | {}", scenario.given_steps, scenario.when_steps, scenario.then_steps).into(),
         };
 
-        match scenario.ctx {
-            Context::Feature(feature) => libtest::Trial::test(scenario_description, move || {
-                let mut world = WorldImpl::default();
+        let ignored = scenario.ctx.feature.ignored.unwrap_or(false)
+            || scenario.ctx.rule.as_ref().and_then(|rule| rule.ignored).unwrap_or(false)
+            || scenario.ignored.unwrap_or(false);
 
-                if let Some(feature_background) = feature.background {
-                    if !feature_background.ignored {
-                        (feature_background.given_steps_callback)(&mut world)?;
-                    }
-                }
+        libtest::Trial::test(description, move || {
+            let mut world = WorldImpl::default();
+            
+            scenario.ctx.feature.background
+                .filter(|background| !background.ignored)
+                .map(|background| (background.given_steps_callback)(&mut world))
+                .transpose()?;
+            
+            scenario.ctx.rule
+                .and_then(|rule| rule.background)
+                .filter(|background| !background.ignored)
+                .map(|background| (background.given_steps_callback)(&mut world))
+                .transpose()?;
 
-                (scenario.given_steps.callback)(&mut world)?;
-                (scenario.when_steps.callback)(&mut world)?;
-                (scenario.then_steps.callback)(&world)?;
+            (scenario.given_steps.callback)(&mut world)?;
+            (scenario.when_steps.callback)(&mut world)?;
+            (scenario.then_steps.callback)(&world)?;
 
-                Ok(())
-            })
-            .with_ignored_flag(feature.ignored.unwrap_or(false) || scenario.ignored.unwrap_or(false))
-            .with_kind(match feature.description {
-                Some(description) => description,
-                None => "".into(),
-            }),
-            Context::Rule(rule) => libtest::Trial::test(scenario_description, move || {
-                let mut world = WorldImpl::default();
-
-                if let Some(feature_background) = rule.feature.background {
-                    if !feature_background.ignored {
-                        (feature_background.given_steps_callback)(&mut world)?;
-                    }
-                }
-
-                if let Some(rule_background) = rule.background {
-                    if !rule_background.ignored {
-                        (rule_background.given_steps_callback)(&mut world)?;
-                    }
-                }
-
-                (scenario.given_steps.callback)(&mut world)?;
-                (scenario.when_steps.callback)(&mut world)?;
-                (scenario.then_steps.callback)(&world)?;
-
-                Ok(())
-            })
-            .with_ignored_flag(
-                rule.feature.ignored.unwrap_or(false)
-                    || rule.ignored.unwrap_or(false)
-                    || scenario.ignored.unwrap_or(false),
-            )
-            .with_kind(match (rule.feature.description, rule.description) {
-                (Some(feature_description), Some(rule_description)) =>
-                    format!("{}{}{}", feature_description, STEP_DELIMITER, rule_description).into(),
-                (Some(feature_description), None) => feature_description,
-                (None, Some(rule_description)) => rule_description,
-                (None, None) => "".into(),
-            }),
-        }
+            Ok(())
+        })
+            .with_ignored_flag(ignored)
     }
 }
 
-enum Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
-    Feature(FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>),
-    Rule(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>),
+pub struct ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
+    feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
+    rule: Option<RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
-impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepImpl, WorldImpl> Clone
-    for Context<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepImpl, WorldImpl>
-where
+impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> Clone for ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+where 
     FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepImpl: ReusableGivenStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn clone(&self) -> Self {
-        match self {
-            Self::Feature(feature) => Self::Feature(feature.clone()),
-            Self::Rule(rule) => Self::Rule(rule.clone()),
+        Self {
+            feature: self.feature.clone(),
+            rule: self.rule.clone(),
         }
     }
 }
