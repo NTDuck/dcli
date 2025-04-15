@@ -1,4 +1,163 @@
+#![allow(dead_code)]
+
+use crate::elements::World;
 use crate::utils::aliases::MaybeOwnedStr;
+
+pub(super) struct ReusableGivenSteps<StepFnImpl> {
+    pub(super) metas: Vec<StepMeta>,
+    pub(super) callback: StepFnImpl,
+}
+
+impl<StepFnImpl> ReusableGivenSteps<StepFnImpl> {
+    pub(super) fn chain<WorldImpl>(
+        self,
+        step: Step<impl ReusableGivenStepFn<WorldImpl>>,
+    ) -> ReusableGivenSteps<impl ReusableGivenStepFn<WorldImpl>>
+    where
+        StepFnImpl: ReusableGivenStepFn<WorldImpl>,
+        WorldImpl: World,
+    {
+        let mut metas = self.metas;
+        let meta = StepMeta {
+            label: step.label,
+            description: step.description,
+        };
+        metas.push(meta);
+
+        let callback = self.callback.chain(step.callback);
+
+        ReusableGivenSteps { metas, callback }
+    }
+}
+
+impl<StepFnImpl> From<Step<StepFnImpl>> for ReusableGivenSteps<StepFnImpl> {
+    fn from(step: Step<StepFnImpl>) -> Self {
+        let meta = StepMeta {
+            label: step.label,
+            description: step.description,
+        };
+
+        Self {
+            metas: vec![meta],
+            callback: step.callback,
+        }
+    }
+}
+
+impl<StepFnImpl> std::fmt::Display for ReusableGivenSteps<StepFnImpl> {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let joined = self.metas
+            .iter()
+            .map(|meta| format!("{}", meta))
+            .collect::<Vec<_>>()
+            .join(" ");
+        write!(formatter, "{}", joined)
+    }
+}
+
+pub(super) struct ReusableWhenSteps<StepFnImpl> {
+    pub(super) metas: Vec<StepMeta>,
+    pub(super) callback: StepFnImpl,
+}
+
+impl<StepFnImpl> ReusableWhenSteps<StepFnImpl> {
+    pub(super) fn chain<WorldImpl>(
+        self,
+        step: Step<impl ReusableWhenStepFn<WorldImpl>>,
+    ) -> ReusableWhenSteps<impl ReusableWhenStepFn<WorldImpl>>
+    where
+        StepFnImpl: ReusableWhenStepFn<WorldImpl>,
+        WorldImpl: World,
+    {
+        let mut metas = self.metas;
+        let meta = StepMeta {
+            label: step.label,
+            description: step.description,
+        };
+        metas.push(meta);
+
+        let callback = self.callback.chain(step.callback);
+
+        ReusableWhenSteps { metas, callback }
+    }
+}
+
+impl<StepFnImpl> From<Step<StepFnImpl>> for ReusableWhenSteps<StepFnImpl> {
+    fn from(step: Step<StepFnImpl>) -> Self {
+        let meta = StepMeta {
+            label: step.label,
+            description: step.description,
+        };
+
+        Self {
+            metas: vec![meta],
+            callback: step.callback,
+        }
+    }
+}
+
+impl<StepFnImpl> std::fmt::Display for ReusableWhenSteps<StepFnImpl> {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let joined = self.metas
+            .iter()
+            .map(|meta| format!("{}", meta))
+            .collect::<Vec<_>>()
+            .join(" ");
+        write!(formatter, "{}", joined)
+    }
+}
+
+pub(super) struct ReusableThenSteps<StepFnImpl> {
+    pub(super) metas: Vec<StepMeta>,
+    pub(super) callback: StepFnImpl,
+}
+
+impl<StepFnImpl> ReusableThenSteps<StepFnImpl> {
+    pub(super) fn chain<WorldImpl>(
+        self,
+        step: Step<impl ReusableThenStepFn<WorldImpl>>,
+    ) -> ReusableThenSteps<impl ReusableThenStepFn<WorldImpl>>
+    where
+        StepFnImpl: ReusableThenStepFn<WorldImpl>,
+        WorldImpl: World,
+    {
+        let mut metas = self.metas;
+        let meta = StepMeta {
+            label: step.label,
+            description: step.description,
+        };
+        metas.push(meta);
+
+        let callback = self.callback.chain(step.callback);
+
+        ReusableThenSteps { metas, callback }
+    }
+}
+
+impl<StepFnImpl> From<Step<StepFnImpl>> for ReusableThenSteps<StepFnImpl> {
+    fn from(step: Step<StepFnImpl>) -> Self {
+        let meta = StepMeta {
+            label: step.label,
+            description: step.description,
+        };
+
+        Self {
+            metas: vec![meta],
+            callback: step.callback,
+        }
+    }
+}
+
+impl<StepFnImpl> std::fmt::Display for ReusableThenSteps<StepFnImpl> {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let joined = self.metas
+            .iter()
+            .map(|meta| format!("{}", meta))
+            .collect::<Vec<_>>()
+            .join(" ");
+        write!(formatter, "{}", joined)
+    }
+}
 
 pub(super) struct GivenSteps<StepFnImpl> {
     pub(super) metas: Vec<StepMeta>,
@@ -155,162 +314,6 @@ impl<StepFnImpl> std::fmt::Display for ThenSteps<StepFnImpl> {
             .collect::<Vec<_>>()
             .join(" ");
 
-        write!(formatter, "{}", joined)
-    }
-}
-
-pub(super) struct ReusableGivenSteps<StepFnImpl> {
-    pub(super) metas: Vec<StepMeta>,
-    pub(super) callback: StepFnImpl,
-}
-
-impl<StepFnImpl> ReusableGivenSteps<StepFnImpl> {
-    pub(super) fn chain<WorldImpl>(
-        self,
-        step: Step<impl ReusableGivenStepFn<WorldImpl>>,
-    ) -> ReusableGivenSteps<impl ReusableGivenStepFn<WorldImpl>>
-    where
-        StepFnImpl: ReusableGivenStepFn<WorldImpl>,
-        WorldImpl: World,
-    {
-        let mut metas = self.metas;
-        let meta = StepMeta {
-            label: step.label,
-            description: step.description,
-        };
-        metas.push(meta);
-
-        let callback = self.callback.chain(step.callback);
-
-        ReusableGivenSteps { metas, callback }
-    }
-}
-
-impl<StepFnImpl> From<Step<StepFnImpl>> for ReusableGivenSteps<StepFnImpl> {
-    fn from(step: Step<StepFnImpl>) -> Self {
-        let meta = StepMeta {
-            label: step.label,
-            description: step.description,
-        };
-
-        Self {
-            metas: vec![meta],
-            callback: step.callback,
-        }
-    }
-}
-
-impl<StepFnImpl> std::fmt::Display for ReusableGivenSteps<StepFnImpl> {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let joined = self.metas
-            .iter()
-            .map(|meta| format!("{}", meta))
-            .collect::<Vec<_>>()
-            .join(" ");
-        write!(formatter, "{}", joined)
-    }
-}
-
-pub(super) struct ReusableWhenSteps<StepFnImpl> {
-    pub(super) metas: Vec<StepMeta>,
-    pub(super) callback: StepFnImpl,
-}
-
-impl<StepFnImpl> ReusableWhenSteps<StepFnImpl> {
-    pub(super) fn chain<WorldImpl>(
-        self,
-        step: Step<impl ReusableWhenStepFn<WorldImpl>>,
-    ) -> ReusableWhenSteps<impl ReusableWhenStepFn<WorldImpl>>
-    where
-        StepFnImpl: ReusableWhenStepFn<WorldImpl>,
-        WorldImpl: World,
-    {
-        let mut metas = self.metas;
-        let meta = StepMeta {
-            label: step.label,
-            description: step.description,
-        };
-        metas.push(meta);
-
-        let callback = self.callback.chain(step.callback);
-
-        ReusableWhenSteps { metas, callback }
-    }
-}
-
-impl<StepFnImpl> From<Step<StepFnImpl>> for ReusableWhenSteps<StepFnImpl> {
-    fn from(step: Step<StepFnImpl>) -> Self {
-        let meta = StepMeta {
-            label: step.label,
-            description: step.description,
-        };
-
-        Self {
-            metas: vec![meta],
-            callback: step.callback,
-        }
-    }
-}
-
-impl<StepFnImpl> std::fmt::Display for ReusableWhenSteps<StepFnImpl> {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let joined = self.metas
-            .iter()
-            .map(|meta| format!("{}", meta))
-            .collect::<Vec<_>>()
-            .join(" ");
-        write!(formatter, "{}", joined)
-    }
-}
-
-pub(super) struct ReusableThenSteps<StepFnImpl> {
-    pub(super) metas: Vec<StepMeta>,
-    pub(super) callback: StepFnImpl,
-}
-
-impl<StepFnImpl> ReusableThenSteps<StepFnImpl> {
-    pub(super) fn chain<WorldImpl>(
-        self,
-        step: Step<impl ReusableThenStepFn<WorldImpl>>,
-    ) -> ReusableThenSteps<impl ReusableThenStepFn<WorldImpl>>
-    where
-        StepFnImpl: ReusableThenStepFn<WorldImpl>,
-        WorldImpl: World,
-    {
-        let mut metas = self.metas;
-        let meta = StepMeta {
-            label: step.label,
-            description: step.description,
-        };
-        metas.push(meta);
-
-        let callback = self.callback.chain(step.callback);
-
-        ReusableThenSteps { metas, callback }
-    }
-}
-
-impl<StepFnImpl> From<Step<StepFnImpl>> for ReusableThenSteps<StepFnImpl> {
-    fn from(step: Step<StepFnImpl>) -> Self {
-        let meta = StepMeta {
-            label: step.label,
-            description: step.description,
-        };
-
-        Self {
-            metas: vec![meta],
-            callback: step.callback,
-        }
-    }
-}
-
-impl<StepFnImpl> std::fmt::Display for ReusableThenSteps<StepFnImpl> {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let joined = self.metas
-            .iter()
-            .map(|meta| format!("{}", meta))
-            .collect::<Vec<_>>()
-            .join(" ");
         write!(formatter, "{}", joined)
     }
 }
@@ -489,7 +492,3 @@ where
 pub(super) type NoOpGivenStepFn<WorldImpl> = fn(&mut WorldImpl) -> Result<(), libtest::Failed>;
 pub(super) type NoOpWhenStepFn<WorldImpl> = fn(&mut WorldImpl) -> Result<(), libtest::Failed>;
 pub(super) type NoOpThenStepFn<WorldImpl> = fn(&WorldImpl) -> Result<(), libtest::Failed>;
-
-pub trait World: Default + Send + Sync + 'static {}
-
-impl<T> World for T where T: Default + Send + Sync + 'static {}
