@@ -1,12 +1,12 @@
 use crate::elements::Tag;
-use crate::utils::aliases::{Arc, HashMap, HashSet};
+use crate::utils::aliases::{Arc, HashMap};
 
 use super::World;
 
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub(super) struct Hooks<WorldImpl> {
     tagged: HashMap<Tag, Arc<dyn HookFn<WorldImpl>>>,
-    untagged: HashSet<Arc<dyn HookFn<WorldImpl>>>,
+    untagged: Vec<Arc<dyn HookFn<WorldImpl>>>,
 }
 
 impl<WorldImpl> Hooks<WorldImpl> 
@@ -27,7 +27,7 @@ where
     pub(super) fn add_untagged(self, hook: impl HookFn<WorldImpl>) -> Self {
         let mut untagged = self.untagged;
         let hook = Arc::new(hook);
-        untagged.insert(hook);
+        untagged.push(hook);
 
         Self {
             untagged,
@@ -36,23 +36,42 @@ where
     }
 }
 
-impl<WorldImpl> Default for Hooks<WorldImpl> {
-    fn default() -> Self {
-        Self(HashMap::new())
+impl<T, U, HookFnImpl, WorldImpl> From<(T, HookFnImpl)> for Hooks<WorldImpl>
+where 
+    T: IntoIterator<Item = U>,
+    U: Into<Tag>,
+    HookFnImpl: HookFn<WorldImpl>,
+    WorldImpl: World,
+{
+    fn from((iter, hook): (T, HookFnImpl)) -> Self {
+        let hook = Arc::new(hook);
+        let mut tagged: HashMap<Tag, Arc<dyn HookFn<WorldImpl>>> = HashMap::new();
+
+        let _ = iter
+            .into_iter()
+            .map(Into::into)
+            .map(|tag| tagged.insert(tag, hook.clone()));
+
+        Self {
+            tagged,
+            untagged: Vec::default(),
+        }
     }
 }
 
-impl<HookFnImpl, WorldImpl> From<(Tag, HookFnImpl)> for Hooks<WorldImpl>
+impl<HookFnImpl, WorldImpl> From<HookFnImpl> for Hooks<WorldImpl>
 where 
     HookFnImpl: HookFn<WorldImpl>,
     WorldImpl: World,
 {
-    fn from((tag, hook): (Tag, HookFnImpl)) -> Self {
-        let mut hooks_by_tags: HashMap<Tag, Arc<dyn HookFn<WorldImpl>>> = HashMap::new();
+    fn from(hook: HookFnImpl) -> Self {
         let hook = Arc::new(hook);
-        hooks_by_tags.insert(tag, hook);
+        let untagged: Vec<Arc<dyn HookFn<WorldImpl>>> = vec![hook];
 
-        Self(hooks_by_tags)
+        Self {
+            tagged: HashMap::default(),
+            untagged,
+        }
     }
 }
 

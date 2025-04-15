@@ -51,18 +51,11 @@ where
         }
     }
 
-    pub fn tag(self, tag: impl Into<Tag>) -> FeatureWithTagOrTagsLastConfigured<WorldImpl> {
-        FeatureWithTagOrTagsLastConfigured {
-            description: self.description,
-            ignored: None,
-            tags: Tags::from(tag.into()),
-
-            phantom: PhantomData,
-        }
-    }
-
-    pub fn tags(self, tags: impl IntoIterator<Item = Tag>) -> FeatureWithTagOrTagsLastConfigured<WorldImpl> {
-        FeatureWithTagOrTagsLastConfigured {
+    pub fn tagged<U>(self, tags: impl IntoIterator<Item = U>) -> FeatureWithTagLastConfigured<WorldImpl>
+    where
+        U: Into<Tag>,
+    {
+        FeatureWithTagLastConfigured {
             description: self.description,
             ignored: None,
             tags: Tags::from_iter(tags),
@@ -71,11 +64,55 @@ where
         }
     }
 
-    pub fn before_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithHookLastConfigured<WorldImpl> {
-        FeatureWithHookLastConfigured {
+    pub fn before_scenario(self, hooks: impl Into<Hooks<WorldImpl>>) -> FeatureWithUntaggedHookLastConfigured<WorldImpl> {
+        FeatureWithUntaggedHookLastConfigured {
             description: self.description,
             ignored: None,
             tags: Tags::default(),
+
+            before_scenario_hooks: hooks.into(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
+        }
+    }
+
+    pub fn after_scenario(self, hooks: impl Into<Hooks<WorldImpl>>) -> FeatureWithUntaggedHookLastConfigured<WorldImpl> {
+        FeatureWithUntaggedHookLastConfigured {
+            description: self.description,
+            ignored: None,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: hooks.into(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
+        }
+    }
+
+    pub fn before_step(self, hooks: impl Into<Hooks<WorldImpl>>) -> FeatureWithUntaggedHookLastConfigured<WorldImpl> {
+        FeatureWithUntaggedHookLastConfigured {
+            description: self.description,
+            ignored: None,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: hooks.into(),
+        }
+    }
+
+    pub fn after_step(self, hooks: impl Into<Hooks<WorldImpl>>) -> FeatureWithUntaggedHookLastConfigured<WorldImpl> {
+        FeatureWithUntaggedHookLastConfigured {
+            description: self.description,
+            ignored: None,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: hooks.into(),
         }
     }
 
@@ -103,7 +140,7 @@ where
     pub fn rule<FromContext, Rule, BackgroundGivenStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
@@ -113,7 +150,7 @@ where
         let rule = from_ctx(ctx);
         let trials = rule.into();
 
-        FeatureWithRulesOrScenariosLastConfigured {
+        FeatureWithRuleOrScenarioLastConfigured {
             description: self.description,
             ignored: None,
 
@@ -126,7 +163,7 @@ where
     pub fn scenario<FromContext, Scenario, BackgroundGivenStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
@@ -136,7 +173,7 @@ where
         let scenario = from_ctx(ctx);
         let trials = vec![scenario.into()];
 
-        FeatureWithRulesOrScenariosLastConfigured {
+        FeatureWithRuleOrScenarioLastConfigured {
             description: self.description,
             ignored: None,
 
@@ -188,7 +225,7 @@ where
     pub fn rule<FromContext, Rule, BackgroundGivenStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
@@ -198,7 +235,7 @@ where
         let rule = from_ctx(ctx);
         let trials = rule.into();
 
-        FeatureWithRulesOrScenariosLastConfigured {
+        FeatureWithRuleOrScenarioLastConfigured {
             description: self.description,
             ignored: self.ignored,
 
@@ -211,7 +248,7 @@ where
     pub fn scenario<FromContext, Scenario, BackgroundGivenStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
@@ -221,7 +258,7 @@ where
         let scenario = from_ctx(ctx);
         let trials = vec![scenario.into()];
 
-        FeatureWithRulesOrScenariosLastConfigured {
+        FeatureWithRuleOrScenarioLastConfigured {
             description: self.description,
             ignored: self.ignored,
 
@@ -244,7 +281,7 @@ where
     }
 }
 
-pub struct FeatureWithTagOrTagsLastConfigured<WorldImpl> {
+pub struct FeatureWithTagLastConfigured<WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
     tags: Tags,
@@ -252,7 +289,18 @@ pub struct FeatureWithTagOrTagsLastConfigured<WorldImpl> {
     phantom: PhantomData<WorldImpl>,
 }
 
-pub struct FeatureWithHookLastConfigured<WorldImpl> {
+pub struct FeatureWithUntaggedHookLastConfigured<WorldImpl> {
+    description: Option<MaybeOwnedStr>,
+    ignored: Option<bool>,
+    tags: Tags,
+
+    before_scenario_hooks: Hooks<WorldImpl>,
+    after_scenario_hooks: Hooks<WorldImpl>,
+    before_step_hooks: Hooks<WorldImpl>,
+    after_step_hooks: Hooks<WorldImpl>,
+}
+
+pub struct FeatureWithTaggedHookLastConfigured<WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
     tags: Tags,
@@ -284,7 +332,7 @@ where
     pub fn rule<FromContext, Rule>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
@@ -293,7 +341,7 @@ where
         let rule = from_ctx(ctx);
         let trials = rule.into();
 
-        FeatureWithRulesOrScenariosLastConfigured {
+        FeatureWithRuleOrScenarioLastConfigured {
             description: self.description,
             ignored: self.ignored,
 
@@ -306,7 +354,7 @@ where
     pub fn scenario<FromContext, Scenario>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
@@ -315,7 +363,7 @@ where
         let scenario = from_ctx(ctx);
         let trials = vec![scenario.into()];
 
-        FeatureWithRulesOrScenariosLastConfigured {
+        FeatureWithRuleOrScenarioLastConfigured {
             description: self.description,
             ignored: self.ignored,
 
@@ -338,7 +386,7 @@ where
     }
 }
 
-pub struct FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl> {
+pub struct FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
     tags: Tags,
@@ -354,7 +402,7 @@ pub struct FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, 
 }
 
 impl<BackgroundGivenStepFnImpl, WorldImpl>
-    FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
 where
     BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
@@ -415,9 +463,9 @@ where
 }
 
 impl<BackgroundGivenStepFnImpl, WorldImpl>
-    From<FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>> for Vec<libtest::Trial>
+    From<FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>> for Vec<libtest::Trial>
 {
-    fn from(feature: FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>) -> Self {
+    fn from(feature: FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>) -> Self {
         feature.trials
     }
 }

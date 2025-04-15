@@ -19,19 +19,14 @@ impl Default for Tags {
     }
 }
 
-impl From<Tag> for Tags {
-    fn from(tag: Tag) -> Self {
-        let mut tags = HashSet::new();
-        tags.insert(tag);
-
-        Self(tags)
-    }
-}
-
-impl FromIterator<Tag> for Tags {
-    fn from_iter<TagsIter: IntoIterator<Item = Tag>>(tags: TagsIter) -> Self {
-        let tags = tags
+impl<U> FromIterator<U> for Tags
+where 
+    U: Into<Tag>,
+{
+    fn from_iter<Iter: IntoIterator<Item = U>>(iter: Iter) -> Self {
+        let tags = iter
             .into_iter()
+            .map(Into::into)
             .collect();
 
         Self(tags)
