@@ -1,20 +1,44 @@
 use crate::elements::Tag;
-use crate::utils::aliases::{Arc, HashMap};
+use crate::utils::aliases::{Arc, HashMap, HashSet};
 
 use super::World;
 
-pub(super) struct Hooks<WorldImpl>(HashMap<Tag, Arc<dyn HookFn<WorldImpl>>>);
+#[derive(Clone)]
+pub(super) struct Hooks<WorldImpl> {
+    tagged: HashMap<Tag, Arc<dyn HookFn<WorldImpl>>>,
+    untagged: HashSet<Arc<dyn HookFn<WorldImpl>>>,
+}
 
 impl<WorldImpl> Hooks<WorldImpl> 
 where 
     WorldImpl: World,
 {
     pub(super) fn add(self, tag: Tag, hook: impl HookFn<WorldImpl>) -> Self {
-        let mut hooks_by_tags = self.0;
+        let mut tagged = self.tagged;
         let hook = Arc::new(hook);
-        hooks_by_tags.insert(tag, hook);
+        tagged.insert(tag, hook);
 
-        Self(hooks_by_tags)
+        Self {
+            tagged,
+            ..self
+        }
+    }
+
+    pub(super) fn add_untagged(self, hook: impl HookFn<WorldImpl>) -> Self {
+        let mut untagged = self.untagged;
+        let hook = Arc::new(hook);
+        untagged.insert(hook);
+
+        Self {
+            untagged,
+            ..self
+        }
+    }
+}
+
+impl<WorldImpl> Default for Hooks<WorldImpl> {
+    fn default() -> Self {
+        Self(HashMap::new())
     }
 }
 

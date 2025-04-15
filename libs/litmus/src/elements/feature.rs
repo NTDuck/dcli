@@ -10,6 +10,11 @@ use crate::elements::FinalizableScenario;
 use crate::elements::World;
 use crate::utils::aliases::MaybeOwnedStr;
 
+use super::HookFn;
+use super::Hooks;
+use super::Tag;
+use super::Tags;
+
 pub struct UnconfiguredFeature<WorldImpl> {
     phantom: PhantomData<WorldImpl>,
 }
@@ -46,6 +51,34 @@ where
         }
     }
 
+    pub fn tag(self, tag: impl Into<Tag>) -> FeatureWithTagOrTagsLastConfigured<WorldImpl> {
+        FeatureWithTagOrTagsLastConfigured {
+            description: self.description,
+            ignored: None,
+            tags: Tags::from(tag.into()),
+
+            phantom: PhantomData,
+        }
+    }
+
+    pub fn tags(self, tags: impl IntoIterator<Item = Tag>) -> FeatureWithTagOrTagsLastConfigured<WorldImpl> {
+        FeatureWithTagOrTagsLastConfigured {
+            description: self.description,
+            ignored: None,
+            tags: Tags::from_iter(tags),
+
+            phantom: PhantomData,
+        }
+    }
+
+    pub fn before_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithHookLastConfigured<WorldImpl> {
+        FeatureWithHookLastConfigured {
+            description: self.description,
+            ignored: None,
+            tags: Tags::default(),
+        }
+    }
+
     pub fn background<BackgroundGivenStepFnImpl>(
         self,
         background: impl FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>,
@@ -56,6 +89,12 @@ where
         FeatureWithBackgroundLastConfigured {
             description: self.description,
             ignored: None,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
 
             background: Some(background.into()),
         }
@@ -205,9 +244,34 @@ where
     }
 }
 
+pub struct FeatureWithTagOrTagsLastConfigured<WorldImpl> {
+    description: Option<MaybeOwnedStr>,
+    ignored: Option<bool>,
+    tags: Tags,
+
+    phantom: PhantomData<WorldImpl>,
+}
+
+pub struct FeatureWithHookLastConfigured<WorldImpl> {
+    description: Option<MaybeOwnedStr>,
+    ignored: Option<bool>,
+    tags: Tags,
+
+    before_scenario_hooks: Hooks<WorldImpl>,
+    after_scenario_hooks: Hooks<WorldImpl>,
+    before_step_hooks: Hooks<WorldImpl>,
+    after_step_hooks: Hooks<WorldImpl>,
+}
+
 pub struct FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
+    tags: Tags,
+
+    before_scenario_hooks: Hooks<WorldImpl>,
+    after_scenario_hooks: Hooks<WorldImpl>,
+    before_step_hooks: Hooks<WorldImpl>,
+    after_step_hooks: Hooks<WorldImpl>,
 
     background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
 }
@@ -277,6 +341,12 @@ where
 pub struct FeatureWithRulesOrScenariosLastConfigured<BackgroundGivenStepFnImpl, WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
+    tags: Tags,
+
+    before_scenario_hooks: Hooks<WorldImpl>,
+    after_scenario_hooks: Hooks<WorldImpl>,
+    before_step_hooks: Hooks<WorldImpl>,
+    after_step_hooks: Hooks<WorldImpl>,
 
     background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
 
@@ -352,25 +422,16 @@ impl<BackgroundGivenStepFnImpl, WorldImpl>
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct FeatureContext<BackgroundGivenStepFnImpl, WorldImpl> {
     pub(super) description: Option<MaybeOwnedStr>,
     pub(super) ignored: Option<bool>,
+    pub(super) tags: Tags,
+
+    pub(super) before_scenario_hooks: Hooks<WorldImpl>,
+    pub(super) after_scenario_hooks: Hooks<WorldImpl>,
+    pub(super) before_step_hooks: Hooks<WorldImpl>,
+    pub(super) after_step_hooks: Hooks<WorldImpl>,
 
     pub(super) background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
-}
-
-impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
-where 
-    BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    WorldImpl: World,
-{
-    fn clone(&self) -> Self {
-        Self {
-            description: self.description.clone(),
-            ignored: self.ignored,
-
-            background: self.background.clone(),
-        }
-    }
 }
