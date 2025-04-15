@@ -2,6 +2,7 @@ mod background;
 mod feature;
 mod rule;
 mod scenario;
+#[allow(dead_code)]
 mod step;
 
 pub use self::background::*;

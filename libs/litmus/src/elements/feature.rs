@@ -70,7 +70,7 @@ where
         Rule: FinalizableRule,
         BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
-        let ctx = self.as_ctx();
+        let ctx = self.to_ctx();
         let rule = from_ctx(ctx);
         let trials = rule.into();
 
@@ -93,7 +93,7 @@ where
         Scenario: FinalizableScenario,
         BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
-        let ctx = self.as_ctx();
+        let ctx = self.to_ctx();
         let scenario = from_ctx(ctx);
         let trials = vec![scenario.into()];
 
@@ -107,7 +107,7 @@ where
         }
     }
 
-    fn as_ctx<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    fn to_ctx<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
@@ -155,7 +155,7 @@ where
         Rule: FinalizableRule,
         BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
-        let ctx = self.as_ctx();
+        let ctx = self.to_ctx();
         let rule = from_ctx(ctx);
         let trials = rule.into();
 
@@ -178,7 +178,7 @@ where
         Scenario: FinalizableScenario,
         BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
-        let ctx = self.as_ctx();
+        let ctx = self.to_ctx();
         let scenario = from_ctx(ctx);
         let trials = vec![scenario.into()];
 
@@ -192,7 +192,7 @@ where
         }
     }
 
-    fn as_ctx<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    fn to_ctx<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
@@ -225,7 +225,7 @@ where
         FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
     {
-        let ctx = self.as_ctx();
+        let ctx = self.to_ctx();
         let rule = from_ctx(ctx);
         let trials = rule.into();
 
@@ -247,7 +247,7 @@ where
         FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
     {
-        let ctx = self.as_ctx();
+        let ctx = self.to_ctx();
         let scenario = from_ctx(ctx);
         let trials = vec![scenario.into()];
 
@@ -261,7 +261,7 @@ where
         }
     }
 
-    fn as_ctx(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    fn to_ctx(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
@@ -294,7 +294,7 @@ where
         FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
     {
-        let ctx = self.as_ctx();
+        let ctx = self.to_ctx();
         let rule = from_ctx(ctx);
 
         let mut trials = self.trials;
@@ -315,7 +315,7 @@ where
         FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
     {
-        let ctx = self.as_ctx();
+        let ctx = self.to_ctx();
         let scenario = from_ctx(ctx);
 
         let mut trials = self.trials;
@@ -331,7 +331,7 @@ where
         }
     }
 
-    fn as_ctx(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    fn to_ctx(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
     where
         BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
