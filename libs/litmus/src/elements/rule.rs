@@ -85,11 +85,11 @@ where
     ) -> RuleWithScenariosLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
         FromContext:
-            FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+            FnOnce(FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
         RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
-        let ctx = self.as_ctx();
+        let ctx = self.to_ctx();
         let scenario = from_ctx(ctx);
         let trials = vec![scenario.into()];
 
@@ -104,19 +104,18 @@ where
         }
     }
 
-    fn as_ctx<RuleBackgroundGivenStepFnImpl>(
+    fn to_ctx<RuleBackgroundGivenStepFnImpl>(
         &self,
-    ) -> RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
         RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
-        RuleContext {
+        (self.feature.clone(), RuleContext {
             description: self.description.clone(),
             ignored: None,
 
-            feature: self.feature.clone(),
             background: None,
-        }
+        })
     }
 }
 
@@ -155,11 +154,11 @@ where
     ) -> RuleWithScenariosLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
         FromContext:
-            FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+            FnOnce(FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
         RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
-        let ctx = self.as_ctx();
+        let ctx = self.to_ctx();
         let scenario = from_ctx(ctx);
         let trials = vec![scenario.into()];
 
@@ -174,19 +173,18 @@ where
         }
     }
 
-    fn as_ctx<RuleBackgroundGivenStepFnImpl>(
+    fn to_ctx<RuleBackgroundGivenStepFnImpl>(
         &self,
-    ) -> RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
         RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     {
-        RuleContext {
+        (self.feature.clone(), RuleContext {
             description: self.description.clone(),
             ignored: self.ignored,
 
-            feature: self.feature.clone(),
             background: None,
-        }
+        })
     }
 }
 
@@ -212,10 +210,10 @@ where
     ) -> RuleWithScenariosLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     where
         FromContext:
-            FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+            FnOnce(FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
     {
-        let ctx = self.as_ctx();
+        let ctx = self.to_ctx();
         let scenario = from_ctx(ctx);
         let trials = vec![scenario.into()];
 
@@ -230,17 +228,13 @@ where
         }
     }
 
-    fn as_ctx(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
-    where
-        RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    {
-        RuleContext {
+    fn to_ctx(&self) -> FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
+        (self.feature.clone(), RuleContext {
             description: self.description.clone(),
             ignored: self.ignored,
 
-            feature: self.feature.clone(),
             background: self.background.clone(),
-        }
+        })
     }
 }
 
@@ -264,10 +258,10 @@ where
     pub fn scenario<FromContext, Scenario>(self, from_ctx: FromContext) -> Self
     where
         FromContext:
-            FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+            FnOnce(FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
     {
-        let ctx = self.as_ctx();
+        let ctx = self.to_ctx();
         let scenario = from_ctx(ctx);
 
         let mut trials = self.trials;
@@ -284,14 +278,13 @@ where
         }
     }
 
-    fn as_ctx(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
-        RuleContext {
+    fn to_ctx(&self) -> FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
+        (self.feature.clone(), RuleContext {
             description: self.description.clone(),
             ignored: self.ignored,
 
-            feature: self.feature.clone(),
             background: self.background.clone(),
-        }
+        })
     }
 }
 
@@ -318,19 +311,19 @@ where
     }
 }
 
+pub type FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> = (FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>, RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>);
+
 #[derive(Default)]
-pub struct RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
+pub struct RuleContext<BackgroundGivenStepFnImpl, WorldImpl> {
     pub(super) description: Option<MaybeOwnedStr>,
     pub(super) ignored: Option<bool>,
 
-    pub(super) feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-    pub(super) background: Option<BackgroundContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+    pub(super) background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
-impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> Clone for RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for RuleContext<BackgroundGivenStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn clone(&self) -> Self {
@@ -338,7 +331,6 @@ where
             description: self.description.clone(),
             ignored: self.ignored,
 
-            feature: self.feature.clone(),
             background: self.background.clone(),
         }
     }

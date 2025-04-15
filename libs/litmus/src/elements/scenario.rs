@@ -11,14 +11,14 @@ use crate::elements::StepLabel;
 use crate::elements::GivenSteps;
 use crate::elements::WhenSteps;
 use crate::elements::ThenSteps;
+use crate::elements::FeatureAndRuleContext;
+use crate::elements::NoOpGivenStepFn;
 use crate::elements::World;
 use crate::utils::aliases::MaybeOwnedStr;
 
-use super::NoOpGivenStepFn;
-
 pub struct UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
     feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-    rule: Option<RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+    rule: Option<RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, WorldImpl> From<FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>> for UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
@@ -34,15 +34,15 @@ where
     }
 }
 
-impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> From<RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>> for UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> From<FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>> for UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
     FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    fn from(rule: RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
+    fn from((feature, rule): FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
         Self {
-            feature: rule.feature.clone(), // FIX THIS IMMEDIATELY USING ENUM OR SOMETHING
+            feature,
             rule: Some(rule),
         }
     }
@@ -89,7 +89,7 @@ pub struct ScenarioWithDescriptionLastConfigured<
     description: Option<MaybeOwnedStr>,
 
     feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-    rule: Option<RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+    rule: Option<RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
@@ -150,7 +150,7 @@ pub struct ScenarioWithIgnoredLastConfigured<FeatureBackgroundGivenStepFnImpl, R
     ignored: Option<bool>,
 
     feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-    rule: Option<RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+    rule: Option<RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
@@ -203,7 +203,7 @@ pub struct ScenarioWithGivenStepsLastConfigured<
     given_steps: GivenSteps<ScenarioGivenStepFnImpl>,
 
     feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-    rule: Option<RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+    rule: Option<RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
 impl<ScenarioGivenStepFnImpl, FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
@@ -326,7 +326,7 @@ pub struct ScenarioWithWhenStepsLastConfigured<
     when_steps: WhenSteps<ScenarioWhenStepFnImpl>,
 
     feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-    rule: Option<RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+    rule: Option<RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
 impl<
@@ -465,7 +465,7 @@ pub struct ScenarioWithThenStepsLastConfigured<
     then_steps: ThenSteps<ScenarioThenStepFnImpl>,
 
     feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-    rule: Option<RuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+    rule: Option<RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
 impl<
