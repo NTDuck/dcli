@@ -1,5 +1,4 @@
 use std::marker::PhantomData;
-use std::sync::Arc;
 
 pub use UnconfiguredBackground as Background;
 
@@ -8,6 +7,7 @@ use crate::elements::StepLabel;
 use crate::elements::World;
 use crate::elements::ReusableGivenStepFn;
 use crate::elements::ReusableGivenSteps;
+use crate::utils::aliases::Arc;
 use crate::utils::aliases::MaybeOwnedStr;
 
 pub struct UnconfiguredBackground<WorldImpl> {

@@ -1,6 +1,6 @@
 [package]
 name = "litmus"
-version = "0.3.0"
+version = "0.3.1"
 description = "a macro-free BDD test harness."
 edition.workspace = true
 license.workspace = true
@@ -9,9 +9,14 @@ keywords = ["bdd", "test", "harness", "cucumber", "gherkin"]
 categories = ["development-tools::testing"]
 publish = true
 
+[features]
+default = []
+triomphe = ["dep:triomphe"]
+
 [dependencies]
 libtest = { package = "libtest-mimic", version = "0.8" }
 strum = { version = "0.27", features = ["derive"] }
+triomphe = { version = "0.1", optional = true }
 
 [lib]
 test = false
