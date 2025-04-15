@@ -11,9 +11,13 @@ publish = true
 
 [features]
 default = []
+ahash = ["dep:ahash"]
+fxhash = ["dep:fxhash"]
 triomphe = ["dep:triomphe"]
 
 [dependencies]
+ahash = { version = "0.8", optional = true }
+fxhash = { version = "0.2", optional = true }
 libtest = { package = "libtest-mimic", version = "0.8" }
 strum = { version = "0.27", features = ["derive"] }
 triomphe = { version = "0.1", optional = true }
