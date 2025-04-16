@@ -16,6 +16,9 @@ use crate::elements::NoOpGivenStepFn;
 use crate::elements::World;
 use crate::utils::aliases::MaybeOwnedStr;
 
+use super::Tag;
+use super::Tags;
+
 pub struct UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
     feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
     rule: Option<RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
@@ -113,6 +116,20 @@ where
         }
     }
 
+    pub fn tagged<U>(self, tags: impl IntoIterator<Item = U>) -> ScenarioWithTagLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    where
+        U: Into<Tag>,
+    {
+        ScenarioWithTagLastConfigured {
+            description: self.description,
+            ignored: None,
+            tags: Tags::from_iter(tags),
+
+            feature: self.feature,
+            rule: self.rule,
+        }
+    }
+
     pub fn given<ScenarioGivenStepFnImpl>(
         self,
         description: impl Into<MaybeOwnedStr>,
@@ -135,6 +152,7 @@ where
         ScenarioWithGivenStepsLastConfigured {
             description: self.description,
             ignored: None,
+            tags: Tags::default(),
 
             given_steps: GivenSteps::from(step),
 
@@ -155,6 +173,67 @@ pub struct ScenarioWithIgnoredLastConfigured<FeatureBackgroundGivenStepFnImpl, R
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     ScenarioWithIgnoredLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+where
+    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    WorldImpl: World,
+{
+    pub fn tagged<U>(self, tags: impl IntoIterator<Item = U>) -> ScenarioWithTagLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
+    where
+        U: Into<Tag>,
+    {
+        ScenarioWithTagLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: Tags::from_iter(tags),
+
+            feature: self.feature,
+            rule: self.rule,
+        }
+    }
+
+    pub fn given<ScenarioGivenStepFnImpl>(
+        self,
+        description: impl Into<MaybeOwnedStr>,
+        callback: ScenarioGivenStepFnImpl,
+    ) -> ScenarioWithGivenStepsLastConfigured<
+        ScenarioGivenStepFnImpl,
+        FeatureBackgroundGivenStepFnImpl,
+        RuleBackgroundGivenStepFnImpl,
+        WorldImpl,
+    >
+    where
+        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
+    {
+        let step = Step {
+            label: StepLabel::Given,
+            description: description.into(),
+            callback,
+        };
+
+        ScenarioWithGivenStepsLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: Tags::default(),
+
+            given_steps: GivenSteps::from(step),
+
+            feature: self.feature,
+            rule: self.rule,
+        }
+    }
+}
+
+pub struct ScenarioWithTagLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
+    description: Option<MaybeOwnedStr>,
+    ignored: Option<bool>,
+    tags: Tags,
+
+    feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
+    rule: Option<RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+}
+
+impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> ScenarioWithTagLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
     FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
@@ -182,6 +261,7 @@ where
         ScenarioWithGivenStepsLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: self.tags,
 
             given_steps: GivenSteps::from(step),
 
@@ -199,6 +279,7 @@ pub struct ScenarioWithGivenStepsLastConfigured<
 > {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
+    tags: Tags,
 
     given_steps: GivenSteps<ScenarioGivenStepFnImpl>,
 
@@ -241,6 +322,7 @@ where
         ScenarioWithGivenStepsLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: self.tags,
 
             given_steps: self.given_steps.chain(step),
 
@@ -271,6 +353,7 @@ where
         ScenarioWithGivenStepsLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: self.tags,
 
             given_steps: self.given_steps.chain(step),
 
@@ -302,6 +385,7 @@ where
         ScenarioWithWhenStepsLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: self.tags,
 
             given_steps: self.given_steps,
             when_steps: WhenSteps::from(step),
@@ -321,6 +405,7 @@ pub struct ScenarioWithWhenStepsLastConfigured<
 > {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
+    tags: Tags,
 
     given_steps: GivenSteps<ScenarioGivenStepFnImpl>,
     when_steps: WhenSteps<ScenarioWhenStepFnImpl>,
@@ -373,6 +458,7 @@ where
         ScenarioWithWhenStepsLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: self.tags,
 
             given_steps: self.given_steps,
             when_steps: self.when_steps.chain(step),
@@ -405,6 +491,7 @@ where
         ScenarioWithWhenStepsLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: self.tags,
 
             given_steps: self.given_steps,
             when_steps: self.when_steps.chain(step),
@@ -438,6 +525,7 @@ where
         ScenarioWithThenStepsLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: self.tags,
 
             given_steps: self.given_steps,
             when_steps: self.when_steps,
@@ -459,6 +547,7 @@ pub struct ScenarioWithThenStepsLastConfigured<
 > {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
+    tags: Tags,
 
     given_steps: GivenSteps<ScenarioGivenStepFnImpl>,
     when_steps: WhenSteps<ScenarioWhenStepFnImpl>,
@@ -516,6 +605,7 @@ where
         ScenarioWithThenStepsLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: self.tags,
 
             given_steps: self.given_steps,
             when_steps: self.when_steps,
@@ -550,6 +640,7 @@ where
         ScenarioWithThenStepsLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: self.tags,
 
             given_steps: self.given_steps,
             when_steps: self.when_steps,
