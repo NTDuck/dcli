@@ -5,8 +5,8 @@ use super::World;
 
 #[derive(Default)]
 pub(super) struct Hooks<WorldImpl> {
-    pub(super) tagged: HashMap<Tag, Vec<Arc<dyn HookFn<WorldImpl>>>>,
-    pub(super) untagged: Vec<Arc<dyn HookFn<WorldImpl>>>,
+    pub(super) tagged: HashMap<Tag, Arc<dyn HookFn<WorldImpl>>>,
+    pub(super) untagged: Option<Arc<dyn HookFn<WorldImpl>>>,
     cached: Option<Arc<dyn HookFn<WorldImpl>>>,
 }
 
@@ -25,23 +25,19 @@ where
     WorldImpl: World,
 {
     pub(super) fn cache(self, hook: impl HookFn<WorldImpl>) -> Self {
-        let mut untagged = self.untagged;
-        let mut cached = self.cached;
+        self.then_cache(hook)
+    }
 
-        if let Some(cached) = cached.take() {
-            untagged.push(cached);
-        }
-
+    pub(super) fn then_cache(self, hook: impl HookFn<WorldImpl>) -> Self {
         let hook = Arc::new(hook);
 
         Self {
-            tagged: self.tagged,
-            untagged,
             cached: Some(hook),
+            ..self
         }
     }
 
-    pub(super) fn tagged<U>(self, tags: impl IntoIterator<Item = U>) -> Self
+    pub(super) fn take_cached_as_tagged<U>(self, tags: impl IntoIterator<Item = U>) -> Self
     where
         U: Into<Tag>,
     {
@@ -51,11 +47,19 @@ where
             tags
                 .into_iter()
                 .map(Into::into)
-                .for_each(|tag| tagged
-                    .entry(tag)
-                    .or_default()
-                    .push(cached.clone()));
-    
+                .for_each(|tag| {
+                    let cached = cached.clone();
+
+                    if let Some(tagged_) = tagged.remove(&tag) {
+                        tagged.insert(tag, Arc::new(move |world| {
+                            (tagged_)(world);
+                            (cached)(world);
+                        }));
+                    } else {
+                        tagged.insert(tag, cached.clone());
+                    }
+                });
+        
             Self {
                 tagged,
                 untagged: self.untagged,
@@ -67,12 +71,19 @@ where
         }
     }
 
-    pub(super) fn untagged(self) -> Self {
+    pub(super) fn take_cached_as_untagged(self) -> Self {
         let mut untagged = self.untagged;
         let mut cached = self.cached;
 
         if let Some(cached) = cached.take() {
-            untagged.push(cached);
+            if let Some(untagged_) = untagged {
+                untagged = Some(Arc::new(move |world| {
+                    (untagged_)(world);
+                    (cached)(world);
+                }));
+            } else {
+                untagged = Some(cached);
+            }
         }
 
         Self {
@@ -83,7 +94,8 @@ where
     }
 }
 
-pub trait HookFn<WorldImpl>: Fn(&mut WorldImpl) -> () + Send + Sync + 'static {}
+pub trait HookFn<WorldImpl>: Fn(&mut WorldImpl) -> () + Send + Sync + 'static {
+}
 
 impl<T, WorldImpl> HookFn<WorldImpl> for T
 where

@@ -574,7 +574,7 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks.tagged(tags),
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_tagged(tags),
             after_scenario_hooks: self.after_scenario_hooks,
             before_step_hooks: self.before_step_hooks,
             after_step_hooks: self.after_step_hooks,
@@ -583,7 +583,9 @@ where
 
     pub fn before_scenario(self, hook: impl HookFn<WorldImpl>) -> Self {
         Self {
-            before_scenario_hooks: self.before_scenario_hooks.cache(hook),
+            before_scenario_hooks: self.before_scenario_hooks
+                .take_cached_as_untagged()
+                .then_cache(hook),
             ..self            
         }
     }
@@ -594,7 +596,7 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
             after_scenario_hooks: self.after_scenario_hooks.cache(hook),
             before_step_hooks: self.before_step_hooks,
             after_step_hooks: self.after_step_hooks,
@@ -607,7 +609,7 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
             after_scenario_hooks: self.after_scenario_hooks,
             before_step_hooks: self.before_step_hooks.cache(hook),
             after_step_hooks: self.after_step_hooks,
@@ -620,7 +622,7 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
             after_scenario_hooks: self.after_scenario_hooks,
             before_step_hooks: self.before_step_hooks,
             after_step_hooks: self.after_step_hooks.cache(hook),
@@ -639,10 +641,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks.untagged(),
-            after_scenario_hooks: self.after_scenario_hooks,
-            before_step_hooks: self.before_step_hooks,
-            after_step_hooks: self.after_step_hooks,
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
 
             background: Some(background.into()),
         }
@@ -666,10 +668,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks.untagged(),
-            after_scenario_hooks: self.after_scenario_hooks,
-            before_step_hooks: self.before_step_hooks,
-            after_step_hooks: self.after_step_hooks,
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
 
             background: None,
 
@@ -695,10 +697,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks.untagged(),
-            after_scenario_hooks: self.after_scenario_hooks,
-            before_step_hooks: self.before_step_hooks,
-            after_step_hooks: self.after_step_hooks,
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
 
             background: None,
 
@@ -715,10 +717,10 @@ where
             ignored: self.ignored,
             tags: self.tags.clone(),
 
-            before_scenario_hooks: self.before_scenario_hooks.clone().untagged(),
-            after_scenario_hooks: self.after_scenario_hooks.clone(),
-            before_step_hooks: self.before_step_hooks.clone(),
-            after_step_hooks: self.after_step_hooks.clone(),
+            before_scenario_hooks: self.before_scenario_hooks.clone().take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.clone().take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.clone().take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.clone().take_cached_as_untagged(),
 
             background: None,
         }
@@ -750,7 +752,7 @@ where
             tags: self.tags,
 
             before_scenario_hooks: self.before_scenario_hooks,
-            after_scenario_hooks: self.after_scenario_hooks.tagged(tags),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_tagged(tags),
             before_step_hooks: self.before_step_hooks,
             after_step_hooks: self.after_step_hooks,
         }
@@ -763,7 +765,7 @@ where
             tags: self.tags,
 
             before_scenario_hooks: self.before_scenario_hooks.cache(hook),
-            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
             before_step_hooks: self.before_step_hooks,
             after_step_hooks: self.after_step_hooks,
         }
@@ -771,7 +773,9 @@ where
 
     pub fn after_scenario(self, hook: impl HookFn<WorldImpl>) -> Self {
         Self {
-            after_step_hooks: self.after_step_hooks.cache(hook),
+            after_step_hooks: self.after_step_hooks
+                .take_cached_as_untagged()
+                .then_cache(hook),
             ..self
         }
     }
@@ -783,7 +787,7 @@ where
             tags: self.tags,
 
             before_scenario_hooks: self.before_scenario_hooks,
-            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
             before_step_hooks: self.before_step_hooks.cache(hook),
             after_step_hooks: self.after_step_hooks,
         }
@@ -796,7 +800,7 @@ where
             tags: self.tags,
 
             before_scenario_hooks: self.before_scenario_hooks,
-            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
             before_step_hooks: self.before_step_hooks,
             after_step_hooks: self.after_step_hooks.cache(hook),
         }
@@ -814,10 +818,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks,
-            after_scenario_hooks: self.after_scenario_hooks.untagged(),
-            before_step_hooks: self.before_step_hooks,
-            after_step_hooks: self.after_step_hooks,
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
 
             background: Some(background.into()),
         }
@@ -841,10 +845,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks,
-            after_scenario_hooks: self.after_scenario_hooks.untagged(),
-            before_step_hooks: self.before_step_hooks,
-            after_step_hooks: self.after_step_hooks,
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
 
             background: None,
 
@@ -870,10 +874,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks,
-            after_scenario_hooks: self.after_scenario_hooks.untagged(),
-            before_step_hooks: self.before_step_hooks,
-            after_step_hooks: self.after_step_hooks,
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
 
             background: None,
 
@@ -890,10 +894,10 @@ where
             ignored: self.ignored,
             tags: self.tags.clone(),
 
-            before_scenario_hooks: self.before_scenario_hooks.clone(),
-            after_scenario_hooks: self.after_scenario_hooks.clone().untagged(),
-            before_step_hooks: self.before_step_hooks.clone(),
-            after_step_hooks: self.after_step_hooks.clone(),
+            before_scenario_hooks: self.before_scenario_hooks.clone().take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.clone().take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.clone().take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.clone().take_cached_as_untagged(),
 
             background: None,
         }
@@ -926,7 +930,7 @@ where
 
             before_scenario_hooks: self.before_scenario_hooks,
             after_scenario_hooks: self.after_scenario_hooks,
-            before_step_hooks: self.before_step_hooks.tagged(tags),
+            before_step_hooks: self.before_step_hooks.take_cached_as_tagged(tags),
             after_step_hooks: self.after_step_hooks,
         }
     }
@@ -939,7 +943,7 @@ where
 
             before_scenario_hooks: self.before_scenario_hooks.cache(hook),
             after_scenario_hooks: self.after_scenario_hooks,
-            before_step_hooks: self.before_step_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
             after_step_hooks: self.after_step_hooks,
         }
     }
@@ -952,14 +956,16 @@ where
 
             before_scenario_hooks: self.before_scenario_hooks,
             after_scenario_hooks: self.after_scenario_hooks.cache(hook),
-            before_step_hooks: self.before_step_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
             after_step_hooks: self.after_step_hooks,
         }
     }
 
     pub fn before_step(self, hook: impl HookFn<WorldImpl>) -> Self {
         Self {
-            before_step_hooks: self.before_step_hooks.cache(hook),
+            before_step_hooks: self.before_step_hooks
+                .take_cached_as_untagged()
+                .then_cache(hook),
             ..self
         }
     }
@@ -972,7 +978,7 @@ where
 
             before_scenario_hooks: self.before_scenario_hooks,
             after_scenario_hooks: self.after_scenario_hooks,
-            before_step_hooks: self.before_step_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
             after_step_hooks: self.after_step_hooks.cache(hook),
         }
     }
@@ -989,10 +995,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks,
-            after_scenario_hooks: self.after_scenario_hooks,
-            before_step_hooks: self.before_step_hooks.untagged(),
-            after_step_hooks: self.after_step_hooks,
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
 
             background: Some(background.into()),
         }
@@ -1016,10 +1022,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks,
-            after_scenario_hooks: self.after_scenario_hooks,
-            before_step_hooks: self.before_step_hooks.untagged(),
-            after_step_hooks: self.after_step_hooks,
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
 
             background: None,
 
@@ -1045,10 +1051,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks,
-            after_scenario_hooks: self.after_scenario_hooks,
-            before_step_hooks: self.before_step_hooks.untagged(),
-            after_step_hooks: self.after_step_hooks,
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
 
             background: None,
 
@@ -1065,10 +1071,10 @@ where
             ignored: self.ignored,
             tags: self.tags.clone(),
 
-            before_scenario_hooks: self.before_scenario_hooks.clone(),
-            after_scenario_hooks: self.after_scenario_hooks.clone(),
-            before_step_hooks: self.before_step_hooks.clone().untagged(),
-            after_step_hooks: self.after_step_hooks.clone(),
+            before_scenario_hooks: self.before_scenario_hooks.clone().take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.clone().take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.clone().take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.clone().take_cached_as_untagged(),
 
             background: None,
         }
@@ -1102,7 +1108,7 @@ where
             before_scenario_hooks: self.before_scenario_hooks,
             after_scenario_hooks: self.after_scenario_hooks,
             before_step_hooks: self.before_step_hooks,
-            after_step_hooks: self.after_step_hooks.tagged(tags),
+            after_step_hooks: self.after_step_hooks.take_cached_as_tagged(tags),
         }
     }
 
@@ -1115,7 +1121,7 @@ where
             before_scenario_hooks: self.before_scenario_hooks.cache(hook),
             after_scenario_hooks: self.after_scenario_hooks,
             before_step_hooks: self.before_step_hooks,
-            after_step_hooks: self.after_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
         }
     }
 
@@ -1128,7 +1134,7 @@ where
             before_scenario_hooks: self.before_scenario_hooks,
             after_scenario_hooks: self.after_scenario_hooks.cache(hook),
             before_step_hooks: self.before_step_hooks,
-            after_step_hooks: self.after_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
         }
     }
 
@@ -1141,13 +1147,15 @@ where
             before_scenario_hooks: self.before_scenario_hooks,
             after_scenario_hooks: self.after_scenario_hooks,
             before_step_hooks: self.before_step_hooks.cache(hook),
-            after_step_hooks: self.after_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
         }
     }
 
     pub fn after_step(self, hook: impl HookFn<WorldImpl>) -> Self {
         Self {
-            after_step_hooks: self.after_step_hooks.cache(hook),
+            after_step_hooks: self.after_step_hooks
+                .take_cached_as_untagged()
+                .then_cache(hook),
             ..self
         }
     }
@@ -1164,10 +1172,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks,
-            after_scenario_hooks: self.after_scenario_hooks,
-            before_step_hooks: self.before_step_hooks,
-            after_step_hooks: self.after_step_hooks.untagged(),
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
 
             background: Some(background.into()),
         }
@@ -1191,10 +1199,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks,
-            after_scenario_hooks: self.after_scenario_hooks,
-            before_step_hooks: self.before_step_hooks,
-            after_step_hooks: self.after_step_hooks.untagged(),
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
 
             background: None,
 
@@ -1220,10 +1228,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks,
-            after_scenario_hooks: self.after_scenario_hooks,
-            before_step_hooks: self.before_step_hooks,
-            after_step_hooks: self.after_step_hooks.untagged(),
+            before_scenario_hooks: self.before_scenario_hooks.take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.take_cached_as_untagged(),
 
             background: None,
 
@@ -1240,10 +1248,10 @@ where
             ignored: self.ignored,
             tags: self.tags.clone(),
 
-            before_scenario_hooks: self.before_scenario_hooks.clone(),
-            after_scenario_hooks: self.after_scenario_hooks.clone(),
-            before_step_hooks: self.before_step_hooks.clone(),
-            after_step_hooks: self.after_step_hooks.clone().untagged(),
+            before_scenario_hooks: self.before_scenario_hooks.clone().take_cached_as_untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.clone().take_cached_as_untagged(),
+            before_step_hooks: self.before_step_hooks.clone().take_cached_as_untagged(),
+            after_step_hooks: self.after_step_hooks.clone().take_cached_as_untagged(),
 
             background: None,
         }
@@ -1272,9 +1280,9 @@ where
             tags: self.tags,
 
             before_scenario_hooks: self.before_scenario_hooks.cache(hook),
-            after_scenario_hooks: self.after_scenario_hooks.untagged(),
-            before_step_hooks: self.before_step_hooks.untagged(),
-            after_step_hooks: self.after_step_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
         }
     }
 
@@ -1284,10 +1292,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            before_scenario_hooks: self.before_scenario_hooks,
             after_scenario_hooks: self.after_scenario_hooks.cache(hook),
-            before_step_hooks: self.before_step_hooks.untagged(),
-            after_step_hooks: self.after_step_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
         }
     }
 
@@ -1297,10 +1305,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks.untagged(),
-            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
             before_step_hooks: self.before_step_hooks.cache(hook),
-            after_step_hooks: self.after_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks,
         }
     }
 
@@ -1310,9 +1318,9 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks.untagged(),
-            after_scenario_hooks: self.after_scenario_hooks.untagged(),
-            before_step_hooks: self.before_step_hooks.untagged(),
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
             after_step_hooks: self.after_step_hooks.cache(hook),
         }
     }
@@ -1329,10 +1337,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks.untagged(),
-            after_scenario_hooks: self.after_scenario_hooks.untagged(),
-            before_step_hooks: self.before_step_hooks.untagged(),
-            after_step_hooks: self.after_step_hooks.untagged(),
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
 
             background: Some(background.into()),
         }
@@ -1356,10 +1364,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks.untagged(),
-            after_scenario_hooks: self.after_scenario_hooks.untagged(),
-            before_step_hooks: self.before_step_hooks.untagged(),
-            after_step_hooks: self.after_step_hooks.untagged(),
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
 
             background: None,
 
@@ -1385,10 +1393,10 @@ where
             ignored: self.ignored,
             tags: self.tags,
 
-            before_scenario_hooks: self.before_scenario_hooks.untagged(),
-            after_scenario_hooks: self.after_scenario_hooks.untagged(),
-            before_step_hooks: self.before_step_hooks.untagged(),
-            after_step_hooks: self.after_step_hooks.untagged(),
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
 
             background: None,
 
@@ -1405,10 +1413,10 @@ where
             ignored: self.ignored,
             tags: self.tags.clone(),
 
-            before_scenario_hooks: self.before_scenario_hooks.clone().untagged(),
-            after_scenario_hooks: self.after_scenario_hooks.clone().untagged(),
-            before_step_hooks: self.before_step_hooks.clone().untagged(),
-            after_step_hooks: self.after_step_hooks.clone().untagged(),
+            before_scenario_hooks: self.before_scenario_hooks.clone(),
+            after_scenario_hooks: self.after_scenario_hooks.clone(),
+            before_step_hooks: self.before_step_hooks.clone(),
+            after_step_hooks: self.after_step_hooks.clone(),
 
             background: None,
         }
