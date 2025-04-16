@@ -5,7 +5,7 @@ use super::World;
 
 #[derive(Default)]
 pub(super) struct Hooks<WorldImpl> {
-    pub(super) tagged: HashMap<Tag, Arc<dyn HookFn<WorldImpl>>>,
+    pub(super) tagged: HashMap<Tag, Vec<Arc<dyn HookFn<WorldImpl>>>>,
     pub(super) untagged: Vec<Arc<dyn HookFn<WorldImpl>>>,
     cached: Option<Arc<dyn HookFn<WorldImpl>>>,
 }
@@ -48,10 +48,13 @@ where
         if let Some(cached) = self.cached {
             let mut tagged = self.tagged;
 
-            let _ = tags
+            tags
                 .into_iter()
                 .map(Into::into)
-                .map(|tag| tagged.insert(tag, cached.clone()));
+                .for_each(|tag| tagged
+                    .entry(tag)
+                    .or_default()
+                    .push(cached.clone()));
     
             Self {
                 tagged,
