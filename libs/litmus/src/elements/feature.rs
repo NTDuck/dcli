@@ -1610,7 +1610,7 @@ impl<BackgroundGivenStepFnImpl, WorldImpl>
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct FeatureContext<BackgroundGivenStepFnImpl, WorldImpl> {
     pub(super) description: Option<MaybeOwnedStr>,
     pub(super) ignored: Option<bool>,
@@ -1622,4 +1622,21 @@ pub struct FeatureContext<BackgroundGivenStepFnImpl, WorldImpl> {
     pub(super) after_step_hooks: Hooks<WorldImpl>,
 
     pub(super) background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
+}
+
+impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for FeatureContext<BackgroundGivenStepFnImpl, WorldImpl> {
+    fn clone(&self) -> Self {
+        Self {
+            description: self.description.clone(),
+            ignored: self.ignored,
+            tags: self.tags.clone(),
+
+            before_scenario_hooks: self.before_scenario_hooks.clone(),
+            after_scenario_hooks: self.after_scenario_hooks.clone(),
+            before_step_hooks: self.before_step_hooks.clone(),
+            after_step_hooks: self.after_step_hooks.clone(),
+
+            background: self.background.clone(),
+        }
+    }
 }

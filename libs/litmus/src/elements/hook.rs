@@ -48,7 +48,7 @@ where
         if let Some(cached) = self.cached {
             let mut tagged = self.tagged;
 
-            tags
+            let _ = tags
                 .into_iter()
                 .map(Into::into)
                 .map(|tag| tagged.insert(tag, cached.clone()));
