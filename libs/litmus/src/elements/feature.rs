@@ -64,47 +64,47 @@ where
         }
     }
 
-    pub fn before_scenario(self, hooks: impl Into<Hooks<WorldImpl>>) -> FeatureWithUntaggedHookLastConfigured<WorldImpl> {
-        FeatureWithUntaggedHookLastConfigured {
+    pub fn before_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeScenarioHookLastConfigured {
             description: self.description,
             ignored: None,
             tags: Tags::default(),
 
-            before_scenario_hooks: hooks.into(),
+            before_scenario_hooks: Hooks::default().cache(hook),
             after_scenario_hooks: Hooks::default(),
             before_step_hooks: Hooks::default(),
             after_step_hooks: Hooks::default(),
         }
     }
 
-    pub fn after_scenario(self, hooks: impl Into<Hooks<WorldImpl>>) -> FeatureWithUntaggedHookLastConfigured<WorldImpl> {
-        FeatureWithUntaggedHookLastConfigured {
+    pub fn after_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithAfterScenarioHookLastConfigured {
             description: self.description,
             ignored: None,
             tags: Tags::default(),
 
             before_scenario_hooks: Hooks::default(),
-            after_scenario_hooks: hooks.into(),
+            after_scenario_hooks: Hooks::default().cache(hook),
             before_step_hooks: Hooks::default(),
             after_step_hooks: Hooks::default(),
         }
     }
 
-    pub fn before_step(self, hooks: impl Into<Hooks<WorldImpl>>) -> FeatureWithUntaggedHookLastConfigured<WorldImpl> {
-        FeatureWithUntaggedHookLastConfigured {
+    pub fn before_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeStepHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeStepHookLastConfigured {
             description: self.description,
             ignored: None,
             tags: Tags::default(),
 
             before_scenario_hooks: Hooks::default(),
             after_scenario_hooks: Hooks::default(),
-            before_step_hooks: Hooks::default(),
-            after_step_hooks: hooks.into(),
+            before_step_hooks: Hooks::default().cache(hook),
+            after_step_hooks: Hooks::default(),
         }
     }
 
-    pub fn after_step(self, hooks: impl Into<Hooks<WorldImpl>>) -> FeatureWithUntaggedHookLastConfigured<WorldImpl> {
-        FeatureWithUntaggedHookLastConfigured {
+    pub fn after_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterStepHookLastConfigured<WorldImpl> {
+        FeatureWithAfterStepHookLastConfigured {
             description: self.description,
             ignored: None,
             tags: Tags::default(),
@@ -112,7 +112,7 @@ where
             before_scenario_hooks: Hooks::default(),
             after_scenario_hooks: Hooks::default(),
             before_step_hooks: Hooks::default(),
-            after_step_hooks: hooks.into(),
+            after_step_hooks: Hooks::default().cache(hook),
         }
     }
 
@@ -153,6 +153,12 @@ where
         FeatureWithRuleOrScenarioLastConfigured {
             description: self.description,
             ignored: None,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
 
             background: None,
 
@@ -176,6 +182,12 @@ where
         FeatureWithRuleOrScenarioLastConfigured {
             description: self.description,
             ignored: None,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
 
             background: None,
 
@@ -190,6 +202,12 @@ where
         FeatureContext {
             description: self.description.clone(),
             ignored: None,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
 
             background: None,
         }
@@ -207,6 +225,71 @@ impl<WorldImpl> FeatureWithIgnoredLastConfigured<WorldImpl>
 where
     WorldImpl: World,
 {
+    pub fn tagged<U>(self, tags: impl IntoIterator<Item = U>) -> FeatureWithTagLastConfigured<WorldImpl>
+    where
+        U: Into<Tag>,
+    {
+        FeatureWithTagLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: Tags::from_iter(tags),
+
+            phantom: PhantomData,
+        }
+    }
+
+    pub fn before_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeScenarioHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default().cache(hook),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
+        }
+    }
+
+    pub fn after_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithAfterScenarioHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default().cache(hook),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
+        }
+    }
+
+    pub fn before_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeStepHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeStepHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default().cache(hook),
+            after_step_hooks: Hooks::default(),
+        }
+    }
+
+    pub fn after_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterStepHookLastConfigured<WorldImpl> {
+        FeatureWithAfterStepHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default().cache(hook),
+        }
+    }
+
     pub fn background<BackgroundGivenStepFnImpl>(
         self,
         background: impl FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>,
@@ -217,6 +300,12 @@ where
         FeatureWithBackgroundLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
 
             background: Some(background.into()),
         }
@@ -238,6 +327,12 @@ where
         FeatureWithRuleOrScenarioLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
 
             background: None,
 
@@ -261,6 +356,12 @@ where
         FeatureWithRuleOrScenarioLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
 
             background: None,
 
@@ -275,6 +376,12 @@ where
         FeatureContext {
             description: self.description.clone(),
             ignored: self.ignored,
+            tags: Tags::default(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
 
             background: None,
         }
@@ -289,7 +396,161 @@ pub struct FeatureWithTagLastConfigured<WorldImpl> {
     phantom: PhantomData<WorldImpl>,
 }
 
-pub struct FeatureWithUntaggedHookLastConfigured<WorldImpl> {
+impl<WorldImpl> FeatureWithTagLastConfigured<WorldImpl>
+where
+    WorldImpl: World,
+{
+    pub fn before_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeScenarioHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: Hooks::default().cache(hook),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
+        }
+    }
+
+    pub fn after_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithAfterScenarioHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default().cache(hook),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
+        }
+    }
+
+    pub fn before_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeStepHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeStepHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default().cache(hook),
+            after_step_hooks: Hooks::default(),
+        }
+    }
+
+    pub fn after_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterStepHookLastConfigured<WorldImpl> {
+        FeatureWithAfterStepHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default().cache(hook),
+        }
+    }
+
+    pub fn background<BackgroundGivenStepFnImpl>(
+        self,
+        background: impl FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>,
+    ) -> FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        FeatureWithBackgroundLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
+
+            background: Some(background.into()),
+        }
+    }
+
+    pub fn rule<FromContext, Rule, BackgroundGivenStepFnImpl>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        Rule: FinalizableRule,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        let ctx = self.to_ctx();
+        let rule = from_ctx(ctx);
+        let trials = rule.into();
+
+        FeatureWithRuleOrScenarioLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
+
+            background: None,
+
+            trials,
+        }
+    }
+
+    pub fn scenario<FromContext, Scenario, BackgroundGivenStepFnImpl>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        let ctx = self.to_ctx();
+        let scenario = from_ctx(ctx);
+        let trials = vec![scenario.into()];
+
+        FeatureWithRuleOrScenarioLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
+
+            background: None,
+
+            trials,
+        }
+    }
+
+    fn to_ctx<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        FeatureContext {
+            description: self.description.clone(),
+            ignored: self.ignored,
+            tags: self.tags.clone(),
+
+            before_scenario_hooks: Hooks::default(),
+            after_scenario_hooks: Hooks::default(),
+            before_step_hooks: Hooks::default(),
+            after_step_hooks: Hooks::default(),
+
+            background: None,
+        }
+    }
+}
+
+pub struct FeatureWithBeforeScenarioHookLastConfigured<WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
     tags: Tags,
@@ -298,6 +559,695 @@ pub struct FeatureWithUntaggedHookLastConfigured<WorldImpl> {
     after_scenario_hooks: Hooks<WorldImpl>,
     before_step_hooks: Hooks<WorldImpl>,
     after_step_hooks: Hooks<WorldImpl>,
+}
+
+impl<WorldImpl> FeatureWithBeforeScenarioHookLastConfigured<WorldImpl>
+where
+    WorldImpl: World,
+{
+    pub fn tagged<U>(self, tags: impl IntoIterator<Item = U>) -> FeatureWithTaggedHookLastConfigured<WorldImpl>
+    where
+        U: Into<Tag>,
+    {
+        FeatureWithTaggedHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.tagged(tags),
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
+        }
+    }
+
+    pub fn before_scenario(self, hook: impl HookFn<WorldImpl>) -> Self {
+        Self {
+            before_scenario_hooks: self.before_scenario_hooks.cache(hook),
+            ..self            
+        }
+    }
+
+    pub fn after_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithAfterScenarioHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.cache(hook),
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
+        }
+    }
+
+    pub fn before_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeStepHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeStepHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks.cache(hook),
+            after_step_hooks: self.after_step_hooks,
+        }
+    }
+
+    pub fn after_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterStepHookLastConfigured<WorldImpl> {
+        FeatureWithAfterStepHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks.cache(hook),
+        }
+    }
+
+    pub fn background<BackgroundGivenStepFnImpl>(
+        self,
+        background: impl FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>,
+    ) -> FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        FeatureWithBackgroundLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
+
+            background: Some(background.into()),
+        }
+    }
+
+    pub fn rule<FromContext, Rule, BackgroundGivenStepFnImpl>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        Rule: FinalizableRule,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        let ctx = self.to_ctx();
+        let rule = from_ctx(ctx);
+        let trials = rule.into();
+
+        FeatureWithRuleOrScenarioLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
+
+            background: None,
+
+            trials,
+        }
+    }
+
+    pub fn scenario<FromContext, Scenario, BackgroundGivenStepFnImpl>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        let ctx = self.to_ctx();
+        let scenario = from_ctx(ctx);
+        let trials = vec![scenario.into()];
+
+        FeatureWithRuleOrScenarioLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
+
+            background: None,
+
+            trials,
+        }
+    }
+
+    fn to_ctx<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        FeatureContext {
+            description: self.description.clone(),
+            ignored: self.ignored,
+            tags: self.tags.clone(),
+
+            before_scenario_hooks: self.before_scenario_hooks.clone().untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.clone(),
+            before_step_hooks: self.before_step_hooks.clone(),
+            after_step_hooks: self.after_step_hooks.clone(),
+
+            background: None,
+        }
+    }
+}
+
+pub struct FeatureWithAfterScenarioHookLastConfigured<WorldImpl> {
+    description: Option<MaybeOwnedStr>,
+    ignored: Option<bool>,
+    tags: Tags,
+
+    before_scenario_hooks: Hooks<WorldImpl>,
+    after_scenario_hooks: Hooks<WorldImpl>,
+    before_step_hooks: Hooks<WorldImpl>,
+    after_step_hooks: Hooks<WorldImpl>,
+}
+
+impl<WorldImpl> FeatureWithAfterScenarioHookLastConfigured<WorldImpl>
+where
+    WorldImpl: World,
+{
+    pub fn tagged<U>(self, tags: impl IntoIterator<Item = U>) -> FeatureWithTaggedHookLastConfigured<WorldImpl>
+    where
+        U: Into<Tag>,
+    {
+        FeatureWithTaggedHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks.tagged(tags),
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
+        }
+    }
+
+    pub fn before_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeScenarioHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.cache(hook),
+            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
+        }
+    }
+
+    pub fn after_scenario(self, hook: impl HookFn<WorldImpl>) -> Self {
+        Self {
+            after_step_hooks: self.after_step_hooks.cache(hook),
+            ..self
+        }
+    }
+
+    pub fn before_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeStepHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeStepHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks.cache(hook),
+            after_step_hooks: self.after_step_hooks,
+        }
+    }
+
+    pub fn after_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterStepHookLastConfigured<WorldImpl> {
+        FeatureWithAfterStepHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks.cache(hook),
+        }
+    }
+
+    pub fn background<BackgroundGivenStepFnImpl>(
+        self,
+        background: impl FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>,
+    ) -> FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        FeatureWithBackgroundLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
+
+            background: Some(background.into()),
+        }
+    }
+
+    pub fn rule<FromContext, Rule, BackgroundGivenStepFnImpl>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        Rule: FinalizableRule,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        let ctx = self.to_ctx();
+        let rule = from_ctx(ctx);
+        let trials = rule.into();
+
+        FeatureWithRuleOrScenarioLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
+
+            background: None,
+
+            trials,
+        }
+    }
+
+    pub fn scenario<FromContext, Scenario, BackgroundGivenStepFnImpl>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        let ctx = self.to_ctx();
+        let scenario = from_ctx(ctx);
+        let trials = vec![scenario.into()];
+
+        FeatureWithRuleOrScenarioLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
+
+            background: None,
+
+            trials,
+        }
+    }
+
+    fn to_ctx<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        FeatureContext {
+            description: self.description.clone(),
+            ignored: self.ignored,
+            tags: self.tags.clone(),
+
+            before_scenario_hooks: self.before_scenario_hooks.clone(),
+            after_scenario_hooks: self.after_scenario_hooks.clone().untagged(),
+            before_step_hooks: self.before_step_hooks.clone(),
+            after_step_hooks: self.after_step_hooks.clone(),
+
+            background: None,
+        }
+    }
+}
+
+pub struct FeatureWithBeforeStepHookLastConfigured<WorldImpl> {
+    description: Option<MaybeOwnedStr>,
+    ignored: Option<bool>,
+    tags: Tags,
+
+    before_scenario_hooks: Hooks<WorldImpl>,
+    after_scenario_hooks: Hooks<WorldImpl>,
+    before_step_hooks: Hooks<WorldImpl>,
+    after_step_hooks: Hooks<WorldImpl>,
+}
+
+impl<WorldImpl> FeatureWithBeforeStepHookLastConfigured<WorldImpl>
+where
+    WorldImpl: World,
+{
+    pub fn tagged<U>(self, tags: impl IntoIterator<Item = U>) -> FeatureWithTaggedHookLastConfigured<WorldImpl>
+    where
+        U: Into<Tag>,
+    {
+        FeatureWithTaggedHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks.tagged(tags),
+            after_step_hooks: self.after_step_hooks,
+        }
+    }
+
+    pub fn before_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeScenarioHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.cache(hook),
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks,
+        }
+    }
+
+    pub fn after_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithAfterScenarioHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks.cache(hook),
+            before_step_hooks: self.before_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks,
+        }
+    }
+
+    pub fn before_step(self, hook: impl HookFn<WorldImpl>) -> Self {
+        Self {
+            before_step_hooks: self.before_step_hooks.cache(hook),
+            ..self
+        }
+    }
+
+    pub fn after_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterStepHookLastConfigured<WorldImpl> {
+        FeatureWithAfterStepHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks.cache(hook),
+        }
+    }
+
+    pub fn background<BackgroundGivenStepFnImpl>(
+        self,
+        background: impl FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>,
+    ) -> FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        FeatureWithBackgroundLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks,
+
+            background: Some(background.into()),
+        }
+    }
+
+    pub fn rule<FromContext, Rule, BackgroundGivenStepFnImpl>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        Rule: FinalizableRule,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        let ctx = self.to_ctx();
+        let rule = from_ctx(ctx);
+        let trials = rule.into();
+
+        FeatureWithRuleOrScenarioLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks,
+
+            background: None,
+
+            trials,
+        }
+    }
+
+    pub fn scenario<FromContext, Scenario, BackgroundGivenStepFnImpl>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        let ctx = self.to_ctx();
+        let scenario = from_ctx(ctx);
+        let trials = vec![scenario.into()];
+
+        FeatureWithRuleOrScenarioLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks,
+
+            background: None,
+
+            trials,
+        }
+    }
+
+    fn to_ctx<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        FeatureContext {
+            description: self.description.clone(),
+            ignored: self.ignored,
+            tags: self.tags.clone(),
+
+            before_scenario_hooks: self.before_scenario_hooks.clone(),
+            after_scenario_hooks: self.after_scenario_hooks.clone(),
+            before_step_hooks: self.before_step_hooks.clone().untagged(),
+            after_step_hooks: self.after_step_hooks.clone(),
+
+            background: None,
+        }
+    }
+}
+
+pub struct FeatureWithAfterStepHookLastConfigured<WorldImpl> {
+    description: Option<MaybeOwnedStr>,
+    ignored: Option<bool>,
+    tags: Tags,
+
+    before_scenario_hooks: Hooks<WorldImpl>,
+    after_scenario_hooks: Hooks<WorldImpl>,
+    before_step_hooks: Hooks<WorldImpl>,
+    after_step_hooks: Hooks<WorldImpl>,
+}
+
+impl<WorldImpl> FeatureWithAfterStepHookLastConfigured<WorldImpl>
+where
+    WorldImpl: World,
+{
+    pub fn tagged<U>(self, tags: impl IntoIterator<Item = U>) -> FeatureWithTaggedHookLastConfigured<WorldImpl>
+    where
+        U: Into<Tag>,
+    {
+        FeatureWithTaggedHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks.tagged(tags),
+        }
+    }
+
+    pub fn before_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeScenarioHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.cache(hook),
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks.untagged(),
+        }
+    }
+
+    pub fn after_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithAfterScenarioHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks.cache(hook),
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks.untagged(),
+        }
+    }
+
+    pub fn before_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeStepHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeStepHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks.cache(hook),
+            after_step_hooks: self.after_step_hooks.untagged(),
+        }
+    }
+
+    pub fn after_step(self, hook: impl HookFn<WorldImpl>) -> Self {
+        Self {
+            after_step_hooks: self.after_step_hooks.cache(hook),
+            ..self
+        }
+    }
+
+    pub fn background<BackgroundGivenStepFnImpl>(
+        self,
+        background: impl FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>,
+    ) -> FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        FeatureWithBackgroundLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks.untagged(),
+
+            background: Some(background.into()),
+        }
+    }
+
+    pub fn rule<FromContext, Rule, BackgroundGivenStepFnImpl>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        Rule: FinalizableRule,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        let ctx = self.to_ctx();
+        let rule = from_ctx(ctx);
+        let trials = rule.into();
+
+        FeatureWithRuleOrScenarioLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks.untagged(),
+
+            background: None,
+
+            trials,
+        }
+    }
+
+    pub fn scenario<FromContext, Scenario, BackgroundGivenStepFnImpl>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        let ctx = self.to_ctx();
+        let scenario = from_ctx(ctx);
+        let trials = vec![scenario.into()];
+
+        FeatureWithRuleOrScenarioLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks.untagged(),
+
+            background: None,
+
+            trials,
+        }
+    }
+
+    fn to_ctx<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        FeatureContext {
+            description: self.description.clone(),
+            ignored: self.ignored,
+            tags: self.tags.clone(),
+
+            before_scenario_hooks: self.before_scenario_hooks.clone(),
+            after_scenario_hooks: self.after_scenario_hooks.clone(),
+            before_step_hooks: self.before_step_hooks.clone(),
+            after_step_hooks: self.after_step_hooks.clone().untagged(),
+
+            background: None,
+        }
+    }
 }
 
 pub struct FeatureWithTaggedHookLastConfigured<WorldImpl> {
@@ -309,6 +1259,160 @@ pub struct FeatureWithTaggedHookLastConfigured<WorldImpl> {
     after_scenario_hooks: Hooks<WorldImpl>,
     before_step_hooks: Hooks<WorldImpl>,
     after_step_hooks: Hooks<WorldImpl>,
+}
+
+impl<WorldImpl> FeatureWithTaggedHookLastConfigured<WorldImpl>
+where
+    WorldImpl: World,
+{
+    pub fn before_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeScenarioHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.cache(hook),
+            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks.untagged(),
+        }
+    }
+
+    pub fn after_scenario(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterScenarioHookLastConfigured<WorldImpl> {
+        FeatureWithAfterScenarioHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.cache(hook),
+            before_step_hooks: self.before_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks.untagged(),
+        }
+    }
+
+    pub fn before_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithBeforeStepHookLastConfigured<WorldImpl> {
+        FeatureWithBeforeStepHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks.cache(hook),
+            after_step_hooks: self.after_step_hooks.untagged(),
+        }
+    }
+
+    pub fn after_step(self, hook: impl HookFn<WorldImpl>) -> FeatureWithAfterStepHookLastConfigured<WorldImpl> {
+        FeatureWithAfterStepHookLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks.cache(hook),
+        }
+    }
+
+    pub fn background<BackgroundGivenStepFnImpl>(
+        self,
+        background: impl FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>,
+    ) -> FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        FeatureWithBackgroundLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks.untagged(),
+
+            background: Some(background.into()),
+        }
+    }
+
+    pub fn rule<FromContext, Rule, BackgroundGivenStepFnImpl>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        Rule: FinalizableRule,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        let ctx = self.to_ctx();
+        let rule = from_ctx(ctx);
+        let trials = rule.into();
+
+        FeatureWithRuleOrScenarioLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks.untagged(),
+
+            background: None,
+
+            trials,
+        }
+    }
+
+    pub fn scenario<FromContext, Scenario, BackgroundGivenStepFnImpl>(
+        self,
+        from_ctx: FromContext,
+    ) -> FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        FromContext: FnOnce(FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>) -> Scenario,
+        Scenario: FinalizableScenario,
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        let ctx = self.to_ctx();
+        let scenario = from_ctx(ctx);
+        let trials = vec![scenario.into()];
+
+        FeatureWithRuleOrScenarioLastConfigured {
+            description: self.description,
+            ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks.untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.untagged(),
+            before_step_hooks: self.before_step_hooks.untagged(),
+            after_step_hooks: self.after_step_hooks.untagged(),
+
+            background: None,
+
+            trials,
+        }
+    }
+
+    fn to_ctx<BackgroundGivenStepFnImpl>(&self) -> FeatureContext<BackgroundGivenStepFnImpl, WorldImpl>
+    where
+        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    {
+        FeatureContext {
+            description: self.description.clone(),
+            ignored: self.ignored,
+            tags: self.tags.clone(),
+
+            before_scenario_hooks: self.before_scenario_hooks.clone().untagged(),
+            after_scenario_hooks: self.after_scenario_hooks.clone().untagged(),
+            before_step_hooks: self.before_step_hooks.clone().untagged(),
+            after_step_hooks: self.after_step_hooks.clone().untagged(),
+
+            background: None,
+        }
+    }
 }
 
 pub struct FeatureWithBackgroundLastConfigured<BackgroundGivenStepFnImpl, WorldImpl> {
@@ -344,6 +1448,12 @@ where
         FeatureWithRuleOrScenarioLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
 
             background: self.background,
 
@@ -366,6 +1476,12 @@ where
         FeatureWithRuleOrScenarioLastConfigured {
             description: self.description,
             ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
 
             background: self.background,
 
@@ -380,6 +1496,12 @@ where
         FeatureContext {
             description: self.description.clone(),
             ignored: self.ignored,
+            tags: self.tags.clone(),
+
+            before_scenario_hooks: self.before_scenario_hooks.clone(),
+            after_scenario_hooks: self.after_scenario_hooks.clone(),
+            before_step_hooks: self.before_step_hooks.clone(),
+            after_step_hooks: self.after_step_hooks.clone(),
 
             background: self.background.clone(),
         }
@@ -421,6 +1543,12 @@ where
         Self {
             description: self.description,
             ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
 
             background: self.background,
 
@@ -442,6 +1570,12 @@ where
         Self {
             description: self.description,
             ignored: self.ignored,
+            tags: self.tags,
+
+            before_scenario_hooks: self.before_scenario_hooks,
+            after_scenario_hooks: self.after_scenario_hooks,
+            before_step_hooks: self.before_step_hooks,
+            after_step_hooks: self.after_step_hooks,
 
             background: self.background,
 
@@ -456,6 +1590,12 @@ where
         FeatureContext {
             description: self.description.clone(),
             ignored: self.ignored,
+            tags: self.tags.clone(),
+
+            before_scenario_hooks: self.before_scenario_hooks.clone(),
+            after_scenario_hooks: self.after_scenario_hooks.clone(),
+            before_step_hooks: self.before_step_hooks.clone(),
+            after_step_hooks: self.after_step_hooks.clone(),
 
             background: self.background.clone(),
         }

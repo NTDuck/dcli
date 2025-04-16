@@ -3,74 +3,79 @@ use crate::utils::aliases::{Arc, HashMap};
 
 use super::World;
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub(super) struct Hooks<WorldImpl> {
-    tagged: HashMap<Tag, Arc<dyn HookFn<WorldImpl>>>,
-    untagged: Vec<Arc<dyn HookFn<WorldImpl>>>,
+    pub(super) tagged: HashMap<Tag, Arc<dyn HookFn<WorldImpl>>>,
+    pub(super) untagged: Vec<Arc<dyn HookFn<WorldImpl>>>,
+    cached: Option<Arc<dyn HookFn<WorldImpl>>>,
+}
+
+impl<WorldImpl> Clone for Hooks<WorldImpl> {
+    fn clone(&self) -> Self {
+        Self {
+            tagged: self.tagged.clone(),
+            untagged: self.untagged.clone(),
+            cached: self.cached.clone(),
+        }
+    }
 }
 
 impl<WorldImpl> Hooks<WorldImpl> 
 where 
     WorldImpl: World,
 {
-    pub(super) fn add(self, tag: Tag, hook: impl HookFn<WorldImpl>) -> Self {
-        let mut tagged = self.tagged;
-        let hook = Arc::new(hook);
-        tagged.insert(tag, hook);
-
-        Self {
-            tagged,
-            ..self
-        }
-    }
-
-    pub(super) fn add_untagged(self, hook: impl HookFn<WorldImpl>) -> Self {
+    pub(super) fn cache(self, hook: impl HookFn<WorldImpl>) -> Self {
         let mut untagged = self.untagged;
+        let mut cached = self.cached;
+
+        if let Some(cached) = cached.take() {
+            untagged.push(cached);
+        }
+
         let hook = Arc::new(hook);
-        untagged.push(hook);
 
         Self {
+            tagged: self.tagged,
             untagged,
-            ..self
+            cached: Some(hook),
         }
     }
-}
 
-impl<T, U, HookFnImpl, WorldImpl> From<(T, HookFnImpl)> for Hooks<WorldImpl>
-where 
-    T: IntoIterator<Item = U>,
-    U: Into<Tag>,
-    HookFnImpl: HookFn<WorldImpl>,
-    WorldImpl: World,
-{
-    fn from((iter, hook): (T, HookFnImpl)) -> Self {
-        let hook = Arc::new(hook);
-        let mut tagged: HashMap<Tag, Arc<dyn HookFn<WorldImpl>>> = HashMap::new();
+    pub(super) fn tagged<U>(self, tags: impl IntoIterator<Item = U>) -> Self
+    where
+        U: Into<Tag>,
+    {
+        if let Some(cached) = self.cached {
+            let mut tagged = self.tagged;
 
-        let _ = iter
-            .into_iter()
-            .map(Into::into)
-            .map(|tag| tagged.insert(tag, hook.clone()));
+            tags
+                .into_iter()
+                .map(Into::into)
+                .map(|tag| tagged.insert(tag, cached.clone()));
+    
+            Self {
+                tagged,
+                untagged: self.untagged,
+                cached: None,
+            }
 
-        Self {
-            tagged,
-            untagged: Vec::default(),
+        } else {
+            unreachable!()
         }
     }
-}
 
-impl<HookFnImpl, WorldImpl> From<HookFnImpl> for Hooks<WorldImpl>
-where 
-    HookFnImpl: HookFn<WorldImpl>,
-    WorldImpl: World,
-{
-    fn from(hook: HookFnImpl) -> Self {
-        let hook = Arc::new(hook);
-        let untagged: Vec<Arc<dyn HookFn<WorldImpl>>> = vec![hook];
+    pub(super) fn untagged(self) -> Self {
+        let mut untagged = self.untagged;
+        let mut cached = self.cached;
+
+        if let Some(cached) = cached.take() {
+            untagged.push(cached);
+        }
 
         Self {
-            tagged: HashMap::default(),
+            tagged: self.tagged,
             untagged,
+            cached: None,
         }
     }
 }

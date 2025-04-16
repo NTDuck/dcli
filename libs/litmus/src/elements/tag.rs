@@ -1,6 +1,8 @@
+use std::ops::Deref;
+
 use crate::utils::aliases::{HashSet, MaybeOwnedStr};
 
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub(super) struct Tags(HashSet<Tag>);
 
 impl Tags {
@@ -10,12 +12,6 @@ impl Tags {
         tags.insert(tag);
 
         Self(tags)
-    }
-}
-
-impl Default for Tags {
-    fn default() -> Self {
-        Self(HashSet::new())
     }
 }
 
@@ -30,6 +26,14 @@ where
             .collect();
 
         Self(tags)
+    }
+}
+
+impl Deref for Tags {
+    type Target = HashSet<Tag>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
