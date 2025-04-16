@@ -701,15 +701,25 @@ where
             || scenario.rule.as_ref().and_then(|rule| rule.ignored).unwrap_or(false)
             || scenario.ignored.unwrap_or(false);
 
+        // ORDERING WILL NEED TO BE REVIEWED AGAIN !!!
         libtest::Trial::test(description, move || {
             let mut world = WorldImpl::default();
+
+            scenario.feature.before_scenario_hooks.untagged
+                .map(|hook| (hook)(&mut world));
+
+            scenario.tags.iter()
+                .chain(scenario.feature.tags.iter())
+                .chain(scenario.rule.clone().iter().flat_map(|rule| rule.tags.iter()))
+                .filter_map(|tag| scenario.feature.before_scenario_hooks.tagged.get(tag))
+                .for_each(|hook| hook(&mut world));
             
             scenario.feature.background
                 .filter(|background| !background.ignored)
                 .map(|background| (background.given_steps_callback)(&mut world))
                 .transpose()?;
             
-            scenario.rule
+            scenario.rule.clone()
                 .and_then(|rule| rule.background)
                 .filter(|background| !background.ignored)
                 .map(|background| (background.given_steps_callback)(&mut world))
@@ -718,6 +728,15 @@ where
             (scenario.given_steps.callback)(&mut world)?;
             (scenario.when_steps.callback)(&mut world)?;
             (scenario.then_steps.callback)(&world)?;
+
+            scenario.feature.after_scenario_hooks.untagged
+                .map(|hook| (hook)(&mut world));
+
+            scenario.tags.iter()
+                .chain(scenario.feature.tags.iter())
+                .chain(scenario.rule.iter().flat_map(|rule| rule.tags.iter()))
+                .filter_map(|tag| scenario.feature.after_scenario_hooks.tagged.get(tag))
+                .for_each(|hook| hook(&mut world));
 
             Ok(())
         })
