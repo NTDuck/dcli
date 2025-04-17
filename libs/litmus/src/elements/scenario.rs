@@ -168,13 +168,13 @@ where
     where
         WorldImpl: World,
     {
-        let before_step_hook_callback = self.feature.before_step_hooks.to_callback(self.tags());
-        let after_step_hook_callback = self.feature.after_step_hooks.to_callback(self.tags());
+        let before_step_hooks_callback = self.feature.before_step_hooks.to_callback(self.tags());
+        let after_step_hooks_callback = self.feature.after_step_hooks.to_callback(self.tags());
 
         move |world| {
-            (before_step_hook_callback)(world);
+            (before_step_hooks_callback)(world);
             let result = (callback)(world);
-            (after_step_hook_callback)(world);
+            (after_step_hooks_callback)(world);
 
             result
         }

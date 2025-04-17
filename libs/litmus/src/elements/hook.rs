@@ -92,13 +92,15 @@ where
         }
     }
 
-    pub(super) fn to_callback<'step>(&self, tags: impl Iterator<Item = &'step Tag>) -> impl HookFn<WorldImpl> {
+    pub(super) fn to_callback<'step>(&self, tags: impl Iterator<Item = &'step Tag>) -> Arc<dyn HookFn<WorldImpl>> {
         let untagged = self.untagged.clone();
+        let tagged = self.tagged.clone();
+
         let tagged = tags
-            .filter_map(|tag| self.tagged.get(tag))
+            .filter_map(|tag| tagged.get(tag))
             .cloned()
-            .fold(None, |acc: Option<Box<dyn HookFn<WorldImpl>>>, hook| {
-                Some(Box::new(move |world| {
+            .fold(None, |acc: Option<Arc<dyn HookFn<WorldImpl>>>, hook| {
+                Some(Arc::new(move |world| {
                     if let Some(ref acc) = acc {
                         acc(world);
                     }
@@ -106,7 +108,7 @@ where
                 }))
             });
 
-        move |world| {
+        Arc::new(move |world| {
             if let Some(untagged) = &untagged {
                 (untagged)(world);
             }
@@ -114,7 +116,7 @@ where
             if let Some(tagged) = &tagged {
                 (tagged)(world);
             }
-        }
+        })
     }
 }
 
