@@ -16,12 +16,22 @@ use crate::elements::NoOpGivenStepFn;
 use crate::elements::World;
 use crate::utils::aliases::MaybeOwnedStr;
 
+use super::BackgroundContext;
+use super::Hooks;
 use super::Tag;
 use super::Tags;
 
 pub struct UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
-    feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-    rule: Option<RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+    ignored: bool,
+    tags: Tags,
+
+    before_scenario_hooks: Hooks<WorldImpl>,
+    after_scenario_hooks: Hooks<WorldImpl>,
+    before_step_hooks: Hooks<WorldImpl>,
+    after_step_hooks: Hooks<WorldImpl>,
+
+    feature: ReducedFeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
+    rule: Option<ReducedRuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, WorldImpl> From<FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>> for UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
@@ -31,7 +41,19 @@ where
 {
     fn from(feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
         Self {
-            feature,
+            ignored: feature.ignored.unwrap_or(false),
+            tags: feature.tags,
+
+            feature: ReducedFeatureContext {
+                description: feature.description,
+
+                before_scenario_hooks: feature.before_scenario_hooks,
+                after_scenario_hooks: feature.after_scenario_hooks,
+                before_step_hooks: feature.before_step_hooks,
+                after_step_hooks: feature.after_step_hooks,
+
+                background: feature.background,
+            },
             rule: None,
         }
     }
@@ -45,8 +67,25 @@ where
 {
     fn from((feature, rule): FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
         Self {
-            feature,
-            rule: Some(rule),
+            ignored: feature.ignored.unwrap_or(false)
+                || rule.ignored.unwrap_or(false),
+            tags: feature.tags.union(rule.tags),
+
+            feature: ReducedFeatureContext {
+                description: feature.description,
+
+                before_scenario_hooks: feature.before_scenario_hooks,
+                after_scenario_hooks: feature.after_scenario_hooks,
+                before_step_hooks: feature.before_step_hooks,
+                after_step_hooks: feature.after_step_hooks,
+
+                background: feature.background,
+            },
+            rule: Some(ReducedRuleContext {
+                description: rule.description,
+
+                background: rule.background,
+            }),
         }
     }
 }
@@ -90,9 +129,11 @@ pub struct ScenarioWithDescriptionLastConfigured<
     WorldImpl,
 > {
     description: Option<MaybeOwnedStr>,
+    ignored: bool,
+    tags: Tags,
 
-    feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-    rule: Option<RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+    feature: ReducedFeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
+    rule: Option<ReducedRuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
@@ -141,7 +182,7 @@ where
         WorldImpl,
     >
     {
-        let callback = self.hook(callback);
+        let callback = self.hook_given_step(callback);
 
         let step = Step {
             label: StepLabel::Given,
@@ -161,7 +202,7 @@ where
         }
     }
 
-    fn hook(&self, callback: impl GivenStepFn<WorldImpl>) -> impl GivenStepFn<WorldImpl>
+    fn hook_given_step(&self, callback: impl GivenStepFn<WorldImpl>) -> impl GivenStepFn<WorldImpl>
     where
         WorldImpl: World,
     {
@@ -214,19 +255,19 @@ where
         }
     }
 
-    pub fn given<ScenarioGivenStepFnImpl>(
+    pub fn given(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: ScenarioGivenStepFnImpl,
+        callback: impl GivenStepFn<WorldImpl>,
     ) -> ScenarioWithGivenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
+        impl GivenStepFn<WorldImpl>,
         FeatureBackgroundGivenStepFnImpl,
         RuleBackgroundGivenStepFnImpl,
         WorldImpl,
     >
-    where
-        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
+        let callback = self.hook_given_step(callback);
+
         let step = Step {
             label: StepLabel::Given,
             description: description.into(),
@@ -243,6 +284,28 @@ where
             feature: self.feature,
             rule: self.rule,
         }
+    }
+
+    fn hook_given_step(&self, callback: impl GivenStepFn<WorldImpl>) -> impl GivenStepFn<WorldImpl>
+    where
+        WorldImpl: World,
+    {
+        let before_step_hooks_callback = self.feature.before_step_hooks.to_callback(self.tags());
+        let after_step_hooks_callback = self.feature.after_step_hooks.to_callback(self.tags());
+
+        move |world| {
+            (before_step_hooks_callback)(world);
+            let result = (callback)(world);
+            (after_step_hooks_callback)(world);
+
+            result
+        }
+    }
+
+    fn tags(&self) -> impl Iterator<Item = &Tag> {
+        self.feature.tags.iter()
+            .chain(self.rule.iter()
+                .flat_map(|rule| rule.tags.iter()))
     }
 }
 
@@ -290,6 +353,29 @@ where
             feature: self.feature,
             rule: self.rule,
         }
+    }
+
+    fn hook_given_step(&self, callback: impl GivenStepFn<WorldImpl>) -> impl GivenStepFn<WorldImpl>
+    where
+        WorldImpl: World,
+    {
+        let before_step_hooks_callback = self.feature.before_step_hooks.to_callback(self.tags());
+        let after_step_hooks_callback = self.feature.after_step_hooks.to_callback(self.tags());
+
+        move |world| {
+            (before_step_hooks_callback)(world);
+            let result = (callback)(world);
+            (after_step_hooks_callback)(world);
+
+            result
+        }
+    }
+
+    fn tags(&self) -> impl Iterator<Item = &Tag> {
+        self.tags.iter()
+            .chain(self.feature.tags.iter())
+            .chain(self.rule.iter()
+                .flat_map(|rule| rule.tags.iter()))
     }
 }
 
@@ -764,4 +850,16 @@ where
         })
             .with_ignored_flag(ignored)
     }
+}
+
+struct ReducedFeatureContext<BackgroundGivenStepFnImpl, WorldImpl> {
+    pub(super) description: Option<MaybeOwnedStr>,
+
+    pub(super) background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
+}
+
+struct ReducedRuleContext<BackgroundGivenStepFnImpl, WorldImpl> {
+    pub(super) description: Option<MaybeOwnedStr>,
+
+    pub(super) background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
 }

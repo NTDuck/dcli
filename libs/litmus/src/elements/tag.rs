@@ -5,6 +5,17 @@ use crate::utils::aliases::{HashSet, MaybeOwnedStr};
 #[derive(Default, Clone)]
 pub(super) struct Tags(HashSet<Tag>);
 
+impl Tags {
+    pub fn union(self, other: Self) -> Self {
+        let mut this = self.0;
+        let other = other.0;
+
+        this.extend(other);
+
+        Self(this)
+    }
+}
+
 impl<U> FromIterator<U> for Tags
 where 
     U: Into<Tag>,
