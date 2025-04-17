@@ -95,9 +95,13 @@ where
         let after_step_hooks_callback = self.ctx.after_step_hooks_callback.clone();
 
         move |world| {
-            (before_step_hooks_callback)(world);
+            before_step_hooks_callback
+                .as_ref()
+                .map(|hook| (hook)(world));
             let result = (callback)(world);
-            (after_step_hooks_callback)(world);
+            after_step_hooks_callback
+                .as_ref()
+                .map(|hook| (hook)(world));
 
             result
         }
@@ -143,9 +147,13 @@ where
         let after_step_hooks_callback = self.ctx.after_step_hooks_callback.clone();
 
         move |world| {
-            (before_step_hooks_callback)(world);
+            before_step_hooks_callback
+                .as_ref()
+                .map(|hook| (hook)(world));
             let result = (callback)(world);
-            (after_step_hooks_callback)(world);
+            after_step_hooks_callback
+                .as_ref()
+                .map(|hook| (hook)(world));
 
             result
         }
@@ -217,9 +225,13 @@ where
         let after_step_hooks_callback = self.ctx.after_step_hooks_callback.clone();
 
         move |world| {
-            (before_step_hooks_callback)(world);
+            before_step_hooks_callback
+                .as_ref()
+                .map(|hook| (hook)(world));
             let result = (callback)(world);
-            (after_step_hooks_callback)(world);
+            after_step_hooks_callback
+                .as_ref()
+                .map(|hook| (hook)(world));
 
             result
         }
@@ -256,8 +268,8 @@ where
 }
 
 pub struct BackgroundContext<WorldImpl> {
-    pub(super) before_step_hooks_callback: Arc<dyn HookFn<WorldImpl>>,
-    pub(super) after_step_hooks_callback: Arc<dyn HookFn<WorldImpl>>,
+    pub(super) before_step_hooks_callback: Option<Arc<dyn HookFn<WorldImpl>>>,
+    pub(super) after_step_hooks_callback: Option<Arc<dyn HookFn<WorldImpl>>>,
 }
 
 pub struct BackgroundPayload<BackgroundGivenStepFnImpl, WorldImpl> {

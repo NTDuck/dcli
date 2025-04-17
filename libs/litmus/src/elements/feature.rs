@@ -206,8 +206,8 @@ where
 
     fn to_background_ctx(&self) -> BackgroundContext<WorldImpl> {
         BackgroundContext {
-            before_step_hooks: Hooks::default(),
-            after_step_hooks: Hooks::default(),
+            before_step_hooks_callback: None,
+            after_step_hooks_callback: None,
         }
     }
 
@@ -412,8 +412,8 @@ where
 
     fn to_background_ctx(&self) -> BackgroundContext<WorldImpl> {
         BackgroundContext {
-            before_step_hooks: Hooks::default(),
-            after_step_hooks: Hooks::default(),
+            before_step_hooks_callback: None,
+            after_step_hooks_callback: None,
         }
     }
 
@@ -606,8 +606,8 @@ where
 
     fn to_background_ctx(&self) -> BackgroundContext<WorldImpl> {
         BackgroundContext {
-            before_step_hooks: Hooks::default(),
-            after_step_hooks: Hooks::default(),
+            before_step_hooks_callback: None,
+            after_step_hooks_callback: None,
         }
     }
 
@@ -815,8 +815,8 @@ where
 
     fn to_background_ctx(&self) -> BackgroundContext<WorldImpl> {
         BackgroundContext {
-            before_step_hooks: self.before_step_hooks.clone().take_cached_as_untagged(),
-            after_step_hooks: self.after_step_hooks.clone().take_cached_as_untagged(),
+            before_step_hooks_callback: self.before_step_hooks.untagged.clone(),
+            after_step_hooks_callback: self.after_step_hooks.untagged.clone(),
         }
     }
 
@@ -1024,8 +1024,8 @@ where
 
     fn to_background_ctx(&self) -> BackgroundContext<WorldImpl> {
         BackgroundContext {
-            before_step_hooks: self.before_step_hooks.clone().take_cached_as_untagged(),
-            after_step_hooks: self.after_step_hooks.clone().take_cached_as_untagged(),
+            before_step_hooks_callback: self.before_step_hooks.untagged.clone(),
+            after_step_hooks_callback: self.after_step_hooks.untagged.clone(),
         }
     }
 
@@ -1233,8 +1233,8 @@ where
 
     fn to_background_ctx(&self) -> BackgroundContext<WorldImpl> {
         BackgroundContext {
-            before_step_hooks: self.before_step_hooks.clone().take_cached_as_untagged(),
-            after_step_hooks: self.after_step_hooks.clone().take_cached_as_untagged(),
+            before_step_hooks_callback: self.before_step_hooks.untagged.clone(),
+            after_step_hooks_callback: self.after_step_hooks.untagged.clone(),
         }
     }
 
@@ -1442,8 +1442,8 @@ where
 
     fn to_background_ctx(&self) -> BackgroundContext<WorldImpl> {
         BackgroundContext {
-            before_step_hooks: self.before_step_hooks.clone().take_cached_as_untagged(),
-            after_step_hooks: self.after_step_hooks.clone().take_cached_as_untagged(),
+            before_step_hooks_callback: self.before_step_hooks.untagged.clone(),
+            after_step_hooks_callback: self.after_step_hooks.untagged.clone(),
         }
     }
 
@@ -1639,8 +1639,8 @@ where
 
     fn to_background_ctx(&self) -> BackgroundContext<WorldImpl> {
         BackgroundContext {
-            before_step_hooks: self.before_step_hooks.clone().take_cached_as_untagged(),
-            after_step_hooks: self.after_step_hooks.clone().take_cached_as_untagged(),
+            before_step_hooks_callback: self.before_step_hooks.untagged.clone(),
+            after_step_hooks_callback: self.after_step_hooks.untagged.clone(),
         }
     }
 
