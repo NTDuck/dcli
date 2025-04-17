@@ -1,7 +1,6 @@
 use crate::elements::Tag;
+use crate::elements::World;
 use crate::utils::aliases::{Arc, HashMap};
-
-use super::World;
 
 #[derive(Default)]
 pub(super) struct Hooks<WorldImpl> {
@@ -92,9 +91,43 @@ where
             cached: None,
         }
     }
+
+    pub(super) fn to_callback<'step>(&self, tags: impl Iterator<Item = &'step Tag>) -> impl HookFn<WorldImpl> {
+        let untagged = self.untagged.clone();
+        let tagged = tags
+            .filter_map(|tag| self.tagged.get(tag))
+            .cloned()
+            .fold(None, |acc: Option<Box<dyn HookFn<WorldImpl>>>, hook| {
+                Some(Box::new(move |world| {
+                    if let Some(ref acc) = acc {
+                        acc(world);
+                    }
+                    hook(world);
+                }))
+            });
+
+        move |world| {
+            if let Some(untagged) = &untagged {
+                (untagged)(world);
+            }
+
+            if let Some(tagged) = &tagged {
+                (tagged)(world);
+            }
+        }
+    }
 }
 
 pub trait HookFn<WorldImpl>: Fn(&mut WorldImpl) -> () + Send + Sync + 'static {
+    fn chain(self, other: impl HookFn<WorldImpl>) -> impl HookFn<WorldImpl>
+    where
+        Self: Sized,
+    {
+        move |world| {
+            (self)(world);
+            (other)(world);
+        }
+    }
 }
 
 impl<T, WorldImpl> HookFn<WorldImpl> for T

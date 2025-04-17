@@ -18,6 +18,7 @@ use crate::elements::World;
 use crate::utils::aliases::Arc;
 use crate::utils::aliases::MaybeOwnedStr;
 
+use super::Hooks;
 use super::Tag;
 use super::Tags;
 
@@ -143,66 +144,40 @@ where
         WorldImpl,
     >
     {
-        let before_step_hooks = self.feature.before_step_hooks.clone();
+        let callback = self.hook(callback);
 
-        if let Some(hook) = before_step_hooks.untagged {
-            let callback = callback.chain_before(hook);
+        let step = Step {
+            label: StepLabel::Given,
+            description: description.into(),
+            callback,
+        };
+
+        ScenarioWithGivenStepsLastConfigured {
+            description: self.description,
+            ignored: None,
+            tags: Tags::default(),
+
+            given_steps: GivenSteps::from(step),
+
+            feature: self.feature,
+            rule: self.rule,
         }
-
-        // self.feature.tags.iter()
-        //     .chain(self.rule.iter().flat_map(|rule| rule.tags.iter()))
-        //     .filter_map(|tag| before_step_hooks.tagged.get(tag))
-        //     .map(|hook| ...)
-        
-        let hook = self.feature.tags.iter()
-            .chain(self.rule.iter().flat_map(|rule| rule.tags.iter()))
-            .filter_map(|tag| before_step_hooks.tagged.get(tag))
-            .cloned()
-            .fold(None, |acc: Option<Arc<dyn HookFn<WorldImpl>>>, hook| {
-                Some(Arc::new(move |world: &mut WorldImpl| {
-                    if let Some(ref acc) = acc {
-                        acc(world);
-                    }
-                    hook(world);
-                }))
-            });
-
-        todo!()
-
-        // let step = Step {
-        //     label: StepLabel::Given,
-        //     description: description.into(),
-        //     callback,
-        // };
-
-        // ScenarioWithGivenStepsLastConfigured {
-        //     description: self.description,
-        //     ignored: None,
-        //     tags: Tags::default(),
-
-        //     given_steps: GivenSteps::from(step),
-
-        //     feature: self.feature,
-        //     rule: self.rule,
-        // }
     }
 
-    fn before_step_hook(&self) -> Option<Arc<dyn HookFn<WorldImpl>>> {
-        let before_step_hooks = self.feature.before_step_hooks.clone();
+    fn hook(&self, callback: impl GivenStepFn<WorldImpl>) -> impl GivenStepFn<WorldImpl>
+    where
+        WorldImpl: World,
+    {
+        let before_step_hook_callback = self.feature.before_step_hooks.to_callback(self.tags());
+        let after_step_hook_callback = self.feature.after_step_hooks.to_callback(self.tags());
 
-        let untagged = before_step_hooks.untagged;
-        let tagged = self.tags()
-            .filter_map(|tag| before_step_hooks.tagged.get(tag))
-            .fold(None, |acc: Option<Arc<dyn HookFn<WorldImpl>>>, hook| {
-                Some(Arc::new(move |world: &mut WorldImpl| {
-                    if let Some(ref acc) = acc {
-                        acc(world);
-                    }
-                    hook(world);
-                }))
-            });
+        move |world| {
+            (before_step_hook_callback)(world);
+            let result = (callback)(world);
+            (after_step_hook_callback)(world);
 
-        None
+            result
+        }
     }
 
     fn tags(&self) -> impl Iterator<Item = &Tag> {
@@ -791,5 +766,21 @@ where
             Ok(())
         })
             .with_ignored_flag(ignored)
+    }
+}
+
+fn hook_given_step<'step, WorldImpl>(callback: impl GivenStepFn<WorldImpl>, tags: impl Iterator<Item = &'step Tag>, tags_: impl Iterator<Item = &'step Tag>, before_step_hooks: Hooks<WorldImpl>, after_step_hooks: Hooks<WorldImpl>) -> impl GivenStepFn<WorldImpl>
+where
+    WorldImpl: World,
+{
+    let before_step_hook_callback = before_step_hooks.to_callback(tags);
+    let after_step_hook_callback = after_step_hooks.to_callback(tags_);
+
+    move |world| {
+        (before_step_hook_callback)(world);
+        let result = (callback)(world);
+        (after_step_hook_callback)(world);
+
+        result
     }
 }
