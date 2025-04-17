@@ -1,6 +1,6 @@
 pub use UnconfiguredRule as Rule;
 
-use crate::elements::BackgroundContext;
+use crate::elements::BackgroundPayload;
 use crate::elements::ReusableGivenStepFn;
 use crate::elements::FeatureContext;
 use crate::elements::FinalizableBackground;
@@ -8,6 +8,7 @@ use crate::elements::FinalizableScenario;
 use crate::elements::World;
 use crate::utils::aliases::MaybeOwnedStr;
 
+use super::Hooks;
 use super::Tag;
 use super::Tags;
 
@@ -303,7 +304,7 @@ pub struct RuleWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, Ru
     tags: Tags,
 
     feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-    background: Option<BackgroundContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+    background: Option<BackgroundPayload<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
@@ -355,7 +356,7 @@ pub struct RuleWithScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, Rule
     tags: Tags,
 
     feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-    background: Option<BackgroundContext<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
+    background: Option<BackgroundPayload<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 
     trials: Vec<libtest::Trial>,
 }
@@ -428,12 +429,17 @@ where
 pub type FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> = (FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>, RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>);
 
 #[derive(Default)]
-pub struct RuleContext<BackgroundGivenStepFnImpl, WorldImpl> {
-    pub(super) description: Option<MaybeOwnedStr>,
+pub struct RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl> {
+    pub(super) feature_description: Option<MaybeOwnedStr>,
     pub(super) ignored: Option<bool>,
     pub(super) tags: Tags,
 
-    pub(super) background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
+    pub(super) before_scenario_hooks: Hooks<WorldImpl>,
+    pub(super) after_scenario_hooks: Hooks<WorldImpl>,
+    pub(super) before_step_hooks: Hooks<WorldImpl>,
+    pub(super) after_step_hooks: Hooks<WorldImpl>,
+
+    pub(super) feature_background: Option<BackgroundPayload<FeatureBackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
 impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for RuleContext<BackgroundGivenStepFnImpl, WorldImpl>
@@ -443,7 +449,7 @@ where
 {
     fn clone(&self) -> Self {
         Self {
-            description: self.description.clone(),
+            feature_description: self.feature_description.clone(),
             ignored: self.ignored,
             tags: self.tags.clone(),
 

@@ -16,7 +16,7 @@ use crate::elements::NoOpGivenStepFn;
 use crate::elements::World;
 use crate::utils::aliases::MaybeOwnedStr;
 
-use super::BackgroundContext;
+use super::BackgroundPayload;
 use super::Hooks;
 use super::Tag;
 use super::Tags;
@@ -852,14 +852,17 @@ where
     }
 }
 
-struct ReducedFeatureContext<BackgroundGivenStepFnImpl, WorldImpl> {
-    pub(super) description: Option<MaybeOwnedStr>,
+pub struct ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
+    pub(super) feature_description: Option<MaybeOwnedStr>,
+    pub(super) rule_description: Option<MaybeOwnedStr>,
+    pub(super) ignored: Option<bool>,
+    pub(super) tags: Tags,
 
-    pub(super) background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
-}
+    pub(super) before_scenario_hooks: Hooks<WorldImpl>,
+    pub(super) after_scenario_hooks: Hooks<WorldImpl>,
+    pub(super) before_step_hooks: Hooks<WorldImpl>,
+    pub(super) after_step_hooks: Hooks<WorldImpl>,
 
-struct ReducedRuleContext<BackgroundGivenStepFnImpl, WorldImpl> {
-    pub(super) description: Option<MaybeOwnedStr>,
-
-    pub(super) background: Option<BackgroundContext<BackgroundGivenStepFnImpl, WorldImpl>>,
+    pub(super) feature_background: Option<BackgroundPayload<FeatureBackgroundGivenStepFnImpl, WorldImpl>>,
+    pub(super) rule_background: Option<BackgroundPayload<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 }
