@@ -1,7 +1,6 @@
 pub use UnconfiguredScenario as Scenario;
 
 use crate::elements::FeatureContext;
-use crate::elements::HookFn;
 use crate::elements::RuleContext;
 use crate::elements::ReusableGivenStepFn;
 use crate::elements::GivenStepFn;
@@ -15,10 +14,8 @@ use crate::elements::ThenSteps;
 use crate::elements::FeatureAndRuleContext;
 use crate::elements::NoOpGivenStepFn;
 use crate::elements::World;
-use crate::utils::aliases::Arc;
 use crate::utils::aliases::MaybeOwnedStr;
 
-use super::Hooks;
 use super::Tag;
 use super::Tags;
 
@@ -766,21 +763,5 @@ where
             Ok(())
         })
             .with_ignored_flag(ignored)
-    }
-}
-
-fn hook_given_step<'step, WorldImpl>(callback: impl GivenStepFn<WorldImpl>, tags: impl Iterator<Item = &'step Tag>, tags_: impl Iterator<Item = &'step Tag>, before_step_hooks: Hooks<WorldImpl>, after_step_hooks: Hooks<WorldImpl>) -> impl GivenStepFn<WorldImpl>
-where
-    WorldImpl: World,
-{
-    let before_step_hook_callback = before_step_hooks.to_callback(tags);
-    let after_step_hook_callback = after_step_hooks.to_callback(tags_);
-
-    move |world| {
-        (before_step_hook_callback)(world);
-        let result = (callback)(world);
-        (after_step_hook_callback)(world);
-
-        result
     }
 }
