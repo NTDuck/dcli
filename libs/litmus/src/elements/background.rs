@@ -10,7 +10,7 @@ use crate::elements::ReusableGivenSteps;
 use crate::utils::aliases::Arc;
 use crate::utils::aliases::MaybeOwnedStr;
 
-use super::Hooks;
+use super::HookFn;
 
 pub struct UnconfiguredBackground<WorldImpl> {
     ctx: BackgroundContext<WorldImpl>,
@@ -67,14 +67,13 @@ where
         }
     }
 
-    pub fn given<BackgroundGivenStepFnImpl>(
+    pub fn given(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: BackgroundGivenStepFnImpl,
-    ) -> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
-    where
-        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    {
+        callback: impl ReusableGivenStepFn<WorldImpl>,
+    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl> {
+        let callback = self.hook_given_step(callback);
+
         let step = Step {
             label: StepLabel::Given,
             description: description.into(),
@@ -90,6 +89,19 @@ where
             ctx: self.ctx,
         }
     }
+
+    fn hook_given_step(&self, callback: impl ReusableGivenStepFn<WorldImpl>) -> impl ReusableGivenStepFn<WorldImpl> {
+        let before_step_hooks_callback = self.ctx.before_step_hooks_callback.clone();
+        let after_step_hooks_callback = self.ctx.after_step_hooks_callback.clone();
+
+        move |world| {
+            (before_step_hooks_callback)(world);
+            let result = (callback)(world);
+            (after_step_hooks_callback)(world);
+
+            result
+        }
+    }
 }
 
 pub struct BackgroundWithIgnoredLastConfigured<WorldImpl> {
@@ -103,14 +115,13 @@ impl<WorldImpl> BackgroundWithIgnoredLastConfigured<WorldImpl>
 where
     WorldImpl: World,
 {
-    pub fn given<BackgroundGivenStepFnImpl>(
+    pub fn given(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: BackgroundGivenStepFnImpl,
-    ) -> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
-    where
-        BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    {
+        callback: impl ReusableGivenStepFn<WorldImpl>,
+    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl> {
+        let callback = self.hook_given_step(callback);
+
         let step = Step {
             label: StepLabel::Given,
             description: description.into(),
@@ -124,6 +135,19 @@ where
             given_steps: ReusableGivenSteps::from(step),
 
             ctx: self.ctx,
+        }
+    }
+
+    fn hook_given_step(&self, callback: impl ReusableGivenStepFn<WorldImpl>) -> impl ReusableGivenStepFn<WorldImpl> {
+        let before_step_hooks_callback = self.ctx.before_step_hooks_callback.clone();
+        let after_step_hooks_callback = self.ctx.after_step_hooks_callback.clone();
+
+        move |world| {
+            (before_step_hooks_callback)(world);
+            let result = (callback)(world);
+            (after_step_hooks_callback)(world);
+
+            result
         }
     }
 }
@@ -142,14 +166,13 @@ where
     BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and<OtherBackgroundGivenStepFnImpl>(
+    pub fn and(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: OtherBackgroundGivenStepFnImpl,
-    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl>
-    where
-        OtherBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    {
+        callback: impl ReusableGivenStepFn<WorldImpl>,
+    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl> {
+        let callback = self.hook_given_step(callback);
+
         let step = Step {
             label: StepLabel::And,
             description: description.into(),
@@ -166,14 +189,13 @@ where
         }
     }
 
-    pub fn but<OtherBackgroundGivenStepFnImpl>(
+    pub fn but(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: OtherBackgroundGivenStepFnImpl,
-    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl>
-    where
-        OtherBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    {
+        callback: impl ReusableGivenStepFn<WorldImpl>,
+    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl> {
+        let callback = self.hook_given_step(callback);
+
         let step = Step {
             label: StepLabel::But,
             description: description.into(),
@@ -187,6 +209,19 @@ where
             given_steps: self.given_steps.chain(step),
 
             ctx: self.ctx,
+        }
+    }
+
+    fn hook_given_step(&self, callback: impl ReusableGivenStepFn<WorldImpl>) -> impl ReusableGivenStepFn<WorldImpl> {
+        let before_step_hooks_callback = self.ctx.before_step_hooks_callback.clone();
+        let after_step_hooks_callback = self.ctx.after_step_hooks_callback.clone();
+
+        move |world| {
+            (before_step_hooks_callback)(world);
+            let result = (callback)(world);
+            (after_step_hooks_callback)(world);
+
+            result
         }
     }
 }
@@ -221,8 +256,8 @@ where
 }
 
 pub struct BackgroundContext<WorldImpl> {
-    pub(super) before_step_hooks: Hooks<WorldImpl>,
-    pub(super) after_step_hooks: Hooks<WorldImpl>,
+    pub(super) before_step_hooks_callback: Arc<dyn HookFn<WorldImpl>>,
+    pub(super) after_step_hooks_callback: Arc<dyn HookFn<WorldImpl>>,
 }
 
 pub struct BackgroundPayload<BackgroundGivenStepFnImpl, WorldImpl> {

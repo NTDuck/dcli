@@ -2,7 +2,6 @@ pub use UnconfiguredRule as Rule;
 
 use crate::elements::BackgroundPayload;
 use crate::elements::ReusableGivenStepFn;
-use crate::elements::FeatureContext;
 use crate::elements::FinalizableBackground;
 use crate::elements::FinalizableScenario;
 use crate::elements::World;
@@ -13,15 +12,15 @@ use super::Tag;
 use super::Tags;
 
 pub struct UnconfiguredRule<FeatureBackgroundGivenStepFnImpl, WorldImpl> {
-    feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
+    ctx: RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
-impl<FeatureBackgroundGivenStepFnImpl, WorldImpl> From<FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>>
+impl<FeatureBackgroundGivenStepFnImpl, WorldImpl> From<RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>>
     for UnconfiguredRule<FeatureBackgroundGivenStepFnImpl, WorldImpl>
 {
-    fn from(feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
+    fn from(ctx: RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
         Self {
-            feature,
+            ctx,
         }
     }
 }
@@ -38,7 +37,7 @@ where
         RuleWithDescriptionLastConfigured {
             description: Some(description.into()),
 
-            feature: self.feature,
+            feature: self.ctx,
         }
     }
 }
@@ -46,7 +45,7 @@ where
 pub struct RuleWithDescriptionLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl> {
     description: Option<MaybeOwnedStr>,
 
-    feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
+    feature: RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, WorldImpl>
@@ -143,7 +142,7 @@ pub struct RuleWithIgnoredLastConfigured<FeatureBackgroundGivenStepFnImpl, World
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
-    feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
+    feature: RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, WorldImpl>
@@ -229,7 +228,7 @@ pub struct RuleWithTagLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl
     ignored: Option<bool>,
     tags: Tags,
 
-    feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
+    feature: RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
 }
 
 impl<FeatureBackgroundGivenStepFnImpl, WorldImpl>
@@ -303,7 +302,7 @@ pub struct RuleWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, Ru
     ignored: Option<bool>,
     tags: Tags,
 
-    feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
+    feature: RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
     background: Option<BackgroundPayload<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 }
 
@@ -355,7 +354,7 @@ pub struct RuleWithScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, Rule
     ignored: Option<bool>,
     tags: Tags,
 
-    feature: FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
+    feature: RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
     background: Option<BackgroundPayload<RuleBackgroundGivenStepFnImpl, WorldImpl>>,
 
     trials: Vec<libtest::Trial>,
@@ -426,7 +425,7 @@ where
     }
 }
 
-pub type FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> = (FeatureContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>, RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>);
+pub type FeatureAndRuleContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> = (RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>, RuleContext<RuleBackgroundGivenStepFnImpl, WorldImpl>);
 
 #[derive(Default)]
 pub struct RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl> {
@@ -453,7 +452,12 @@ where
             ignored: self.ignored,
             tags: self.tags.clone(),
 
-            background: self.background.clone(),
+            before_scenario_hooks: self.before_scenario_hooks.clone(),
+            after_scenario_hooks: self.after_scenario_hooks.clone(),
+            before_step_hooks: self.before_step_hooks.clone(),
+            after_step_hooks: self.after_step_hooks.clone(),
+
+            feature_background: self.feature_background.clone(),
         }
     }
 }

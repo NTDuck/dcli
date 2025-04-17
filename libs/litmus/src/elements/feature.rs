@@ -1884,6 +1884,14 @@ where
     }
 }
 
+pub trait FinalizableFeature: Into<Vec<libtest::Trial>> {}
+
+impl<T> FinalizableFeature for T
+where
+    T: Into<Vec<libtest::Trial>>,
+{
+}
+
 impl<BackgroundGivenStepFnImpl, WorldImpl>
     From<FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>> for Vec<libtest::Trial>
 {
