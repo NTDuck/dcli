@@ -1,6 +1,7 @@
 pub use UnconfiguredScenario as Scenario;
 
 use crate::elements::FeatureContext;
+use crate::elements::HookFn;
 use crate::elements::RuleContext;
 use crate::elements::ReusableGivenStepFn;
 use crate::elements::GivenStepFn;
@@ -14,6 +15,7 @@ use crate::elements::ThenSteps;
 use crate::elements::FeatureAndRuleContext;
 use crate::elements::NoOpGivenStepFn;
 use crate::elements::World;
+use crate::utils::aliases::Arc;
 use crate::utils::aliases::MaybeOwnedStr;
 
 use super::Tag;
@@ -130,35 +132,83 @@ where
         }
     }
 
-    pub fn given<ScenarioGivenStepFnImpl>(
+    pub fn given(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: ScenarioGivenStepFnImpl,
+        callback: impl GivenStepFn<WorldImpl>,
     ) -> ScenarioWithGivenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
+        impl GivenStepFn<WorldImpl>,
         FeatureBackgroundGivenStepFnImpl,
         RuleBackgroundGivenStepFnImpl,
         WorldImpl,
     >
-    where
-        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
-        let step = Step {
-            label: StepLabel::Given,
-            description: description.into(),
-            callback,
-        };
+        let before_step_hooks = self.feature.before_step_hooks.clone();
 
-        ScenarioWithGivenStepsLastConfigured {
-            description: self.description,
-            ignored: None,
-            tags: Tags::default(),
-
-            given_steps: GivenSteps::from(step),
-
-            feature: self.feature,
-            rule: self.rule,
+        if let Some(hook) = before_step_hooks.untagged {
+            let callback = callback.chain_before(hook);
         }
+
+        // self.feature.tags.iter()
+        //     .chain(self.rule.iter().flat_map(|rule| rule.tags.iter()))
+        //     .filter_map(|tag| before_step_hooks.tagged.get(tag))
+        //     .map(|hook| ...)
+        
+        let hook = self.feature.tags.iter()
+            .chain(self.rule.iter().flat_map(|rule| rule.tags.iter()))
+            .filter_map(|tag| before_step_hooks.tagged.get(tag))
+            .cloned()
+            .fold(None, |acc: Option<Arc<dyn HookFn<WorldImpl>>>, hook| {
+                Some(Arc::new(move |world: &mut WorldImpl| {
+                    if let Some(ref acc) = acc {
+                        acc(world);
+                    }
+                    hook(world);
+                }))
+            });
+
+        todo!()
+
+        // let step = Step {
+        //     label: StepLabel::Given,
+        //     description: description.into(),
+        //     callback,
+        // };
+
+        // ScenarioWithGivenStepsLastConfigured {
+        //     description: self.description,
+        //     ignored: None,
+        //     tags: Tags::default(),
+
+        //     given_steps: GivenSteps::from(step),
+
+        //     feature: self.feature,
+        //     rule: self.rule,
+        // }
+    }
+
+    fn before_step_hook(&self) -> Option<Arc<dyn HookFn<WorldImpl>>> {
+        let before_step_hooks = self.feature.before_step_hooks.clone();
+
+        let untagged = before_step_hooks.untagged;
+        let tagged = self.tags()
+            .filter_map(|tag| before_step_hooks.tagged.get(tag))
+            .fold(None, |acc: Option<Arc<dyn HookFn<WorldImpl>>>, hook| {
+                Some(Arc::new(move |world: &mut WorldImpl| {
+                    if let Some(ref acc) = acc {
+                        acc(world);
+                    }
+                    hook(world);
+                }))
+            });
+
+        None
+    }
+
+    fn tags(&self) -> impl Iterator<Item = &Tag> {
+        self.feature.tags.iter()
+            .chain(self.rule.iter()
+                .flat_map(|rule| rule.tags.iter()))
     }
 }
 

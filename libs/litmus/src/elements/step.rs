@@ -1,7 +1,9 @@
 #![allow(dead_code)]
 
 use crate::elements::World;
-use crate::utils::aliases::MaybeOwnedStr;
+use crate::utils::aliases::{Arc, MaybeOwnedStr};
+
+use super::HookFn;
 
 pub(super) struct ReusableGivenSteps<StepFnImpl> {
     pub(super) metas: Vec<StepMeta>,
@@ -430,6 +432,32 @@ pub trait GivenStepFn<WorldImpl>:
             (other)(world)?;
 
             Ok(())
+        }
+    }
+
+    fn chain_before(self, hook: Arc<dyn HookFn<WorldImpl>>) -> impl GivenStepFn<WorldImpl>
+    where
+        Self: Sized,
+        WorldImpl: World,
+    {
+        move |world| {
+            (hook)(world);
+            (self)(world)?;
+
+            Ok(())
+        }
+    }
+
+    fn chain_after(self, hook: Arc<dyn HookFn<WorldImpl>>) -> impl GivenStepFn<WorldImpl>
+    where
+        Self: Sized,
+        WorldImpl: World,
+    {
+        move |world| {
+            let result = (self)(world);
+            (hook)(world);
+
+            result
         }
     }
 }
