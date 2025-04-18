@@ -12,6 +12,7 @@ use crate::utils::aliases::MaybeOwnedStr;
 
 use super::HookFn;
 use super::ReusableHookedStepFn;
+use super::ReusableHookedSteps;
 
 pub struct UnconfiguredBackground<WorldImpl> {
     ctx: BackgroundContext<WorldImpl>,
@@ -120,7 +121,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: ReusableGivenSteps::from(step),
+            given_steps: ReusableHookedSteps::from(step),
 
             ctx: self.ctx,
         }
@@ -131,7 +132,7 @@ pub struct BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, Wor
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
-    given_steps: ReusableGivenSteps<BackgroundGivenStepFnImpl>,
+    given_steps: ReusableHookedSteps<BackgroundGivenStepFnImpl>,
 
     ctx: BackgroundContext<WorldImpl>,
 }
@@ -145,7 +146,7 @@ where
         self,
         description: impl Into<MaybeOwnedStr>,
         callback: impl ReusableGivenStepFn<WorldImpl>,
-    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl> {
+    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableHookedStepFn<WorldImpl>, WorldImpl> {
         let callback = self.ctx.hook(callback);
 
         let step = Step {
