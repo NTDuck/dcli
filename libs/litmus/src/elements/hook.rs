@@ -92,7 +92,7 @@ where
         }
     }
 
-    pub(super) fn to_callback<'step>(&self, tags: impl Iterator<Item = &'step Tag>) -> Arc<dyn HookFn<WorldImpl>> {
+    pub(super) fn to_callback<'step>(&self, tags: impl Iterator<Item = &'step Tag>) -> Option<Arc<dyn HookFn<WorldImpl>>> {
         let untagged = self.untagged.clone();
         let tagged = self.tagged.clone();
 
@@ -108,15 +108,15 @@ where
                 }))
             });
 
-        Arc::new(move |world| {
-            if let Some(untagged) = &untagged {
+        match (untagged, tagged) {
+            (None, None) => None,
+            (Some(untagged), None) => Some(untagged),
+            (None, Some(tagged)) => Some(tagged),
+            (Some(untagged), Some(tagged)) => Some(Arc::new(move |world| {
                 (untagged)(world);
-            }
-
-            if let Some(tagged) = &tagged {
                 (tagged)(world);
-            }
-        })
+            })),
+        }
     }
 }
 

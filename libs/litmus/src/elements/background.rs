@@ -11,6 +11,7 @@ use crate::utils::aliases::Arc;
 use crate::utils::aliases::MaybeOwnedStr;
 
 use super::HookFn;
+use super::ReusableHookedStepFn;
 
 pub struct UnconfiguredBackground<WorldImpl> {
     ctx: BackgroundContext<WorldImpl>,
@@ -71,8 +72,8 @@ where
         self,
         description: impl Into<MaybeOwnedStr>,
         callback: impl ReusableGivenStepFn<WorldImpl>,
-    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl> {
-        let callback = self.hook_given_step(callback);
+    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableHookedStepFn<WorldImpl>, WorldImpl> {
+        let callback = self.ctx.hook(callback);
 
         let step = Step {
             label: StepLabel::Given,
@@ -87,23 +88,6 @@ where
             given_steps: ReusableGivenSteps::from(step),
 
             ctx: self.ctx,
-        }
-    }
-
-    fn hook_given_step(&self, callback: impl ReusableGivenStepFn<WorldImpl>) -> impl ReusableGivenStepFn<WorldImpl> {
-        let before_step_hooks_callback = self.ctx.before_step_hooks_callback.clone();
-        let after_step_hooks_callback = self.ctx.after_step_hooks_callback.clone();
-
-        move |world| {
-            before_step_hooks_callback
-                .as_ref()
-                .map(|hook| (hook)(world));
-            let result = (callback)(world);
-            after_step_hooks_callback
-                .as_ref()
-                .map(|hook| (hook)(world));
-
-            result
         }
     }
 }
@@ -123,8 +107,8 @@ where
         self,
         description: impl Into<MaybeOwnedStr>,
         callback: impl ReusableGivenStepFn<WorldImpl>,
-    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl> {
-        let callback = self.hook_given_step(callback);
+    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableHookedStepFn<WorldImpl>, WorldImpl> {
+        let callback = self.ctx.hook(callback);
 
         let step = Step {
             label: StepLabel::Given,
@@ -139,23 +123,6 @@ where
             given_steps: ReusableGivenSteps::from(step),
 
             ctx: self.ctx,
-        }
-    }
-
-    fn hook_given_step(&self, callback: impl ReusableGivenStepFn<WorldImpl>) -> impl ReusableGivenStepFn<WorldImpl> {
-        let before_step_hooks_callback = self.ctx.before_step_hooks_callback.clone();
-        let after_step_hooks_callback = self.ctx.after_step_hooks_callback.clone();
-
-        move |world| {
-            before_step_hooks_callback
-                .as_ref()
-                .map(|hook| (hook)(world));
-            let result = (callback)(world);
-            after_step_hooks_callback
-                .as_ref()
-                .map(|hook| (hook)(world));
-
-            result
         }
     }
 }
@@ -179,7 +146,7 @@ where
         description: impl Into<MaybeOwnedStr>,
         callback: impl ReusableGivenStepFn<WorldImpl>,
     ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl> {
-        let callback = self.hook_given_step(callback);
+        let callback = self.ctx.hook(callback);
 
         let step = Step {
             label: StepLabel::And,
@@ -202,7 +169,7 @@ where
         description: impl Into<MaybeOwnedStr>,
         callback: impl ReusableGivenStepFn<WorldImpl>,
     ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl> {
-        let callback = self.hook_given_step(callback);
+        let callback = self.ctx.hook(callback);
 
         let step = Step {
             label: StepLabel::But,
@@ -217,23 +184,6 @@ where
             given_steps: self.given_steps.chain(step),
 
             ctx: self.ctx,
-        }
-    }
-
-    fn hook_given_step(&self, callback: impl ReusableGivenStepFn<WorldImpl>) -> impl ReusableGivenStepFn<WorldImpl> {
-        let before_step_hooks_callback = self.ctx.before_step_hooks_callback.clone();
-        let after_step_hooks_callback = self.ctx.after_step_hooks_callback.clone();
-
-        move |world| {
-            before_step_hooks_callback
-                .as_ref()
-                .map(|hook| (hook)(world));
-            let result = (callback)(world);
-            after_step_hooks_callback
-                .as_ref()
-                .map(|hook| (hook)(world));
-
-            result
         }
     }
 }
@@ -270,6 +220,30 @@ where
 pub struct BackgroundContext<WorldImpl> {
     pub(super) before_step_hooks_callback: Option<Arc<dyn HookFn<WorldImpl>>>,
     pub(super) after_step_hooks_callback: Option<Arc<dyn HookFn<WorldImpl>>>,
+}
+
+impl<WorldImpl> BackgroundContext<WorldImpl>
+where
+    WorldImpl: World,
+{
+    fn hook(&self, callback: impl ReusableGivenStepFn<WorldImpl>) -> impl ReusableHookedStepFn<WorldImpl> {
+        let before_step_hooks_callback = self.before_step_hooks_callback.clone();
+        let after_step_hooks_callback = self.after_step_hooks_callback.clone();
+
+        move |world| {
+            before_step_hooks_callback
+                .as_ref()
+                .map(|hook| (hook)(world));
+
+            let result = (callback)(world);
+
+            after_step_hooks_callback
+                .as_ref()
+                .map(|hook| (hook)(world));
+
+            result
+        }
+    }
 }
 
 pub struct BackgroundPayload<BackgroundGivenStepFnImpl, WorldImpl> {
