@@ -1,6 +1,6 @@
 pub use UnconfiguredScenario as Scenario;
 
-use crate::elements::ReusableGivenStepFn;
+use crate::elements::ReusableHookedStepFn;
 use crate::elements::GivenStepFn;
 use crate::elements::ThenStepFn;
 use crate::elements::WhenStepFn;
@@ -15,7 +15,10 @@ use crate::utils::aliases::MaybeOwnedStr;
 
 use super::BackgroundPayload;
 use super::HookFn;
+use super::HookedStepFn;
+use super::HookedSteps;
 use super::Hooks;
+use super::ReusableHookedStepFn;
 use super::Tag;
 use super::Tags;
 
@@ -25,8 +28,8 @@ pub struct UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackground
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> From<ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>> for UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(ctx: ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
@@ -39,8 +42,8 @@ where
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     UnconfiguredScenario<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn named(
@@ -80,8 +83,8 @@ pub struct ScenarioWithDescriptionLastConfigured<
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     ScenarioWithDescriptionLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn ignored(
@@ -181,8 +184,8 @@ pub struct ScenarioWithIgnoredLastConfigured<FeatureBackgroundGivenStepFnImpl, R
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
     ScenarioWithIgnoredLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn tagged<U>(self, tags: impl IntoIterator<Item = U>) -> ScenarioWithTagLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
@@ -261,8 +264,8 @@ pub struct ScenarioWithTagLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleB
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> ScenarioWithTagLastConfigured<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn given<ScenarioGivenStepFnImpl>(
@@ -328,7 +331,7 @@ pub struct ScenarioWithGivenStepsLastConfigured<
 > {
     description: Option<MaybeOwnedStr>,
 
-    given_steps: GivenSteps<ScenarioGivenStepFnImpl>,
+    given_steps: HookedSteps<ScenarioGivenStepFnImpl>,
     
     ctx: ResolvedScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
@@ -342,8 +345,8 @@ impl<ScenarioGivenStepFnImpl, FeatureBackgroundGivenStepFnImpl, RuleBackgroundGi
     >
 where
     ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn and<OtherScenarioGivenStepFnImpl>(
@@ -451,8 +454,7 @@ pub struct ScenarioWithWhenStepsLastConfigured<
 > {
     description: Option<MaybeOwnedStr>,
 
-    given_steps: GivenSteps<ScenarioGivenStepFnImpl>,
-    when_steps: WhenSteps<ScenarioWhenStepFnImpl>,
+    steps: HookedSteps<Scenario>,
     
     ctx: ResolvedScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>,
 }
@@ -474,8 +476,8 @@ impl<
 where
     ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn and<OtherScenarioWhenStepFnImpl>(
@@ -617,8 +619,8 @@ where
     ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
     ScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn and<OtherScenarioThenStepFnImpl>(
@@ -718,8 +720,8 @@ where
     ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
     ScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(
@@ -801,8 +803,8 @@ pub struct ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGiven
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn resolve(self) -> ResolvedScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> {
@@ -827,8 +829,8 @@ struct ResolvedScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundG
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> From<ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>> for ResolvedScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(ctx: ScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>) -> Self {
@@ -852,11 +854,11 @@ where
 
 impl<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl> ResolvedScenarioContext<FeatureBackgroundGivenStepFnImpl, RuleBackgroundGivenStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
-    RuleBackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    RuleBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    fn hook_given_step(&self, callback: impl GivenStepFn<WorldImpl>) -> impl GivenStepFn<WorldImpl> {
+    fn hook_given_step(&self, callback: impl GivenStepFn<WorldImpl>) -> impl HookedStepFn<WorldImpl> {
         let before_step_hooks_callback = self.before_step_hooks_callback.clone();
         let after_step_hooks_callback = self.after_step_hooks_callback.clone();
 
@@ -875,7 +877,7 @@ where
         }
     }
 
-    fn hook_when_step(&self, callback: impl WhenStepFn<WorldImpl>) -> impl WhenStepFn<WorldImpl> {
+    fn hook_when_step(&self, callback: impl WhenStepFn<WorldImpl>) -> impl HookedStepFn<WorldImpl> {
         let before_step_hooks_callback = self.before_step_hooks_callback.clone();
         let after_step_hooks_callback = self.after_step_hooks_callback.clone();
 
@@ -894,7 +896,7 @@ where
         }
     }
     
-    fn hook_then_step(&self, callback: impl ThenStepFn<WorldImpl>) -> impl ThenStepFn<WorldImpl> {
+    fn hook_then_step(&self, callback: impl ThenStepFn<WorldImpl>) -> impl HookedStepFn<WorldImpl> {
         let before_step_hooks_callback = self.before_step_hooks_callback.clone();
         let after_step_hooks_callback = self.after_step_hooks_callback.clone();
 

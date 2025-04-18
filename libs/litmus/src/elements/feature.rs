@@ -120,14 +120,14 @@ where
         }
     }
 
-    pub fn background<FromContext, Background, FeatureBackgroundGivenStepFnImpl>(
+    pub fn background<FromContext, Background, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(BackgroundContext<WorldImpl>) -> Background,
-        Background: FinalizableBackground<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        Background: FinalizableBackground<FeatureBackgroundHookedStepFnImpl, WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_background_ctx();
         let background = from_ctx(ctx);
@@ -146,14 +146,14 @@ where
         }
     }
 
-    pub fn rule<FromContext, Rule, FeatureBackgroundGivenStepFnImpl>(
+    pub fn rule<FromContext, Rule, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_rule_ctx();
         let rule = from_ctx(ctx);
@@ -175,14 +175,14 @@ where
         }
     }
 
-    pub fn scenario<FromContext, Scenario, FeatureBackgroundGivenStepFnImpl>(
+    pub fn scenario<FromContext, Scenario, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
+        FromContext: FnOnce(ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_scenario_ctx();
         let scenario = from_ctx(ctx);
@@ -211,9 +211,9 @@ where
         }
     }
 
-    fn to_rule_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    fn to_rule_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         RuleContext {
             feature_description: self.description.clone(),
@@ -229,9 +229,9 @@ where
         }
     }
 
-    fn to_scenario_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
+    fn to_scenario_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         ScenarioContext {
             feature_description: self.description.clone(),
@@ -326,14 +326,14 @@ where
         }
     }
 
-    pub fn background<FromContext, Background, FeatureBackgroundGivenStepFnImpl>(
+    pub fn background<FromContext, Background, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(BackgroundContext<WorldImpl>) -> Background,
-        Background: FinalizableBackground<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        Background: FinalizableBackground<FeatureBackgroundHookedStepFnImpl, WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_background_ctx();
         let background = from_ctx(ctx);
@@ -352,14 +352,14 @@ where
         }
     }
 
-    pub fn rule<FromContext, Rule, FeatureBackgroundGivenStepFnImpl>(
+    pub fn rule<FromContext, Rule, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_rule_ctx();
         let rule = from_ctx(ctx);
@@ -381,14 +381,14 @@ where
         }
     }
 
-    pub fn scenario<FromContext, Scenario, FeatureBackgroundGivenStepFnImpl>(
+    pub fn scenario<FromContext, Scenario, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
+        FromContext: FnOnce(ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_scenario_ctx();
         let scenario = from_ctx(ctx);
@@ -417,9 +417,9 @@ where
         }
     }
 
-    fn to_rule_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    fn to_rule_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         RuleContext {
             feature_description: self.description.clone(),
@@ -435,9 +435,9 @@ where
         }
     }
 
-    fn to_scenario_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
+    fn to_scenario_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         ScenarioContext {
             feature_description: self.description.clone(),
@@ -520,14 +520,14 @@ where
         }
     }
 
-    pub fn background<FromContext, Background, FeatureBackgroundGivenStepFnImpl>(
+    pub fn background<FromContext, Background, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(BackgroundContext<WorldImpl>) -> Background,
-        Background: FinalizableBackground<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        Background: FinalizableBackground<FeatureBackgroundHookedStepFnImpl, WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_background_ctx();
         let background = from_ctx(ctx);
@@ -546,14 +546,14 @@ where
         }
     }
 
-    pub fn rule<FromContext, Rule, FeatureBackgroundGivenStepFnImpl>(
+    pub fn rule<FromContext, Rule, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_rule_ctx();
         let rule = from_ctx(ctx);
@@ -575,14 +575,14 @@ where
         }
     }
 
-    pub fn scenario<FromContext, Scenario, FeatureBackgroundGivenStepFnImpl>(
+    pub fn scenario<FromContext, Scenario, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
+        FromContext: FnOnce(ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_scenario_ctx();
         let scenario = from_ctx(ctx);
@@ -611,9 +611,9 @@ where
         }
     }
 
-    fn to_rule_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    fn to_rule_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         RuleContext {
             feature_description: self.description.clone(),
@@ -629,9 +629,9 @@ where
         }
     }
 
-    fn to_scenario_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
+    fn to_scenario_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         ScenarioContext {
             feature_description: self.description.clone(),
@@ -729,14 +729,14 @@ where
         }
     }
 
-    pub fn background<FromContext, Background, FeatureBackgroundGivenStepFnImpl>(
+    pub fn background<FromContext, Background, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(BackgroundContext<WorldImpl>) -> Background,
-        Background: FinalizableBackground<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        Background: FinalizableBackground<FeatureBackgroundHookedStepFnImpl, WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_background_ctx();
         let background = from_ctx(ctx);
@@ -755,14 +755,14 @@ where
         }
     }
 
-    pub fn rule<FromContext, Rule, FeatureBackgroundGivenStepFnImpl>(
+    pub fn rule<FromContext, Rule, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_rule_ctx();
         let rule = from_ctx(ctx);
@@ -784,14 +784,14 @@ where
         }
     }
 
-    pub fn scenario<FromContext, Scenario, FeatureBackgroundGivenStepFnImpl>(
+    pub fn scenario<FromContext, Scenario, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
+        FromContext: FnOnce(ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_scenario_ctx();
         let scenario = from_ctx(ctx);
@@ -820,9 +820,9 @@ where
         }
     }
 
-    fn to_rule_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    fn to_rule_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         RuleContext {
             feature_description: self.description.clone(),
@@ -838,9 +838,9 @@ where
         }
     }
 
-    fn to_scenario_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
+    fn to_scenario_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         ScenarioContext {
             feature_description: self.description.clone(),
@@ -938,14 +938,14 @@ where
         }
     }
 
-    pub fn background<FromContext, Background, FeatureBackgroundGivenStepFnImpl>(
+    pub fn background<FromContext, Background, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(BackgroundContext<WorldImpl>) -> Background,
-        Background: FinalizableBackground<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        Background: FinalizableBackground<FeatureBackgroundHookedStepFnImpl, WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_background_ctx();
         let background = from_ctx(ctx);
@@ -964,14 +964,14 @@ where
         }
     }
 
-    pub fn rule<FromContext, Rule, FeatureBackgroundGivenStepFnImpl>(
+    pub fn rule<FromContext, Rule, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_rule_ctx();
         let rule = from_ctx(ctx);
@@ -993,14 +993,14 @@ where
         }
     }
 
-    pub fn scenario<FromContext, Scenario, FeatureBackgroundGivenStepFnImpl>(
+    pub fn scenario<FromContext, Scenario, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
+        FromContext: FnOnce(ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_scenario_ctx();
         let scenario = from_ctx(ctx);
@@ -1029,9 +1029,9 @@ where
         }
     }
 
-    fn to_rule_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    fn to_rule_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         RuleContext {
             feature_description: self.description.clone(),
@@ -1047,9 +1047,9 @@ where
         }
     }
 
-    fn to_scenario_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
+    fn to_scenario_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         ScenarioContext {
             feature_description: self.description.clone(),
@@ -1147,14 +1147,14 @@ where
         }
     }
 
-    pub fn background<FromContext, Background, FeatureBackgroundGivenStepFnImpl>(
+    pub fn background<FromContext, Background, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(BackgroundContext<WorldImpl>) -> Background,
-        Background: FinalizableBackground<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        Background: FinalizableBackground<FeatureBackgroundHookedStepFnImpl, WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_background_ctx();
         let background = from_ctx(ctx);
@@ -1173,14 +1173,14 @@ where
         }
     }
 
-    pub fn rule<FromContext, Rule, FeatureBackgroundGivenStepFnImpl>(
+    pub fn rule<FromContext, Rule, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_rule_ctx();
         let rule = from_ctx(ctx);
@@ -1202,14 +1202,14 @@ where
         }
     }
 
-    pub fn scenario<FromContext, Scenario, FeatureBackgroundGivenStepFnImpl>(
+    pub fn scenario<FromContext, Scenario, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
+        FromContext: FnOnce(ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_scenario_ctx();
         let scenario = from_ctx(ctx);
@@ -1238,9 +1238,9 @@ where
         }
     }
 
-    fn to_rule_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    fn to_rule_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         RuleContext {
             feature_description: self.description.clone(),
@@ -1256,9 +1256,9 @@ where
         }
     }
 
-    fn to_scenario_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
+    fn to_scenario_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         ScenarioContext {
             feature_description: self.description.clone(),
@@ -1356,14 +1356,14 @@ where
         }
     }
 
-    pub fn background<FromContext, Background, FeatureBackgroundGivenStepFnImpl>(
+    pub fn background<FromContext, Background, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(BackgroundContext<WorldImpl>) -> Background,
-        Background: FinalizableBackground<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        Background: FinalizableBackground<FeatureBackgroundHookedStepFnImpl, WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_background_ctx();
         let background = from_ctx(ctx);
@@ -1382,14 +1382,14 @@ where
         }
     }
 
-    pub fn rule<FromContext, Rule, FeatureBackgroundGivenStepFnImpl>(
+    pub fn rule<FromContext, Rule, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_rule_ctx();
         let rule = from_ctx(ctx);
@@ -1411,14 +1411,14 @@ where
         }
     }
 
-    pub fn scenario<FromContext, Scenario, FeatureBackgroundGivenStepFnImpl>(
+    pub fn scenario<FromContext, Scenario, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
+        FromContext: FnOnce(ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_scenario_ctx();
         let scenario = from_ctx(ctx);
@@ -1447,9 +1447,9 @@ where
         }
     }
 
-    fn to_rule_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    fn to_rule_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         RuleContext {
             feature_description: self.description.clone(),
@@ -1465,9 +1465,9 @@ where
         }
     }
 
-    fn to_scenario_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
+    fn to_scenario_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         ScenarioContext {
             feature_description: self.description.clone(),
@@ -1553,14 +1553,14 @@ where
         }
     }
 
-    pub fn background<FromContext, Background, FeatureBackgroundGivenStepFnImpl>(
+    pub fn background<FromContext, Background, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithBackgroundLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
         FromContext: FnOnce(BackgroundContext<WorldImpl>) -> Background,
-        Background: FinalizableBackground<FeatureBackgroundGivenStepFnImpl, WorldImpl>,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        Background: FinalizableBackground<FeatureBackgroundHookedStepFnImpl, WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_background_ctx();
         let background = from_ctx(ctx);
@@ -1579,14 +1579,14 @@ where
         }
     }
 
-    pub fn rule<FromContext, Rule, FeatureBackgroundGivenStepFnImpl>(
+    pub fn rule<FromContext, Rule, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_rule_ctx();
         let rule = from_ctx(ctx);
@@ -1608,14 +1608,14 @@ where
         }
     }
 
-    pub fn scenario<FromContext, Scenario, FeatureBackgroundGivenStepFnImpl>(
+    pub fn scenario<FromContext, Scenario, FeatureBackgroundHookedStepFnImpl>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
+        FromContext: FnOnce(ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         let ctx = self.to_scenario_ctx();
         let scenario = from_ctx(ctx);
@@ -1644,9 +1644,9 @@ where
         }
     }
 
-    fn to_rule_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    fn to_rule_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         RuleContext {
             feature_description: self.description.clone(),
@@ -1662,9 +1662,9 @@ where
         }
     }
 
-    fn to_scenario_ctx<FeatureBackgroundGivenStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
+    fn to_scenario_ctx<FeatureBackgroundHookedStepFnImpl>(&self) -> ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>
     where
-        FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     {
         ScenarioContext {
             feature_description: self.description.clone(),
@@ -1683,7 +1683,7 @@ where
     }
 }
 
-pub struct FeatureWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl> {
+pub struct FeatureWithBackgroundLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
     tags: Tags,
@@ -1693,20 +1693,20 @@ pub struct FeatureWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl,
     before_step_hooks: Hooks<WorldImpl>,
     after_step_hooks: Hooks<WorldImpl>,
 
-    background: Option<BackgroundPayload<FeatureBackgroundGivenStepFnImpl, WorldImpl>>,
+    background: Option<BackgroundPayload<FeatureBackgroundHookedStepFnImpl, WorldImpl>>,
 }
 
-impl<FeatureBackgroundGivenStepFnImpl, WorldImpl> FeatureWithBackgroundLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+impl<FeatureBackgroundHookedStepFnImpl, WorldImpl> FeatureWithBackgroundLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn rule<FromContext, Rule>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
     {
         let ctx = self.to_rule_ctx();
@@ -1732,9 +1732,9 @@ where
     pub fn scenario<FromContext, Scenario>(
         self,
         from_ctx: FromContext,
-    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+    ) -> FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
     where
-        FromContext: FnOnce(ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
+        FromContext: FnOnce(ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
     {
         let ctx = self.to_scenario_ctx();
@@ -1757,7 +1757,7 @@ where
         }
     }
 
-    fn to_rule_ctx(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl> {
+    fn to_rule_ctx(&self) -> RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl> {
         RuleContext {
             feature_description: self.description.clone(),
             ignored: self.ignored,
@@ -1772,7 +1772,7 @@ where
         }
     }
 
-    fn to_scenario_ctx(&self) -> ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl> {
+    fn to_scenario_ctx(&self) -> ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl> {
         ScenarioContext {
             feature_description: self.description.clone(),
             rule_description: None,
@@ -1790,7 +1790,7 @@ where
     }
 }
 
-pub struct FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl> {
+pub struct FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
     tags: Tags,
@@ -1800,15 +1800,15 @@ pub struct FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnI
     before_step_hooks: Hooks<WorldImpl>,
     after_step_hooks: Hooks<WorldImpl>,
 
-    background: Option<BackgroundPayload<FeatureBackgroundGivenStepFnImpl, WorldImpl>>,
+    background: Option<BackgroundPayload<FeatureBackgroundHookedStepFnImpl, WorldImpl>>,
 
     trials: Vec<libtest::Trial>,
 }
 
-impl<FeatureBackgroundGivenStepFnImpl, WorldImpl>
-    FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundGivenStepFnImpl, WorldImpl>
+impl<FeatureBackgroundHookedStepFnImpl, WorldImpl>
+    FeatureWithRuleOrScenarioLastConfigured<FeatureBackgroundHookedStepFnImpl, WorldImpl>
 where
-    FeatureBackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn rule<FromContext, Rule>(
@@ -1816,7 +1816,7 @@ where
         from_ctx: FromContext,
     ) -> Self
     where
-        FromContext: FnOnce(RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl>) -> Rule,
+        FromContext: FnOnce(RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl>) -> Rule,
         Rule: FinalizableRule,
     {
         let ctx = self.to_rule_ctx();
@@ -1836,7 +1836,7 @@ where
         from_ctx: FromContext,
     ) -> Self
     where
-        FromContext: FnOnce(ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
+        FromContext: FnOnce(ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl>) -> Scenario,
         Scenario: FinalizableScenario,
     {
         let ctx = self.to_scenario_ctx();
@@ -1851,7 +1851,7 @@ where
         }
     }
 
-    fn to_rule_ctx(&self) -> RuleContext<FeatureBackgroundGivenStepFnImpl, WorldImpl> {
+    fn to_rule_ctx(&self) -> RuleContext<FeatureBackgroundHookedStepFnImpl, WorldImpl> {
         RuleContext {
             feature_description: self.description.clone(),
             ignored: self.ignored,
@@ -1866,7 +1866,7 @@ where
         }
     }
 
-    fn to_scenario_ctx(&self) -> ScenarioContext<FeatureBackgroundGivenStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl> {
+    fn to_scenario_ctx(&self) -> ScenarioContext<FeatureBackgroundHookedStepFnImpl, NoOpGivenStepFn<WorldImpl>, WorldImpl> {
         ScenarioContext {
             feature_description: self.description.clone(),
             rule_description: None,
@@ -1892,10 +1892,10 @@ where
 {
 }
 
-impl<BackgroundGivenStepFnImpl, WorldImpl>
-    From<FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>> for Vec<libtest::Trial>
+impl<BackgroundHookedStepFnImpl, WorldImpl>
+    From<FeatureWithRuleOrScenarioLastConfigured<BackgroundHookedStepFnImpl, WorldImpl>> for Vec<libtest::Trial>
 {
-    fn from(feature: FeatureWithRuleOrScenarioLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>) -> Self {
+    fn from(feature: FeatureWithRuleOrScenarioLastConfigured<BackgroundHookedStepFnImpl, WorldImpl>) -> Self {
         feature.trials
     }
 }

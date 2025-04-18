@@ -85,7 +85,7 @@ where
             description: self.description,
             ignored: None,
 
-            given_steps: ReusableHookedSteps::from(step),
+            steps: ReusableHookedSteps::from(step),
 
             ctx: self.ctx,
         }
@@ -120,25 +120,25 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: ReusableHookedSteps::from(step),
+            steps: ReusableHookedSteps::from(step),
 
             ctx: self.ctx,
         }
     }
 }
 
-pub struct BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl> {
+pub struct BackgroundWithGivenStepsLastConfigured<HookedStepFnImpl, WorldImpl> {
     description: Option<MaybeOwnedStr>,
     ignored: Option<bool>,
 
-    given_steps: ReusableHookedSteps<BackgroundGivenStepFnImpl>,
+    steps: ReusableHookedSteps<HookedStepFnImpl>,
 
     ctx: BackgroundContext<WorldImpl>,
 }
 
-impl<BackgroundGivenStepFnImpl, WorldImpl> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
+impl<HookedStepFnImpl, WorldImpl> BackgroundWithGivenStepsLastConfigured<HookedStepFnImpl, WorldImpl>
 where
-    BackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    HookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn and(
@@ -158,7 +158,7 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain(step),
+            steps: self.steps.chain(step),
 
             ctx: self.ctx,
         }
@@ -181,36 +181,36 @@ where
             description: self.description,
             ignored: self.ignored,
 
-            given_steps: self.given_steps.chain(step),
+            steps: self.steps.chain(step),
 
             ctx: self.ctx,
         }
     }
 }
 
-pub trait FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl>:
-    Into<BackgroundPayload<BackgroundGivenStepFnImpl, WorldImpl>>
+pub trait FinalizableBackground<HookedStepFnImpl, WorldImpl>:
+    Into<BackgroundPayload<HookedStepFnImpl, WorldImpl>>
 {
 }
 
-impl<T, BackgroundGivenStepFnImpl, WorldImpl> FinalizableBackground<BackgroundGivenStepFnImpl, WorldImpl> for T where
-    T: Into<BackgroundPayload<BackgroundGivenStepFnImpl, WorldImpl>>
+impl<T, HookedStepFnImpl, WorldImpl> FinalizableBackground<HookedStepFnImpl, WorldImpl> for T where
+    T: Into<BackgroundPayload<HookedStepFnImpl, WorldImpl>>
 {
 }
 
-impl<BackgroundGivenStepFnImpl, WorldImpl>
-    From<BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>>
-    for BackgroundPayload<BackgroundGivenStepFnImpl, WorldImpl>
+impl<HookedStepFnImpl, WorldImpl>
+    From<BackgroundWithGivenStepsLastConfigured<HookedStepFnImpl, WorldImpl>>
+    for BackgroundPayload<HookedStepFnImpl, WorldImpl>
 where
-    BackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
+    HookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    fn from(background: BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>) -> Self {
+    fn from(background: BackgroundWithGivenStepsLastConfigured<HookedStepFnImpl, WorldImpl>) -> Self {
         Self {
             description: background.description,
             ignored: background.ignored,
 
-            given_steps_callback: Arc::new(background.given_steps.callback),
+            steps_callback: Arc::new(background.steps.callback),
 
             phantom: PhantomData,
         }
@@ -246,22 +246,22 @@ where
     }
 }
 
-pub struct BackgroundPayload<BackgroundGivenStepFnImpl, WorldImpl> {
+pub struct BackgroundPayload<HookedStepFnImpl, WorldImpl> {
     pub(super) description: Option<MaybeOwnedStr>,
     pub(super) ignored: Option<bool>,
 
-    pub(super) given_steps_callback: Arc<BackgroundGivenStepFnImpl>,
+    pub(super) steps_callback: Arc<HookedStepFnImpl>,
 
     phantom: PhantomData<WorldImpl>,
 }
 
-impl<BackgroundGivenStepFnImpl, WorldImpl> Clone for BackgroundPayload<BackgroundGivenStepFnImpl, WorldImpl> {
+impl<HookedStepFnImpl, WorldImpl> Clone for BackgroundPayload<HookedStepFnImpl, WorldImpl> {
     fn clone(&self) -> Self {
         Self {
             description: self.description.clone(),
             ignored: self.ignored,
 
-            given_steps_callback: self.given_steps_callback.clone(),
+            steps_callback: self.steps_callback.clone(),
 
             phantom: PhantomData,
         }
