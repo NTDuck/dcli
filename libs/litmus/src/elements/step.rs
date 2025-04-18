@@ -1,7 +1,5 @@
 use crate::elements::World;
-use crate::utils::aliases::{Arc, MaybeOwnedStr};
-
-use super::HookFn;
+use crate::utils::aliases::MaybeOwnedStr;
 
 pub(super) struct ReusableHookedSteps<StepFnImpl> {
     pub(super) metas: Vec<StepMeta>,
@@ -137,18 +135,6 @@ pub(super) enum StepLabel {
 pub trait ReusableGivenStepFn<WorldImpl>:
     Fn(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static
 {
-    fn chain(self, other: impl ReusableGivenStepFn<WorldImpl>) -> impl ReusableGivenStepFn<WorldImpl>
-    where
-        Self: Sized,
-        WorldImpl: World,
-    {
-        move |world| {
-            (self)(world)?;
-            (other)(world)?;
-
-            Ok(())
-        }
-    }
 }
 
 impl<T, WorldImpl> ReusableGivenStepFn<WorldImpl> for T
@@ -161,18 +147,6 @@ where
 pub trait ReusableWhenStepFn<WorldImpl>:
     Fn(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static
 {
-    fn chain(self, other: impl ReusableWhenStepFn<WorldImpl>) -> impl ReusableWhenStepFn<WorldImpl>
-    where
-        Self: Sized,
-        WorldImpl: World,
-    {
-        move |world| {
-            (self)(world)?;
-            (other)(world)?;
-
-            Ok(())
-        }
-    }
 }
 
 impl<T, WorldImpl> ReusableWhenStepFn<WorldImpl> for T
@@ -185,18 +159,6 @@ where
 pub trait ReusableThenStepFn<WorldImpl>:
     Fn(&WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static
 {
-    fn chain(self, other: impl ReusableThenStepFn<WorldImpl>) -> impl ReusableThenStepFn<WorldImpl>
-    where
-        Self: Sized,
-        WorldImpl: World,
-    {
-        move |world| {
-            (self)(world)?;
-            (other)(world)?;
-
-            Ok(())
-        }
-    }
 }
 
 impl<T, WorldImpl> ReusableThenStepFn<WorldImpl> for T
@@ -209,44 +171,6 @@ where
 pub trait GivenStepFn<WorldImpl>:
     FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static
 {
-    fn chain(self, other: impl GivenStepFn<WorldImpl>) -> impl GivenStepFn<WorldImpl>
-    where
-        Self: Sized,
-        WorldImpl: World,
-    {
-        move |world| {
-            (self)(world)?;
-            (other)(world)?;
-
-            Ok(())
-        }
-    }
-
-    fn chain_before(self, hook: Arc<dyn HookFn<WorldImpl>>) -> impl GivenStepFn<WorldImpl>
-    where
-        Self: Sized,
-        WorldImpl: World,
-    {
-        move |world| {
-            (hook)(world);
-            (self)(world)?;
-
-            Ok(())
-        }
-    }
-
-    fn chain_after(self, hook: Arc<dyn HookFn<WorldImpl>>) -> impl GivenStepFn<WorldImpl>
-    where
-        Self: Sized,
-        WorldImpl: World,
-    {
-        move |world| {
-            let result = (self)(world);
-            (hook)(world);
-
-            result
-        }
-    }
 }
 
 impl<T, WorldImpl> GivenStepFn<WorldImpl> for T
@@ -259,18 +183,6 @@ where
 pub trait WhenStepFn<WorldImpl>:
     FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static
 {
-    fn chain(self, other: impl WhenStepFn<WorldImpl>) -> impl WhenStepFn<WorldImpl>
-    where
-        Self: Sized,
-        WorldImpl: World,
-    {
-        move |world| {
-            (self)(world)?;
-            (other)(world)?;
-
-            Ok(())
-        }
-    }
 }
 
 impl<T, WorldImpl> WhenStepFn<WorldImpl> for T
@@ -283,18 +195,6 @@ where
 pub trait ThenStepFn<WorldImpl>:
     FnOnce(&WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static
 {
-    fn chain(self, other: impl ThenStepFn<WorldImpl>) -> impl ThenStepFn<WorldImpl>
-    where
-        Self: Sized,
-        WorldImpl: World,
-    {
-        move |world| {
-            (self)(world)?;
-            (other)(world)?;
-
-            Ok(())
-        }
-    }
 }
 
 impl<T, WorldImpl> ThenStepFn<WorldImpl> for T
