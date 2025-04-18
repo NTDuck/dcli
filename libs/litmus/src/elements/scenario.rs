@@ -6,9 +6,6 @@ use crate::elements::ThenStepFn;
 use crate::elements::WhenStepFn;
 use crate::elements::Step;
 use crate::elements::StepLabel;
-use crate::elements::GivenSteps;
-use crate::elements::WhenSteps;
-use crate::elements::ThenSteps;
 use crate::elements::World;
 use crate::utils::aliases::Arc;
 use crate::utils::aliases::MaybeOwnedStr;
@@ -93,16 +90,18 @@ where
     {
         let scenario_ignored = ignored.into();
 
+        let ctx = ScenarioContext {
+            ignored: Some(match self.ctx.ignored {
+                Some(feature_or_rule_ignored) => feature_or_rule_ignored || scenario_ignored,
+                None => scenario_ignored,
+            }),
+            ..self.ctx
+        };
+
         ScenarioWithIgnoredLastConfigured {
             description: self.description,
 
-            ctx: ScenarioContext {
-                ignored: Some(match self.ctx.ignored {
-                    Some(feature_or_rule_ignored) => feature_or_rule_ignored || scenario_ignored,
-                    None => scenario_ignored,
-                }),
-                ..self.ctx
-            },
+            ctx,
         }
     }
 
@@ -112,13 +111,16 @@ where
     {
         let scenario_tags = Tags::from_iter(tags);
 
+        let ctx = ScenarioContext {
+            tags: self.ctx.tags.union(scenario_tags),
+            ..self.ctx
+        };
+        let ctx = ctx.resolve();
+
         ScenarioWithTagLastConfigured {
             description: self.description,
 
-            ctx: ScenarioContext {
-                tags: self.ctx.tags.union(scenario_tags),
-                ..self.ctx
-            }.resolve(),
+            ctx,
         }
     }
 
@@ -127,13 +129,14 @@ where
         description: impl Into<MaybeOwnedStr>,
         callback: impl GivenStepFn<WorldImpl>,
     ) -> ScenarioWithGivenStepsLastConfigured<
-        impl GivenStepFn<WorldImpl>,
+        impl HookedStepFn<WorldImpl>,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
     {
-        let callback = self.hook_given_step(callback);
+        let ctx = self.ctx.resolve();
+        let callback = ctx.hook_given_step(callback);
 
         let step = Step {
             label: StepLabel::Given,
@@ -144,31 +147,9 @@ where
         ScenarioWithGivenStepsLastConfigured {
             description: self.description,
 
-            steps: GivenSteps::from(step),
+            steps: HookedSteps::from(step),
 
-            ctx: 
-        }
-    }
-
-    fn hook_given_step(ctx: &ResolvedScenarioContext<FeatureBackgroundHookedStepFnImpl, RuleBackgroundHookedStepFnImpl, WorldImpl>, callback: impl GivenStepFn<WorldImpl>) -> impl GivenStepFn<WorldImpl>
-    where
-        WorldImpl: World,
-    {
-        let before_step_hooks_callback = ctx.before_step_hooks_callback.clone();
-        let after_step_hooks_callback = ctx.after_step_hooks_callback.clone();
-
-        move |world| {
-            before_step_hooks_callback
-                .as_ref()
-                .map(|hook| (hook)(world));
-
-            let result = (callback)(world);
-            
-            after_step_hooks_callback
-                .as_ref()
-                .map(|hook| (hook)(world));
-
-            result
+            ctx,
         }
     }
 }
@@ -191,13 +172,18 @@ where
     where
         U: Into<Tag>,
     {
+        let scenario_tags = Tags::from_iter(tags);
+
+        let ctx = ScenarioContext {
+            tags: self.ctx.tags.union(scenario_tags),
+            ..self.ctx
+        };
+        let ctx = ctx.resolve();
+
         ScenarioWithTagLastConfigured {
             description: self.description,
-            ignored: self.ignored,
-            tags: Tags::from_iter(tags),
 
-            feature: self.feature,
-            rule: self.rule,
+            ctx,
         }
     }
 
@@ -206,13 +192,14 @@ where
         description: impl Into<MaybeOwnedStr>,
         callback: impl GivenStepFn<WorldImpl>,
     ) -> ScenarioWithGivenStepsLastConfigured<
-        impl GivenStepFn<WorldImpl>,
+        impl HookedStepFn<WorldImpl>,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
     {
-        let callback = self.hook_given_step(callback);
+        let ctx = self.ctx.resolve();
+        let callback = ctx.hook_given_step(callback);
 
         let step = Step {
             label: StepLabel::Given,
@@ -222,36 +209,11 @@ where
 
         ScenarioWithGivenStepsLastConfigured {
             description: self.description,
-            ignored: self.ignored,
-            tags: Tags::default(),
 
-            steps: GivenSteps::from(step),
+            steps: HookedSteps::from(step),
 
-            feature: self.feature,
-            rule: self.rule,
+            ctx,
         }
-    }
-
-    fn hook_given_step(&self, callback: impl GivenStepFn<WorldImpl>) -> impl GivenStepFn<WorldImpl>
-    where
-        WorldImpl: World,
-    {
-        let before_step_hooks_callback = self.feature.before_step_hooks.to_callback(self.tags());
-        let after_step_hooks_callback = self.feature.after_step_hooks.to_callback(self.tags());
-
-        move |world| {
-            (before_step_hooks_callback)(world);
-            let result = (callback)(world);
-            (after_step_hooks_callback)(world);
-
-            result
-        }
-    }
-
-    fn tags(&self) -> impl Iterator<Item = &Tag> {
-        self.feature.tags.iter()
-            .chain(self.rule.iter()
-                .flat_map(|rule| rule.tags.iter()))
     }
 }
 
@@ -267,19 +229,19 @@ where
     RuleBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn given<ScenarioGivenStepFnImpl>(
+    pub fn given(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: ScenarioGivenStepFnImpl,
+        callback: impl GivenStepFn<WorldImpl>,
     ) -> ScenarioWithGivenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
+        impl HookedStepFn<WorldImpl>,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
-    where
-        ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
+        let callback = self.ctx.hook_given_step(callback);
+
         let step = Step {
             label: StepLabel::Given,
             description: description.into(),
@@ -288,37 +250,11 @@ where
 
         ScenarioWithGivenStepsLastConfigured {
             description: self.description,
-            ignored: self.ignored,
-            tags: self.tags,
 
-            steps: GivenSteps::from(step),
+            steps: HookedSteps::from(step),
 
-            feature: self.feature,
-            rule: self.rule,
+            ctx: self.ctx,
         }
-    }
-
-    fn hook_given_step(&self, callback: impl GivenStepFn<WorldImpl>) -> impl GivenStepFn<WorldImpl>
-    where
-        WorldImpl: World,
-    {
-        let before_step_hooks_callback = self.feature.before_step_hooks.to_callback(self.tags());
-        let after_step_hooks_callback = self.feature.after_step_hooks.to_callback(self.tags());
-
-        move |world| {
-            (before_step_hooks_callback)(world);
-            let result = (callback)(world);
-            (after_step_hooks_callback)(world);
-
-            result
-        }
-    }
-
-    fn tags(&self) -> impl Iterator<Item = &Tag> {
-        self.tags.iter()
-            .chain(self.feature.tags.iter())
-            .chain(self.rule.iter()
-                .flat_map(|rule| rule.tags.iter()))
     }
 }
 
@@ -334,32 +270,32 @@ pub struct ScenarioWithGivenStepsLastConfigured<
     ctx: ResolvedScenarioContext<FeatureBackgroundHookedStepFnImpl, RuleBackgroundHookedStepFnImpl, WorldImpl>,
 }
 
-impl<ScenarioGivenStepFnImpl, FeatureBackgroundHookedStepFnImpl, RuleBackgroundHookedStepFnImpl, WorldImpl>
+impl<ScenarioHookedStepFnImpl, FeatureBackgroundHookedStepFnImpl, RuleBackgroundHookedStepFnImpl, WorldImpl>
     ScenarioWithGivenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
+        ScenarioHookedStepFnImpl,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
 where
-    ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
+    ScenarioHookedStepFnImpl: HookedStepFn<WorldImpl>,
     FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     RuleBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and<OtherScenarioGivenStepFnImpl>(
+    pub fn and(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: OtherScenarioGivenStepFnImpl,
+        callback: impl GivenStepFn<WorldImpl>,
     ) -> ScenarioWithGivenStepsLastConfigured<
-        impl GivenStepFn<WorldImpl>,
+        impl HookedStepFn<WorldImpl>,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
-    where
-        OtherScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
+        let callback = self.ctx.hook_given_step(callback);
+
         let step = Step {
             label: StepLabel::And,
             description: description.into(),
@@ -368,29 +304,25 @@ where
 
         ScenarioWithGivenStepsLastConfigured {
             description: self.description,
-            ignored: self.ignored,
-            tags: self.tags,
-
             steps: self.steps.chain(step),
 
-            feature: self.feature,
-            rule: self.rule,
+            ctx: self.ctx,
         }
     }
 
-    pub fn but<OtherScenarioGivenStepFnImpl>(
+    pub fn but(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: OtherScenarioGivenStepFnImpl,
+        callback: impl GivenStepFn<WorldImpl>,
     ) -> ScenarioWithGivenStepsLastConfigured<
-        impl GivenStepFn<WorldImpl>,
+        impl HookedStepFn<WorldImpl>,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
-    where
-        OtherScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
     {
+        let callback = self.ctx.hook_given_step(callback);
+
         let step = Step {
             label: StepLabel::But,
             description: description.into(),
@@ -399,30 +331,25 @@ where
 
         ScenarioWithGivenStepsLastConfigured {
             description: self.description,
-            ignored: self.ignored,
-            tags: self.tags,
-
             steps: self.steps.chain(step),
 
-            feature: self.feature,
-            rule: self.rule,
+            ctx: self.ctx,
         }
     }
 
-    pub fn when<ScenarioWhenStepFnImpl>(
+    pub fn when(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: ScenarioWhenStepFnImpl,
+        callback: impl WhenStepFn<WorldImpl>,
     ) -> ScenarioWithWhenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        ScenarioWhenStepFnImpl,
+        impl HookedStepFn<WorldImpl>,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
-    where
-        ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
     {
+        let callback = self.ctx.hook_when_step(callback);
+
         let step = Step {
             label: StepLabel::When,
             description: description.into(),
@@ -431,14 +358,9 @@ where
 
         ScenarioWithWhenStepsLastConfigured {
             description: self.description,
-            ignored: self.ignored,
-            tags: self.tags,
+            steps: self.steps.chain(step),
 
-            given_steps: self.steps,
-            when_steps: WhenSteps::from(step),
-
-            feature: self.feature,
-            rule: self.rule,
+            ctx: self.ctx,
         }
     }
 }
@@ -456,40 +378,36 @@ pub struct ScenarioWithWhenStepsLastConfigured<
 }
 
 impl<
-        ScenarioGivenStepFnImpl,
-        ScenarioWhenStepFnImpl,
+        ScenarioHookedStepFnImpl,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
     ScenarioWithWhenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        ScenarioWhenStepFnImpl,
+        ScenarioHookedStepFnImpl,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
 where
-    ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
-    ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
+    ScenarioHookedStepFnImpl: HookedStepFn<WorldImpl>,
     FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     RuleBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and<OtherScenarioWhenStepFnImpl>(
+    pub fn and(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: OtherScenarioWhenStepFnImpl,
+        callback: impl WhenStepFn<WorldImpl>,
     ) -> ScenarioWithWhenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        impl WhenStepFn<WorldImpl>,
+        impl HookedStepFn<WorldImpl>,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
-    where
-        OtherScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
     {
+        let callback = self.ctx.hook_when_step(callback);
+
         let step = Step {
             label: StepLabel::And,
             description: description.into(),
@@ -498,31 +416,25 @@ where
 
         ScenarioWithWhenStepsLastConfigured {
             description: self.description,
-            ignored: self.ignored,
-            tags: self.tags,
+            steps: self.steps.chain(step),
 
-            given_steps: self.given_steps,
-            when_steps: self.when_steps.chain(step),
-
-            feature: self.feature,
-            rule: self.rule,
+            ctx: self.ctx,
         }
     }
 
-    pub fn but<OtherScenarioWhenStepFnImpl>(
+    pub fn but(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: OtherScenarioWhenStepFnImpl,
+        callback: impl WhenStepFn<WorldImpl>,
     ) -> ScenarioWithWhenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        impl WhenStepFn<WorldImpl>,
+        impl HookedStepFn<WorldImpl>,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
-    where
-        OtherScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
     {
+        let callback = self.ctx.hook_when_step(callback);
+
         let step = Step {
             label: StepLabel::But,
             description: description.into(),
@@ -531,32 +443,25 @@ where
 
         ScenarioWithWhenStepsLastConfigured {
             description: self.description,
-            ignored: self.ignored,
-            tags: self.tags,
+            steps: self.steps.chain(step),
 
-            given_steps: self.given_steps,
-            when_steps: self.when_steps.chain(step),
-
-            feature: self.feature,
-            rule: self.rule,
+            ctx: self.ctx,
         }
     }
 
-    pub fn then<ScenarioThenStepFnImpl>(
+    pub fn then(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: ScenarioThenStepFnImpl,
+        callback: impl ThenStepFn<WorldImpl>,
     ) -> ScenarioWithThenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        ScenarioWhenStepFnImpl,
-        ScenarioThenStepFnImpl,
+        impl HookedStepFn<WorldImpl>,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
-    where
-        ScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
     {
+        let callback = self.ctx.hook_then_step(callback);
+
         let step = Step {
             label: StepLabel::Then,
             description: description.into(),
@@ -565,15 +470,9 @@ where
 
         ScenarioWithThenStepsLastConfigured {
             description: self.description,
-            ignored: self.ignored,
-            tags: self.tags,
+            steps: self.steps.chain(step),
 
-            given_steps: self.given_steps,
-            when_steps: self.when_steps,
-            then_steps: ThenSteps::from(step),
-
-            feature: self.feature,
-            rule: self.rule,
+            ctx: self.ctx,
         }
     }
 }
@@ -591,44 +490,36 @@ pub struct ScenarioWithThenStepsLastConfigured<
 }
 
 impl<
-        ScenarioGivenStepFnImpl,
-        ScenarioWhenStepFnImpl,
-        ScenarioThenStepFnImpl,
+        ScenarioHookedStepFnImpl,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
     ScenarioWithThenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        ScenarioWhenStepFnImpl,
-        ScenarioThenStepFnImpl,
+        ScenarioHookedStepFnImpl,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
 where
-    ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
-    ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
-    ScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
+    ScenarioHookedStepFnImpl: HookedStepFn<WorldImpl>,
     FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     RuleBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
-    pub fn and<OtherScenarioThenStepFnImpl>(
+    pub fn and(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: OtherScenarioThenStepFnImpl,
+        callback: impl ThenStepFn<WorldImpl>,
     ) -> ScenarioWithThenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        ScenarioWhenStepFnImpl,
-        impl ThenStepFn<WorldImpl>,
+        impl HookedStepFn<WorldImpl>,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
-    where
-        OtherScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
     {
+        let callback = self.ctx.hook_then_step(callback);
+
         let step = Step {
             label: StepLabel::And,
             description: description.into(),
@@ -637,33 +528,25 @@ where
 
         ScenarioWithThenStepsLastConfigured {
             description: self.description,
-            ignored: self.ignored,
-            tags: self.tags,
+            steps: self.steps.chain(step),
 
-            given_steps: self.given_steps,
-            when_steps: self.when_steps,
-            then_steps: self.then_steps.chain(step),
-
-            feature: self.feature,
-            rule: self.rule,
+            ctx: self.ctx,
         }
     }
 
-    pub fn but<OtherScenarioThenStepFnImpl>(
+    pub fn but(
         self,
         description: impl Into<MaybeOwnedStr>,
-        callback: OtherScenarioThenStepFnImpl,
+        callback: impl ThenStepFn<WorldImpl>,
     ) -> ScenarioWithThenStepsLastConfigured<
-        ScenarioGivenStepFnImpl,
-        ScenarioWhenStepFnImpl,
-        impl ThenStepFn<WorldImpl>,
+        impl HookedStepFn<WorldImpl>,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
-    where
-        OtherScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
     {
+        let callback = self.ctx.hook_then_step(callback);
+
         let step = Step {
             label: StepLabel::But,
             description: description.into(),
@@ -672,15 +555,9 @@ where
 
         ScenarioWithThenStepsLastConfigured {
             description: self.description,
-            ignored: self.ignored,
-            tags: self.tags,
+            steps: self.steps.chain(step),
 
-            given_steps: self.given_steps,
-            when_steps: self.when_steps,
-            then_steps: self.then_steps.chain(step),
-
-            feature: self.feature,
-            rule: self.rule,
+            ctx: self.ctx,
         }
     }
 }
@@ -690,36 +567,28 @@ pub trait FinalizableScenario: Into<libtest::Trial> {}
 impl<T> FinalizableScenario for T where T: Into<libtest::Trial> {}
 
 impl<
-        ScenarioGivenStepFnImpl,
-        ScenarioWhenStepFnImpl,
-        ScenarioThenStepFnImpl,
+        ScenarioHookedStepFnImpl,
         FeatureBackgroundHookedStepFnImpl,
         RuleBackgroundHookedStepFnImpl,
         WorldImpl,
     >
     From<
         ScenarioWithThenStepsLastConfigured<
-            ScenarioGivenStepFnImpl,
-            ScenarioWhenStepFnImpl,
-            ScenarioThenStepFnImpl,
+            ScenarioHookedStepFnImpl,
             FeatureBackgroundHookedStepFnImpl,
             RuleBackgroundHookedStepFnImpl,
             WorldImpl,
         >,
     > for libtest::Trial
 where
-    ScenarioGivenStepFnImpl: GivenStepFn<WorldImpl>,
-    ScenarioWhenStepFnImpl: WhenStepFn<WorldImpl>,
-    ScenarioThenStepFnImpl: ThenStepFn<WorldImpl>,
+    ScenarioHookedStepFnImpl: HookedStepFn<WorldImpl>,
     FeatureBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     RuleBackgroundHookedStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(
         scenario: ScenarioWithThenStepsLastConfigured<
-            ScenarioGivenStepFnImpl,
-            ScenarioWhenStepFnImpl,
-            ScenarioThenStepFnImpl,
+            ScenarioHookedStepFnImpl,
             FeatureBackgroundHookedStepFnImpl,
             RuleBackgroundHookedStepFnImpl,
             WorldImpl,
@@ -727,14 +596,9 @@ where
     ) -> Self {
         let description = match scenario.description {
             Some(description) => description,
-            None => format!("{} | {} | {}", scenario.given_steps, scenario.when_steps, scenario.then_steps).into(),
+            None => format!("{}", scenario.steps).into(),
         };
 
-        let ignored = scenario.feature.ignored.unwrap_or(false)
-            || scenario.rule.as_ref().and_then(|rule| rule.ignored).unwrap_or(false)
-            || scenario.ignored.unwrap_or(false);
-
-        // ORDERING WILL NEED TO BE REVIEWED AGAIN !!!
         libtest::Trial::test(description, move || {
             let mut world = WorldImpl::default();
 
