@@ -138,7 +138,7 @@ pub struct BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, Wor
 
 impl<BackgroundGivenStepFnImpl, WorldImpl> BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>
 where
-    BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    BackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     pub fn and(
@@ -202,7 +202,7 @@ impl<BackgroundGivenStepFnImpl, WorldImpl>
     From<BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>>
     for BackgroundPayload<BackgroundGivenStepFnImpl, WorldImpl>
 where
-    BackgroundGivenStepFnImpl: ReusableGivenStepFn<WorldImpl>,
+    BackgroundGivenStepFnImpl: ReusableHookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
     fn from(background: BackgroundWithGivenStepsLastConfigured<BackgroundGivenStepFnImpl, WorldImpl>) -> Self {
