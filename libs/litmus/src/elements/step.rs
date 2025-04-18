@@ -22,7 +22,7 @@ impl<StepFnImpl> ReusableHookedSteps<StepFnImpl> {
         };
         metas.push(meta);
 
-        let callback = self.callback.chain(step.callback);
+        let callback = ReusableHookedStepFnExt::chain(self.callback, step.callback); // Disambiguation required
 
         ReusableHookedSteps { metas, callback }
     }
@@ -207,18 +207,6 @@ where
 pub trait ReusableHookedStepFn<WorldImpl>:
     Fn(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static
 {
-    fn chain(self, other: impl ReusableHookedStepFn<WorldImpl>) -> impl ReusableHookedStepFn<WorldImpl>
-    where
-        Self: Sized,
-        WorldImpl: World,
-    {
-        move |world| {
-            (self)(world)?;
-            (other)(world)?;
-
-            Ok(())
-        }
-    }
 }
 
 impl<T, WorldImpl> ReusableHookedStepFn<WorldImpl> for T
@@ -231,7 +219,20 @@ where
 pub trait HookedStepFn<WorldImpl>:
     FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static
 {
-    fn chain(self, other: impl HookedStepFn<WorldImpl>) -> impl HookedStepFn<WorldImpl>
+}
+
+impl<T, WorldImpl> HookedStepFn<WorldImpl> for T
+where
+    T: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static,
+    WorldImpl: World,
+{
+}
+
+trait ReusableHookedStepFnExt<WorldImpl>: ReusableHookedStepFn<WorldImpl>
+where
+    WorldImpl: World,
+{
+    fn chain(self, other: impl ReusableHookedStepFnExt<WorldImpl>) -> impl ReusableHookedStepFnExt<WorldImpl>
     where
         Self: Sized,
         WorldImpl: World,
@@ -245,9 +246,34 @@ pub trait HookedStepFn<WorldImpl>:
     }
 }
 
-impl<T, WorldImpl> HookedStepFn<WorldImpl> for T
+impl<T, WorldImpl> ReusableHookedStepFnExt<WorldImpl> for T
+where 
+    T: ReusableHookedStepFn<WorldImpl>,
+    WorldImpl: World,
+{
+}
+
+trait HookedStepFnExt<WorldImpl>: HookedStepFn<WorldImpl>
 where
-    T: FnOnce(&mut WorldImpl) -> Result<(), libtest::Failed> + Send + Sync + 'static,
+    WorldImpl: World,
+{
+    fn chain(self, other: impl HookedStepFnExt<WorldImpl>) -> impl HookedStepFnExt<WorldImpl>
+    where
+        Self: Sized,
+        WorldImpl: World,
+    {
+        move |world| {
+            (self)(world)?;
+            (other)(world)?;
+
+            Ok(())
+        }
+    }
+}
+
+impl<T, WorldImpl> HookedStepFnExt<WorldImpl> for T
+where 
+    T: HookedStepFn<WorldImpl>,
     WorldImpl: World,
 {
 }
