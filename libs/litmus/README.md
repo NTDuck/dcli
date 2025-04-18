@@ -20,7 +20,7 @@ Add this to your `Cargo.toml`:
 # ./Cargo.toml
 
 [dev-dependencies]
-litmus = "0.3.2"
+litmus = "0.4.0"
 ```
 
 Disable the default harness for your test targets:
