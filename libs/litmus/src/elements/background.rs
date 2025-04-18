@@ -6,7 +6,6 @@ use crate::elements::Step;
 use crate::elements::StepLabel;
 use crate::elements::World;
 use crate::elements::ReusableGivenStepFn;
-use crate::elements::ReusableGivenSteps;
 use crate::utils::aliases::Arc;
 use crate::utils::aliases::MaybeOwnedStr;
 
@@ -86,7 +85,7 @@ where
             description: self.description,
             ignored: None,
 
-            given_steps: ReusableGivenSteps::from(step),
+            given_steps: ReusableHookedSteps::from(step),
 
             ctx: self.ctx,
         }
@@ -169,7 +168,7 @@ where
         self,
         description: impl Into<MaybeOwnedStr>,
         callback: impl ReusableGivenStepFn<WorldImpl>,
-    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableGivenStepFn<WorldImpl>, WorldImpl> {
+    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableHookedStepFn<WorldImpl>, WorldImpl> {
         let callback = self.ctx.hook(callback);
 
         let step = Step {
