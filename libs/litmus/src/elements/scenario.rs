@@ -54,14 +54,73 @@ where
         }
     }
 
-    pub fn unnamed(
+    pub fn ignored(
         self,
-    ) -> ScenarioWithDescriptionLastConfigured<FeatureBackgroundHookedStepFnImpl, RuleBackgroundHookedStepFnImpl, WorldImpl>
+        ignored: impl Into<bool>,
+    ) -> ScenarioWithIgnoredLastConfigured<FeatureBackgroundHookedStepFnImpl, RuleBackgroundHookedStepFnImpl, WorldImpl>
     {
-        ScenarioWithDescriptionLastConfigured {
+        let scenario_ignored = ignored.into();
+
+        let ctx = ScenarioContext {
+            ignored: Some(match self.ctx.ignored {
+                Some(feature_or_rule_ignored) => feature_or_rule_ignored || scenario_ignored,
+                None => scenario_ignored,
+            }),
+            ..self.ctx
+        };
+
+        ScenarioWithIgnoredLastConfigured {
             description: None,
 
-            ctx: self.ctx,
+            ctx,
+        }
+    }
+
+    pub fn tagged<U>(self, tags: impl IntoIterator<Item = U>) -> ScenarioWithTagLastConfigured<FeatureBackgroundHookedStepFnImpl, RuleBackgroundHookedStepFnImpl, WorldImpl>
+    where
+        U: Into<Tag>,
+    {
+        let scenario_tags = Tags::from_iter(tags);
+
+        let ctx = ScenarioContext {
+            tags: self.ctx.tags.union(scenario_tags),
+            ..self.ctx
+        };
+        let ctx = ctx.resolve();
+
+        ScenarioWithTagLastConfigured {
+            description: None,
+
+            ctx,
+        }
+    }
+
+    pub fn given(
+        self,
+        description: impl Into<MaybeOwnedStr>,
+        callback: impl GivenStepFn<WorldImpl>,
+    ) -> ScenarioWithGivenStepsLastConfigured<
+        impl HookedStepFn<WorldImpl>,
+        FeatureBackgroundHookedStepFnImpl,
+        RuleBackgroundHookedStepFnImpl,
+        WorldImpl,
+    >
+    {
+        let ctx = self.ctx.resolve();
+        let callback = ctx.hook_given_step(callback);
+
+        let step = Step {
+            label: StepLabel::Given,
+            description: description.into(),
+            callback,
+        };
+
+        ScenarioWithGivenStepsLastConfigured {
+            description: None,
+
+            steps: HookedSteps::from(step),
+
+            ctx,
         }
     }
 }

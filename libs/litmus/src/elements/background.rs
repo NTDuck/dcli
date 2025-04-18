@@ -40,9 +40,33 @@ where
         }
     }
 
-    pub fn unnamed(self) -> BackgroundWithDescriptionLastConfigured<WorldImpl> {
-        BackgroundWithDescriptionLastConfigured {
+    pub fn ignored(self, ignored: impl Into<bool>) -> BackgroundWithIgnoredLastConfigured<WorldImpl> {
+        BackgroundWithIgnoredLastConfigured {
             description: None,
+            ignored: Some(ignored.into()),
+
+            ctx: self.ctx,
+        }
+    }
+
+    pub fn given(
+        self,
+        description: impl Into<MaybeOwnedStr>,
+        callback: impl ReusableGivenStepFn<WorldImpl>,
+    ) -> BackgroundWithGivenStepsLastConfigured<impl ReusableHookedStepFn<WorldImpl>, WorldImpl> {
+        let callback = self.ctx.hook(callback);
+
+        let step = Step {
+            label: StepLabel::Given,
+            description: description.into(),
+            callback,
+        };
+
+        BackgroundWithGivenStepsLastConfigured {
+            description: None,
+            ignored: None,
+
+            steps: ReusableHookedSteps::from(step),
 
             ctx: self.ctx,
         }

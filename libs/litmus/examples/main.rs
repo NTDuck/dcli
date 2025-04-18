@@ -109,7 +109,6 @@ impl From<RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>> for Vec<
                     .and("a repository with task `MAX - 2`", |world| world.repository.add(usize::MAX - 2).ok()))
 
                 .scenario(|ctx| Scenario::from(ctx)
-                    .unnamed()
                     .given("a populated repository", |_| ok())
                     .when("doing nothing", |_| ok())
                     .then("the repository should contain all populated numbers", |world| {
@@ -123,14 +122,12 @@ impl From<RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>> for Vec<
                     })))
 
             .scenario(|ctx| Scenario::from(ctx)
-                .unnamed()
                 .given("an empty repository", |_| ok())
                 .when("adding 0", |world| world.repository.add(0).ok())
                 .then("the repository should contain 0", |world| world.repository.contains(&0)
                     .expect(true, "expected 0 to be present, found absent")))
 
             .scenario(|ctx| Scenario::from(ctx)
-                .unnamed()
                 .given("a repository containing 0", |world| world.repository.add(0).ok())
                 .and("1", |world| world.repository.add(1).ok())
                 .when("removing 0", |world| world.repository.remove(&0).ok())
