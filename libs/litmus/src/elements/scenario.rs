@@ -594,6 +594,9 @@ where
             WorldImpl,
         >,
     ) -> Self {
+        let _ = scenario.ctx.feature_description;
+        let _ = scenario.ctx.rule_description;
+
         let description = match scenario.description {
             Some(description) => description,
             None => format!("{}", scenario.steps).into(),
@@ -602,42 +605,36 @@ where
         libtest::Trial::test(description, move || {
             let mut world = WorldImpl::default();
 
-            scenario.feature.before_scenario_hooks.untagged
+            scenario.ctx.before_scenario_hooks_callback
+                .as_ref()
+                .map(|hook| (hook)(&mut world));
+            
+            let result = {
+                scenario.ctx.feature_background
+                    .filter(|background| background.ignored.map_or(true, |ignored| !ignored))
+                    .map(|background| (background.steps_callback)(&mut world))
+                    .transpose()?;
+
+                scenario.ctx.rule_background
+                    .filter(|background| background.ignored.map_or(true, |ignored| !ignored))
+                    .map(|background| (background.steps_callback)(&mut world))
+                    .transpose()?;
+
+                (scenario.steps.callback)(&mut world)
+            };
+            
+            scenario.ctx.after_scenario_hooks_callback
+                .as_ref()
                 .map(|hook| (hook)(&mut world));
 
-            scenario.tags.iter()
-                .chain(scenario.feature.tags.iter())
-                .chain(scenario.rule.clone().iter().flat_map(|rule| rule.tags.iter()))
-                .filter_map(|tag| scenario.feature.before_scenario_hooks.tagged.get(tag))
-                .for_each(|hook| hook(&mut world));
-            
-            scenario.feature.background
-                .filter(|background| !background.ignored)
-                .map(|background| (background.given_steps_callback)(&mut world))
-                .transpose()?;
-            
-            scenario.rule.clone()
-                .and_then(|rule| rule.background)
-                .filter(|background| !background.ignored)
-                .map(|background| (background.given_steps_callback)(&mut world))
-                .transpose()?;
-
-            (scenario.given_steps.callback)(&mut world)?;
-            (scenario.when_steps.callback)(&mut world)?;
-            (scenario.then_steps.callback)(&world)?;
-
-            scenario.feature.after_scenario_hooks.untagged
-                .map(|hook| (hook)(&mut world));
-
-            scenario.tags.iter()
-                .chain(scenario.feature.tags.iter())
-                .chain(scenario.rule.iter().flat_map(|rule| rule.tags.iter()))
-                .filter_map(|tag| scenario.feature.after_scenario_hooks.tagged.get(tag))
-                .for_each(|hook| hook(&mut world));
-
-            Ok(())
+            result
         })
-            .with_ignored_flag(ignored)
+            .with_ignored_flag(scenario.ctx.ignored.unwrap_or(false))
+            .with_kind(scenario.ctx.tags
+                .iter()
+                .map(|tag| tag.as_ref())
+                .collect::<Vec<_>>()
+                .join(", "))
     }
 }
 

@@ -353,5 +353,3 @@ where
 }
 
 pub(super) type NoOpGivenStepFn<WorldImpl> = fn(&mut WorldImpl) -> Result<(), libtest::Failed>;
-pub(super) type NoOpWhenStepFn<WorldImpl> = fn(&mut WorldImpl) -> Result<(), libtest::Failed>;
-pub(super) type NoOpThenStepFn<WorldImpl> = fn(&WorldImpl) -> Result<(), libtest::Failed>;
