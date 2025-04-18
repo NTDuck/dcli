@@ -1,6 +1,5 @@
 use std::collections::HashSet;
 use std::marker::PhantomData;
-use std::process::ExitCode;
 
 use litmus::elements::Background;
 use litmus::elements::Feature;
@@ -8,10 +7,10 @@ use litmus::elements::Rule;
 use litmus::elements::Scenario;
 use litmus::prelude::*;
 
-pub fn main() -> ExitCode {
+pub fn main() -> std::process::ExitCode {
     type World = RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>;
 
-    litmus::run(World::default()).exit_code()
+    litmus::run(World::default())
 }
 
 pub trait Repository<T> {

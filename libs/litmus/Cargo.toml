@@ -1,6 +1,6 @@
 [package]
 name = "litmus"
-version = "0.4.0"
+version = "0.4.1"
 description = "a macro-free BDD test harness."
 edition.workspace = true
 license.workspace = true
