@@ -90,20 +90,24 @@ impl From<RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>> for Vec<
 
         Feature::<World>::named("Number Repository")
             .ignored(false)
+
             .background(|ctx| Background::from(ctx)
                 .named("No-op background")
                 .ignored(true)
                 .given("foo", |_| ok())
                 .and("bar", |_| ok())
                 .but("baz", |_| ok()))
+
             .rule(|ctx| Rule::from(ctx)
                 .named("Big numbers should work as well")
                 .ignored(true)
+                
                 .background(|ctx| Background::from(ctx)
                     .named("Populate repository with big numbers")
                     .given("a repository with task `MAX`", |world| world.repository.add(usize::MAX).ok())
                     .and("a repository with task `MAX - 1`", |world| world.repository.add(usize::MAX - 1).ok())
                     .and("a repository with task `MAX - 2`", |world| world.repository.add(usize::MAX - 2).ok()))
+
                 .scenario(|ctx| Scenario::from(ctx)
                     .unnamed()
                     .given("a populated repository", |_| ok())
@@ -117,12 +121,14 @@ impl From<RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>> for Vec<
                             .expect(true, "expected `MAX - 2` to be present, found absent")?;
                         Ok(())
                     })))
+
             .scenario(|ctx| Scenario::from(ctx)
                 .unnamed()
                 .given("an empty repository", |_| ok())
                 .when("adding 0", |world| world.repository.add(0).ok())
                 .then("the repository should contain 0", |world| world.repository.contains(&0)
                     .expect(true, "expected 0 to be present, found absent")))
+
             .scenario(|ctx| Scenario::from(ctx)
                 .unnamed()
                 .given("a repository containing 0", |world| world.repository.add(0).ok())
@@ -133,6 +139,7 @@ impl From<RepositoryWorld<usize, InMemoryRepositoryWorldHandle<usize>>> for Vec<
                     .expect(true, "expected 1 to be present, found absent"))
                 .but("not 0", |world| world.repository.contains(&0)
                     .expect(false, "expected 0 to be absent, found present")))
+
             .into()
     }
 }
